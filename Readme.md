@@ -4,6 +4,8 @@ There is the WebAssembly version of [https://github\.com/andrzejlisek/TextPaint]
 
 Now, there is a draft version with lack of some functionality compated than mentioned original TextPaint project\.
 
+Direct link: [https://andrzejlisek\.github\.io/TextPaintWeb/index\.html](https://andrzejlisek.github.io/TextPaintWeb/index.html "https://andrzejlisek.github.io/TextPaintWeb/index.html") 
+
 # Differences
 
 | \.NET version | WebAssembly version \(current state\) |
