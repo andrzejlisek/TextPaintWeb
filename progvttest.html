@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en-us">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8" />
+        <title>TextPaint</title>
+        <script src="coi-serviceworker.js"></script>
+    </head>
+    <body>
+        <script type='text/javascript'>
+    
+            let VTLoaded = false;
+            let VTRunning = false;
+            
+            function VTData(Raw)
+            {
+                if (VTRunning)
+                {
+                    Module.ccall("EventData", null, ["string"], [Raw]);
+                }
+            }
+
+            function VTStart()
+            {
+                Module.ccall("EventStart", null, ["string"], [""]);
+                VTRunning = true;
+            }
+
+            function VTStop()
+            {
+                VTRunning = false;
+                Module.ccall("EventStop", null, null, null);
+            }
+            
+            function VTMsg(Raw)
+            {
+                parent.VTTestData(Raw);
+            }
+    
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+
+      var Module = {
+        print: (function() {
+          return function(text) {
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            console.log(text);
+          };
+        })(),
+        canvas: (() => {
+          var canvas = document.getElementById('canvas');
+          return canvas;
+        })(),
+        setStatus: (text) => {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+
+          if (text == "")
+          {
+            VTLoaded = true;
+          }
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: (left) => {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = (event) => {
+        Module.setStatus('Exception thrown, see JavaScript console');
+        Module.setStatus = (text) => {
+          if (text) console.error('[post-exception status] ' + text);
+        };
+      };
+
+        </script>
+        <script async type="text/javascript" src="progvttest.js"></script>
+    </body>
+</html>

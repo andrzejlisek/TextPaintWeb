@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8" />
+        <title>TextPaint</title>
+        <style>
+        
+        *
+        {
+            box-sizing: border-box;
+        }
+
+        body
+        { 
+            font: 10pt Arial, sans-serif; 
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        div
+        {
+            padding: 0px;
+        }
+
+        /*canvas
+        {  
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }*/
+
+        canvas
+        {
+            image-rendering: optimizeSpeed;             /* Older versions of FF          */
+            image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+            image-rendering: -webkit-optimize-contrast; /* Safari                        */
+            image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+            image-rendering: pixelated;                 /* Awesome future-browsers       */
+            -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+        }
+        </style>
+        <script src="coi-serviceworker.js"></script>
+    </head>
+    <body id="app">
+        <canvas id="Screen" style="width:100vw;height:100vh" onclick=""></canvas>
+
+
+        <div style="background-color:#ffffff;display:none">
+
+
+        <span id="info"></span>
+
+        <br>
+        <hr>
+        <hr>
+    <input type="button" value="ProgEventTick" onclick="ProgEventTick()"><br>
+    <input type="button" value="ProgEventKey" onclick="ProgEventKey()"><br>
+    <input type="button" value="test proc" onclick="ProgTestProc()"><br>
+    <input type="button" value="VTTEST" onclick="ProgTestVT()"><br>
+        
+        
+        <iframe id="vttest" width="1" height="1" src="progvttest.html"></iframe>
+        
+        
+    <input type="text" value="" id="TestResult" size="20">
+
+        <br>
+
+        </div>
+        <div style="background-color:#ffffff;display:none">
+
+        <canvas id="testbmp1"></canvas>
+        <br>
+        <canvas id="testbmp2"></canvas>
+        <br>
+        <input type="button" value="Fullscreen" onclick="ToggleFullScreen()">
+        <input type="button" value="Refresh" onclick="test()">
+        </div>
+
+
+        <script type="text/javascript" src="screenfonturl.js"></script>
+        <script type="text/javascript" src="screenfont.js"></script>
+        <script type="text/javascript" src="screentimer.js"></script>
+        <script type="text/javascript" src="screen.js"></script>
+        <script type="text/javascript" src="prog.js"></script>
+        <script type="text/javascript" src="progio.js"></script>
+
+        <script type="text/javascript">
+
+
+
+
+
+
+function KeyPress(e)
+{
+    e.preventDefault();
+
+    //https://keycode.info/
+    //console.log(e.keyCode);
+    switch(e.keyCode)
+    {
+        default:
+            // key  location  code  which  
+            let Chr = 0;
+            if (e.key.length == 1)
+            {
+                Chr = e.key.charCodeAt(0);
+            }
+            else
+            {
+                switch (e.key)
+                {
+                    case "Escape": Chr = 27; break;
+                    case "Tab": Chr = 9; break;
+                    case "Enter": Chr = 13; break;
+                    case "Backspace": Chr = 8; break;
+                }
+            }
+            switch (e.key)
+            {
+                case "Shift":
+                case "Control":
+                case "Alt":
+                case "AltGraph":
+                case "Meta":
+                    break;
+                default:
+                    //console.log("KeyPress: " + "    " + Chr + "    " + e.code + "    " + e.key);
+                    //ProgEventKey(Chr + "|" + (e.shiftKey ? "1" : "0") + (e.ctrlKey ? "1" : "0") + (e.altKey ? "1" : "0") + e.code);
+                    ProgEventKey(e.code, Chr, (e.shiftKey ? 1 : 0), (e.ctrlKey ? 1 : 0), (e.altKey ? 1 : 0));
+                    break;
+            }
+            //console.log(e);
+            return false;
+    }
+}
+
+
+/*
+{
+ "key": "Escape",
+ "keyCode": 27,
+ "which": 27,
+ "code": "Escape",
+ "location": 0,
+ "altKey": false,
+ "ctrlKey": false,
+ "metaKey": false,
+ "shiftKey": false,
+ "repeat": false
+}
+*/
+
+
+
+document.addEventListener("keydown", KeyPress, false);
+       
+       
+if (typeof SharedArrayBuffer !== 'undefined')
+{
+    document.getElementById("TestResult").value = "jest";
+}
+else
+{
+    document.getElementById("TestResult").value = "brak";
+}
+
+
+/*
+function goodbye(e) {
+    if(!e) e = window.event;
+    //e.cancelBubble is supported by IE - this will kill the bubbling process.
+    e.cancelBubble = true;
+    e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
+
+    //e.stopPropagation works in Firefox.
+    if (e.stopPropagation) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+}
+window.onbeforeunload=goodbye; 
+*/
+
+ 
+        </script>
+        
+    </body>
+</html>
