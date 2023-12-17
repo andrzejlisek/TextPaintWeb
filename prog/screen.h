@@ -25,6 +25,7 @@ public:
     static inline void (*ScreenResize_)( int, int );
     static inline void (*ScreenCursorMove_)( int, int );
     static inline void (*ScreenTextMove)( int, int, int, int, int, int );
+    static inline void (*ScreenLineOffset)( int, int, int, int, int, int );
     static inline void (*ClipboardCopy)( std::string );
     static inline void (*ClipboardPaste)( );
     static inline void (*WorkerSend)( int, std::string );

@@ -1638,7 +1638,7 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     case _("0"):
                         if (AnsiState_.__AnsiTabs.Contains(AnsiState_.__AnsiX) && (AnsiState_.__AnsiX >= 0))
                         {
-                            AnsiState_.__AnsiTabs.Remove(AnsiState_.__AnsiX);
+                            AnsiState_.__AnsiTabs.Remove(AnsiState_.__AnsiTabs.IndexOf(AnsiState_.__AnsiX));
                         }
                         break;
                     case _("3"):

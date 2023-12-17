@@ -19,6 +19,7 @@ public:
     static inline int ProgWork = 1;
     static inline bool Echo = true;
 
+    static void io_clear();
     static void i_push(int Val);
     static int i_pop();
     static int i_count();

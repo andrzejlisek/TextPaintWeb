@@ -32,6 +32,9 @@ void Base64Raw2Str()
         if ((I + 0) < Base64RawL) Char0 = Base64Raw[I + 0];
         if ((I + 1) < Base64RawL) Char1 = Base64Raw[I + 1];
         if ((I + 2) < Base64RawL) Char2 = Base64Raw[I + 2];
+        if (Char0 < 0) Char0 += 256;
+        if (Char1 < 0) Char1 += 256;
+        if (Char2 < 0) Char2 += 256;
         int Byte0 = 64;
         int Byte1 = 64;
         int Byte2 = 64;
@@ -98,30 +101,8 @@ void Base64Str2Raw()
     }
 }
 
-
-/*
-void RespondClear()
-{
-    IOBuf[0] = '0';
-    IOBuf[1] = 0;
-    IOBufPtr = 2;
-
-
-
-    //IOBufPtr = 0;
-    //BufTxt("0");
-}
-
-void RespondFinish()
-{
-    //BufTxt("0]);");
-    //BufChr(0);
-    emscripten_worker_respond(IOBuf, IOBufPtr);
-}
-*/
-
 //emscripten_wasm_worker_t Wrk;
-std::thread * Wrk;
+std::thread * Wrk = NULL;
 
 char * ProgArgs[2];
 
@@ -134,10 +115,12 @@ void PrintStr(char * SS, int L)
 {
     for (int I = 0; I < L; I++)
     {
-        if (Base64Raw[I] < 32)
+        int T = (int)Base64Raw[I];
+        if ((T < 32) || (T > 126))
         {
+            if (T < 0) T += 256;
             std::cout << "<";
-            std::cout << (int)Base64Raw[I];
+            std::cout << T;
             std::cout << ">";
         }
         else
@@ -168,10 +151,10 @@ extern "C"
                 fakeio::i_push((char)Base64Raw[I]);
             }
 
-            Base64Raw[Base64RawL] = 0;
-            std::cout << "Nadawanie: ";
-            PrintStr(Base64Raw, Base64RawL);
-            std::cout << std::endl;
+            //Base64Raw[Base64RawL] = 0;
+            //std::cout << "Nadawanie: ";
+            //PrintStr(Base64Raw, Base64RawL);
+            //std::cout << std::endl;
         }
     
     
@@ -197,10 +180,10 @@ extern "C"
                 Base64Raw2Str();
                 memcpy(Base64Str + Base64StrL, StrSuffix, StrSuffixL + 1);
 
-                Base64Raw[Base64RawL] = 0;
-                std::cout << "Odbior: ";
-                PrintStr(Base64Raw, Base64RawL);
-                std::cout << std::endl;
+                //Base64Raw[Base64RawL] = 0;
+                //std::cout << "Odbior: ";
+                //PrintStr(Base64Raw, Base64RawL);
+                //std::cout << std::endl;
 
                 emscripten_run_script(Base64Str);
             }
@@ -212,13 +195,15 @@ extern "C"
     {
         strcpy(ProgArgs[0], "/test/vttest");
         strcpy(ProgArgs[1], "");
+        fakeio::io_clear();
         Wrk = new std::thread(main0);
     }
 
     EMSCRIPTEN_KEEPALIVE
     void EventStop()
     {
-        printf("VTTEST program w ramce Stop\n");
+        //!!!!!!!!!delete Wrk;
+        Wrk = NULL;
     }
 }
 

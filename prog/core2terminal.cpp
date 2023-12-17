@@ -129,7 +129,6 @@ void Core2Terminal::EventTick()
 
 void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
-    std::cout << "terminal klawisz >>>  " << KeyName << " " << KeyChar << std::endl;
     switch (WorkStateC)
     {
         case WorkStateCDef::InfoScreen:

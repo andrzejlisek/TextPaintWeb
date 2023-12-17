@@ -112,8 +112,8 @@ function _TestOK2(D)
                     I += 7;
                     break;
                 case 106:
-                    ScreenWrite(D[I+1],D[I+2],D[I+3]);
-                    I += 4;
+                    ScreenLineOffset(D[I+1],D[I+2],D[I+3],D[I+4],D[I+5],D[I+6]);
+                    I += 7;
                     break;
                 case 200:
                     VTTEST_.VTData(D[I+1]);

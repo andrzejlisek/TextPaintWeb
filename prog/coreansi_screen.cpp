@@ -10,9 +10,9 @@ void CoreAnsi::ScreenBell()
 
 }
 
-void CoreAnsi::ScreenSetLineOffset(int Y, int Offset, bool Blank, int ColorBack, int ColorFore, int FontAttr)
+void CoreAnsi::ScreenSetLineOffset(int Y, int Offset, bool Blank, int ColorBack, int ColorFore, int ColorAttr)
 {
-
+    Screen::ScreenLineOffset(Y, Offset, Blank ? 1 : 0, ColorBack, ColorFore, ColorAttr);
 }
 
 void CoreAnsi::ScreenMove(int SrcX, int SrcY, int DstX, int DstY, int W, int H)

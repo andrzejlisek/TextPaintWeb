@@ -20,9 +20,9 @@ Direct link: [https://andrzejlisek\.github\.io/TextPaintWeb/index\.html](https:/
 This version is not completed yet and now there are need to do following:
 
 
-* Fix ANSI display bugs visible in demo animations and VTTEST \(player and terminal\)\.
-* Support for various font sizes, which now are displayed as multiple base size\.
 * Smooth scrolling for terminal and player\.
+* Support for various font sizes above 2 \- now there are supported single and double size only\.
+* XTERM mouse support\.
 * File contents preservation \(now, the changes will lost after application refresh or exit\)\.
 * File import and export\.
 * Integration with file system and telnet using WebSocket and separated \.NET/Java application\.

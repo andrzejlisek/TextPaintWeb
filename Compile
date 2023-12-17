@@ -1,0 +1,23 @@
+#!/bin/bash
+
+emcc -std=c++20 progio.cpp -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -o progio.js
+
+emcc -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp prog/raw.cpp prog/str.cpp prog/textwork.cpp prog/textcodec.cpp \
+ prog/clipboard.cpp prog/stopwatch.cpp \
+ prog/coreansi.cpp prog/coreansi_char.cpp prog/coreansi_fontsize.cpp prog/coreansi_parse.cpp prog/coreansi_process.cpp prog/coreansi_screen.cpp prog/coreansi_scroll.cpp \
+ prog/ansilineoccupyex.cpp prog/ansilineoccupy.cpp prog/ansilineoccupyitem.cpp prog/ansisauce.cpp prog/ansistate.cpp \
+ prog/configfile.cpp prog/corestatic.cpp prog/binaryfile.cpp prog/binaryfile_test.cpp prog/corecommon.cpp \
+ prog/editordata.cpp prog/editorinfo.cpp prog/editorchar.cpp prog/editorundo.cpp prog/editorsemi.cpp \
+ prog/editorpixelpaint.cpp prog/editorpixelpaintstate.cpp prog/editorclipboard.cpp prog/core0editor.cpp \
+ prog/core1player.cpp \
+ prog/terminalkeyboard.cpp prog/terminalconn.cpp prog/terminalconntest.cpp prog/terminalconnworker.cpp prog/core2terminal.cpp \
+ prog/core3keys.cpp prog/core4command.cpp prog/core9menu.cpp \
+ progcore.cpp -s BUILD_AS_WORKER=1 -o progcore.js -s ALLOW_MEMORY_GROWTH
+
+emcc -std=c++20 prog/stopwatch.cpp vttest/fakeio.cpp \
+ vttest/charsets.cpp vttest/color.cpp vttest/draw.cpp vttest/esc.cpp vttest/keyboard.cpp vttest/mouse.cpp vttest/nonvt100.cpp \
+ vttest/printer.cpp vttest/reports.cpp vttest/reset.cpp vttest/setup.cpp vttest/sixel.cpp vttest/status.cpp vttest/tek4014.cpp \
+ vttest/ttymodes.cpp vttest/unix_io.cpp vttest/utf8.cpp \
+ vttest/vt52.cpp vttest/vt220.cpp vttest/vt320.cpp vttest/vt420.cpp vttest/vt520.cpp vttest/xterm.cpp \
+ vttest/fake_main.cpp progvttest.cpp -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -pthread -s PTHREAD_POOL_SIZE=5 -o progvttest.js
+

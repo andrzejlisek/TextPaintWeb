@@ -4,7 +4,7 @@ BinaryFile::BinaryFile()
 {
     TextCodec B64;
 
-    ListName.Add(Str("blank"));
+    ListName.Add(Str("Dump.txt"));
     ListData.Add(Raw());
     ListCodec.Add(std::make_shared<TextCodec>(65001));
 
@@ -63,15 +63,11 @@ BinaryFile::BinaryFile()
 
 
 
-    return;
 
 
-
-
-
-    ListName.Add(Str("Formaty"));
+    /*ListName.Add(Str("Formaty"));
     ListName.Add(Str("Prosty1"));
-    ListName.Add(Str("Prosty2"));
+    ListName.Add(Str("Prosty2"));*/
     /*ListName.Add(Str("xmas0.txt"));
     ListName.Add(Str("xmas2.txt"));
     ListName.Add(Str("xmas3.txt"));*/
@@ -149,83 +145,18 @@ BinaryFile::BinaryFile()
 
     ListData.Add(Raw());
     ListData[0].AddRange(DD);
-
-
-
-
-    for (int Idx = 1; Idx <= 2; Idx++)
-    {
-        ListData.Add(Raw());
-
-        /*ListData[Idx].Add('1');
-        ListData[Idx].Add('2');
-        ListData[Idx].Add('3');
-        if (Idx == 1)
-        {
-            ListData[Idx].Add(27);
-            ListData[Idx].Add('[');
-            ListData[Idx].Add('0');
-            ListData[Idx].Add('m');
-        }
-        ListData[Idx].Add('4');
-        ListData[Idx].Add('5');
-        ListData[Idx].Add('6');*/
-
-
-        for (int II = 0; II < 9; II++)
-        {
-            ListData[Idx].Add('[');
-            ListData[Idx].Add((char)(II + 49));
-            ListData[Idx].Add(']');
-            int C = 65;
-            for (int Y = 0; Y < 5; Y++)
-            {
-                for (int X = 0; X < 5; X++)
-                {
-                    switch (C + (Idx * 100))
-                    {
-                        case (100 + 'N'):
-                            ListData[Idx].Add(27);
-                            ListData[Idx].Add('[');
-                            ListData[Idx].Add('4');
-                            ListData[Idx].Add('2');
-                            ListData[Idx].Add('m');
-                            break;
-                        case (100 + 'S'):
-                            ListData[Idx].Add(27);
-                            ListData[Idx].Add('[');
-                            ListData[Idx].Add('0');
-                            ListData[Idx].Add(';');
-                            ListData[Idx].Add('3');
-                            ListData[Idx].Add('3');
-                            ListData[Idx].Add('m');
-                            break;
-                        case (100 + 'Y'):
-                            ListData[Idx].Add(27);
-                            ListData[Idx].Add('[');
-                            ListData[Idx].Add('0');
-                            ListData[Idx].Add('m');
-                            break;
-                    }
-                    ListData[Idx].Add(C);
-                    C++;
-                }
-                ListData[Idx].Add('\r');
-                ListData[Idx].Add('\n');
-            }
-        }
-    }
-
+    ListData[0].Clear();
 
     //!!!!!!!!!!!! Zaczytanie pliku do testowania
-    /*for (int Idx = 2; Idx < ListName.Count; Idx++)
+    /*for (int Idx = 0; Idx <= 1; Idx++)
     {
-        ListData.Add(Raw());
-        std::fstream FS("/media/xxx/WORK1/__ToBackup/Develop/Csharp/TextPaint/Stuff/VT100-xmas/" + ListName[Idx].ToString(), std::ios::binary | std::ios::in);
+        std::fstream FS("/media/xxx/WORK1/__ToBackup/Develop/HTML/WebAssembly/TextPaint/" + ListName[Idx].ToString(), std::ios::binary | std::ios::in);
         if (FS.is_open())
         {
             FS.seekg(0, std::ios_base::end);
             int FileSize = FS.tellg();
+            std::cout << FileSize << std::endl;
+            //FileSize = 739;
             FS.seekg(0);
 
             unsigned char * FileRaw = new unsigned char[FileSize];
@@ -238,7 +169,7 @@ BinaryFile::BinaryFile()
                 }
                 if (FileRaw[I] == '\n')
                 {
-                    ListData[Idx].Add('\r');
+                    //ListData[Idx].Add('\r');
                 }
                 ListData[Idx].Add(FileRaw[I]);
             }

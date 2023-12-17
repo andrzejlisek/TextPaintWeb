@@ -84,6 +84,18 @@ void ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H)
     RespondPartial();
 }
 
+void ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore, int ColorAttr)
+{
+    BufNum(106);
+    BufNum(Y);
+    BufNum(Offset);
+    BufNum(Blank);
+    BufNum(ColorBack);
+    BufNum(ColorFore);
+    BufNum(ColorAttr);
+    RespondPartial();
+}
+
 void ClipboardCopy(std::string X)
 {
 }
@@ -181,7 +193,7 @@ extern "C"
 
         CF.get()->ParamSet("WinUse", "1");
 
-        CF.get()->ParamSet("WinTimer100", "0");
+        CF.get()->ParamSet("WinTimer", "100");
 
         CF.get()->ParamSet("Bell", "1");
 
@@ -404,9 +416,12 @@ extern "C"
 
 
         //CF.get()->ParamSet("TerminalKeys", "1101200");
-        CF.get()->ParamSet("ANSIReadCR", "0");
+        CF.get()->ParamSet("ANSIReadCR", "2");
         CF.get()->ParamSet("ANSIReadLF", "1");
         CF.get()->ParamSet("TerminalType", "4");
+        CF.get()->ParamSet("FileDelayStep", "200");
+        CF.get()->ParamSet("TerminalStep", "200");
+        CF.get()->ParamSet("DisplayAttrib", "15");
 
 
         // Assigning screen functions
@@ -415,6 +430,7 @@ extern "C"
         Screen::ScreenResize_ = ScreenResize;
         Screen::ScreenCursorMove_ = ScreenCursorMove;
         Screen::ScreenTextMove = ScreenTextMove;
+        Screen::ScreenLineOffset = ScreenLineOffset;
         Screen::ClipboardCopy = ClipboardCopy;
         Screen::ClipboardPaste = ClipboardPaste;
         Screen::WorkerSend = WorkerSend;

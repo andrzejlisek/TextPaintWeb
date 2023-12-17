@@ -20,7 +20,7 @@ private:
     void Repaint(bool Force);
     bool TimerTick = true;
     bool LoadFileMeasuring = false;
-    int LoadFileTimeFactor = 75;
+    int LoadFileTimeFactor = 80;
     int LoadFileTimeChunk = 10;
     int LoadFileChunk = 10;
     int FilePos = 0;

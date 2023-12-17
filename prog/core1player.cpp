@@ -7,13 +7,15 @@ Core1Player::Core1Player()
 
 void Core1Player::Init()
 {
-    LoadFileMeasuring = true;
-    Stopwatch_.MeasureTick();
+    //LoadFileMeasuring = true;
+    //Stopwatch_.MeasureTick();
 
     Stopwatch_.Reset();
 
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
     CoreAnsi_.get()->__AnsiProcessDelayFactor = CF.get()->ParamGetI("FileDelayFrame");
+
+    LoadFileTimeChunk = (CF.get()->ParamGetI("WinTimer") * LoadFileTimeFactor) / 100;
 
     ServerPort = CF.get()->ParamGetI("ServerPort");
     ServerTelnet = CF.get()->ParamGetB("ServerTelnet");
@@ -67,7 +69,7 @@ void Core1Player::CalcFileDelayStep()
 void Core1Player::EventTick()
 {
     // Measuring timer period
-    if (LoadFileMeasuring && TimerTick)
+    /*if (LoadFileMeasuring && TimerTick)
     {
         Stopwatch_.Tick();
         if (Stopwatch_.TickPeriod >= 0)
@@ -75,7 +77,7 @@ void Core1Player::EventTick()
             LoadFileTimeChunk = (Stopwatch_.TickPeriod * LoadFileTimeFactor) / 100;
             LoadFileMeasuring = false;
         }
-    }
+    }*/
 
 
     switch (WorkStateS)
@@ -154,11 +156,11 @@ void Core1Player::EventTick()
 
                 MoviePos = 0;
                 MovieLength = 0;
-                if (!LoadFileMeasuring)
+                /*if (!LoadFileMeasuring)
                 {
                     LoadFileMeasuring = true;
                     Stopwatch_.MeasureTick();
-                }
+                }*/
 
                 WorkStateS = WorkStateSDef::FileOpenWait;
                 LoadFileChunk = 10;
@@ -374,8 +376,6 @@ void Core1Player::EventTick()
 
 void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
-    std::cout << "odtwarzacz klawisz >>>  " << KeyName << " " << KeyChar << std::endl;
-
     if (WorkStateS == WorkStateSDef::DispConf)
     {
         //!!!!DisplayConfig_.ProcessKey(KeyName, KeyChar);
@@ -518,6 +518,10 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 {
                     BinaryFile_.get()->ListIndex--;
                 }
+                else
+                {
+                    BinaryFile_.get()->ListIndex = (BinaryFile_.get()->ListName.Count - 1);
+                }
                 WorkStateS = WorkStateSDef::FileOpen;
                 EventTickX();
             }
@@ -527,6 +531,10 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 if (BinaryFile_.get()->ListIndex < (BinaryFile_.get()->ListName.Count - 1))
                 {
                     BinaryFile_.get()->ListIndex++;
+                }
+                else
+                {
+                    BinaryFile_.get()->ListIndex = 0;
                 }
                 WorkStateS = WorkStateSDef::FileOpen;
                 EventTickX();

@@ -5,6 +5,16 @@ fakeio::fakeio()
 
 }
 
+void fakeio::io_clear()
+{
+    fake_i_mtx.lock();
+    fake_o_mtx.lock();
+    fake_i.clear();
+    fake_o.clear();
+    fake_o_mtx.unlock();
+    fake_i_mtx.unlock();
+}
+
 void fakeio::i_push(int Val)
 {
     fake_i_mtx.lock();
@@ -65,7 +75,7 @@ int fakeio::_getchar( void )
     _fflush(stdout);
     while (i_count() < 1)
     {
-        _sleep(100);
+        _sleep(20);
     }
     int Chr = i_pop();
     if (Echo)
@@ -92,13 +102,13 @@ int fakeio::_read(int fd, void * buf, int nbytes)
         {
             while (i_count() == 0)
             {
-                _sleep(100);
+                _sleep(20);
             }
         }
         while ((N < nbytes) && (i_count() > 0))
         {
             int Chr = i_pop();
-            if (Echo)
+            /*if (Echo)
             {
                 if (Chr == '\r')
                 {
@@ -108,7 +118,7 @@ int fakeio::_read(int fd, void * buf, int nbytes)
                 {
                     _putchar(Chr);
                 }
-            }
+            }*/
             ((char*)buf)[N] = (char)(Chr);
             N++;
         }
@@ -191,10 +201,5 @@ int fakeio::_fprintf(FILE * stream, const char * format, ...)
 
 void fakeio::_sleep(int T)
 {
-    /*Stopwatch SW;
-    SW.Reset();
-    while (SW.Elapsed() < T)
-    {
-    }*/
     std::this_thread::sleep_for(std::chrono::milliseconds(T));
 }

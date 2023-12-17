@@ -118,7 +118,6 @@ void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int Evt
 
 void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
-    std::cout << "edytor klawisz >>>  " << KeyName << " " << KeyChar << std::endl;
     CursorLine(false);
     switch (_(KeyName.c_str()))
     {
@@ -1088,7 +1087,6 @@ void Core0Editor::EventKey_Editor_4(std::string KeyName, int KeyChar, bool ModSh
 
 void Core0Editor::EventKey_Info(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
-    std::cout << "informacja klawisz >>>  " << KeyName << " " << KeyChar << std::endl;
     int Repaint = 0;
     switch (_(KeyName.c_str()))
     {
@@ -2048,11 +2046,9 @@ void Core0Editor::SetInfo(bool Enable, int N)
         DisplayState = DisplayStateDef::Info;
         TextDisplay(0);
         ScreenRefresh(true);
-        std::cout << "info start" << std::endl;
     }
     else
     {
-        std::cout << "info stop" << std::endl;
         DisplayState = DisplayStateDef::Editor;
     }
 }
