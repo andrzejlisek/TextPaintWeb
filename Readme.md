@@ -20,8 +20,7 @@ Direct link: [https://andrzejlisek\.github\.io/TextPaintWeb/index\.html](https:/
 This version is not completed yet and now there are need to do following:
 
 
-* Smooth scrolling for terminal and player\.
-* Support for various font sizes above 2 \- now there are supported single and double size only\.
+* Support for various font sizes above 2 \- now there are supported single and double size only \(enough for embedded animations and VTTEST\)\.
 * XTERM mouse support\.
 * File contents preservation \(now, the changes will lost after application refresh or exit\)\.
 * File import and export\.

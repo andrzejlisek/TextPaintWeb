@@ -88,7 +88,6 @@ private:
     bool __AnsiLineOccupy2_Use = false;
 
     int ANSIScrollChars = 0;
-    int ANSIScrollBuffer = 0;
     int ANSIScrollSmooth = 0;
 
     int ColorThresholdBlackWhite = 48;

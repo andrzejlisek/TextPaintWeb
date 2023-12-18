@@ -121,6 +121,8 @@ public:
     int PrintCharInsDel = 0;
     int PrintCharScroll = 0;
 
+    bool ProcessBackgroundChars = false;
+
     XList<XList<int>> CharProtection1;
     XList<XList<int>> CharProtection2;
     bool CharProtection1Print = false;

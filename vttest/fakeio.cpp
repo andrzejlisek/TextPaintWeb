@@ -108,17 +108,13 @@ int fakeio::_read(int fd, void * buf, int nbytes)
         while ((N < nbytes) && (i_count() > 0))
         {
             int Chr = i_pop();
-            /*if (Echo)
+            if (Echo)
             {
-                if (Chr == '\r')
+                if ((Chr == '\r') || (Chr == '\n'))
                 {
                     _putchar('\n');
                 }
-                else
-                {
-                    _putchar(Chr);
-                }
-            }*/
+            }
             ((char*)buf)[N] = (char)(Chr);
             N++;
         }

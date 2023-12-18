@@ -342,6 +342,8 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
     PrintCharInsDel = 0;
     PrintCharScroll = 0;
 
+    ProcessBackgroundChars = false;
+
     IsScreenAlternate = false;
 
     DECCOLMPreserve = false;
@@ -1032,6 +1034,8 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     Dst.PrintCharCounterOver = Src.PrintCharCounterOver;
     Dst.PrintCharInsDel = Src.PrintCharInsDel;
     Dst.PrintCharScroll = Src.PrintCharScroll;
+
+    Dst.ProcessBackgroundChars = Src.ProcessBackgroundChars;
 
     Dst.DECCOLMPreserve = Src.DECCOLMPreserve;
 

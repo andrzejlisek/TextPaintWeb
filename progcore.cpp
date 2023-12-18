@@ -416,7 +416,7 @@ extern "C"
 
 
         //CF.get()->ParamSet("TerminalKeys", "1101200");
-        CF.get()->ParamSet("ANSIReadCR", "2");
+        CF.get()->ParamSet("ANSIReadCR", "0");
         CF.get()->ParamSet("ANSIReadLF", "1");
         CF.get()->ParamSet("TerminalType", "4");
         CF.get()->ParamSet("FileDelayStep", "200");

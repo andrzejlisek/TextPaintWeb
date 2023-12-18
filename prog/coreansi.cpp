@@ -21,7 +21,6 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
     AnsiTerminalResize(AnsiMaxX, AnsiMaxY);
 
     ANSIScrollChars = CF.get()->ParamGetI("ANSIScrollChars");
-    ANSIScrollBuffer = CF.get()->ParamGetI("ANSIScrollBuffer");
     ANSIScrollSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
 
     ColorThresholdBlackWhite = CF.get()->ParamGetI("ANSIColorThresholdBlackWhite");

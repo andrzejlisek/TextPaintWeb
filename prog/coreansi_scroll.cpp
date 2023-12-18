@@ -22,6 +22,7 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
     if (AnsiState_.__AnsiSmoothScroll && (ANSIScrollSmooth > 0))
     {
         AnsiState_.AnsiScrollCounter = ANSIScrollChars + 1;
+        AnsiState_.ProcessBackgroundChars = true;
 
         if (AnsiScrollPosition.Count == 0)
         {

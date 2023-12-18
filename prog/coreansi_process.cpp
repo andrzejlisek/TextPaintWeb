@@ -190,6 +190,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
             break;
         }
         StdProc = true;
+        ProcAdditionalChars = false;
         if (AnsiCharPrintRepeater > 0)
         {
             Processed++;
@@ -331,9 +332,36 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
         }
         else
         {
-            if (ProcAdditionalChars && (AnsiState_.__AnsiAdditionalChars < ANSIScrollBuffer))
+            if (ProcAdditionalChars && (AnsiState_.ProcessBackgroundChars))
             {
                 AnsiState_.__AnsiAdditionalChars++;
+                bool BufStop = false;
+                if ((AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars) >= AnsiBuffer.Count)
+                {
+                    BufStop = true;
+                }
+                else
+                {
+                    if (AnsiBuffer[AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars] < 32)
+                    {
+                        BufStop = true;
+                    }
+                    else
+                    {
+                        if ((AnsiState_.__AnsiX + AnsiState_.__AnsiAdditionalChars) >= AnsiProcessGetXMax(false))
+                        {
+                            if (!AnsiState_.__AnsiNoWrap)
+                            {
+                                BufStop = true;
+                            }
+                        }
+                    }
+                }
+                if (BufStop)
+                {
+                    AnsiState_.__AnsiAdditionalChars--;
+                    AnsiState_.ProcessBackgroundChars = false;
+                }
             }
             ProcessCount--;
             AnsiState_.__AnsiCounter++;

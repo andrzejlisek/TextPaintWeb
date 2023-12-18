@@ -1615,6 +1615,7 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                 if (AnsiCharPrintLast >= 0)
                 {
                     AnsiCharPrintRepeater = AnsiProcess_Int11(AnsiParams[0], AnsiCmd_);
+                    AnsiState_.ProcessBackgroundChars = true;
                 }
             }
             break;
