@@ -6,35 +6,54 @@
 #include <fstream>
 #include <iostream>
 #include "str.h"
+#include "screen.h"
+#include "binaryfileitem.h"
 
 class BinaryFile
 {
 public:
     BinaryFile();
     int ListIndex = 0;
-    int ListIndex_ = 0;
     int ListDispOffset = 0;
     int ListDispOffset_ = 0;
-    XList<Str> ListName;
-    XList<Raw> ListData;
-    void Refresh();
-    void Init(int CodecR, int CodecW);
+    Str ListDir;
+
+    BinaryFileItem &ItemGet(int idx);
+    void ItemAdd(BinaryFileItem X);
+    Str ItemName(int Idx);
+    int ItemType0(int Idx);
+    int ItemType(int Idx);
+    int ItemCount();
+
+    void SetDir(Str Dir);
+
     void SetCRLF(int CR, int LF);
     void Save(Str &Text);
     void Load(Str &Text);
+    std::string LoadToString();
+    void SaveFromString(std::string S);
+    bool IsSystemFile();
+
+    void FileImportSys(int Idx);
+    void FileImport(int Idx);
+    void FileExport(int Idx);
+
+    bool EventFileImport(int Id, int Kind, std::string Data);
+    bool EventFileExport(int Id, int Kind);
+
+    void SysSaveConfig();
+
+    int SystemFileCount = 2;
 private:
-    XList<std::shared_ptr<TextCodec>> ListCodec;
-    void FileXmas0();
-    void FileXmas1();
-    void FileXmas2();
-    void FileXmas3();
-    void FileXmas4();
-    void FileXmas5();
-    void FileXmas6();
-    void FileXmas7();
-    void FileXmas8();
-    void FileXmas9();
-    void FilePrepare(unsigned char * RawX, int RawC);
+    XList<Str> Disp;
+    XList<BinaryFileItem> ListItems;
+    int PtrSep = 126;
+    int PtrSepNum = 8;
+
+    Raw TempData;
+    std::string SystemFile0 = "!!config.txt";
+    std::string SystemFile1 = "!!system.txt";
+    std::unique_ptr<TextCodec> B64;
 };
 
 #endif // BINARYFILE_H

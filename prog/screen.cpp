@@ -151,3 +151,17 @@ void Screen::MouseActive(bool X)
 {
 
 }
+
+int Screen::FileImport(int Kind, std::string Name)
+{
+    FilePortId++;
+    FileImport_(FilePortId, Kind, Name);
+    return FilePortId;
+}
+
+int Screen::FileExport(int Kind, std::string Name, std::string Data)
+{
+    FilePortId++;
+    FileExport_(FilePortId, Kind, Name, Data);
+    return FilePortId;
+}

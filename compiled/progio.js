@@ -5547,6 +5547,7 @@ var _Init = Module['_Init'] = createExportWrapper('Init');
 var _EventTick = Module['_EventTick'] = createExportWrapper('EventTick');
 var _EventKey = Module['_EventKey'] = createExportWrapper('EventKey');
 var _EventOther = Module['_EventOther'] = createExportWrapper('EventOther');
+var _EventOtherFile = Module['_EventOtherFile'] = createExportWrapper('EventOtherFile');
 var _TestString = Module['_TestString'] = createExportWrapper('TestString');
 var _main = Module['_main'] = createExportWrapper('main');
 var ___errno_location = createExportWrapper('__errno_location');

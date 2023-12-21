@@ -33,6 +33,16 @@ public:
         }
     }
 
+    XList<T> GetRange(int Pos, int Count_)
+    {
+        XList<T> X;
+        for (int I = Pos; I < (Count_ + Pos); I++)
+        {
+            X.Add(Data[I]);
+        }
+        return X;
+    }
+
     void Clear()
     {
         Data.clear();
@@ -43,6 +53,22 @@ public:
     {
         Data.push_back(Val);
         Count++;
+    }
+
+    int AddSort(T Val)
+    {
+        for (int I = 0; I < Count; I++)
+        {
+            if (Data[I] > Val)
+            {
+                Data.insert(Data.begin() + I, Val);
+                Count++;
+                return I;
+            }
+        }
+        Data.push_back(Val);
+        Count++;
+        return (Count - 1);
     }
 
     void AddRange(T * Vals, unsigned int ValsC)
@@ -124,16 +150,42 @@ public:
         return false;
     }
 
-    int IndexOf(T Val)
+    int IndexOf(T Val, int StartPos)
     {
-        for (int I = 0; I < Count; I++)
+        if (StartPos >= 0)
         {
-            if (Data[I] == Val)
+            if (StartPos >= Count)
             {
-                return I;
+                return -1;
+            }
+            for (int I = StartPos; I < Count; I++)
+            {
+                if (Data[I] == Val)
+                {
+                    return I;
+                }
+            }
+        }
+        else
+        {
+            if ((0 - StartPos) >= Count)
+            {
+                StartPos = 0 - Count + 1;
+            }
+            for (int I = (0 - StartPos); I >= 0; I--)
+            {
+                if (Data[I] == Val)
+                {
+                    return I;
+                }
             }
         }
         return -1;
+    }
+
+    int IndexOf(T Val)
+    {
+        return IndexOf(Val, 0);
     }
 
     T& operator [](int Pos)
@@ -232,6 +284,37 @@ public:
         }
     }
 
+    int Compare(XList<T> &X)
+    {
+        int L = Count;
+        if (L > X.Count)
+        {
+            L = X.Count;
+        }
+        for (int I = 0; I < L; I++)
+        {
+            T _1 = Data[I];
+            T _2 = X[I];
+            if (_1 < _2)
+            {
+                return -1;
+            }
+            if (_1 > _2)
+            {
+                return 1;
+            }
+        }
+        if (Count > L) { return 1; }
+        if (X.Count > L) { return -1; }
+        return 0;
+    }
+
+    bool operator== (XList<T> _) { return Compare(_) == 0; }
+    bool operator!= (XList<T> _) { return Compare(_) != 0; }
+    bool operator>  (XList<T> _) { return Compare(_) >  0; }
+    bool operator<  (XList<T> _) { return Compare(_) <  0; }
+    bool operator<= (XList<T> _) { return Compare(_) <= 0; }
+    bool operator>= (XList<T> _) { return Compare(_) >= 0; }
 
 protected:
     std::vector<T> Data;

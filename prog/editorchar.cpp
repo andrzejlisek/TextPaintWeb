@@ -8,8 +8,9 @@ EditorChar::EditorChar()
     }
 }
 
-void EditorChar::Init(std::shared_ptr<ConfigFile> CF)
+void EditorChar::Init(std::shared_ptr<ConfigFile> CF_)
 {
+    CF = CF_;
     int I = 0;
     while (CF.get()->ParamGetS("_WinBitmapFontPage" + std::to_string(I)) != "")
     {
@@ -19,16 +20,15 @@ void EditorChar::Init(std::shared_ptr<ConfigFile> CF)
 
     for (I = 0; I < 256; I++)
     {
-        if (CF.get()->ParamGetS("_FavChar" + std::to_string(I)) != "")
+        if (CF.get()->ParamGetS("FavChar" + std::to_string(I)) != "")
         {
-            FavChar[I] = CF.get()->ParamGetI("_FavChar" + std::to_string(I));
+            FavChar[I] = CF.get()->ParamGetI("FavChar" + std::to_string(I));
         }
     }
 }
 
 void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
-    std::cout << "Zestaw znakow klawisz >>>  " << KeyName << " " << KeyChar << std::endl;
     switch (_(KeyName.c_str()))
     {
         default:
@@ -41,6 +41,10 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
                     if (SelectChar >= 0)
                     {
                         FavChar[KeyChar] = SelectChar;
+                        CF.get()->ParamSet("FavChar" + std::to_string(KeyChar), std::to_string(SelectChar));
+                        BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                        BinaryFile_.get()->SysSaveConfig();
+
                         RepaintDepth = 3;
                     }
                     else
@@ -122,7 +126,7 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
             break;
         case _("F3"):
             RepaintDepth = 1;
-            if (SelectorState < 3)
+            if (SelectorState < 2)
             {
                 SelectorState++;
             }
@@ -152,6 +156,9 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
                 if ((SelectChar < 0) && (SelectToFav >= 0))
                 {
                     FavChar[SelectCharFavGet()] = SelectToFav;
+                    CF.get()->ParamSet("FavChar" + std::to_string(SelectCharFavGet()), std::to_string(SelectToFav));
+                    BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                    BinaryFile_.get()->SysSaveConfig();
                     SelectToFav = -1;
                 }
             }
@@ -563,26 +570,6 @@ void EditorChar::SelectCharChange(int T)
                 }
                 break;
         }
-        RepaintDepth = 3;
-    }
-    if (SelectorState == 3)
-    {
-        switch (T)
-        {
-            case -2:
-                if (BinaryFile_.get()->ListIndex_ > 0)
-                {
-                    BinaryFile_.get()->ListIndex_--;
-                }
-                break;
-            case 2:
-                if (BinaryFile_.get()->ListIndex_ < (BinaryFile_.get()->ListName.Count - 1))
-                {
-                    BinaryFile_.get()->ListIndex_++;
-                }
-                break;
-        }
-
         RepaintDepth = 3;
     }
 }

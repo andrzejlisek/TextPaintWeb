@@ -12,6 +12,7 @@
 #include "coreansi.h"
 #include "clipboard.h"
 #include "binaryfile.h"
+#include "filemanager.h"
 
 class CoreCommon
 {
@@ -31,6 +32,7 @@ public:
     int CharDouble(int C);
     bool AppExit = false;
     std::shared_ptr<BinaryFile> BinaryFile_;
+    FileManager FileManager_;
 protected:
     void ReadColor(std::string SettingValue, int &ColorB, int &ColorF);
     int ScreenW = 80;

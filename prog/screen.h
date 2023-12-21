@@ -26,8 +26,6 @@ public:
     static inline void (*ScreenCursorMove_)( int, int );
     static inline void (*ScreenTextMove)( int, int, int, int, int, int );
     static inline void (*ScreenLineOffset)( int, int, int, int, int, int );
-    static inline void (*ClipboardCopy)( std::string );
-    static inline void (*ClipboardPaste)( );
     static inline void (*WorkerSend)( int, std::string );
     static void ScreenResize(int NewW, int NewH);
     static void ScreenCursorMove(int X, int Y);
@@ -51,6 +49,12 @@ public:
     static inline int CurrentH = 1;
 
     static void MouseActive(bool X);
+
+    static inline int FilePortId = 0;
+    static inline void (*FileImport_)( int, int, std::string );
+    static inline void (*FileExport_)( int, int, std::string, std::string );
+    static int FileImport(int Kind, std::string Name);
+    static int FileExport(int Kind, std::string Name, std::string Data);
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;

@@ -245,13 +245,13 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                     {
                                         WorkStateC = WorkStateCDef::Session;
                                         Clipboard_.SetText(CoreAnsi_.get()->AnsiState_.GetScreen(0, 0, ScreenW - 1, ScreenH - 1));
-                                        Screen::ClipboardCopy(Clipboard_.SystemText);
+                                        Screen::FileExport(0, "", Clipboard_.SystemText);
                                     }
                                     break;
                                 case '.':
                                     {
                                         WorkStateC = WorkStateCDef::Session;
-                                        Screen::ClipboardPaste();
+                                        Screen::FileImport(0, "");
                                     }
                                     break;
                                 default:
@@ -402,13 +402,16 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
                     break;
             }
             break;
-        case _("TextPaste"):
+        case _("FileImport"):
             {
-                Clipboard_.SystemText = EvtParam0;
-                Str Text = Clipboard_.GetText();
-                Raw Data;
-                TerminalCodec.get()->Encode(Text, Data);
-                Conn.get()->Send(Data);
+                if ((EvtParam2 == 0) && (EvtParam4 == 0))
+                {
+                    Clipboard_.SystemText = EvtParam0;
+                    Str Text = Clipboard_.GetText();
+                    Raw Data;
+                    TerminalCodec.get()->Encode(Text, Data);
+                    Conn.get()->Send(Data);
+                }
             }
         case _("Received"):
             {
@@ -1174,7 +1177,8 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
             InfoMsg.Add(" ? - Send screen size ");
             InfoMsg.Add(" ` - Local echo: " + (LocalEcho ? std::string("on") : std::string("off")));
             InfoMsg.Add(" | - Input commands: " + (Command_8bit ? std::string("8-bit") : std::string("7-bit")));
-            InfoMsg.Add(" \\ - Display configuration");
+            //!!!!!!!!!!InfoMsg.Add(" \\ - Display configuration");
+            InfoMsg.Add("");
         }
         InfoMsg.Add(" , - Copy screen as text");
         InfoMsg.Add(" . - Paste text as keystrokes");

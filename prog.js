@@ -1,10 +1,3 @@
-let ProgLoaded = false;
-let ProgStarted = false;
-
-let Stopwatch = 0;
-
-let VTTEST_ = document.getElementById("vttest").contentWindow;
-
 function StopwatchReset()
 {
     console.log("<<<");
@@ -17,21 +10,11 @@ function StopwatchTime()
     console.log(">>> " + StopwatchTime);
 }
 
-function ProgInit()
-{
-    if (ProgLoaded)
-    {
-        Module.ccall("Init", null, null, null);
-    }
-    else
-    {
-        setTimeout(ProgInit, 20);
-    }
-}
-
 function ProgStart()
 {
     ProgStarted = true;
+    
+    KeybInit();
 }
 
 function ProgEventTick()
@@ -40,6 +23,16 @@ function ProgEventTick()
     {
         Module.ccall("EventTick", null, null, null);
     }
+}
+
+function ProgEventOther(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4)
+{
+    Module.ccall("EventOther", null, ["string", "string", "number", "number", "number", "number"], [EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4]);
+}
+
+function ProgEventOtherFile(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4)
+{
+    Module.ccall("EventOtherFile", null, ["string", "string", "number", "number", "number", "number"], [EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4]);
 }
 
 function VTTestData(X)
@@ -87,6 +80,18 @@ function _TestOK2(D)
         {
             switch (Proc)
             {
+                case 97:
+                    setTimeout(ProgInitResult1, WaitTimeout);
+                    I += 1;
+                    break;
+                case 98:
+                    setTimeout(ProgInitResult2, WaitTimeout);
+                    I += 1;
+                    break;
+                case 99:
+                    ProgInitResult3();
+                    I += 1;
+                    break;
                 case 100:
                     ProgStart();
                     I += 1;
@@ -114,6 +119,18 @@ function _TestOK2(D)
                 case 106:
                     ScreenLineOffset(D[I+1],D[I+2],D[I+3],D[I+4],D[I+5],D[I+6]);
                     I += 7;
+                    break;
+                case 111:
+                    FileImport(D[I+1],D[I+2],D[I+3]);
+                    I += 4;
+                    break;
+                case 112:
+                    FileExport(D[I+1],D[I+2],D[I+3],D[I+4]);
+                    I += 5;
+                    break;
+                case 113:
+                    ConfigFileGet(D[I+1],D[I+2]);
+                    I += 3;
                     break;
                 case 200:
                     VTTEST_.VTData(D[I+1]);
@@ -203,4 +220,6 @@ function _TestOK3(D)
         };
       };
 
+
+ProgInit();
 

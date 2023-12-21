@@ -15,6 +15,8 @@ class CoreAnsi
 public:
     CoreAnsi(std::shared_ptr<ConfigFile> CF);
 
+    void UpdateConfig(std::shared_ptr<ConfigFile> CF);
+
     int AnsiMaxX = 80;
     int AnsiMaxY = 24;
 

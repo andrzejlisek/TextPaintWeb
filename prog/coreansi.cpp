@@ -9,14 +9,11 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
 
     AnsiMaxX = CF.get()->ParamGetI("ANSIWidth");
     AnsiMaxY = CF.get()->ParamGetI("ANSIHeight");
-    ANSI_CR = CF.get()->ParamGetI("ANSIReadCR");
-    ANSI_LF = CF.get()->ParamGetI("ANSIReadLF");
-    ANSIDOS = CF.get()->ParamGetI("ANSIDOS");
+
+    UpdateConfig(CF);
+
     if ((ANSIDOS < 0) || (ANSIDOS >= 3)) ANSIDOS = 0;
     ANSIDOS_ = (ANSIDOS == 1);
-    ANSI8bit = CF.get()->ParamGetB("ANSI8bit");
-    ANSIPrintBackspace = CF.get()->ParamGetB("ANSIPrintBackspace");
-    ANSIPrintTab = CF.get()->ParamGetB("ANSIPrintTab");
 
     AnsiTerminalResize(AnsiMaxX, AnsiMaxY);
 
@@ -145,6 +142,16 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
             }
         }
     }
+}
+
+void CoreAnsi::UpdateConfig(std::shared_ptr<ConfigFile> CF)
+{
+    ANSI_CR = CF.get()->ParamGetI("ANSIReadCR");
+    ANSI_LF = CF.get()->ParamGetI("ANSIReadLF");
+    ANSIDOS = CF.get()->ParamGetI("ANSIDOS");
+    ANSI8bit = CF.get()->ParamGetB("ANSI8bit");
+    ANSIPrintBackspace = CF.get()->ParamGetB("ANSIPrintBackspace");
+    ANSIPrintTab = CF.get()->ParamGetB("ANSIPrintTab");
 }
 
 void CoreAnsi::AnsiRepaint(bool AdditionalBuffers)

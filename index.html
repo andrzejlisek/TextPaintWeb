@@ -42,11 +42,119 @@
             image-rendering: pixelated;                 /* Awesome future-browsers       */
             -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
         }
+        textarea
+        {
+            resize:none;
+            white-space:pre;
+            overflow:auto;
+        }
+        
+        .keybdiv
+        {
+            margin:0;
+            padding:0;
+            border-style:none;
+            position:relative;
+        }
+        .keybfld
+        {
+            margin:0;
+            padding:0;
+            position:absolute;
+            box-sizing:border-box;
+            text-align:center;
+        }
+        .configdiv
+        {
+            color:#ffffff;
+            display:inline-block;
+            text-align:center;
+            vertical-align: middle;
+        }
+        .configbtn
+        {
+            height:13vh;
+            text-align:center;
+            vertical-align: middle;
+        }
+        
         </style>
         <script src="coi-serviceworker.js"></script>
     </head>
     <body id="app">
-        <canvas id="Screen" style="width:100vw;height:100vh" onclick=""></canvas>
+        <canvas id="Screen" style="width:100vw;height:100vh" onclick="ConfShow()"></canvas>
+        <div class="keybdiv">
+            <svg id="KeybSvg" width="100" height="100">
+                <text id="KeybSvgTxt" x="-10" y="0" text-anchor="end">X</text>
+                <rect id="KeybSvgScr" x="0" y="0" width="100" height="100" fill="rgb(0,0,0)" style="fill-opacity:0.0;" shape-rendering="optimizeSpeed">
+            </svg>
+            <textarea id="KeybSvgFld" class="keybfld"></textarea>
+        </div>
+        <div class="keybdiv">
+            <svg id="KeybSvgBlank" width="100" height="100" onclick="ConfShow()">
+            </svg>
+        </div>
+
+
+        <div id="ConfGui" style="display:none;background-color:#00000080;width:100vw;height:100vh;position:absolute;left:0;top:0">
+            
+            <div class="configdiv" style="width:15%" id="ConfLbl1">General</div>
+            <input class="configbtn" type="button" id="ConfBtn11" onclick="ConfClick(11)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn12" onclick="ConfClick(12)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn13" onclick="ConfClick(13)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn14" onclick="ConfClick(14)" style="width:18%">
+            <br>
+
+            <div class="configdiv" style="width:15%" id="ConfLbl2">Layout</div>
+            <input class="configbtn" type="button" id="ConfBtn21" onclick="ConfClick(21)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn22" onclick="ConfClick(22)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn23" onclick="ConfClick(23)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn24" onclick="ConfClick(24)" style="width:18%">
+            <br>
+
+            <div class="configdiv" style="width:15%" id="ConfLbl5">Process</div>
+            <input class="configbtn" type="button" id="ConfBtn51" onclick="ConfClick(51)" style="width:12%">
+            <input class="configbtn" type="button" id="ConfBtn52" onclick="ConfClick(52)" style="width:12%">
+            <input class="configbtn" type="button" id="ConfBtn53" onclick="ConfClick(53)" style="width:12%">
+            <input class="configbtn" type="button" id="ConfBtn54" onclick="ConfClick(54)" style="width:12%">
+            <input class="configbtn" type="button" id="ConfBtn55" onclick="ConfClick(55)" style="width:12%">
+            <input class="configbtn" type="button" id="ConfBtn56" onclick="ConfClick(56)" style="width:12%">
+            <br>
+
+            <div class="configdiv" style="width:15%" id="ConfLbl3">Colors</div>
+            <input class="configbtn" type="button" id="ConfBtn31" onclick="ConfClick(31)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn32" onclick="ConfClick(32)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn33" onclick="ConfClick(33)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn34" onclick="ConfClick(34)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn35" onclick="ConfClick(35)" style="width:14%">
+            <br>
+
+            <div class="configdiv" style="width:15%" id="ConfLbl4">Font</div>
+            <input class="configbtn" type="button" id="ConfBtn41" onclick="ConfClick(41)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn42" onclick="ConfClick(42)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn43" onclick="ConfClick(43)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn44" onclick="ConfClick(44)" style="width:14%">
+            <input class="configbtn" type="button" id="ConfBtn45" onclick="ConfClick(45)" style="width:14%">
+            <br>
+
+        </div>
+        <div style="displey:hidden">
+            <div class="configdiv" style="width:15%" id="ConfLbl6">Screen width</div>
+            <input class="configbtn" type="button" id="ConfBtn61" onclick="ConfClick(61)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn62" onclick="ConfClick(62)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn63" onclick="ConfClick(63)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn64" onclick="ConfClick(64)" style="width:18%">
+            <br>
+
+            <div class="configdiv" style="width:15%" id="ConfLbl7">Screen height</div>
+            <input class="configbtn" type="button" id="ConfBtn71" onclick="ConfClick(71)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn72" onclick="ConfClick(72)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn73" onclick="ConfClick(73)" style="width:18%">
+            <input class="configbtn" type="button" id="ConfBtn74" onclick="ConfClick(74)" style="width:18%">
+            <br>
+        </div>
+
+
 
 
         <div style="background-color:#ffffff;display:none">
@@ -54,19 +162,11 @@
 
         <span id="info"></span>
 
-        <br>
-        <hr>
-        <hr>
-    <input type="button" value="ProgEventTick" onclick="ProgEventTick()"><br>
-    <input type="button" value="ProgEventKey" onclick="ProgEventKey()"><br>
-    <input type="button" value="test proc" onclick="ProgTestProc()"><br>
-    <input type="button" value="VTTEST" onclick="ProgTestVT()"><br>
-        
         
         <iframe id="vttest" width="1" height="1" src="progvttest.html"></iframe>
         
         
-    <input type="text" value="" id="TestResult" size="20">
+        <input type="text" value="" id="TestResult" size="20">
 
         <br>
 
@@ -82,12 +182,18 @@
         </div>
 
 
-        <script type="text/javascript" src="screenfonturl.js"></script>
+        <script type="text/javascript" src="confgui.js"></script>
+        <script type="text/javascript" src="global.js"></script>
+        <script type="text/javascript" src="unistorage.js"></script>
         <script type="text/javascript" src="screenfont.js"></script>
         <script type="text/javascript" src="screentimer.js"></script>
         <script type="text/javascript" src="screen.js"></script>
+        <script type="text/javascript" src="keyboard.js"></script>
+        <script type="text/javascript" src="fileport.js"></script>
+
+        <script type="text/javascript" src="proginit.js"></script>
         <script type="text/javascript" src="prog.js"></script>
-        <script type="text/javascript" src="progio.js"></script>
+        <script type="text/javascript" src="compiled/progio.js"></script>
 
         <script type="text/javascript">
 
@@ -98,7 +204,25 @@
 
 function KeyPress(e)
 {
-    e.preventDefault();
+    if (!ProgStarted)
+    {
+        return;
+    }
+
+    if (GuiSettingsShown)
+    {
+        return;
+    }
+
+    if (document.activeElement == KeybSvgTxt)
+    {
+        return;
+    }
+
+    if (KeybBlockShortcuts)
+    {
+        e.preventDefault();
+    }
 
     //https://keycode.info/
     //console.log(e.keyCode);
@@ -171,21 +295,22 @@ else
 }
 
 
-/*
-function goodbye(e) {
+function goodbye(e)
+{
     if(!e) e = window.event;
     //e.cancelBubble is supported by IE - this will kill the bubbling process.
     e.cancelBubble = true;
     e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
 
     //e.stopPropagation works in Firefox.
-    if (e.stopPropagation) {
+    if (e.stopPropagation)
+    {
         e.stopPropagation();
         e.preventDefault();
     }
 }
-window.onbeforeunload=goodbye; 
-*/
+window.onbeforeunload = goodbye; 
+
 
  
         </script>

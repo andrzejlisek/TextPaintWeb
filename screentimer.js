@@ -1,6 +1,3 @@
-ScreenTimerCounter = 0;
-ScreenTimerPeriod = 100;
-
 function ScreenTimerStart()
 {
     if (ProgStarted)
@@ -23,12 +20,12 @@ function ScreenTimerTick()
         case 3:
         case 7:
         case 9:
-            ScreenDrawCursor(false);
+            ScreenDrawCursor(ScreenCursorSteady);
             ProgEventTick();
             VTTEST_.VTData("");
             break;
         case 5:
-            ScreenDrawCursor(false);
+            ScreenDrawCursor(ScreenCursorSteady);
             ScreenDrawBlink(true);
             ProgEventTick();
             VTTEST_.VTData("");

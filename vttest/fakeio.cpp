@@ -66,6 +66,10 @@ int fakeio::o_count()
 
 int fakeio::_putchar(int character)
 {
+    if (character == '\n')
+    {
+        o_push('\r');
+    }
     o_push(character);
     return 0;
 }
@@ -82,6 +86,7 @@ int fakeio::_getchar( void )
     {
         if (Chr == '\r')
         {
+            _putchar('\r');
             _putchar('\n');
         }
         else
@@ -110,9 +115,14 @@ int fakeio::_read(int fd, void * buf, int nbytes)
             int Chr = i_pop();
             if (Echo)
             {
-                if ((Chr == '\r') || (Chr == '\n'))
+                if (Chr == '\r')
                 {
+                    _putchar('\r');
                     _putchar('\n');
+                }
+                else
+                {
+                    _putchar(Chr);
                 }
             }
             ((char*)buf)[N] = (char)(Chr);

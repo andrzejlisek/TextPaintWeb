@@ -147,6 +147,16 @@ std::string Str::IntToStr(int I)
     return L.ToString();
 }
 
+Str Str::Substring(int Pos, int Count_)
+{
+    Str X;
+    for (int I = Pos; I < (Count_ + Pos); I++)
+    {
+        X.Add(Data[I]);
+    }
+    return X;
+}
+
 void Str::AddString(std::string T)
 {
     AddRange(Str::FromString(T));

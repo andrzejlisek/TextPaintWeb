@@ -10,73 +10,67 @@ ConfigFile::~ConfigFile()
 
 }
 
-void ConfigFile::FileLoad(std::string FileName)
+void ConfigFile::FileLoad(int N, std::string RawS)
 {
-    /*ParamClear();
-    std::fstream F(FileName, std::ios::in);
-    if (F.is_open())
+    std::string Buf = "";
+    Raw[N].clear();
+    char C0 = ' ';
+    char C = ' ';
+    for (unsigned int I = 0; I < RawS.length(); I++)
     {
-        std::stringstream SS;
-        SS << F.rdbuf();
-        std::string RawS = SS.str();
-        F.close();
-        std::string Buf = "";
-        for (unsigned int I = 0; I < RawS.length(); I++)
+        C = RawS[I];
+        if ((C == '\r') || (C == '\n'))
         {
-            char C = RawS[I];
-            if ((C == '\r') || (C == '\n'))
+            if (C0 != '\r')
             {
-                if (Buf != "")
-                {
-                    Raw.push_back(Buf);
-                    Buf = "";
-                }
-            }
-            else
-            {
-                Buf += C;
+                Raw[N].push_back(Buf);
+                Buf = "";
             }
         }
-        if (Buf != "")
+        else
         {
-            Raw.push_back(Buf);
-            Buf = "";
+            Buf += C;
         }
-    }*/
+    }
+    if (Buf != "")
+    {
+        Raw[N].push_back(Buf);
+        Buf = "";
+    }
 }
 
-void ConfigFile::FileSave(std::string FileName)
+std::string ConfigFile::FileSave(int N)
 {
-    /*std::fstream F(FileName, std::ios::out);
-    if (F.is_open())
+    std::stringstream SS;
+    for (unsigned int I = 0; I < Raw[N].size(); I++)
     {
-        for (unsigned int I = 0; I < Raw.size(); I++)
-        {
-            if (Raw[I] != "")
-            {
-                F << Raw[I] << std::endl;
-            }
-        }
-        F.close();
-    }*/
+        SS << Raw[N][I] << std::endl;
+    }
+    return SS.str();
 }
 
 void ConfigFile::ParamClear()
 {
-    Raw.clear();
+    for (int II = 0; II < RawN; II++)
+    {
+        Raw[II].clear();
+    }
 }
 
 void ConfigFile::ParamRemove(std::string Name)
 {
     std::string NameX = Name + "=";
-    for (unsigned int I = 0; I < Raw.size(); I++)
+    for (int II = 0; II < RawN; II++)
     {
-        if (Raw[I].length() >= NameX.length())
+        for (unsigned int I = 0; I < Raw[II].size(); I++)
         {
-            if (Raw[I].substr(0, NameX.length()) == NameX)
+            if (Raw[II][I].length() >= NameX.length())
             {
-                Raw[I] = "";
-                return;
+                if (Raw[II][I].substr(0, NameX.length()) == NameX)
+                {
+                    Raw[II][I] = "";
+                    return;
+                }
             }
         }
     }
@@ -85,18 +79,21 @@ void ConfigFile::ParamRemove(std::string Name)
 void ConfigFile::ParamSet(std::string Name, std::string Value)
 {
     std::string NameX = Name + "=";
-    for (unsigned int I = 0; I < Raw.size(); I++)
+    for (int II = 0; II < RawN; II++)
     {
-        if (Raw[I].length() >= NameX.length())
+        for (unsigned int I = 0; I < Raw[II].size(); I++)
         {
-            if (Raw[I].substr(0, NameX.length()) == NameX)
+            if (Raw[II][I].length() >= NameX.length())
             {
-                Raw[I] = NameX + Value;
-                return;
+                if (Raw[II][I].substr(0, NameX.length()) == NameX)
+                {
+                    Raw[II][I] = NameX + Value;
+                    return;
+                }
             }
         }
     }
-    Raw.push_back(NameX + Value);
+    Raw[9].push_back(NameX + Value);
 }
 
 void ConfigFile::ParamSet(std::string Name, char * Value)
@@ -114,40 +111,56 @@ void ConfigFile::ParamSet(std::string Name, long long Value)
     ParamSet(Name, std::to_string(Value));
 }
 
-/*void ConfigFile::ParamSet(std::string Name, bool Value)
+bool ConfigFile::ParamExists(std::string Name)
 {
-    std::string X = "";
-    if (Value)
+    for (int II = 0; II < RawN; II++)
     {
-        X = "1";
-        ParamSet(Name, X);
+        for (unsigned int I = 0; I < Raw[II].size(); I++)
+        {
+            std::string S = Raw[II][I];
+            int X = -1;
+            for (unsigned int II = 0; II < S.length(); II++)
+            {
+                if (S.at(II) == '=')
+                {
+                    X = II;
+                    break;
+                }
+            }
+            if (X > 0)
+            {
+                if (Name == S.substr(0, X))
+                {
+                    return true;
+                }
+            }
+        }
     }
-    else
-    {
-        X = "0";
-        ParamSet(Name, X);
-    }
-}*/
+    return false;
+}
 
 void ConfigFile::ParamGet(std::string Name, std::string &Value)
 {
-    for (unsigned int I = 0; I < Raw.size(); I++)
+    for (int II = 0; II < RawN; II++)
     {
-        std::string S = Raw[I];
-        int X = -1;
-        for (unsigned int II = 0; II < S.length(); II++)
+        for (unsigned int I = 0; I < Raw[II].size(); I++)
         {
-            if (S.at(II) == '=')
+            std::string S = Raw[II][I];
+            int X = -1;
+            for (unsigned int II = 0; II < S.length(); II++)
             {
-                X = II;
-                break;
+                if (S.at(II) == '=')
+                {
+                    X = II;
+                    break;
+                }
             }
-        }
-        if (X > 0)
-        {
-            if (Name == S.substr(0, X))
+            if (X > 0)
             {
-                Value = S.substr(X + 1);
+                if (Name == S.substr(0, X))
+                {
+                    Value = S.substr(X + 1);
+                }
             }
         }
     }

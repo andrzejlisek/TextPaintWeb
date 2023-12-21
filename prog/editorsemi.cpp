@@ -139,7 +139,6 @@ void EditorSemi::SetFrameNext(int N)
             Frame2I = 0;
         }
     }
-    std::cout << Frame1C.Count << "____" << Frame2C.Count << std::endl;
     SetFrame(Frame1I, Frame2I);
 }
 

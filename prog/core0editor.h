@@ -18,7 +18,10 @@ public:
     void Init();
     void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void EventOther(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
+    void EventTick();
 private:
+    int TickRepaintX = 2;
+    int TickRepaint = 0;
     bool UseAnsiLoad = false;
     bool UseAnsiSave = false;
     int FileReadSteps = 0;
@@ -58,7 +61,7 @@ private:
     std::shared_ptr<EditorChar> EditorChar_;
     std::shared_ptr<EditorPixelPaint> EditorPixelPaint_;
     std::shared_ptr<EditorClipboard> EditorClipboard_;
-    enum DisplayStateDef { Editor, Info, Charmap };
+    enum DisplayStateDef { Editor, Info, Charmap, FileMan };
     int DisplayState = Editor;
     int CursorType = 0;
     int CursorFontW = 1;
@@ -105,6 +108,7 @@ private:
     void CharmapPaint(int Depth);
 
     void FileLoad();
+    void FileLoad2();
     void FileSave();
 };
 

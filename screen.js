@@ -54,17 +54,41 @@ ScreenGlyphBuf0 = {};
 ScreenGlyphBuf1 = {};
 
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-let SET_ANSIIgnoreConcealed = false;
-let SET_ANSIReverseMode = 0;
-let SET_ANSIColors = true;
-let SET_ANSIColorBlink = false;
-let SET_ANSIColorBold = false
+let ScreenSET_ANSIIgnoreConcealed = false;
+let ScreenSET_ANSIReverseMode = 0;
+let ScreenSET_ANSIColors = true;
+let ScreenSET_ANSIColorBlink = false;
+let ScreenSET_ANSIColorBold = false
+let ScreenSET_Blink = 1;
+let ScreenAttrB = true;
+let ScreenAttrI = true;
+let ScreenAttrU = true;
+let ScreenAttrS = true;
 
-//SET_ANSIColorBlink = true;
-SET_ANSIColorBold = true;
-SET_ANSIReverseMode = 2;
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+function ScreenSetDisplayConfig(Repaint)
+{
+    ScreenCursorSteady = ConfigFileB("WinSteadyCursor");
+    ScreenSET_ANSIIgnoreConcealed = ConfigFileB("ANSIIgnoreConcealed");
+    ScreenSET_ANSIReverseMode = ConfigFileI("ANSIReverseMode");
+    ScreenSET_ANSIColors = ConfigFileB("ANSIColors");
+    ScreenSET_ANSIColorBlink = ConfigFileB("ANSIColorBlink");
+    ScreenSET_ANSIColorBold = ConfigFileB("ANSIColorBold");
+
+    ScreenAttrB = ((ConfigFileI("DisplayAttrib") & 1) > 0) ? true : false;
+    ScreenAttrI = ((ConfigFileI("DisplayAttrib") & 2) > 0) ? true : false;
+    ScreenAttrU = ((ConfigFileI("DisplayAttrib") & 4) > 0) ? true : false;
+    ScreenAttrS = ((ConfigFileI("DisplayAttrib") & 8) > 0) ? true : false;
+
+    ScreenSET_Blink = ConfigFileI("DisplayBlink");
+    
+    ScreenGlyphBuf0 = {};
+    ScreenGlyphBuf1 = {};
+    
+    if (Repaint)
+    {
+        ScreenRepaint();
+    }
+}
 
 
 let ScreenCalcColor_Back = 0;
@@ -72,7 +96,7 @@ let ScreenCalcColor_Fore = 7;
 let ScreenCalcColor_Temp = 0;
 function ScreenCalcColor(Back, Fore, Attr)
 {
-    if (SET_ANSIColors)
+    if (ScreenSET_ANSIColors)
     {
         ScreenCalcColor_Back = (Back >= 0) ? Back : ScreenDefaultBack;
         ScreenCalcColor_Fore = (Fore >= 0) ? Fore : ScreenDefaultFore;
@@ -88,7 +112,7 @@ function ScreenCalcColor(Back, Fore, Attr)
         return;
     }
     
-    if (SET_ANSIReverseMode == 1)
+    if (ScreenSET_ANSIReverseMode == 1)
     {
         if ((Attr & 16) != 0)
         {
@@ -98,7 +122,7 @@ function ScreenCalcColor(Back, Fore, Attr)
         }
     }
 
-    if (((Attr & 1) != 0) && (SET_ANSIColorBold))
+    if (((Attr & 1) != 0) && (ScreenSET_ANSIColorBold))
     {
         if (ScreenCalcColor_Fore < 8)
         {
@@ -116,7 +140,7 @@ function ScreenCalcColor(Back, Fore, Attr)
         }
     }
 
-    if (((Attr & 8) != 0) && (SET_ANSIColorBlink))
+    if (((Attr & 8) != 0) && (ScreenSET_ANSIColorBlink))
     {
         if (ScreenCalcColor_Back < 8)
         {
@@ -134,7 +158,7 @@ function ScreenCalcColor(Back, Fore, Attr)
         }
     }
 
-    if (SET_ANSIReverseMode == 2)
+    if (ScreenSET_ANSIReverseMode == 2)
     {
         if ((Attr & 16) != 0)
         {
@@ -151,7 +175,7 @@ function ScreenCalcColor(Back, Fore, Attr)
         ScreenCalcColor_Back = ScreenCalcColor_Temp;
     }
 
-    if (((Attr & 32) != 0) && (!SET_ANSIIgnoreConcealed))
+    if (((Attr & 32) != 0) && (!ScreenSET_ANSIIgnoreConcealed))
     {
         ScreenCalcColor_Fore = ScreenCalcColor_Back;
     }
@@ -176,15 +200,14 @@ function ScreenCharBlank(Buf, ScrIdx)
     
     if ((CharIdx == 0) || (!CharData0))
     {
-        let AttrB = Attr & 1;
-        let AttrI = Attr & 2;
-        let AttrU = Attr & 4;
+        let AttrB = ScreenAttrB ? Attr & 1 : 0;
+        let AttrI = ScreenAttrI ? Attr & 2 : 0;
+        let AttrU = ScreenAttrU ? Attr & 4 : 0;
         let AttrK = Attr & 8;
         let AttrR = Attr & 16;
         let AttrC = Attr & 32;
-        let AttrS = Attr & 64;
+        let AttrS = ScreenAttrS ? Attr & 64 : 0;
         let AttrN = Attr & 128;
-        AttrB = 0;
     
         let CharVals = ScreenFont1.GetGlyph(Chr);
         CharData0 = ScreenCtx.createImageData(ScreenCellW, ScreenCellH);
@@ -208,11 +231,20 @@ function ScreenCharBlank(Buf, ScrIdx)
                     CharData0.data[Ptr4 + 0] = ScreenPalette1R[Fore_];
                     CharData0.data[Ptr4 + 1] = ScreenPalette1G[Fore_];
                     CharData0.data[Ptr4 + 2] = ScreenPalette1B[Fore_];
-                    if (AttrK)
+                    if (AttrK && (ScreenSET_Blink > 0))
                     {
-                        CharData1.data[Ptr4 + 0] = ScreenPalette2R[Fore_];
-                        CharData1.data[Ptr4 + 1] = ScreenPalette2G[Fore_];
-                        CharData1.data[Ptr4 + 2] = ScreenPalette2B[Fore_];
+                        if (ScreenSET_Blink == 1)
+                        {
+                            CharData1.data[Ptr4 + 0] = ScreenPalette2R[Fore_];
+                            CharData1.data[Ptr4 + 1] = ScreenPalette2G[Fore_];
+                            CharData1.data[Ptr4 + 2] = ScreenPalette2B[Fore_];
+                        }
+                        else
+                        {
+                            CharData1.data[Ptr4 + 0] = ScreenPalette1R[Back_];
+                            CharData1.data[Ptr4 + 1] = ScreenPalette1G[Back_];
+                            CharData1.data[Ptr4 + 2] = ScreenPalette1B[Back_];
+                        }
                     }
                     else
                     {
@@ -226,7 +258,7 @@ function ScreenCharBlank(Buf, ScrIdx)
                     CharData0.data[Ptr4 + 0] = ScreenPalette1R[Back_];
                     CharData0.data[Ptr4 + 1] = ScreenPalette1G[Back_];
                     CharData0.data[Ptr4 + 2] = ScreenPalette1B[Back_];
-                    if (AttrK)
+                    if (AttrK && (ScreenSET_Blink == 1))
                     {
                         CharData1.data[Ptr4 + 0] = ScreenPalette2R[Back_];
                         CharData1.data[Ptr4 + 1] = ScreenPalette2G[Back_];
@@ -276,15 +308,14 @@ function ScreenCharGlyph(Buf, ScrIdx)
     
     if ((FontW > 0) || (FontH > 0) || (CharIdx == 0) || (!CharData0))
     {
-        let AttrB = Attr & 1;
-        let AttrI = Attr & 2;
-        let AttrU = Attr & 4;
+        let AttrB = ScreenAttrB ? Attr & 1 : 0;
+        let AttrI = ScreenAttrI ? Attr & 2 : 0;
+        let AttrU = ScreenAttrU ? Attr & 4 : 0;
         let AttrK = Attr & 8;
         let AttrR = Attr & 16;
         let AttrC = Attr & 32;
-        let AttrS = Attr & 64;
+        let AttrS = ScreenAttrS ? Attr & 64 : 0;
         let AttrN = Attr & 128;
-        AttrB = 0;
     
         let CharVals = ScreenFont1.GetGlyph(Chr);
         CharData0 = ScreenCtx.createImageData(ScreenCellW, ScreenCellH);
@@ -330,11 +361,20 @@ function ScreenCharGlyph(Buf, ScrIdx)
                     CharData0.data[Ptr4 + 0] = ScreenPalette1R[Fore_];
                     CharData0.data[Ptr4 + 1] = ScreenPalette1G[Fore_];
                     CharData0.data[Ptr4 + 2] = ScreenPalette1B[Fore_];
-                    if (AttrK)
+                    if (AttrK && (ScreenSET_Blink > 0))
                     {
-                        CharData1.data[Ptr4 + 0] = ScreenPalette2R[Fore_];
-                        CharData1.data[Ptr4 + 1] = ScreenPalette2G[Fore_];
-                        CharData1.data[Ptr4 + 2] = ScreenPalette2B[Fore_];
+                        if (ScreenSET_Blink == 1)
+                        {
+                            CharData1.data[Ptr4 + 0] = ScreenPalette2R[Fore_];
+                            CharData1.data[Ptr4 + 1] = ScreenPalette2G[Fore_];
+                            CharData1.data[Ptr4 + 2] = ScreenPalette2B[Fore_];
+                        }
+                        else
+                        {
+                            CharData1.data[Ptr4 + 0] = ScreenPalette1R[Back_];
+                            CharData1.data[Ptr4 + 1] = ScreenPalette1G[Back_];
+                            CharData1.data[Ptr4 + 2] = ScreenPalette1B[Back_];
+                        }
                     }
                     else
                     {
@@ -348,7 +388,7 @@ function ScreenCharGlyph(Buf, ScrIdx)
                     CharData0.data[Ptr4 + 0] = ScreenPalette1R[Back_];
                     CharData0.data[Ptr4 + 1] = ScreenPalette1G[Back_];
                     CharData0.data[Ptr4 + 2] = ScreenPalette1B[Back_];
-                    if (AttrK)
+                    if (AttrK && (ScreenSET_Blink == 1))
                     {
                         CharData1.data[Ptr4 + 0] = ScreenPalette2R[Back_];
                         CharData1.data[Ptr4 + 1] = ScreenPalette2G[Back_];
@@ -728,7 +768,8 @@ function ScreenResize(NewW, NewH)
         ScreenDataChr1.data[I * 4 + 3] = 255;
     }
     
-    ScreenRepaint();
+    ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
+    //ScreenRepaint();
 }
 
 function ScreenTest()
@@ -916,20 +957,23 @@ function ScreenDrawCursor(State)
 }
 
 
+
 let ScreenFont1;
 let ScreenFont2;
 
 
 function ScreenInit1()
 {
+    KeybTouch = ConfigFileI("WinTouchScreen");
+
     ScreenPalette1R = [0x00, 0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x55, 0xFF, 0x55, 0xFF, 0x55, 0xFF, 0x55, 0xFF];
     ScreenPalette1G = [0x00, 0x00, 0xAA, 0xAA, 0x00, 0x00, 0xAA, 0xAA, 0x55, 0x55, 0xFF, 0xFF, 0x55, 0x55, 0xFF, 0xFF];
     ScreenPalette1B = [0x00, 0x00, 0x00, 0x00, 0xAA, 0xAA, 0xAA, 0xAA, 0x55, 0x55, 0x55, 0x55, 0xFF, 0xFF, 0xFF, 0xFF];
     ScreenPalette2R = [0x00, 0x71, 0x00, 0x71, 0x00, 0x71, 0x00, 0x71, 0x39, 0xAA, 0x39, 0xAA, 0x39, 0xAA, 0x39, 0xAA];
     ScreenPalette2G = [0x00, 0x00, 0x71, 0x71, 0x00, 0x00, 0x71, 0x71, 0x39, 0x39, 0xAA, 0xAA, 0x39, 0x39, 0xAA, 0xAA];
     ScreenPalette2B = [0x00, 0x00, 0x00, 0x00, 0x71, 0x71, 0x71, 0x71, 0x39, 0x39, 0x39, 0x39, 0xAA, 0xAA, 0xAA, 0xAA];
-    ScreenFont1 = new ScreenFont(ScreenFontUrl1);
-    ScreenFont2 = new ScreenFont(ScreenFontUrl2);
+    ScreenFont1 = new ScreenFont(ConfigFileS("WinFontName"));
+    ScreenFont2 = new ScreenFont(ConfigFileS("DuospaceFontName"));
 
     setTimeout(ScreenInit2, 20);
 }
@@ -938,6 +982,9 @@ function ScreenInit2()
 {
     if (ScreenFont1.Ready && ScreenFont2.Ready)
     {
+        ScreenSetDisplayConfig(false);
+        ScreenTimerPeriod = ConfigFileI("WinTimer");
+    
         ScreenCellW = ScreenFont1.CellW;
         ScreenCellH = ScreenFont1.CellH;
         ScreenCellH2 = ScreenCellH / 2;
@@ -974,13 +1021,13 @@ function ScreenInit2()
         ScreenCellFontY[2].push(ScreenCellW * ScreenCellH2);
 
         
-        console.log(ScreenCellFontX);
+
         
         ScreenResize(80, 24);
         ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
         //ScreenTest();
         ScreenTimerStart();
-        ProgInit();
+        ProgInitAfterConf();
     }
     else
     {
@@ -988,4 +1035,3 @@ function ScreenInit2()
     }
 }
 
-ScreenInit1();

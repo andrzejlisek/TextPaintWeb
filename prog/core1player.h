@@ -36,8 +36,8 @@ private:
     time_pt Time3;
     time_pt Time4;
 
-    enum WorkStateSDef { None, InfoScreen, InfoScreenWaitForKey,
-                         FileOpen, FileOpenWait, FileOpenPrepare,
+    enum WorkStateSDef { None, InfoScreen, InfoScreenWaitForKey, FileMan,
+                         FileOpenFile0, FileOpenFile, FileOpen, FileOpenWait, FileOpenPrepare,
                          DisplayFwdStep, DisplayFwdPlay, DisplayRevStep, DisplayRevPlay, DisplayPause,
                          DisplayInfo, DispConf };
     WorkStateSDef WorkStateS = WorkStateSDef::InfoScreen;

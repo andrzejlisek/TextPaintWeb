@@ -37,11 +37,38 @@ void CoreCommon::ReadColor(std::string SettingValue, int &ColorB, int &ColorF)
 
 void CoreCommon::InitCommon()
 {
+    if (BinaryFile_.get()->ItemCount() <= BinaryFile_.get()->SystemFileCount)
+    {
+        int I = 1;
+        int XCodec = 0;
+        bool XAnsi = false;
+
+        while (CF.get()->ParamExists("File" + std::to_string(I) + "Name"))
+        {
+            std::string XFile = CF.get()->ParamGetS("File" + std::to_string(I) + "Name");
+            if (CF.get()->ParamExists("File" + std::to_string(I) + "Codec"))
+            {
+                XCodec = CF.get()->ParamGetI("File" + std::to_string(I) + "Codec");
+            }
+            if (CF.get()->ParamExists("File" + std::to_string(I) + "Ansi"))
+            {
+                XAnsi = CF.get()->ParamGetB("File" + std::to_string(I) + "Ansi");
+            }
+            BinaryFile_.get()->ItemAdd(BinaryFileItem(XFile, std::make_shared<TextCodec>(XCodec), 4, 0, XAnsi));
+            I++;
+        }
+        BinaryFile_.get()->SetDir(Str("/"));
+    }
+
+
     ReadColor(CF.get()->ParamGetS("ColorNormal"), Screen::TextNormalBack, Screen::TextNormalFore);
     ReadColor(CF.get()->ParamGetS("ColorCursor"), CursorBack, CursorFore);
     ReadColor(CF.get()->ParamGetS("ColorStatus"), StatusBack, StatusFore);
     ReadColor(CF.get()->ParamGetS("ColorPopup"), PopupBack, PopupFore);
 
+    FileManager_.BinaryFile_ = BinaryFile_;
+    FileManager_.PopupBack = PopupBack;
+    FileManager_.PopupFore = PopupFore;
 
     std::string Space[256];
     int L = TextWork::StringSplit(CF.get()->ParamGetS("Space"), ',', Space);

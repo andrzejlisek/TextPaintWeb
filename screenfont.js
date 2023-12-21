@@ -89,7 +89,7 @@ class ScreenFont
             Val += (this.GetPixelBin(15, I));
             if (Val0 != Val)
             {
-            console.log("CF.get()->ParamSet(\"_WinBitmapPage" + IdxI + "\", 0x" + Val.toString(16) + ");")
+                ConfigFileSet("_WinBitmapFontPage" + IdxI + "", Val);
                 this.Idx[IdxI] = Val;
                 IdxI++;
                 Val0 = Val;

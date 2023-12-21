@@ -19,17 +19,17 @@ bool VTRun = false;
 int main()
 {
     BufInit();
-    worker = emscripten_create_worker("progcore.js");
+    worker = emscripten_create_worker("compiled/progcore.js");
     return 0;
 }
 
 extern "C"
 {
     EMSCRIPTEN_KEEPALIVE
-    void Init()
+    void Init(const char * ConfData)
     {
         BufClear();
-        BufChr('_');
+        BufTxt(ConfData);
         BufChr(0);
         emscripten_call_worker(worker, "Init", IOBuf, IOBufPtr, Callback, (void*)0);
     }
@@ -71,6 +71,22 @@ extern "C"
         BufNum(EvtParam4);
         BufChr(0);
         emscripten_call_worker(worker, "EventOther", IOBuf, IOBufPtr, Callback, (void*)0);
+    }
+
+    EMSCRIPTEN_KEEPALIVE
+    void EventOtherFile(const char * EvtName, const char * EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4)
+    {
+        BufClear();
+        BufTxt(EvtName);
+        BufChr(',');
+        BufStr(EvtParam0);
+        BufChr(',');
+        BufNum(EvtParam1);
+        BufNum(EvtParam2);
+        BufNum(EvtParam3);
+        BufNum(EvtParam4);
+        BufChr(0);
+        emscripten_call_worker(worker, "EventOtherFile", IOBuf, IOBufPtr, Callback, (void*)0);
     }
 
     EMSCRIPTEN_KEEPALIVE

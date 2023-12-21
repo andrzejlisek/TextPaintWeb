@@ -113,7 +113,7 @@ void BufStr(std::string Str)
     for (int I = 0; I < StrL; I++)
     {
         char Chr = Str[I];
-        if ((Chr == '_') || (Chr == ',') || (Chr > 126) || (Chr < 32))
+        if ((Chr == '_') || (Chr == ',') || (Chr == '\"') || (Chr > 126) || (Chr < 32))
         {
             IOBuf[IOBufPtr] = '_';
             IOBufPtr++;
@@ -157,7 +157,6 @@ std::string BufGetStr()
         {
             IOBufPtr++;
             int ChrN = BufGetNum();
-            std::cout << "{" << ChrN << "}" << std::endl;
             S.push_back((char)ChrN);
         }
         else
@@ -172,6 +171,11 @@ std::string BufGetStr()
 
 void BufSet(char * data)
 {
+    int TxtL = strlen(data);
+    while (IOBufSize <= (IOBufPtr + TxtL))
+    {
+        BufExpand();
+    }
     strcpy(IOBuf, data);
     IOBufPtr = 0;
 }

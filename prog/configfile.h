@@ -11,10 +11,11 @@ class ConfigFile
 public:
     ConfigFile();
     ~ConfigFile();
-    std::vector<std::string> Raw;
+    std::vector<std::string> Raw[10];
+    int RawN = 10;
 
-    void FileLoad(std::string FileName);
-    void FileSave(std::string FileName);
+    void FileLoad(int N, std::string RawS);
+    std::string FileSave(int N);
 
     void ParamClear();
     void ParamRemove(std::string Name);
@@ -23,7 +24,8 @@ public:
     void ParamSet(std::string Name, std::string Value);
     void ParamSet(std::string Name, int Value);
     void ParamSet(std::string Name, long long Value);
-    //void ParamSet(std::string Name, bool Value);
+
+    bool ParamExists(std::string Name);
 
     void ParamGet(std::string Name, std::string &Value);
     void ParamGet(std::string Name, int &Value);

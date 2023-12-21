@@ -122,7 +122,9 @@ void Core1Player::EventTick()
                 Screen_WriteLine();
                 Screen_WriteText(", - Copy screen to clipboard");
                 Screen_WriteLine();
-                Screen_WriteText("\\ - Display configuration");
+                Screen_WriteText(". - File manager");
+                Screen_WriteLine();
+                //!!!!!!!!!!!!!!Screen_WriteText("\\ - Display configuration");
                 Screen_WriteLine();
                 Screen_WriteLine();
                 Screen_WriteLine();
@@ -134,8 +136,23 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::InfoScreenWaitForKey: // Waiting for user key press before opening file
             {
-                BinaryFile_.get()->Refresh();
+
             }
+            break;
+        case WorkStateSDef::FileOpenFile0: // Waiting for file contents
+            {
+                Screen_Clear();
+                Screen_Refresh();
+                WorkStateS = WorkStateSDef::FileOpenFile;
+                BinaryFile_.get()->FileImport(-1);
+            }
+            break;
+        case WorkStateSDef::FileOpenFile: // Waiting for file contents
+            {
+
+            }
+            break;
+        case WorkStateSDef::FileMan: // File manager
             break;
         case WorkStateSDef::FileOpen: // Opening file
             {
@@ -192,8 +209,8 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
 
-                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->ListIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ListName.Count));
-                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->ListName[BinaryFile_.get()->ListIndex].ToString());
+                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->ListIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()));
+                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->ItemName(BinaryFile_.get()->ListIndex).ToString());
                 AnsiSauce_.NonSauceInfo("Steps", MovieLength);
                 AnsiSauce_.NonSauceInfo("Characters", CoreAnsi_.get()->AnsiState_.AnsiBufferI);
                 AnsiSauce_.NonSauceInfo("Overwrites/writes", std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter));
@@ -376,12 +393,6 @@ void Core1Player::EventTick()
 
 void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
-    if (WorkStateS == WorkStateSDef::DispConf)
-    {
-        //!!!!DisplayConfig_.ProcessKey(KeyName, KeyChar);
-        return;
-    }
-
     std::string WorkDisp = "__";
 
     switch (WorkStateS)
@@ -401,6 +412,22 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case WorkStateSDef::DisplayInfo:
             WorkDisp = "2_";
             break;
+        case WorkStateSDef::FileMan:
+            FileManager_.EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            if (FileManager_.RequestRepaint)
+            {
+                Repaint(true);
+                FileManager_.Repaint();
+            }
+            if (FileManager_.RequestClose)
+            {
+                WorkStateS = WorkStateSDef::FileOpenFile0;
+                EventTickX();
+            }
+            return;
+        case WorkStateSDef::DispConf:
+            //!!!!DisplayConfig_.ProcessKey(KeyName, KeyChar);
+            return;
     }
 
 
@@ -409,8 +436,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case _("0_Enter"):
         case _("0_NumpadEnter"):
             {
-                Screen_Clear();
-                WorkStateS = WorkStateSDef::FileOpen;
+                WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
             }
             return;
@@ -514,29 +540,39 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_PageUp"):
             {
-                if (BinaryFile_.get()->ListIndex > 0)
+                int FType = -1;
+                while (FType < 0)
                 {
-                    BinaryFile_.get()->ListIndex--;
+                    if (BinaryFile_.get()->ListIndex > 0)
+                    {
+                        BinaryFile_.get()->ListIndex--;
+                    }
+                    else
+                    {
+                        BinaryFile_.get()->ListIndex = (BinaryFile_.get()->ItemCount() - 1);
+                    }
+                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ListIndex);
                 }
-                else
-                {
-                    BinaryFile_.get()->ListIndex = (BinaryFile_.get()->ListName.Count - 1);
-                }
-                WorkStateS = WorkStateSDef::FileOpen;
+                WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
             }
             return;
         case _("1_PageDown"):
             {
-                if (BinaryFile_.get()->ListIndex < (BinaryFile_.get()->ListName.Count - 1))
+                int FType = -1;
+                while (FType < 0)
                 {
-                    BinaryFile_.get()->ListIndex++;
+                    if (BinaryFile_.get()->ListIndex < (BinaryFile_.get()->ItemCount() - 1))
+                    {
+                        BinaryFile_.get()->ListIndex++;
+                    }
+                    else
+                    {
+                        BinaryFile_.get()->ListIndex = 0;
+                    }
+                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ListIndex);
                 }
-                else
-                {
-                    BinaryFile_.get()->ListIndex = 0;
-                }
-                WorkStateS = WorkStateSDef::FileOpen;
+                WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
             }
             return;
@@ -577,7 +613,11 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Comma"):
             Clipboard_.SetText(CoreAnsi_.get()->AnsiState_.GetScreen(0, 0, ScreenW - 1, ScreenH - 1));
-            Screen::ClipboardCopy(Clipboard_.SystemText);
+            Screen::FileExport(0, "", Clipboard_.SystemText);
+            return;
+        case _("1_Period"):
+            WorkStateS = WorkStateSDef::FileMan;
+            FileManager_.Open();
             return;
         case _("1_Backslash"):
             return;
@@ -632,6 +672,12 @@ void Core1Player::EventOther(std::string EvtName, std::string EvtParam0, int Evt
                     break;
             }
             break;
+        case _("FileImport"):
+            if (EvtParam2 != 0)
+            {
+                WorkStateS = WorkStateSDef::FileOpen;
+            }
+            break;
     }
 }
 
@@ -658,9 +704,9 @@ void Core1Player::Repaint(bool Force)
                 {
                     Str CharMsgIdx(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
                     CharMsgIdx.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
-                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->ListIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ListName.Count) + (AnsiSauce_.Exists ? "= " : ": "));
+                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->ListIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()) + (AnsiSauce_.Exists ? "= " : ": "));
 
-                    CharMsg.AddRange(BinaryFile_.get()->ListName[BinaryFile_.get()->ListIndex]);
+                    CharMsg.AddRange(BinaryFile_.get()->ItemName(BinaryFile_.get()->ListIndex));
                     int MaxS = (ScreenW - CharMsgIdx.Count);
                     if (CharMsg.Count > MaxS)
                     {

@@ -11,8 +11,9 @@ class EditorChar
 {
 public:
     std::shared_ptr<BinaryFile> BinaryFile_;
+    std::shared_ptr<ConfigFile> CF;
     EditorChar();
-    void Init(std::shared_ptr<ConfigFile> CF);
+    void Init(std::shared_ptr<ConfigFile> CF_);
     std::shared_ptr<EditorData> EditorData_;
     std::shared_ptr<CoreAnsi> CoreAnsi_;
     void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);

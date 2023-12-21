@@ -44,11 +44,10 @@ void Core0Editor::Init()
 
 
 
-
-    FileLoad();
-
     EditorScreenRefresh();
     ScreenRefresh(true);
+
+    FileLoad();
 }
 
 void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
@@ -64,13 +63,36 @@ void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case DisplayStateDef::Charmap:
             EventKey_Charmap(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
             break;
+        case DisplayStateDef::FileMan:
+            FileManager_.EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            if (FileManager_.RequestRepaint)
+            {
+                DisplayState = DisplayStateDef::Editor;
+                EditorScreenRefresh();
+                ScreenRefresh(true);
+                DisplayState = DisplayStateDef::FileMan;
+                FileManager_.Repaint();
+            }
+            if (FileManager_.RequestClose)
+            {
+                DisplayState = DisplayStateDef::Editor;
+                EditorScreenRefresh();
+                ScreenRefresh(true);
+            }
+            break;
     }
 }
 
 void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4)
 {
-    std::cout << "zdarzenie inne  [" << EvtName << "] [" << EvtParam0 << "] " << EvtParam1 << "_" << EvtParam2 << std::endl;
-
+    if ((EvtName == "FileImport") && (EvtParam2 != 0))
+    {
+        if (DisplayState == DisplayStateDef::Editor)
+        {
+            FileLoad2();
+            return;
+        }
+    }
 
     std::string StateId = "__";
     switch (WorkState)
@@ -99,19 +121,51 @@ void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int Evt
 
     switch (_((StateId + EvtName).c_str()))
     {
-        case _("DrawChar_TextCopy"):
-            EditorClipboard_.get()->SysClpTextCopy = EvtParam0;
+        case _("DrawChar_FileExport"):
+            if ((EvtParam2 == 0) && (EvtParam4 == 0))
+            {
+                EditorClipboard_.get()->SysClpTextCopy = EvtParam0;
+            }
             break;
-        case _("DrawChar_TextPaste"):
-            EditorClipboard_.get()->SysClpTextPaste = EvtParam0;
-            EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, true, EditorSemi_.get()->DiamondType);
+        case _("DrawChar_FileImport"):
+            if (EvtParam2 == 0)
+            {
+                if (EvtParam4 == 0)
+                {
+                    EditorClipboard_.get()->SysClpTextPaste = EvtParam0;
+                }
+                else
+                {
+                    EditorClipboard_.get()->SysClpTextPaste = EditorClipboard_.get()->SysClpTextCopy;
+                }
+                EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, true, EditorSemi_.get()->DiamondType);
+                EditorScreenRefresh();
+                ScreenRefresh(true);
+                TickRepaint = TickRepaintX;
+            }
             break;
-        case _("DrawPixel_TextCopy"):
-            EditorClipboard_.get()->SysClpTextCopy = EvtParam0;
+        case _("DrawPixel_FileExport"):
+            if ((EvtParam2 == 0) && (EvtParam4 == 0))
+            {
+                EditorClipboard_.get()->SysClpTextCopy = EvtParam0;
+            }
             break;
-        case _("DrawPixel_TextPaste"):
-            EditorClipboard_.get()->SysClpTextPaste = EvtParam0;
-            EditorPixelPaint_.get()->ClipboardPaste();
+        case _("DrawPixel_FileImport"):
+            if (EvtParam2 == 0)
+            {
+                if (EvtParam4 == 0)
+                {
+                    EditorClipboard_.get()->SysClpTextPaste = EvtParam0;
+                }
+                else
+                {
+                    EditorClipboard_.get()->SysClpTextPaste = EditorClipboard_.get()->SysClpTextCopy;
+                }
+                EditorPixelPaint_.get()->ClipboardPaste();
+                EditorScreenRefresh();
+                ScreenRefresh(true);
+                TickRepaint = TickRepaintX;
+            }
             break;
     }
 }
@@ -136,9 +190,6 @@ void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShif
             EditorChar_.get()->SelectColoB = EditorData_.get()->DrawColoBI;
             EditorChar_.get()->SelectColoF = EditorData_.get()->DrawColoFI;
             EditorChar_.get()->SelectColoA = EditorData_.get()->DrawColoAI;
-            BinaryFile_.get()->ListIndex_ = BinaryFile_.get()->ListIndex;
-            BinaryFile_.get()->ListDispOffset_ = BinaryFile_.get()->ListDispOffset;
-            BinaryFile_.get()->Refresh();
             CharmapPaint(0);
             return;
         case _("Tab"):
@@ -196,6 +247,11 @@ void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShif
             return;
         case _("F8"):
             FileLoad();
+            return;
+
+        case _("F11"):
+            DisplayState = DisplayStateDef::FileMan;
+            FileManager_.Open();
             return;
 
         case _("F12"):
@@ -850,10 +906,10 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
 
         case _("KeyC"):
             EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, false, EditorSemi_.get()->DiamondType);
-            Screen::ClipboardCopy(EditorClipboard_.get()->SysClpTextCopy);
+            Screen::FileExport(0, "", EditorClipboard_.get()->SysClpTextCopy);
             break;
         case _("KeyV"):
-            Screen::ClipboardPaste();
+            Screen::FileImport(0, "");
             break;
 
 
@@ -1022,10 +1078,10 @@ void Core0Editor::EventKey_Editor_4(std::string KeyName, int KeyChar, bool ModSh
 
         case _("KeyC"):
             EditorPixelPaint_.get()->ClipboardCopy();
-            Screen::ClipboardCopy(EditorClipboard_.get()->SysClpTextCopy);
+            Screen::FileExport(0, "", EditorClipboard_.get()->SysClpTextCopy);
             break;
         case _("KeyV"):
-            Screen::ClipboardPaste();
+            Screen::FileImport(0, "");
             break;
 
         case _("Digit1"):
@@ -1165,6 +1221,20 @@ void Core0Editor::EventKey_Charmap(std::string KeyName, int KeyChar, bool ModShi
 {
     EditorChar_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
     CharmapPaint(EditorChar_.get()->RepaintDepth);
+}
+
+void Core0Editor::EventTick()
+{
+    if (TickRepaint > 0)
+    {
+        TickRepaint--;
+        if (TickRepaint == 0)
+        {
+            //??EventKey("", 0, false, false, false);
+            EditorScreenRefresh();
+            ScreenRefresh(true);
+        }
+    }
 }
 
 void Core0Editor::CursorLimit()
@@ -1659,6 +1729,7 @@ void Core0Editor::ScreenRefresh(bool Force)
         case DisplayStateDef::Editor:
         case DisplayStateDef::Info:
         case DisplayStateDef::Charmap:
+        case DisplayStateDef::FileMan:
             {
                 Str StatusText;
                 EditorData_.get()->CursorChar = EditorData_.get()->ElementGetVal(EditorData_.get()->CursorX, EditorData_.get()->CursorY, true, false, 0);
@@ -2085,6 +2156,8 @@ void Core0Editor::CharmapPaintCursor(int X, int Y, int Chr, bool Sel)
 
 void Core0Editor::CharmapPaint(int Depth)
 {
+    int FileListDispLen = 17;
+
     if ((Depth == 101) || (Depth == 102))
     {
         if (Depth == 102)
@@ -2093,8 +2166,6 @@ void Core0Editor::CharmapPaint(int Depth)
             EditorData_.get()->DrawColoBI = EditorChar_.get()->SelectColoB;
             EditorData_.get()->DrawColoFI = EditorChar_.get()->SelectColoF;
             EditorData_.get()->DrawColoAI = EditorChar_.get()->SelectColoA;
-            BinaryFile_.get()->ListIndex = BinaryFile_.get()->ListIndex_;
-            BinaryFile_.get()->ListDispOffset = BinaryFile_.get()->ListDispOffset_;
         }
 
         DisplayState = DisplayStateDef::Editor;
@@ -2191,24 +2262,6 @@ void Core0Editor::CharmapPaint(int Depth)
                 }
             }
         }
-        if (EditorChar_.get()->SelectorState == 3)
-        {
-            for (int Idx = BinaryFile_.get()->ListDispOffset_; Idx < std::min(BinaryFile_.get()->ListName.Count, 16 + BinaryFile_.get()->ListDispOffset_); Idx++)
-            {
-                int ItemL = std::min(BinaryFile_.get()->ListName[Idx].Count, 32);
-                int ItemO = BinaryFile_.get()->ListName[Idx].Count - ItemL;
-                for (int I = 0; I < ItemL; I++)
-                {
-                    ScreenChar0(CharPosX + I + 2, CharPosY + 1 + Idx, BinaryFile_.get()->ListName[Idx][I + ItemO], PopupBack, PopupFore);
-                }
-                if (ItemO > 0)
-                {
-                    ScreenChar0(CharPosX + 0 + 2, CharPosY + 1 + Idx, '.', PopupBack, PopupFore);
-                    ScreenChar0(CharPosX + 1 + 2, CharPosY + 1 + Idx, '.', PopupBack, PopupFore);
-                    ScreenChar0(CharPosX + 2 + 2, CharPosY + 1 + Idx, '.', PopupBack, PopupFore);
-                }
-            }
-        }
     }
 
     // Selector cursor and information
@@ -2218,11 +2271,6 @@ void Core0Editor::CharmapPaint(int Depth)
     {
         ScrX = EditorChar_.get()->SelectCharPart(2);
         ScrY = EditorChar_.get()->SelectCharPart(3);
-    }
-    if (EditorChar_.get()->SelectorState == 3)
-    {
-        ScrX = 0;
-        ScrY = BinaryFile_.get()->ListIndex_ - 1;
     }
     int SelX = CharPosX + ScrX * 2 + 2;
     int SelY = CharPosY + ScrY + 2;
@@ -2495,37 +2543,22 @@ void Core0Editor::CharmapPaint(int Depth)
                 ScreenChar0(CharPosX + 5 + i, CharPosY + 1, StateMsg[i], PopupBack, PopupFore);
             }
         }
-        if (EditorChar_.get()->SelectorState == 3)
-        {
-            for (int Idx = 0; Idx < 16; Idx++)
-            {
-                if ((Idx + BinaryFile_.get()->ListDispOffset_) == (BinaryFile_.get()->ListIndex_))
-                {
-                    ScreenChar0(CharPosX + 0 + 1, CharPosY + 1 + Idx, '>', PopupBack, PopupFore);
-                }
-                else
-                {
-                    ScreenChar0(CharPosX + 0 + 1, CharPosY + 1 + Idx, ' ', PopupBack, PopupFore);
-                }
-            }
-        }
     }
 
     // Cursor position
-    if ((EditorChar_.get()->SelectorState == 1) || (EditorChar_.get()->SelectorState == 2))
-    {
-        if (ScrX < 0) SelX = 1;
-        if (ScrY < 0) SelY = 1;
-    }
-    else
-    {
-        SelX--;
-    }
+    if (ScrX < 0) SelX = 1;
+    if (ScrY < 0) SelY = 1;
     Screen::ScreenCursorMove(SelX, SelY);
     Screen::ScreenRefresh();
 }
 
 void Core0Editor::FileLoad()
+{
+    BinaryFile_.get()->FileImport(-1);
+    //FileLoad2();
+}
+
+void Core0Editor::FileLoad2()
 {
     TempMemoB.Add(EditorData_.get()->ToggleDrawText);
     TempMemoB.Add(EditorData_.get()->ToggleDrawColo);
@@ -2541,7 +2574,8 @@ void Core0Editor::FileLoad()
     Str FileTxt;
     BinaryFile_.get()->Load(FileTxt);
 
-    if (UseAnsiLoad)
+
+    if (UseAnsiLoad && (!BinaryFile_.get()->IsSystemFile()))
     {
         CoreAnsi_.get()->AnsiProcessReset(true, false, 0);
         CoreAnsi_.get()->AnsiRingBell = false;
@@ -2623,6 +2657,7 @@ void Core0Editor::FileLoad()
     EditorData_.get()->DrawColoBI = TempMemoI.PopLast();
     EditorData_.get()->ToggleDrawColo = TempMemoB.PopLast();
     EditorData_.get()->ToggleDrawText = TempMemoB.PopLast();
+    TickRepaint = TickRepaintX;
 }
 
 void Core0Editor::FileSave()
@@ -2632,7 +2667,7 @@ void Core0Editor::FileSave()
     Str FileTxt;
     for (int i = 0; i < EditorData_.get()->TextBuffer.CountLines(); i++)
     {
-        if (UseAnsiSave)
+        if (UseAnsiSave && (!BinaryFile_.get()->IsSystemFile()))
         {
             FileTxt.AddRange(AnsiFile_.Process(EditorData_.get()->TextBuffer, i, CoreAnsi_.get()->AnsiMaxX));
         }
@@ -2643,4 +2678,5 @@ void Core0Editor::FileSave()
         }
     }
     BinaryFile_.get()->Save(FileTxt);
+    BinaryFile_.get()->FileExport(-1);
 }

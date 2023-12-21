@@ -20,6 +20,7 @@ public:
     int TrimEndLength();
     Str TrimEnC();
     Str TrimEnd();
+    Str Substring(int Pos, int Count_);
 
     void AddString(std::string T);
 
@@ -31,7 +32,6 @@ public:
     static std::string IntToStr(int I);
     static Str BlkCol(int I);
     static Str Spaces(int I);
-
 };
 
 #endif // STR_H
