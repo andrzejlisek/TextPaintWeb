@@ -1,5 +1,5 @@
 let KeybTouch = 0;
-let KeybLineWidth = 3;
+let KeybLineWidth = 2;
 let KeybTextSize = 12;
 let KeybBack = 'rgb(128, 128, 128)';
 let KeybFore = 'rgb(255, 255, 255)';
@@ -364,6 +364,17 @@ function KeybRepaint()
             KeybSvg.appendChild(Temp);
         }
     }
+
+    Temp = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    Temp.setAttribute("x", 0 - 10);
+    Temp.setAttribute("y", 0 - 10);
+    Temp.setAttribute("width", KeybW + 20);
+    Temp.setAttribute("height", KeybH + 20);
+    Temp.setAttribute("shape-rendering", "crispEdges");
+    Temp.setAttribute("stroke", "none");
+    Temp.setAttribute("stroke-width", 0);
+    Temp.setAttribute("fill", "#80808001");
+    KeybSvg.appendChild(Temp);
     
     switch (KeybCurrent)
     {

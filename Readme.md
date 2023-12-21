@@ -30,6 +30,8 @@ In editor: You have to press the F8 again to load selected file or press the F7 
 
 In player\. The file manager is needed for change the current directory\. After closing the file manager, the selected animation will be loaded\.
 
+**Note:** Currently, the file manager has a certain bug: Sometimes, the other files than the two system siles is not visible\. If the problem occurs, just restart the application \(refresh page in browser\)\.
+
 # GUI interface
 
 If you click the screen, there will be show the GUI interface usable both on touchscreen and with mouse\. The button caption represents the current state\. The settings are organized in the following rows:
