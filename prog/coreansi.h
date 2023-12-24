@@ -153,15 +153,6 @@ private:
     void AnsiScrollColumns(int Columns);
     void AnsiScrollLines(int Lines);
     void AnsiDoTab(int TabTimes);
-
-    void ScreenPutChar(int X, int Y, int C, int ColorBack, int ColorFore, int FontW, int FontH, int ColorAttr);
-    void ScreenBell();
-    void ScreenSetLineOffset(int Y, int Offset, bool Blank, int ColorBack, int ColorFore, int ColorAttr);
-    void ScreenMove(int SrcX, int SrcY, int DstX, int DstY, int W, int H);
-    void ScreenClear(int ColorB, int ColorF);
-    void ScreenSetCursorPosition(int X, int Y);
-    void ScreenAppResize(int NewW, int NewH, bool Force);
-    bool ScreenWinAuto = true;
 };
 
 #endif // COREANSI_H

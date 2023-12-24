@@ -37,6 +37,7 @@ void CoreCommon::ReadColor(std::string SettingValue, int &ColorB, int &ColorF)
 
 void CoreCommon::InitCommon()
 {
+    BinaryFile_.get()->PreInit = false;
     if (BinaryFile_.get()->ItemCount() <= BinaryFile_.get()->SystemFileCount)
     {
         int I = 1;
@@ -60,11 +61,16 @@ void CoreCommon::InitCommon()
         BinaryFile_.get()->SetDir(Str("/"));
     }
 
+    DisplayConfig_ = std::make_shared<DisplayConfig>();
+    DisplayConfig_.get()->CF = CF;
 
     ReadColor(CF.get()->ParamGetS("ColorNormal"), Screen::TextNormalBack, Screen::TextNormalFore);
-    ReadColor(CF.get()->ParamGetS("ColorCursor"), CursorBack, CursorFore);
     ReadColor(CF.get()->ParamGetS("ColorStatus"), StatusBack, StatusFore);
     ReadColor(CF.get()->ParamGetS("ColorPopup"), PopupBack, PopupFore);
+    StatusBack += 16;
+    StatusFore += 16;
+    PopupBack += 16;
+    PopupFore += 16;
 
     FileManager_.BinaryFile_ = BinaryFile_;
     FileManager_.PopupBack = PopupBack;

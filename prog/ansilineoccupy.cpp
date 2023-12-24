@@ -15,7 +15,7 @@ void AnsiLineOccupy::Append(int Y)
     Data[Y].Add(Item_Char);
     Data[Y].Add(Item_ColorB);
     Data[Y].Add(Item_ColorF);
-    Data[Y].Add(Item_ColorA + (Item_Type << 8));
+    Data[Y].Add(Item_ColorA);
     Data[Y].Add(Item_FontW);
     Data[Y].Add(Item_FontH);
 }
@@ -24,7 +24,7 @@ void AnsiLineOccupy::Insert(int Y, int X)
 {
     Data[Y].Insert(X * Factor, Item_FontH);
     Data[Y].Insert(X * Factor, Item_FontW);
-    Data[Y].Insert(X * Factor, Item_ColorA + (Item_Type << 8));
+    Data[Y].Insert(X * Factor, Item_ColorA);
     Data[Y].Insert(X * Factor, Item_ColorF);
     Data[Y].Insert(X * Factor, Item_ColorB);
     Data[Y].Insert(X * Factor, Item_Char);
@@ -67,8 +67,7 @@ void AnsiLineOccupy::Get(int Y, int X)
     Item_Char = Data[Y][X * Factor + 0];
     Item_ColorB = Data[Y][X * Factor + 1];
     Item_ColorF = Data[Y][X * Factor + 2];
-    Item_ColorA = Data[Y][X * Factor + 3] & 255;
-    Item_Type = Data[Y][X * Factor + 3] >> 8;
+    Item_ColorA = Data[Y][X * Factor + 3];
     Item_FontW = Data[Y][X * Factor + 4];
     Item_FontH = Data[Y][X * Factor + 5];
 }
@@ -78,7 +77,7 @@ void AnsiLineOccupy::Set(int Y, int X)
     Data[Y][X * Factor + 0] = Item_Char;
     Data[Y][X * Factor + 1] = Item_ColorB;
     Data[Y][X * Factor + 2] = Item_ColorF;
-    Data[Y][X * Factor + 3] = Item_ColorA + (Item_Type << 8);
+    Data[Y][X * Factor + 3] = Item_ColorA;
     Data[Y][X * Factor + 4] = Item_FontW;
     Data[Y][X * Factor + 5] = Item_FontH;
 }

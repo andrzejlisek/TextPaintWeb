@@ -13,9 +13,8 @@ class BinaryFile
 {
 public:
     BinaryFile();
-    int ListIndex = 0;
+    int ItemIndex = 0;
     int ListDispOffset = 0;
-    int ListDispOffset_ = 0;
     Str ListDir;
 
     BinaryFileItem &ItemGet(int idx);
@@ -43,7 +42,12 @@ public:
 
     void SysSaveConfig();
 
+    void ManagerInfoPush();
+    void ManagerInfoPop();
+
     int SystemFileCount = 2;
+    bool FileImportWaiting = false;
+    bool PreInit = true;
 private:
     XList<Str> Disp;
     XList<BinaryFileItem> ListItems;
@@ -54,6 +58,10 @@ private:
     std::string SystemFile0 = "!!config.txt";
     std::string SystemFile1 = "!!system.txt";
     std::unique_ptr<TextCodec> B64;
+
+    int ItemIndex_ = 0;
+    int ListDispOffset_ = 0;
+    Str ListDir_;
 };
 
 #endif // BINARYFILE_H

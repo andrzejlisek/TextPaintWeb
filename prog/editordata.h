@@ -12,7 +12,6 @@ public:
     std::shared_ptr<EditorUndo> EditorUndo_;
     EditorData();
     AnsiLineOccupyEx TextBuffer;
-    AnsiLineOccupyEx ScrChar_;
     AnsiLineOccupyEx ScrCharDisp_;
     XList<int> ElementGet_Kind;
     XList<int> ElementGet_Count;

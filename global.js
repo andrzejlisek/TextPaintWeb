@@ -1,20 +1,38 @@
+let ExistsSharedArrayBuffer = false;
+let DebugMode = true;
 let KeybBlockShortcuts = true;
 let GuiSettingsShown = false;
 let ProgLoaded = false;
 let ProgStarted = false;
-let Stopwatch = 0;
+let Stopwatch = [];
+let StopwatchOffset = 0;
 let VTTEST_ = document.getElementById("vttest").contentWindow;
 
 let ProgInit_ConfData = "";
 
-let ScreenTimerCounter = 0;
 let ScreenTimerPeriod = 100;
+let ScreenTimerCounter = 0;
+let ScreenTimerCounterLoop = 10;
+let ScreenTimerCursor = 1;
+let ScreenTimerCursorDisp = false;
+let ScreenTimerBlink = 5;
+let ScreenTimerBlinkDisp = false;
+let ScreenTimerTickEvent = 1;
 
 let WaitTimeout = 100;
 
 let ScreenCursorSteady = false;
 
 let KeybReady = false;
+
+if (typeof SharedArrayBuffer !== 'undefined')
+{
+    ExistsSharedArrayBuffer = true;
+}
+else
+{
+    ExistsSharedArrayBuffer = false;
+}
 
 function HexToNum4(X)
 {
@@ -35,5 +53,16 @@ function HexToNum8(X)
     let N1 = HexToNum4(X[0]);
     let N2 = HexToNum4(X[1]);
     return (N1 << 4) + N2;
+}
+
+function StopwatchReset()
+{
+    StopwatchOffset = performance.now();
+    Stopwatch = [];
+}
+
+function StopwatchTime()
+{
+    Stopwatch.push(performance.now() - StopwatchOffset);
 }
 

@@ -809,43 +809,27 @@ void EditorData::DisplayMove(int Dir, int WinTxtW, int WinTxtH)
     switch (Dir)
     {
         case 1:
-            ScrChar_.InsertLine(0);
-            ScrChar_.DeleteLine(WinTxtH);
-
             ScrCharDisp_.InsertLine(0);
             ScrCharDisp_.PadRightTab(0, WinTxtW);
             ScrCharDisp_.DeleteLine(WinTxtH);
             break;
         case 2:
-            ScrChar_.DeleteLine(0);
-            ScrChar_.AppendLine();
-
             ScrCharDisp_.DeleteLine(0);
             ScrCharDisp_.AppendLine();
             ScrCharDisp_.PadRightTab(ScrCharDisp_.CountLines() - 1, WinTxtW);
             break;
         case 3:
-            ScrChar_.BlankChar();
             ScrCharDisp_.BlankChar();
-            ScrCharDisp_.Item_Type = 32;
             for (int i = 0; i < WinTxtH; i++)
             {
-                ScrChar_.Insert(i, 0);
-                ScrChar_.Delete(i, WinTxtW);
-
                 ScrCharDisp_.Insert(i, 0);
                 ScrCharDisp_.Delete(i, WinTxtW);
             }
             break;
         case 4:
-            ScrChar_.BlankChar();
             ScrCharDisp_.BlankChar();
-            ScrCharDisp_.Item_Type = 32;
             for (int i = 0; i < WinTxtH; i++)
             {
-                ScrChar_.Delete(i, 0);
-                ScrChar_.Append(i);
-
                 ScrCharDisp_.Delete(i, 0);
                 ScrCharDisp_.Append(i);
             }

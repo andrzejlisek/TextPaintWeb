@@ -11,6 +11,9 @@ void Core2Terminal::Init()
     HexText = std::make_unique<TextCodec>(2);
 
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
+    DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
+    DisplayConfig_.get()->PopupBack = PopupBack;
+    DisplayConfig_.get()->PopupFore = PopupFore;
     CoreAnsi_.get()->__AnsiProcessDelayFactor = CF.get()->ParamGetI("FileDelayFrame");
     TerminalKeyboard_.CoreAnsi_ = CoreAnsi_;
 
@@ -120,6 +123,9 @@ void Core2Terminal::EventTick()
             {
                 TelnetDisplayInfo(false);
             }
+            break;
+        case WorkStateCDef::DispConf:
+            DisplayConfig_.get()->Repaint();
             break;
         default:
             break;
@@ -354,7 +360,8 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                                 break;
                                             case '\\':
                                                 {
-                                                    //!!!!!!DisplayConfigOpen();
+                                                    WorkStateC = WorkStateCDef::DispConf;
+                                                    DisplayConfig_.get()->Open();
                                                 }
                                                 break;
                                         }
@@ -375,7 +382,28 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             CoreAnsi_.get()->AnsiRepaintCursor();
             break;
         case WorkStateCDef::Toolbox_:
+            break;
         case WorkStateCDef::DispConf:
+            DisplayConfig_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            DisplayConfig_.get()->Repaint();
+            if (DisplayConfig_.get()->RequestRepaint)
+            {
+                CoreAnsi_.get()->AnsiRepaint(false);
+                DisplayConfig_.get()->Repaint();
+            }
+            if (DisplayConfig_.get()->RequestClose)
+            {
+                WorkStateC = WorkStateCDef::Toolbox;
+                CoreAnsi_.get()->AnsiRepaint(false);
+            }
+            else
+            {
+                if (DisplayConfig_.get()->RequestResize)
+                {
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 0, 0);
+                }
+                CoreAnsi_.get()->AnsiRepaint(false);
+            }
             break;
     }
 }
@@ -397,6 +425,9 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
                 case WorkStateCDef::Toolbox:
                 case WorkStateCDef::EscapeKey:
                     TelnetDisplayInfo(true);
+                    break;
+                case WorkStateCDef::DispConf:
+                    DisplayConfig_.get()->Repaint();
                     break;
                 default:
                     break;
@@ -1177,8 +1208,7 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
             InfoMsg.Add(" ? - Send screen size ");
             InfoMsg.Add(" ` - Local echo: " + (LocalEcho ? std::string("on") : std::string("off")));
             InfoMsg.Add(" | - Input commands: " + (Command_8bit ? std::string("8-bit") : std::string("7-bit")));
-            //!!!!!!!!!!InfoMsg.Add(" \\ - Display configuration");
-            InfoMsg.Add("");
+            InfoMsg.Add(" \\ - Display configuration");
         }
         InfoMsg.Add(" , - Copy screen as text");
         InfoMsg.Add(" . - Paste text as keystrokes");

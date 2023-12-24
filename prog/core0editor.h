@@ -28,6 +28,8 @@ private:
     int FileREnc = 0;
     int FileWEnc = 0;
 
+    XList<int> CursorSetX;
+    XList<int> CursorSetY;
 
     void EventKey_Editor(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void EventKey_Editor_1(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
@@ -61,7 +63,7 @@ private:
     std::shared_ptr<EditorChar> EditorChar_;
     std::shared_ptr<EditorPixelPaint> EditorPixelPaint_;
     std::shared_ptr<EditorClipboard> EditorClipboard_;
-    enum DisplayStateDef { Editor, Info, Charmap, FileMan };
+    enum DisplayStateDef { Editor, Info, Charmap, FileMan, DispConfig };
     int DisplayState = Editor;
     int CursorType = 0;
     int CursorFontW = 1;
@@ -89,8 +91,6 @@ private:
 
     void EditorScreenRefresh();
     void ScreenRefresh(bool Force);
-    void TextDisplay(int Mode);
-    void TextDisplayLine(int Y);
     void TextRepaint(bool Force);
 
     int FontMaxSize = 32;

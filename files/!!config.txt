@@ -1,4 +1,9 @@
-WinTimer=100
+TimerPeriod=100
+TimerLoop=10
+TimerCursor=1
+TimerBlink=5
+TimerTick=1
+
 WinScreenSize=70
 WinKeyboardSize=30
 WinTouchScreen=0

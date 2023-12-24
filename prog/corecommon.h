@@ -13,6 +13,8 @@
 #include "clipboard.h"
 #include "binaryfile.h"
 #include "filemanager.h"
+#include "displayconfig.h"
+#include "stopwatch.h"
 
 class CoreCommon
 {
@@ -20,6 +22,7 @@ public:
     CoreCommon();
     std::shared_ptr<ConfigFile> CF;
     std::shared_ptr<CoreAnsi> CoreAnsi_;
+    std::shared_ptr<DisplayConfig> DisplayConfig_;
 
     void ScreenChar0(int X, int Y, int Chr, int Back, int Fore, int Attr, int FontW, int FontH);
     void ScreenChar0(int X, int Y, int Chr, int Back, int Fore);
@@ -39,8 +42,6 @@ protected:
     int ScreenH = 24;
     XList<int> TempMemoI;
     XList<bool> TempMemoB;
-    int CursorBack = 15;
-    int CursorFore = 0;
     int StatusBack = 15;
     int StatusFore = 0;
     int PopupBack = 0;

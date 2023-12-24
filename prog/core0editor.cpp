@@ -25,9 +25,16 @@ void Core0Editor::Init()
     EditorChar_.get()->Init(CF);
     EditorPixelPaint_.get()->Init(CF);
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
+    DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
+    DisplayConfig_.get()->PopupBack = PopupBack;
+    DisplayConfig_.get()->PopupFore = PopupFore;
     EditorChar_.get()->CoreAnsi_ = CoreAnsi_;
     ReadColor(CF.get()->ParamGetS("ColorBeyondLine"), TextBeyondLineBack, TextBeyondLineFore);
     ReadColor(CF.get()->ParamGetS("ColorBeyondEnd"), TextBeyondEndBack, TextBeyondEndFore);
+    TextBeyondLineBack += 16;
+    TextBeyondLineFore += 16;
+    TextBeyondEndBack += 16;
+    TextBeyondEndFore += 16;
 
     UseAnsiLoad = CF.get()->ParamGetB("ANSIRead");
     UseAnsiSave = CF.get()->ParamGetB("ANSIWrite");
@@ -73,11 +80,38 @@ void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 DisplayState = DisplayStateDef::FileMan;
                 FileManager_.Repaint();
             }
-            if (FileManager_.RequestClose)
+            if ((FileManager_.RequestCloseOld) || (FileManager_.RequestCloseNew))
             {
                 DisplayState = DisplayStateDef::Editor;
                 EditorScreenRefresh();
                 ScreenRefresh(true);
+            }
+            break;
+        case DisplayStateDef::DispConfig:
+            DisplayConfig_.get()->Repaint();
+            DisplayConfig_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            if (DisplayConfig_.get()->RequestRepaint)
+            {
+                DisplayState = DisplayStateDef::Charmap;
+                CharmapPaint(0);
+                DisplayState = DisplayStateDef::DispConfig;
+                CharmapPaint(0);
+            }
+            if (DisplayConfig_.get()->RequestClose)
+            {
+                DisplayState = DisplayStateDef::Charmap;
+                CharmapPaint(0);
+            }
+            else
+            {
+                if (DisplayConfig_.get()->RequestResize)
+                {
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 0, 0);
+                }
+                else
+                {
+                    CharmapPaint(0);
+                }
             }
             break;
     }
@@ -114,8 +148,28 @@ void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int Evt
             ScreenW = EvtParam1;
             ScreenH = EvtParam2;
             Screen::ScreenResize(ScreenW, ScreenH);
+            TempMemoI.Add(DisplayState);
+            switch (DisplayState)
+            {
+                case DisplayStateDef::Charmap:
+                case DisplayStateDef::DispConfig:
+                    DisplayState = DisplayStateDef::Editor;
+                    break;
+                default:
+                    break;
+            }
             EditorScreenRefresh();
             ScreenRefresh(true);
+            DisplayState = TempMemoI.PopLast();
+            switch (DisplayState)
+            {
+                case DisplayStateDef::Charmap:
+                case DisplayStateDef::DispConfig:
+                    CharmapPaint(0);
+                    break;
+                default:
+                    break;
+            }
             break;
     }
 
@@ -249,7 +303,7 @@ void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShif
             FileLoad();
             return;
 
-        case _("F11"):
+        case _("F10"):
             DisplayState = DisplayStateDef::FileMan;
             FileManager_.Open();
             return;
@@ -1183,22 +1237,18 @@ void Core0Editor::EventKey_Info(std::string KeyName, int KeyChar, bool ModShift,
             case 2:
                 Screen::ScreenTextMove(0, 0, 0, 1, WinTxtW, WinTxtH - 1);
                 EditorData_.get()->DisplayMove(1, WinTxtW, WinTxtH);
-                TextDisplay(1);
                 break;
             case 3:
                 Screen::ScreenTextMove(0, 1, 0, 0, WinTxtW, WinTxtH - 1);
                 EditorData_.get()->DisplayMove(2, WinTxtW, WinTxtH);
-                TextDisplay(2);
                 break;
             case 4:
                 Screen::ScreenTextMove(0, 0, 1, 0, WinTxtW - 1, WinTxtH);
                 EditorData_.get()->DisplayMove(3, WinTxtW, WinTxtH);
-                TextDisplay(3);
                 break;
             case 5:
                 Screen::ScreenTextMove(1, 0, 0, 0, WinTxtW - 1, WinTxtH);
                 EditorData_.get()->DisplayMove(4, WinTxtW, WinTxtH);
-                TextDisplay(4);
                 break;
         }
         TextRepaint(false);
@@ -1221,6 +1271,17 @@ void Core0Editor::EventKey_Charmap(std::string KeyName, int KeyChar, bool ModShi
 {
     EditorChar_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
     CharmapPaint(EditorChar_.get()->RepaintDepth);
+    switch (_(KeyName.c_str()))
+    {
+        case _("F4"):
+            if (EditorChar_.get()->SelectorState == 2)
+            {
+                DisplayState = DisplayStateDef::DispConfig;
+                DisplayConfig_.get()->Open();
+                CharmapPaint(0);
+            }
+            break;
+    }
 }
 
 void Core0Editor::EventTick()
@@ -1359,28 +1420,24 @@ void Core0Editor::MoveCursor(int Direction)
         DisplayY--;
         Screen::ScreenTextMove(0, 0, 0, 1, WinTxtW, WinTxtH - 1);
         EditorData_.get()->DisplayMove(1, WinTxtW, WinTxtH);
-        TextDisplay(1);
     }
     while (DisplayY < (EditorData_.get()->CursorY - WinTxtH + 1))
     {
         DisplayY++;
         Screen::ScreenTextMove(0, 1, 0, 0, WinTxtW, WinTxtH - 1);
         EditorData_.get()->DisplayMove(2, WinTxtW, WinTxtH);
-        TextDisplay(2);
     }
     while (DisplayX > EditorData_.get()->CursorX)
     {
         DisplayX--;
         Screen::ScreenTextMove(0, 0, 1, 0, WinTxtW - 1, WinTxtH);
         EditorData_.get()->DisplayMove(3, WinTxtW, WinTxtH);
-        TextDisplay(3);
     }
     while (DisplayX < (EditorData_.get()->CursorX - WinTxtW + 1))
     {
         DisplayX++;
         Screen::ScreenTextMove(1, 0, 0, 0, WinTxtW - 1, WinTxtH);
         EditorData_.get()->DisplayMove(4, WinTxtW, WinTxtH);
-        TextDisplay(4);
     }
 }
 
@@ -1432,7 +1489,11 @@ void Core0Editor::CursorChar0(int X, int Y, bool Show)
     {
         for (int XX = XMin; XX < XMax; XX++)
         {
-            EditorData_.get()->ScrChar_.Get(YY, XX);
+            CursorSetX.Add(XX);
+            CursorSetY.Add(YY);
+
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            /*EditorData_.get()->ScrChar_.Get(YY, XX);
             if (Show)
             {
                 if (EditorData_.get()->ScrChar_.Item_Type < 3)
@@ -1447,7 +1508,7 @@ void Core0Editor::CursorChar0(int X, int Y, bool Show)
                     EditorData_.get()->ScrChar_.Item_Type -= 3;
                 }
             }
-            EditorData_.get()->ScrChar_.Set(YY, XX);
+            EditorData_.get()->ScrChar_.Set(YY, XX);*/
         }
     }
 }
@@ -1468,7 +1529,11 @@ void Core0Editor::CursorCharX(int X, int Y, bool Show)
         {
             if ((XX != X) || (YY != Y))
             {
-                EditorData_.get()->ScrChar_.Get(YY, XX);
+                CursorSetX.Add(XX);
+                CursorSetY.Add(YY);
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                /*EditorData_.get()->ScrChar_.Get(YY, XX);
                 if (Show)
                 {
                     if (EditorData_.get()->ScrChar_.Item_Type < 3)
@@ -1483,7 +1548,7 @@ void Core0Editor::CursorCharX(int X, int Y, bool Show)
                         EditorData_.get()->ScrChar_.Item_Type -= 3;
                     }
                 }
-                EditorData_.get()->ScrChar_.Set(YY, XX);
+                EditorData_.get()->ScrChar_.Set(YY, XX);*/
             }
         }
     }
@@ -1491,179 +1556,184 @@ void Core0Editor::CursorCharX(int X, int Y, bool Show)
 
 void Core0Editor::CursorLine(bool Show)
 {
-    int XX = EditorData_.get()->CursorX - DisplayX;
-    int YY = EditorData_.get()->CursorY - DisplayY;
-    int XX0 = CursorX0();
-    int YY0 = CursorY0();
-    if (WorkState == WorkStateDef::DrawChar)
+    CursorSetX.Clear();
+    CursorSetY.Clear();
+    if (Show)
     {
-        if (EditorSemi_.get()->DiamondType == 0)
+        int XX = EditorData_.get()->CursorX - DisplayX;
+        int YY = EditorData_.get()->CursorY - DisplayY;
+        int XX0 = CursorX0();
+        int YY0 = CursorY0();
+        if (WorkState == WorkStateDef::DrawChar)
         {
-            int X1 = std::min(XX, XX + (CursorXSize * CursorFontW));
-            int X2 = std::max(XX, XX + (CursorXSize * CursorFontW));
-            int Y1 = std::min(YY, YY + (CursorYSize * CursorFontH));
-            int Y2 = std::max(YY, YY + (CursorYSize * CursorFontH));
-
-            X1 = std::max(std::min(X1, WinTxtW - 1), XX0);
-            X2 = std::max(std::min(X2, WinTxtW - 1), XX0);
-            Y1 = std::max(std::min(Y1, WinTxtH - 1), YY0);
-            Y2 = std::max(std::min(Y2, WinTxtH - 1), YY0);
-
-            for (int Y = Y1; Y <= Y2; Y += CursorFontH)
+            if (EditorSemi_.get()->DiamondType == 0)
             {
-                for (int X = X1; X <= X2; X += CursorFontW)
+                int X1 = std::min(XX, XX + (CursorXSize * CursorFontW));
+                int X2 = std::max(XX, XX + (CursorXSize * CursorFontW));
+                int Y1 = std::min(YY, YY + (CursorYSize * CursorFontH));
+                int Y2 = std::max(YY, YY + (CursorYSize * CursorFontH));
+
+                X1 = std::max(std::min(X1, WinTxtW - 1), XX0);
+                X2 = std::max(std::min(X2, WinTxtW - 1), XX0);
+                Y1 = std::max(std::min(Y1, WinTxtH - 1), YY0);
+                Y2 = std::max(std::min(Y2, WinTxtH - 1), YY0);
+
+                for (int Y = Y1; Y <= Y2; Y += CursorFontH)
                 {
-                    if ((X != XX) || (Y != YY))
+                    for (int X = X1; X <= X2; X += CursorFontW)
                     {
-                        CursorChar0(X, Y, Show);
+                        if ((X != XX) || (Y != YY))
+                        {
+                            CursorChar0(X, Y, Show);
+                        }
                     }
                 }
             }
+            else
+            {
+                int X1 = std::min(0, CursorXSize);
+                int X2 = std::max(0, CursorXSize);
+                int Y1 = std::min(0, CursorYSize);
+                int Y2 = std::max(0, CursorYSize);
+
+                for (int X_ = X1; X_ <= X2; X_++)
+                {
+                    for (int Y_ = Y1; Y_ <= Y2; Y_++)
+                    {
+                        int X__ = XX + ((X_ - Y_) * CursorFontW);
+                        int Y__ = YY + ((X_ + Y_) * CursorFontH);
+
+                        CursorChar_(XX, YY, X__, Y__, Show);
+
+                        switch (EditorSemi_.get()->DiamondType)
+                        {
+                            case 1:
+                                if ((X_ < X2) && (Y_ > Y1))
+                                {
+                                    CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
+                                }
+                                break;
+                            case 2:
+                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
+                                break;
+                            case 3:
+                                CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
+                                break;
+                            case 4:
+                                CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
+                                break;
+                            case 5:
+                                CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
+                                break;
+                            case 6:
+                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ + CursorFontW, Y__ - CursorFontH, Show);
+                                break;
+                            case 7:
+                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ + CursorFontW, Y__ + CursorFontH, Show);
+                                break;
+                            case 8:
+                                CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ - CursorFontW, Y__ + CursorFontH, Show);
+                                break;
+                            case 9:
+                                CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ - CursorFontW, Y__ - CursorFontH, Show);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        if (WorkState == WorkStateDef::DrawPixel)
+        {
+            int XX2 = EditorPixelPaint_.get()->GetCursorPosXSize() - DisplayX;
+            int YY2 = EditorPixelPaint_.get()->GetCursorPosYSize() - DisplayY;
+            if ((XX != XX2) || (YY != YY2))
+            {
+                int XX3 = std::max(std::min(XX2, WinTxtW - 1), 0);
+                int YY3 = std::max(std::min(YY2, WinTxtH - 1), 0);
+                CursorChar_(XX, YY, XX3, YY3, Show);
+                if ((XX2 < 0) || (XX2 >= WinTxtW))
+                {
+                    CursorChar_(XX, YY, XX3, YY3 - CursorFontH, Show);
+                    CursorChar_(XX, YY, XX3, YY3 + CursorFontH, Show);
+                }
+                if ((YY2 < 0) || (YY2 >= WinTxtH))
+                {
+                    CursorChar_(XX, YY, XX3 - CursorFontW, YY3, Show);
+                    CursorChar_(XX, YY, XX3 + CursorFontW, YY3, Show);
+                }
+            }
+        }
+
+        if (CursorDisplay)
+        {
+            CursorChar0(XX, YY, Show);
         }
         else
         {
-            int X1 = std::min(0, CursorXSize);
-            int X2 = std::max(0, CursorXSize);
-            int Y1 = std::min(0, CursorYSize);
-            int Y2 = std::max(0, CursorYSize);
-
-            for (int X_ = X1; X_ <= X2; X_++)
+            CursorCharX(XX, YY, Show);
+        }
+        if ((CursorType == 1) || (CursorType == 3))
+        {
+            for (int X = XX - CursorFontW; X > (0 - CursorFontW); X -= CursorFontW)
             {
-                for (int Y_ = Y1; Y_ <= Y2; Y_++)
-                {
-                    int X__ = XX + ((X_ - Y_) * CursorFontW);
-                    int Y__ = YY + ((X_ + Y_) * CursorFontH);
-
-                    CursorChar_(XX, YY, X__, Y__, Show);
-
-                    switch (EditorSemi_.get()->DiamondType)
-                    {
-                        case 1:
-                            if ((X_ < X2) && (Y_ > Y1))
-                            {
-                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
-                            }
-                            break;
-                        case 2:
-                            CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
-                            break;
-                        case 3:
-                            CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
-                            break;
-                        case 4:
-                            CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
-                            break;
-                        case 5:
-                            CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
-                            break;
-                        case 6:
-                            CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
-                            CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
-                            CursorChar_(XX, YY, X__ + CursorFontW, Y__ - CursorFontH, Show);
-                            break;
-                        case 7:
-                            CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
-                            CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
-                            CursorChar_(XX, YY, X__ + CursorFontW, Y__ + CursorFontH, Show);
-                            break;
-                        case 8:
-                            CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
-                            CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
-                            CursorChar_(XX, YY, X__ - CursorFontW, Y__ + CursorFontH, Show);
-                            break;
-                        case 9:
-                            CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
-                            CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
-                            CursorChar_(XX, YY, X__ - CursorFontW, Y__ - CursorFontH, Show);
-                            break;
-                    }
-                }
+                CursorChar0(X, YY, Show);
+            }
+            for (int X = XX + CursorFontW; X < WinTxtW; X += CursorFontW)
+            {
+                CursorChar0(X, YY, Show);
+            }
+            for (int Y = YY - CursorFontH; Y > (0 - CursorFontH); Y -= CursorFontH)
+            {
+                CursorChar0(XX, Y, Show);
+            }
+            for (int Y = YY + CursorFontH; Y < WinTxtH; Y += CursorFontH)
+            {
+                CursorChar0(XX, Y, Show);
             }
         }
-    }
-    if (WorkState == WorkStateDef::DrawPixel)
-    {
-        int XX2 = EditorPixelPaint_.get()->GetCursorPosXSize() - DisplayX;
-        int YY2 = EditorPixelPaint_.get()->GetCursorPosYSize() - DisplayY;
-        if ((XX != XX2) || (YY != YY2))
+        if ((CursorType == 2) || (CursorType == 3))
         {
-            int XX3 = std::max(std::min(XX2, WinTxtW - 1), 0);
-            int YY3 = std::max(std::min(YY2, WinTxtH - 1), 0);
-            CursorChar_(XX, YY, XX3, YY3, Show);
-            if ((XX2 < 0) || (XX2 >= WinTxtW))
+            int XX_, YY_;
+            XX_ = XX - CursorFontW;
+            YY_ = YY - CursorFontH;
+            while ((XX_ > (0 - CursorFontW)) && (YY_ > (0 - CursorFontH)))
             {
-                CursorChar_(XX, YY, XX3, YY3 - CursorFontH, Show);
-                CursorChar_(XX, YY, XX3, YY3 + CursorFontH, Show);
+                CursorChar0(XX_, YY_, Show);
+                XX_ -= CursorFontW;
+                YY_ -= CursorFontH;
             }
-            if ((YY2 < 0) || (YY2 >= WinTxtH))
+            XX_ = XX + CursorFontW;
+            YY_ = YY + CursorFontH;
+            while ((XX_ < WinTxtW) && (YY_ < WinTxtH))
             {
-                CursorChar_(XX, YY, XX3 - CursorFontW, YY3, Show);
-                CursorChar_(XX, YY, XX3 + CursorFontW, YY3, Show);
+                CursorChar0(XX_, YY_, Show);
+                XX_ += CursorFontW;
+                YY_ += CursorFontH;
             }
-        }
-    }
-
-    if (CursorDisplay)
-    {
-        CursorChar0(XX, YY, Show);
-    }
-    else
-    {
-        CursorCharX(XX, YY, Show);
-    }
-    if ((CursorType == 1) || (CursorType == 3))
-    {
-        for (int X = XX - CursorFontW; X > (0 - CursorFontW); X -= CursorFontW)
-        {
-            CursorChar0(X, YY, Show);
-        }
-        for (int X = XX + CursorFontW; X < WinTxtW; X += CursorFontW)
-        {
-            CursorChar0(X, YY, Show);
-        }
-        for (int Y = YY - CursorFontH; Y > (0 - CursorFontH); Y -= CursorFontH)
-        {
-            CursorChar0(XX, Y, Show);
-        }
-        for (int Y = YY + CursorFontH; Y < WinTxtH; Y += CursorFontH)
-        {
-            CursorChar0(XX, Y, Show);
-        }
-    }
-    if ((CursorType == 2) || (CursorType == 3))
-    {
-        int XX_, YY_;
-        XX_ = XX - CursorFontW;
-        YY_ = YY - CursorFontH;
-        while ((XX_ > (0 - CursorFontW)) && (YY_ > (0 - CursorFontH)))
-        {
-            CursorChar0(XX_, YY_, Show);
-            XX_ -= CursorFontW;
-            YY_ -= CursorFontH;
-        }
-        XX_ = XX + CursorFontW;
-        YY_ = YY + CursorFontH;
-        while ((XX_ < WinTxtW) && (YY_ < WinTxtH))
-        {
-            CursorChar0(XX_, YY_, Show);
-            XX_ += CursorFontW;
-            YY_ += CursorFontH;
-        }
-        XX_ = XX - CursorFontW;
-        YY_ = YY + CursorFontH;
-        while ((XX_ > (0 - CursorFontW)) && (YY_ < WinTxtH))
-        {
-            CursorChar0(XX_, YY_, Show);
-            XX_ -= CursorFontW;
-            YY_ += CursorFontH;
-        }
-        XX_ = XX + CursorFontW;
-        YY_ = YY - CursorFontH;
-        while ((XX_ < WinTxtW) && (YY_ > (0 - CursorFontH)))
-        {
-            CursorChar0(XX_, YY_, Show);
-            XX_ += CursorFontW;
-            YY_ -= CursorFontH;
+            XX_ = XX - CursorFontW;
+            YY_ = YY + CursorFontH;
+            while ((XX_ > (0 - CursorFontW)) && (YY_ < WinTxtH))
+            {
+                CursorChar0(XX_, YY_, Show);
+                XX_ -= CursorFontW;
+                YY_ += CursorFontH;
+            }
+            XX_ = XX + CursorFontW;
+            YY_ = YY - CursorFontH;
+            while ((XX_ < WinTxtW) && (YY_ > (0 - CursorFontH)))
+            {
+                CursorChar0(XX_, YY_, Show);
+                XX_ += CursorFontW;
+                YY_ -= CursorFontH;
+            }
         }
     }
 }
@@ -1678,7 +1748,6 @@ void Core0Editor::UndoBufferStop()
     EditorUndo_.get()->BufferStop();
     EditorData_.get()->TextBuffer.TrimLines();
     CursorLimit();
-    TextDisplay(0);
 }
 
 void Core0Editor::UndoBufferUndo()
@@ -1706,17 +1775,14 @@ void Core0Editor::EditorScreenRefresh()
     WinTxtW = ScreenW;
     WinTxtH = ScreenH - 1;
 
-    EditorData_.get()->ScrChar_.Clear();
     EditorData_.get()->ScrCharDisp_.Clear();
     EditorData_.get()->ScrCharDisp_.BlankChar();
-    EditorData_.get()->ScrCharDisp_.Item_Type = 32;
     for (int i = 0; i < WinTxtH; i++)
     {
-        EditorData_.get()->ScrChar_.AppendLine();
         EditorData_.get()->ScrCharDisp_.AppendLine();
         EditorData_.get()->ScrCharDisp_.PadRight(i, WinTxtW);
     }
-    TextDisplay(0);
+
     CursorLimit();
 }
 
@@ -1730,6 +1796,7 @@ void Core0Editor::ScreenRefresh(bool Force)
         case DisplayStateDef::Info:
         case DisplayStateDef::Charmap:
         case DisplayStateDef::FileMan:
+        case DisplayStateDef::DispConfig:
             {
                 Str StatusText;
                 EditorData_.get()->CursorChar = EditorData_.get()->ElementGetVal(EditorData_.get()->CursorX, EditorData_.get()->CursorY, true, false, 0);
@@ -1742,27 +1809,27 @@ void Core0Editor::ScreenRefresh(bool Force)
                 EditorData_.get()->CursorColoA = EditorData_.get()->ElementGetVal(EditorData_.get()->CursorX, EditorData_.get()->CursorY, true, false, 3);
                 if (WorkState == WorkStateDef::DrawPixel)
                 {
-                    StatusText.AddString(std::to_string(EditorPixelPaint_.get()->PPS.FontW));
+                    StatusText.AddString(EditorPixelPaint_.get()->PPS.FontW);
                     StatusText.AddString("x");
-                    StatusText.AddString(std::to_string(EditorPixelPaint_.get()->PPS.FontH));
+                    StatusText.AddString(EditorPixelPaint_.get()->PPS.FontH);
                     StatusText.AddString(" ");
 
-                    StatusText.AddString(std::to_string(EditorPixelPaint_.get()->PPS.CanvasX));
+                    StatusText.AddString(EditorPixelPaint_.get()->PPS.CanvasX);
                     StatusText.AddString(TextWork::NumPlusMinus(EditorPixelPaint_.get()->PPS.SizeX));
                     StatusText.AddString(BeyondIndicator());
-                    StatusText.AddString(std::to_string(EditorPixelPaint_.get()->PPS.CanvasY));
+                    StatusText.AddString(EditorPixelPaint_.get()->PPS.CanvasY);
                     StatusText.AddString(TextWork::NumPlusMinus(EditorPixelPaint_.get()->PPS.SizeY));
                 }
                 else
                 {
-                    StatusText.AddString(std::to_string(CursorFontW));
+                    StatusText.AddString(CursorFontW);
                     StatusText.AddString("x");
-                    StatusText.AddString(std::to_string(CursorFontH));
+                    StatusText.AddString(CursorFontH);
                     StatusText.AddString(" ");
 
-                    StatusText.AddString(std::to_string(EditorData_.get()->CursorX));
+                    StatusText.AddString(EditorData_.get()->CursorX);
                     StatusText.AddString(BeyondIndicator());
-                    StatusText.AddString(std::to_string(EditorData_.get()->CursorY));
+                    StatusText.AddString(EditorData_.get()->CursorY);
                     if (DisplayState != DisplayStateDef::Info)
                     {
                         StatusCursorChar = EditorData_.get()->CursorChar;
@@ -1876,215 +1943,87 @@ void Core0Editor::ScreenRefresh(bool Force)
     }
 }
 
-void Core0Editor::TextDisplay(int Mode)
+void Core0Editor::TextRepaint(bool Force)
 {
-    switch (DisplayState)
+    if (DisplayState == DisplayStateDef::Editor)
     {
-        case DisplayStateDef::Editor:
+        int CountLinesDispY = EditorData_.get()->TextBuffer.CountLines() - DisplayY;
+        for (int Y = 0; Y < WinTxtH; Y++)
+        {
+            for (int X = 0; X < WinTxtW; X++)
             {
-                int I1 = 0;
-                int I2 = (WinTxtH - 1);
-                if (Mode == 1)
+                if (!EditorData_.get()->TextBuffer.Get_(Y + DisplayY, X + DisplayX))
                 {
-                    I2 = 0;
-                }
-                if (Mode == 2)
-                {
-                    I1 = (WinTxtH - 1);
-                }
-                if (Mode >= MaxlineSize)
-                {
-                    I1 = Mode - MaxlineSize;
-                    I2 = Mode - MaxlineSize;
-                }
-
-                if ((Mode < 3) || (Mode >= MaxlineSize))
-                {
-                    for (int i = I1; i <= I2; i++)
+                    EditorData_.get()->TextBuffer.BlankChar();
+                    EditorData_.get()->TextBuffer.Item_Char = 32;
+                    if (Y < CountLinesDispY)
                     {
-                        if ((i + DisplayY) < EditorData_.get()->TextBuffer.CountLines())
-                        {
-                            EditorData_.get()->ScrChar_.LineCopy(EditorData_.get()->TextBuffer, i + DisplayY, i);
-                            if (DisplayX > 0)
-                            {
-                                if (EditorData_.get()->ScrChar_.CountItems(i) > DisplayX)
-                                {
-                                    EditorData_.get()->ScrChar_.DeleteLeft(i, DisplayX);
-                                }
-                                else
-                                {
-                                    EditorData_.get()->ScrChar_.ClearLine(i);
-                                }
-                            }
-                            if (EditorData_.get()->ScrChar_.CountItems(i) < WinTxtW)
-                            {
-                                EditorData_.get()->ScrChar_.BlankChar();
-                                EditorData_.get()->ScrChar_.Item_Type = 1;
-                                EditorData_.get()->ScrChar_.PadRight(i, WinTxtW);
-                            }
-                            else
-                            {
-                                EditorData_.get()->ScrChar_.Crop(i, 0, WinTxtW);
-                            }
-                        }
-                        else
-                        {
-                            EditorData_.get()->ScrChar_.ClearLine(i);
-                            EditorData_.get()->ScrChar_.BlankChar();
-                            EditorData_.get()->ScrChar_.Item_Type = 2;
-                            EditorData_.get()->ScrChar_.PadRight(i, WinTxtW);
-                        }
-                    }
-                }
-                else
-                {
-                    int CurOffset = (Mode == 3) ? 0 : WinTxtW - 1;
-                    for (int i = I1; i <= I2; i++)
-                    {
-                        EditorData_.get()->ScrChar_.BlankChar();
-                        if ((i + DisplayY) < EditorData_.get()->TextBuffer.CountLines())
-                        {
-                            if (EditorData_.get()->TextBuffer.CountItems(i + DisplayY) > (DisplayX + CurOffset))
-                            {
-                                EditorData_.get()->TextBuffer.Get(i + DisplayY, DisplayX + CurOffset);
-                                EditorData_.get()->ScrChar_.CopyItem(EditorData_.get()->TextBuffer);
-                                EditorData_.get()->ScrChar_.Item_Type = 0;
-                            }
-                            else
-                            {
-                                EditorData_.get()->ScrChar_.Item_Type = 1;
-                            }
-                        }
-                        else
-                        {
-                            EditorData_.get()->ScrChar_.Item_Type = 2;
-                        }
-                        if (Mode == 3)
-                        {
-                            EditorData_.get()->ScrChar_.Set(i, 0);
-                        }
-                        else
-                        {
-                            EditorData_.get()->ScrChar_.Set(i, WinTxtW - 1);
-                        }
-                    }
-                }
-            }
-            break;
-        case DisplayStateDef::Info:
-            {
-                for (int i = 0; i < WinTxtH - 0; i++)
-                {
-                    if (i < (EditorInfo_.get()->Info.Count - EditorInfo_.get()->InfoY))
-                    {
-                        std::string InfoTemp = EditorInfo_.get()->Info[i + EditorInfo_.get()->InfoY];
-                        if (InfoTemp.length() > EditorInfo_.get()->InfoX)
-                        {
-                            InfoTemp = InfoTemp.substr(EditorInfo_.get()->InfoX, InfoTemp.length() - EditorInfo_.get()->InfoX);
-                            if (InfoTemp.length() > WinTxtW)
-                            {
-                                InfoTemp = InfoTemp.substr(0, WinTxtW);
-                            }
-                        }
-                        else
-                        {
-                            InfoTemp = "";
-                        }
-                        EditorData_.get()->ScrChar_.SetLineString(i, InfoTemp);
-                        EditorData_.get()->ScrChar_.PadRightSpace(i, WinTxtW);
+                        EditorData_.get()->TextBuffer.Item_ColorB = TextBeyondLineBack;
+                        EditorData_.get()->TextBuffer.Item_ColorF = TextBeyondLineFore;
                     }
                     else
                     {
-                        EditorData_.get()->ScrChar_.SetLineString(i, "");
-                        EditorData_.get()->ScrChar_.PadRightSpace(i, WinTxtW);
+                        EditorData_.get()->TextBuffer.Item_ColorB = TextBeyondEndBack;
+                        EditorData_.get()->TextBuffer.Item_ColorF = TextBeyondEndFore;
                     }
                 }
-            }
-            break;
-    }
-}
-
-void Core0Editor::TextDisplayLine(int Y)
-{
-    if (((Y - DisplayY) >= 0) && ((Y - DisplayY) < WinTxtH))
-    {
-        TextDisplay(MaxlineSize + (Y - DisplayY));
-    }
-}
-
-void Core0Editor::TextRepaint(bool Force)
-{
-    for (int Y = 0; Y < WinTxtH; Y++)
-    {
-        for (int X = 0; X < WinTxtW; X++)
-        {
-            EditorData_.get()->ScrChar_.Get(Y, X);
-            EditorData_.get()->ScrCharDisp_.Get(Y, X);
-            bool Difference = false;
-            if (EditorData_.get()->ScrCharDisp_.Item_Char != EditorData_.get()->ScrChar_.Item_Char) Difference = true;
-            if (EditorData_.get()->ScrCharDisp_.Item_ColorB != EditorData_.get()->ScrChar_.Item_ColorB) Difference = true;
-            if (EditorData_.get()->ScrCharDisp_.Item_ColorF != EditorData_.get()->ScrChar_.Item_ColorF) Difference = true;
-            if (EditorData_.get()->ScrCharDisp_.Item_ColorA != EditorData_.get()->ScrChar_.Item_ColorA) Difference = true;
-            if (EditorData_.get()->ScrCharDisp_.Item_FontW != EditorData_.get()->ScrChar_.Item_FontW) Difference = true;
-            if (EditorData_.get()->ScrCharDisp_.Item_FontH != EditorData_.get()->ScrChar_.Item_FontH) Difference = true;
-            if (EditorData_.get()->ScrCharDisp_.Item_Type != EditorData_.get()->ScrChar_.Item_Type) Difference = true;
-            if (CharDouble(EditorData_.get()->ScrCharDisp_.Item_Char) != 0)
-            {
-                Difference = true;
-            }
-            if (Force || Difference)
-            {
-                bool InsideText = true;
-                switch (EditorData_.get()->ScrChar_.Item_Type)
-                {
-                    case 0:
-                    case 3:
-                        if (EditorData_.get()->ScrChar_.Item_ColorB < 0)
-                        {
-                            EditorData_.get()->ScrChar_.Item_ColorB = Screen::TextNormalBack;
-                        }
-                        if (EditorData_.get()->ScrChar_.Item_ColorF < 0)
-                        {
-                            EditorData_.get()->ScrChar_.Item_ColorF = Screen::TextNormalFore;
-                        }
-                        break;
-                    case 1:
-                    case 4:
-                        if (((X + DisplayX) < TextBeyondLineMargin) || ((TextBeyondLineMargin < 0) && ((X + DisplayX) < CoreAnsi_.get()->AnsiMaxX)))
-                        {
-                            EditorData_.get()->ScrChar_.Item_ColorB = Screen::TextNormalBack;
-                            EditorData_.get()->ScrChar_.Item_ColorF = Screen::TextNormalFore;
-                        }
-                        else
-                        {
-                            EditorData_.get()->ScrChar_.Item_ColorB = TextBeyondLineBack;
-                            EditorData_.get()->ScrChar_.Item_ColorF = TextBeyondLineFore;
-                            InsideText = false;
-                        }
-                        break;
-                    case 2:
-                    case 5:
-                        EditorData_.get()->ScrChar_.Item_ColorB = TextBeyondEndBack;
-                        EditorData_.get()->ScrChar_.Item_ColorF = TextBeyondEndFore;
-                        InsideText = false;
-                        break;
-                }
-                if (EditorData_.get()->ScrChar_.Item_Type >= 3)
-                {
-                    EditorData_.get()->ScrChar_.Item_ColorB = CoreStatic::ColorNegative(EditorData_.get()->ScrChar_.Item_ColorB);
-                    EditorData_.get()->ScrChar_.Item_ColorF = CoreStatic::ColorNegative(EditorData_.get()->ScrChar_.Item_ColorF);
-                    InsideText = false;
-                }
-                EditorData_.get()->ScrCharDisp_.CopyItem(EditorData_.get()->ScrChar_);
+                EditorData_.get()->ScrCharDisp_.Get(Y, X);
+                EditorData_.get()->ScrCharDisp_.CopyItem(EditorData_.get()->TextBuffer);
                 EditorData_.get()->ScrCharDisp_.Set(Y, X);
-                if (InsideText)
+                Screen::ScreenChar(X, Y, EditorData_.get()->TextBuffer.Item_Char, EditorData_.get()->TextBuffer.Item_ColorB, EditorData_.get()->TextBuffer.Item_ColorF, EditorData_.get()->TextBuffer.Item_ColorA, EditorData_.get()->TextBuffer.Item_FontW, EditorData_.get()->TextBuffer.Item_FontH);
+            }
+        }
+
+        for (int I = 0; I < CursorSetX.Count; I++)
+        {
+            int X = CursorSetX[I];
+            int Y = CursorSetY[I];
+            EditorData_.get()->ScrCharDisp_.Get(Y, X);
+            int ColorB = EditorData_.get()->ScrCharDisp_.Item_ColorB;
+            int ColorF = EditorData_.get()->ScrCharDisp_.Item_ColorF;
+            if (ColorB < 0) ColorB = Screen::TextNormalBack;
+            if (ColorF < 0) ColorF = Screen::TextNormalFore;
+            EditorData_.get()->ScrCharDisp_.Item_ColorB = CoreStatic::ColorNegative(ColorB);
+            EditorData_.get()->ScrCharDisp_.Item_ColorF = CoreStatic::ColorNegative(ColorF);
+            Screen::ScreenChar(X, Y, EditorData_.get()->ScrCharDisp_.Item_Char, EditorData_.get()->ScrCharDisp_.Item_ColorB, EditorData_.get()->ScrCharDisp_.Item_ColorF, 0, EditorData_.get()->ScrCharDisp_.Item_FontW, EditorData_.get()->ScrCharDisp_.Item_FontH);
+        }
+    }
+    if (DisplayState == DisplayStateDef::Info)
+    {
+
+        /*!!!!!!!!!!!!!!!!!!for (int i = 0; i < WinTxtH - 0; i++)
+        {
+            if (i < (EditorInfo_.get()->Info.Count - EditorInfo_.get()->InfoY))
+            {
+                std::string InfoTemp = EditorInfo_.get()->Info[i + EditorInfo_.get()->InfoY];
+                if (InfoTemp.length() > EditorInfo_.get()->InfoX)
                 {
-                    Screen::ScreenChar(X, Y, EditorData_.get()->ScrChar_.Item_Char, EditorData_.get()->ScrChar_.Item_ColorB, EditorData_.get()->ScrChar_.Item_ColorF, EditorData_.get()->ScrChar_.Item_ColorA, EditorData_.get()->ScrChar_.Item_FontW, EditorData_.get()->ScrChar_.Item_FontH);
+                    InfoTemp = InfoTemp.substr(EditorInfo_.get()->InfoX, InfoTemp.length() - EditorInfo_.get()->InfoX);
+                    if (InfoTemp.length() > WinTxtW)
+                    {
+                        InfoTemp = InfoTemp.substr(0, WinTxtW);
+                    }
                 }
                 else
                 {
-                    Screen::ScreenChar(X, Y, EditorData_.get()->ScrChar_.Item_Char, EditorData_.get()->ScrChar_.Item_ColorB, EditorData_.get()->ScrChar_.Item_ColorF, 0, EditorData_.get()->ScrChar_.Item_FontW, EditorData_.get()->ScrChar_.Item_FontH);
+                    InfoTemp = "";
                 }
+                EditorData_.get()->ScrChar_.SetLineString(i, InfoTemp);
+                EditorData_.get()->ScrChar_.PadRightSpace(i, WinTxtW);
+            }
+            else
+            {
+                EditorData_.get()->ScrChar_.SetLineString(i, "");
+                EditorData_.get()->ScrChar_.PadRightSpace(i, WinTxtW);
+            }
+        }*/
+
+
+        for (int Y = 0; Y < WinTxtH; Y++)
+        {
+            for (int X = 0; X < WinTxtW; X++)
+            {
+
             }
         }
     }
@@ -2115,7 +2054,6 @@ void Core0Editor::SetInfo(bool Enable, int N)
     {
         EditorInfo_.get()->CreateInfo(N);
         DisplayState = DisplayStateDef::Info;
-        TextDisplay(0);
         ScreenRefresh(true);
     }
     else
@@ -2156,6 +2094,18 @@ void Core0Editor::CharmapPaintCursor(int X, int Y, int Chr, bool Sel)
 
 void Core0Editor::CharmapPaint(int Depth)
 {
+    if (DisplayState == DisplayStateDef::DispConfig)
+    {
+        if (DisplayConfig_.get()->RequestRepaint)
+        {
+            Depth = 1;
+        }
+        else
+        {
+            Depth = 9;
+        }
+    }
+
     int FileListDispLen = 17;
 
     if ((Depth == 101) || (Depth == 102))
@@ -2258,7 +2208,7 @@ void Core0Editor::CharmapPaint(int Depth)
             {
                 for (int XX = 0; XX < 16; XX++)
                 {
-                    ScreenChar0(CharPosX + XX * 2 + 2, CharPosY + YY + 2, '#', YY, XX);
+                    ScreenChar0(CharPosX + XX * 2 + 2, CharPosY + YY + 2, '#', YY + 16, XX + 16);
                 }
             }
         }
@@ -2550,6 +2500,11 @@ void Core0Editor::CharmapPaint(int Depth)
     if (ScrY < 0) SelY = 1;
     Screen::ScreenCursorMove(SelX, SelY);
     Screen::ScreenRefresh();
+
+    if (DisplayState == DisplayStateDef::DispConfig)
+    {
+        DisplayConfig_.get()->Repaint();
+    }
 }
 
 void Core0Editor::FileLoad()

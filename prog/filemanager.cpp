@@ -33,17 +33,17 @@ void FileManager::Repaint()
         }
     }
 
-    int DispLen = SizeH - 3;
+    int DispLen = SizeH - MarginHead - MarginFoot;
 
-    if (BinaryFile_.get()->ListDispOffset < (BinaryFile_.get()->ListIndex - DispLen + 1))
+    if (BinaryFile_.get()->ListDispOffset < (BinaryFile_.get()->ItemIndex - DispLen + 1))
     {
-        BinaryFile_.get()->ListDispOffset = (BinaryFile_.get()->ListIndex - DispLen + 1);
+        BinaryFile_.get()->ListDispOffset = (BinaryFile_.get()->ItemIndex - DispLen + 1);
         RepaintDepth = 2;
     }
 
-    if (BinaryFile_.get()->ListDispOffset > (BinaryFile_.get()->ListIndex))
+    if (BinaryFile_.get()->ListDispOffset > (BinaryFile_.get()->ItemIndex))
     {
-        BinaryFile_.get()->ListDispOffset = (BinaryFile_.get()->ListIndex);
+        BinaryFile_.get()->ListDispOffset = (BinaryFile_.get()->ItemIndex);
         RepaintDepth = 2;
     }
 
@@ -97,7 +97,7 @@ void FileManager::Repaint()
     {
         for (int Idx = 0; Idx < DispLen; Idx++)
         {
-            if ((Idx + BinaryFile_.get()->ListDispOffset) == (BinaryFile_.get()->ListIndex))
+            if ((Idx + BinaryFile_.get()->ListDispOffset) == (BinaryFile_.get()->ItemIndex))
             {
                 Sel = Idx;
                 Screen::ScreenChar(PosX + 0 + 1, PosY + 1 + Idx + 1, '>', PopupBack, PopupFore, 0, 0, 0);
@@ -109,6 +109,36 @@ void FileManager::Repaint()
         }
     }
 
+    // File info and keyboard shortcuts
+    Str Info1;
+    Str Info2;
+    Str Info3;
+    int ItemIdx = BinaryFile_.get()->ItemIndex;
+    if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+    {
+        Info1.AddString("Ansi: ");
+        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Ansi ? "Y" : "N");
+        Info1.AddString("  Codec: ");
+        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->EncodingNumber);
+        Info1.AddString("/");
+        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->EncodingName);
+    }
+    else
+    {
+        Info1.AddString("Directory");
+    }
+    Info2.AddString("Ins - New file  Home - Upload");
+    Info3.AddString("Del - Remove    End - Download");
+    Info1.AddPad(SizeW, 32);
+    Info2.AddPad(SizeW, 32);
+    Info3.AddPad(SizeW, 32);
+    for (int I = 0; I < SizeW; I++)
+    {
+        Screen::ScreenChar(PosX + 1 + I, PosY + 1 + SizeH - MarginFoot, Info1[I], PopupBack, PopupFore, 0, 0, 0);
+        Screen::ScreenChar(PosX + 1 + I, PosY + 2 + SizeH - MarginFoot, Info2[I], PopupBack, PopupFore, 0, 0, 0);
+        Screen::ScreenChar(PosX + 1 + I, PosY + 3 + SizeH - MarginFoot, Info3[I], PopupBack, PopupFore, 0, 0, 0);
+    }
+
     Screen::ScreenCursorMove(PosX + 1, PosY + 2 + Sel);
     Screen::ScreenRefresh();
 }
@@ -116,29 +146,30 @@ void FileManager::Repaint()
 void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
     RequestRepaint = false;
-    RequestClose = false;
+    RequestCloseOld = false;
+    RequestCloseNew = false;
     switch (_(KeyName.c_str()))
     {
         case _("ArrowUp"):
-            if (BinaryFile_.get()->ListIndex > 0)
+            if (BinaryFile_.get()->ItemIndex > 0)
             {
-                BinaryFile_.get()->ListIndex--;
+                BinaryFile_.get()->ItemIndex--;
             }
             else
             {
-                BinaryFile_.get()->ListIndex = (BinaryFile_.get()->ItemCount() - 1);
+                BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
             }
             RepaintDepth = 3;
             Repaint();
             break;
         case _("ArrowDown"):
-            if (BinaryFile_.get()->ListIndex < (BinaryFile_.get()->ItemCount() - 1))
+            if (BinaryFile_.get()->ItemIndex < (BinaryFile_.get()->ItemCount() - 1))
             {
-                BinaryFile_.get()->ListIndex++;
+                BinaryFile_.get()->ItemIndex++;
             }
             else
             {
-                BinaryFile_.get()->ListIndex = 0;
+                BinaryFile_.get()->ItemIndex = 0;
             }
             RepaintDepth = 3;
             Repaint();
@@ -153,19 +184,20 @@ void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             RepaintDepth = 0;
             break;
         case _("Escape"):
+            BinaryFile_.get()->ManagerInfoPop();
             RequestRepaint = true;
-            RequestClose = true;
+            RequestCloseOld = true;
             break;
         case _("Enter"):
-            if (BinaryFile_.get()->ItemType(BinaryFile_.get()->ListIndex) >= 0)
+        case _("NumpadEnter"):
+            if (BinaryFile_.get()->ItemType(BinaryFile_.get()->ItemIndex) >= 0)
             {
-                BinaryFile_.get()->ListIndex = BinaryFile_.get()->ListIndex;
                 RequestRepaint = true;
-                RequestClose = true;
+                RequestCloseNew = true;
             }
             else
             {
-                BinaryFile_.get()->SetDir(BinaryFile_.get()->ItemName(BinaryFile_.get()->ListIndex));
+                BinaryFile_.get()->SetDir(BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex));
                 RepaintDepth = 2;
                 Repaint();
             }
@@ -175,9 +207,10 @@ void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
 
 void FileManager::Open()
 {
-    BinaryFile_.get()->ListDispOffset = BinaryFile_.get()->ListDispOffset;
+    BinaryFile_.get()->ManagerInfoPush();
     RequestRepaint = false;
-    RequestClose = false;
+    RequestCloseOld = false;
+    RequestCloseNew = false;
     RepaintDepth = 0;
     Repaint();
 }

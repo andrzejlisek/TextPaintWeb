@@ -1,11 +1,13 @@
-let FileNameSystem = ["!!config.txt", "!!system.txt"];
-let FileBufSize = 512;
+let FileBufSize = 10000;
 
 let FileIndexLS = {};
 let FileIndexLSNum = 1;
 let FileIndexName = "TextPaintFileIndex";
 let FileIndexTempl = "TextPaintFile";
 let FileIndexSepa = "\n";
+let FileFreeSpaceLS = 0;
+let FileFreeSpaceDB = 0;
+let FileFreeSpaceSafe = 100;
 
 let ConfigFileJS = {};
 
@@ -100,6 +102,7 @@ function IndexImportLS()
             }
         }
     }
+    IndexMeasureSpaceLS();
 }
 
 function IndexExportLS()
@@ -111,6 +114,59 @@ function IndexExportLS()
     }
     DataSet(FileIndexName, IndexRaw);
 }
+
+function IndexMeasureSpaceLS()
+{
+    FileFreeSpaceLS = 0;
+    FileFreeSpaceDB = 0;
+    if (LS())
+    {
+        let DummySize = 1;
+        let TestName = "TextPaintTest";
+        let MeasuredSize;
+        let DummyData;
+
+        while (true)
+        {
+            DummySize = DummySize * 10;
+            DummyData = "".padEnd(DummySize, 'X');
+            try
+            {
+                localStorage.setItem(TestName, DummyData);
+                localStorage.removeItem(TestName);
+            }
+            catch (E)
+            {
+                DummySize = DummySize / 10;
+                break;
+            }
+        }
+        DataDelete(TestName);
+        MeasuredSize = DummySize;
+        while (DummySize >= 1)
+        {
+            while (true)
+            {
+                MeasuredSize = MeasuredSize + DummySize;
+                DummyData = "".padEnd(MeasuredSize, 'X');
+                try
+                {
+                    localStorage.setItem(TestName, DummyData);
+                    localStorage.removeItem(TestName);
+                }
+                catch (E)
+                {
+                    localStorage.removeItem(TestName);
+                    MeasuredSize = MeasuredSize - DummySize;
+                    DummySize = DummySize / 10;
+                    break;
+                }
+            }
+        }
+        FileFreeSpaceLS = MeasuredSize + TestName.length;
+    }
+}
+
 
 IndexImportLS();
 
@@ -218,48 +274,6 @@ function FileImport(Id, Kind, Name)
                 FileFetch(Id, Kind, Name);
             }
             break;
-        case 9: // System file, behavior depends on file name
-            if (Name == FileNameSystem[0])
-            {
-                if (FileIndexLS[Name])
-                {
-                    FileIdx = FileIndexLS[Name];
-                    let Data = DataGet(FileIndexTempl + FileIdx);
-                    FileSystemFetch(Id, Name, Data, Kind);
-                }
-                else
-                {
-                    let file = "files/" + Name;
-                    fetch(file)
-                    .then(x => x.text())
-                    .then(y => FileSystemFetch(Id, Name, btoa(y), Kind));
-                }
-            }
-            if (Name == FileNameSystem[1])
-            {
-                let file = "files/" + Name;
-                fetch(file)
-                .then(x => x.text())
-                .then(y => FileSystemFetch(Id, Name, btoa(y), Kind));
-            }
-            break;
-    }
-}
-
-let FileSystem0 = false;
-let FileSystem1 = false;
-
-function FileSystemFetch(Id, Name, Data, Kind)
-{
-    if (Name == FileNameSystem[0])
-    {
-        FileImportFinish(Id, 9, Name, Data, 0);
-        FileSystem0 = true;
-    }
-    if (Name == FileNameSystem[1])
-    {
-        FileImportFinish(Id, 9, Name, Data, 0);
-        FileSystem1 = true;
     }
 }
 
@@ -417,8 +431,13 @@ function FileExport(Id, Kind, Name, Data)
                     FileIndexLSNum++;
                     IndexExportLS();
                 }
-                DataSet(FileIndexTempl + FileIdx, Data);
-                if (Kind == 1)
+                if ((FileFreeSpaceLS == 0) || ((Data.length + FileFreeSpaceSafe) > FileFreeSpaceLS))
+                {
+                    DataSet(FileIndexTempl + FileIdx, Data);
+                    IndexMeasureSpaceLS();
+                    ProgEventOther("FileExport", "", Id, Kind, 0, 0);
+                }
+                else
                 {
                     ProgEventOther("FileExport", "", Id, Kind, 0, 0);
                 }
@@ -440,24 +459,18 @@ function FileDelete(Id, Kind, Name)
             break;
         case 1: // Local storage
         case 4: // Local storage - if not exists, then fetch
-        case 9: // System file, depends on file name
             {
                 let FileIdx = 0;
-                if ((Kind != 9) || (Name == FileNameSystem[0]))
+                if (FileIndexLS[Name])
                 {
-                    if (FileIndexLS[Name])
-                    {
-                        FileIdx = FileIndexLS[Name];
-                        FileIdx = FileIndexLS[Name];
-                        DataDelete(FileIndexTempl + FileIdx);
-                        delete FileIndexLS[Name];
-                        IndexExportLS();
-                    }
+                    FileIdx = FileIndexLS[Name];
+                    FileIdx = FileIndexLS[Name];
+                    DataDelete(FileIndexTempl + FileIdx);
+                    delete FileIndexLS[Name];
+                    IndexExportLS();
                 }
-                if (Kind != 9)
-                {
-                    ProgEventOther("FileExport", "", Id, Kind, 0, 0);
-                }
+                IndexMeasureSpaceLS();
+                ProgEventOther("FileExport", "", Id, Kind, 0, 0);
             }
             break;
         case 2: // Database

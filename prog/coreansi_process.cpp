@@ -159,7 +159,7 @@ bool CoreAnsi::AnsiSeek(int StepCount)
     {
         if (RingBellCount != AnsiState_.AnsiRingBellCount)
         {
-            ScreenBell();
+            //!!!!ScreenBell();
         }
     }
 

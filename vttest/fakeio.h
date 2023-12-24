@@ -47,6 +47,10 @@ private:
     static inline std::deque<int> fake_o;
     static inline std::mutex fake_i_mtx;
     static inline std::mutex fake_o_mtx;
+
+    static inline int ReportState = 0;
+    static void Report(int Chr);
+    static inline char EscapeEnd[59] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@`{}~|";
 };
 
 #endif // FAKEIO_H

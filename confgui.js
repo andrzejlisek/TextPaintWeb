@@ -150,7 +150,7 @@ function ConfRepaint()
     if (ScreenSET_ANSIReverseMode == 2) ConfBtn32.value = "Reverse\nafter";
     ConfBtn33.value = ScreenSET_ANSIColorBold ? "Bold\nas color" : "No bold\ncolor";
     ConfBtn34.value = ScreenSET_ANSIColorBlink ? "Blink\nas color" : "No blink\ncolor";
-    ConfBtn35.value = ScreenSET_ANSIIgnoreConcealed ? "Use\nconce" : "Ignore\nconce";
+    ConfBtn35.value = ScreenSET_ANSIIgnoreConcealed ? "Ignore\nconce" : "Use\nconce";
 
     if (ScreenSET_Blink == 0) ConfBtn41.value = "Steady";
     if (ScreenSET_Blink == 1) ConfBtn41.value = "VTx\nblink";
@@ -192,6 +192,7 @@ function ConfShow()
 {
     GuiSettingsShown = true;
     document.getElementById("ConfGui").style["display"] = "block";
+    ConfRepaint();
 }
 
 function ConfClick(id)
@@ -205,7 +206,6 @@ function ConfClick(id)
             break;
         case 12:
             location.reload(true);
-            //KeybBlockShortcuts = !KeybBlockShortcuts;
             break;
         case 13:
             ConfFullScreen();
@@ -279,119 +279,91 @@ function ConfClick(id)
             break;
 
         case 31:
-            ScreenSET_ANSIColors = !ScreenSET_ANSIColors;
-            ConfigFileGui("ANSIColors", ScreenSET_ANSIColors);
+            ConfigFileGui("ANSIColors", !ScreenSET_ANSIColors);
             ScreenSetDisplayConfig(true);
             break;
         case 32:
-            ScreenSET_ANSIReverseMode++;
-            if (ScreenSET_ANSIReverseMode == 3) ScreenSET_ANSIReverseMode = 0;
-            ConfigFileGui("ANSIReverseMode", ScreenSET_ANSIReverseMode);
+            ConfigFileGui("ANSIReverseMode", (ScreenSET_ANSIReverseMode + 1) % 3);
             ScreenSetDisplayConfig(true);
             break;
         case 33:
-            ScreenSET_ANSIColorBold = !ScreenSET_ANSIColorBold;
-            ConfigFileGui("ANSIColorBold", ScreenSET_ANSIColorBold);
+            ConfigFileGui("ANSIColorBold", !ScreenSET_ANSIColorBold);
             ScreenSetDisplayConfig(true);
             break;
         case 34:
-            ScreenSET_ANSIColorBlink = !ScreenSET_ANSIColorBlink;
-            ConfigFileGui("ANSIColorBlink", ScreenSET_ANSIColorBlink);
+            ConfigFileGui("ANSIColorBlink", !ScreenSET_ANSIColorBlink);
             ScreenSetDisplayConfig(true);
             break;
         case 35:
-            ScreenSET_ANSIIgnoreConcealed = !ScreenSET_ANSIIgnoreConcealed;
-            ConfigFileGui("ANSIIgnoreConcealed", ScreenSET_ANSIIgnoreConcealed);
+            ConfigFileGui("ANSIIgnoreConcealed", !ScreenSET_ANSIIgnoreConcealed);
             ScreenSetDisplayConfig(true);
             break;
             
         case 41:
-            ScreenSET_Blink++;
-            if (ScreenSET_Blink==3) ScreenSET_Blink = 0;
-            ConfigFileGui("DisplayBlink", ScreenSET_Blink);
+            ConfigFileGui("DisplayBlink", (ScreenSET_Blink + 1) % 3);
             ScreenSetDisplayConfig(true);
             break;
         case 42:
-            ScreenAttrB = !ScreenAttrB;
             Temp = 0;
-            if (ScreenAttrB) Temp += 1;
-            if (ScreenAttrI) Temp += 2;
-            if (ScreenAttrU) Temp += 4;
-            if (ScreenAttrS) Temp += 8;
+            if (!ScreenAttrB) Temp += 1;
+            if ( ScreenAttrI) Temp += 2;
+            if ( ScreenAttrU) Temp += 4;
+            if ( ScreenAttrS) Temp += 8;
             ConfigFileGui("DisplayAttrib", Temp);
             ScreenSetDisplayConfig(true);
             break;
         case 43:
-            ScreenAttrI = !ScreenAttrI;
             Temp = 0;
-            if (ScreenAttrB) Temp += 1;
-            if (ScreenAttrI) Temp += 2;
-            if (ScreenAttrU) Temp += 4;
-            if (ScreenAttrS) Temp += 8;
+            if ( ScreenAttrB) Temp += 1;
+            if (!ScreenAttrI) Temp += 2;
+            if ( ScreenAttrU) Temp += 4;
+            if ( ScreenAttrS) Temp += 8;
             ConfigFileGui("DisplayAttrib", Temp);
             ScreenSetDisplayConfig(true);
             break;
         case 44:
-            ScreenAttrU = !ScreenAttrU;
             Temp = 0;
-            if (ScreenAttrB) Temp += 1;
-            if (ScreenAttrI) Temp += 2;
-            if (ScreenAttrU) Temp += 4;
-            if (ScreenAttrS) Temp += 8;
+            if ( ScreenAttrB) Temp += 1;
+            if ( ScreenAttrI) Temp += 2;
+            if (!ScreenAttrU) Temp += 4;
+            if ( ScreenAttrS) Temp += 8;
             ConfigFileGui("DisplayAttrib", Temp);
             ScreenSetDisplayConfig(true);
             break;
         case 45:
-            ScreenAttrS = !ScreenAttrS;
             Temp = 0;
-            if (ScreenAttrB) Temp += 1;
-            if (ScreenAttrI) Temp += 2;
-            if (ScreenAttrU) Temp += 4;
-            if (ScreenAttrS) Temp += 8;
+            if ( ScreenAttrB) Temp += 1;
+            if ( ScreenAttrI) Temp += 2;
+            if ( ScreenAttrU) Temp += 4;
+            if (!ScreenAttrS) Temp += 8;
             ConfigFileGui("DisplayAttrib", Temp);
             ScreenSetDisplayConfig(true);
             break;
             
         case 61:
-            ScreenW -= 10;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW - 10, ScreenH, 0, 0);
             break;
         case 62:
-            ScreenW -= 1;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW -  1, ScreenH, 0, 0);
             break;
         case 63:
-            ScreenW += 1;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW +  1, ScreenH, 0, 0);
             break;
         case 64:
-            ScreenW += 10;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW + 10, ScreenH, 0, 0);
             break;
             
         case 71:
-            ScreenH -= 10;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH - 10, 0, 0);
             break;
         case 72:
-            ScreenH -= 1;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH -  1, 0, 0);
             break;
         case 73:
-            ScreenH += 1;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH +  1, 0, 0);
             break;
         case 74:
-            ScreenH += 10;
-            ScreenResize(ScreenW, ScreenH);
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH + 10, 0, 0);
             break;
     }
     

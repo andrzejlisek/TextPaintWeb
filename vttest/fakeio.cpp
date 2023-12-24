@@ -63,6 +63,46 @@ int fakeio::o_count()
     return Val;
 }
 
+void fakeio::Report(int Chr)
+{
+    /*if (Chr < 0)
+    {
+        Chr += 256;
+    }
+
+    if (ReportState == 9)
+    {
+        ReportState = 0;
+    }
+
+    switch (ReportState)
+    {
+        case 0:
+            if (Chr == 0x1b) { ReportState = 1; }
+            if (Chr == 0x9b) { ReportState = 2; }
+            if (Chr == 0x9c) { ReportState = 9; }
+            break;
+        case 1:
+            if (Chr == '/')  { ReportState = 2; }
+            if (Chr == '[')  { ReportState = 2; }
+            if (Chr == '\\') { ReportState = 9; }
+            break;
+        case 2:
+            {
+                int I = 0;
+                while (EscapeEnd[I] != 0)
+                {
+                    if (EscapeEnd[I] == Chr)
+                    {
+                        ReportState = 9;
+                    }
+                    I++;
+                }
+            }
+            break;
+    }*/
+}
+
 
 int fakeio::_putchar(int character)
 {
@@ -82,7 +122,8 @@ int fakeio::_getchar( void )
         _sleep(20);
     }
     int Chr = i_pop();
-    if (Echo)
+    Report(Chr);
+    if (Echo && (ReportState == 0))
     {
         if (Chr == '\r')
         {
@@ -113,7 +154,8 @@ int fakeio::_read(int fd, void * buf, int nbytes)
         while ((N < nbytes) && (i_count() > 0))
         {
             int Chr = i_pop();
-            if (Echo)
+            Report(Chr);
+            if (Echo && (ReportState == 0))
             {
                 if (Chr == '\r')
                 {

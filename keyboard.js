@@ -35,6 +35,9 @@ function KeybEvent(Evt)
         case "_Switch1":
             KeybCurrent = 1;
             break;
+        case "_Switch2":
+            KeybCurrent = 2;
+            break;
         default:
             RegularKey = true;
             break;
@@ -113,7 +116,7 @@ let KeybCellY = 0;
 let KeybCurrent = 0;
 
 // Keyboard layout
-let KeybLayout = [[],[]];
+let KeybLayout = [[],[], []];
 
 // Left part
 KeybLayout[0].push([ 0,  0, 29, 13, "",             "", ""]);
@@ -219,7 +222,7 @@ KeybLayout[1].push([ 4, 11,  2,  2, "ArrowRight",   String.fromCharCode(0x2192),
 KeybLayout[1].push([ 2,  9,  2,  2, "ArrowUp",      String.fromCharCode(0x2191), ""]);
 KeybLayout[1].push([ 2, 11,  2,  2, "ArrowDown",    String.fromCharCode(0x2193), ""]);
 
-KeybLayout[1].push([ 7,  3,  2,  2, "_Switch0",       "SWI", "KEYB"]);
+KeybLayout[1].push([ 7,  3,  2,  2, "_Switch2",       "SWI", "KEYB"]);
 KeybLayout[1].push([ 9,  3,  2,  2, "NumpadDivide",   "/", "", 47]);
 KeybLayout[1].push([11,  3,  2,  2, "NumpadMultiply", "*", "", 42]);
 KeybLayout[1].push([13,  3,  2,  2, "NumpadSubtract", "-", "", 45]);
@@ -240,6 +243,34 @@ KeybLayout[1].push([11, 11,  2,  2, "NumpadDecimal",  ".", "", 46]);
 KeybLayout[1].push([13,  9,  2,  4, "NumpadEnter",    "Enter", ""]);
 
 
+// Animation player
+KeybLayout[2].push([ 0,  0, 12,  8, "",             "", ""]);
+
+KeybLayout[2].push([ 0,  0,  2,  4, "PageUp",       "Up", "Page"]);
+KeybLayout[2].push([10,  0,  2,  4, "PageDown",     "Down", "Page"]);
+KeybLayout[2].push([ 0,  4,  2,  4, "Backspace",    "Back", "", 8]);
+KeybLayout[2].push([10,  4,  2,  4, "Enter",        "Enter", "", 13]);
+
+KeybLayout[2].push([ 2,  0,  2,  2, "BracketLeft",  "[", "{", 91, 123]);
+KeybLayout[2].push([ 4,  0,  2,  2, "Slash",        "/", "?", 47, 63]);
+KeybLayout[2].push([ 6,  0,  2,  2, "_Switch0",     "SWI", "KEYB"]);
+KeybLayout[2].push([ 8,  0,  2,  2, "BracketRight", "]", "}", 93, 125]);
+
+KeybLayout[2].push([ 2,  2,  2,  2, "Escape",       "Esc", "", 27]);
+KeybLayout[2].push([ 4,  2,  2,  2, "Tab",          "Tab", "", 9]);
+KeybLayout[2].push([ 6,  2,  2,  2, "Backquote",    "`", "~", 96, 126]);
+KeybLayout[2].push([ 8,  2,  2,  2, "Period",       ".", ">", 46, 62]);
+
+KeybLayout[2].push([ 2,  6,  2,  2, "Home",         "Home", ""]);
+KeybLayout[2].push([ 4,  6,  4,  2, "Space",        "Space", ""]);
+KeybLayout[2].push([ 8,  6,  2,  2, "End",          "End", ""]);
+
+KeybLayout[2].push([ 2,  4,  2,  2, "ArrowLeft",    String.fromCharCode(0x2190), ""]);
+KeybLayout[2].push([ 4,  4,  2,  2, "ArrowUp",      String.fromCharCode(0x2191), ""]);
+KeybLayout[2].push([ 6,  4,  2,  2, "ArrowDown",    String.fromCharCode(0x2193), ""]);
+KeybLayout[2].push([ 8,  4,  2,  2, "ArrowRight",   String.fromCharCode(0x2192), ""]);
+
+
 function KeybRepaint()
 {
     while (KeybSvg.firstChild)
@@ -258,8 +289,16 @@ function KeybRepaint()
     Temp.setAttribute("fill", KeybBack);
     KeybSvg.appendChild(Temp);
     
+    KeybCellW = Math.floor(KeybW / (KeybLayout[KeybCurrent][0][2] * 2));
+    KeybCellH = Math.floor(KeybH / (KeybLayout[KeybCurrent][0][3] * 2));
+    KeybCellW = KeybCellW * 2;
+    KeybCellH = KeybCellH * 2;
     KeybCellX = Math.floor((KeybW - (KeybLayout[KeybCurrent][0][2] * KeybCellW)) / 2);
     KeybCellY = Math.floor((KeybH - (KeybLayout[KeybCurrent][0][3] * KeybCellH)) / 2);
+
+    let KeybCellWH = (KeybCellW < KeybCellH) ? KeybCellW : KeybCellH;
+    KeybTextSize = Math.floor(3 * (KeybCellWH / 4));
+
     
     for (let I = 1; I < KeybLayout[KeybCurrent].length; I++)
     {
@@ -379,6 +418,7 @@ function KeybRepaint()
     switch (KeybCurrent)
     {
         case 0:
+        case 2:
             {
                 KeybSvgTxt.style.left = "0px";
                 KeybSvgTxt.style.top = "0px";
@@ -541,14 +581,6 @@ function KeybSetSize(W, H, H0)
     KeybSvgBlank.setAttribute("height", H0);
     KeybSvgScr.setAttribute("width", W);
     KeybSvgScr.setAttribute("height", H);
-
-    KeybCellW = Math.floor(KeybW / (KeybLayout[0][0][2] * 2));
-    KeybCellH = Math.floor(KeybH / (KeybLayout[0][0][3] * 2));
-    KeybCellW = KeybCellW * 2;
-    KeybCellH = KeybCellH * 2;
-
-    let KeybCellX = (KeybCellW < KeybCellH) ? KeybCellW : KeybCellH;
-    KeybTextSize = Math.floor(3 * (KeybCellH / 4));
 }
 
 function KeybColorToStyle(N)

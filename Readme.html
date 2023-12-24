@@ -1,0 +1,143 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=windows-1250">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Untitled </title>
+</head>
+
+<body>
+
+<h1>Overview</h1>
+
+<p>There is the WebAssembly version of <a
+href="https://github.com/andrzejlisek/TextPaint">https://github.com/andrzejlisek/TextPaint</a>
+project. There is not simply port. The source was strongly
+refactored and mathched into web browser behaviour. These source
+are compilable using <a href="https://emscripten.org/">https://emscripten.org/</a>
+compiler.</p>
+
+<p>Now, there is a draft version with lack of some functionality
+compated than mentioned original TextPaint project.</p>
+
+<p>Direct link: <a
+href="https://andrzejlisek.github.io/TextPaintWeb/index.html">https://andrzejlisek.github.io/TextPaintWeb/index.html</a>
+</p>
+
+<h1>Differences</h1>
+
+<table border="1" width="100%">
+    <tr>
+        <td>.NET version</td>
+        <td>WebAssembly version (current state)</td>
+    </tr>
+    <tr>
+        <td>Reads and writes file directly</td>
+        <td>Uses internal file storage and files from server</td>
+    </tr>
+    <tr>
+        <td>Editor: Tho states of character selector by pressing
+        F3</td>
+        <td>Three states, the third state is the file list and
+        you can select the file and press Enter.</td>
+    </tr>
+    <tr>
+        <td>Terminal: Supports Telnet, SSH, Serial connections</td>
+        <td>Has embedded VTTEST 2.7 only.</td>
+    </tr>
+    <tr>
+        <td>Run as command with parameters</td>
+        <td>Has menu displayed at the begin and exit command
+        returns into the menu.</td>
+    </tr>
+</table>
+
+<h1>File manager</h1>
+
+<p>This version of TextPaint has the internal file manager, which
+now allows to browse the system files (<strong>!!config.txt</strong>
+ans <strong>!!system.txt</strong>) and the files defined in <strong>!!system.txt</strong>
+configuration file. If you modify any file, the file will be
+stored at local storage and replaces the original default file.</p>
+
+<p>The file manager is available in editor (press <strong>F11</strong>
+key) and in the animation player (press <strong>dot/period</strong>
+key). In the file manager, there are posiible the following keys:</p>
+
+<ul>
+    <li><strong>Tab</strong> - Move the popup.</li>
+    <li><strong>Up arrow</strong> and <strong>Down arrow</strong>
+        - select item.</li>
+    <li><strong>Enter</strong> - Exit from the file manager when
+        selected file or enter into directory or upper directory.</li>
+</ul>
+
+<p>In editor: You have to press the F8 again to load selected
+file or press the F7 key to save the current text into the
+selected file.</p>
+
+<p>In player. The file manager is needed for change the current
+directory. After closing the file manager, the selected animation
+will be loaded.</p>
+
+<p><strong>Note:</strong> Currently, the file manager has a
+certain bug: Sometimes, the other files than the two system siles
+is not visible. If the problem occurs, just restart the
+application (refresh page in browser).</p>
+
+<h1>GUI interface</h1>
+
+<p>If you click the screen, there will be show the GUI interface
+usable both on touchscreen and with mouse. The button caption
+represents the current state. The settings are organized in the
+following rows:</p>
+
+<ul>
+    <li><strong>General</strong> - General actions:<ul>
+            <li><strong>Mouse/Touchscreen</strong> - Toggle
+                between mouse and touchscreen, this affects on
+                the screen keyboard.</li>
+            <li><strong>Restart</strong> - Restart the
+                application by refresh the page.</li>
+            <li><strong>Window/Fullscreen</strong> - Toggle
+                display between window and fullscreen.</li>
+            <li><strong>Return to program</strong> - Close the
+                interface and return to the program.</li>
+        </ul>
+    </li>
+    <li><strong>Layout</strong> - Set the screen and virtual
+        keyboard sizes.</li>
+    <li><strong>Process</strong> - Toggle the ANSI processing
+        options. The change affects after processing new data. In
+        the player, you have to reopen the file. In the terminal,
+        the will be affect fo new data only.</li>
+    <li><strong>Colors</strong>, <strong>Font</strong>- Set the
+        color and font display options. The result will be shown
+        immediately and the affect the screen display only.</li>
+</ul>
+
+<h1>To do</h1>
+
+<p>This version is not completed yet and now there are need to do
+following:</p>
+
+<ul>
+    <li>Optimize text editor display - when loaded larger file,
+        the application slows down while writing or navigating</li>
+    <li>Support for various font sizes above 2 - now there are
+        supported single and double size only (enough for
+        embedded animations and VTTEST).</li>
+    <li>XTERM mouse support.</li>
+    <li>File contents preservation (now, the changes will lost
+        after application refresh or exit).</li>
+    <li>File import and export.</li>
+    <li>Integration with file system and telnet using WebSocket
+        and separated .NET/Java application.</li>
+    <li>And much more...</li>
+</ul>
+
+<p><script language="JavaScript"
+src="file:///media/xxx/WORK1/__ToBackup/Develop/HTML/HTML2MD/Prog/html2md.js"></script></p>
+</body>
+</html>

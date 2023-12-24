@@ -5,7 +5,7 @@ BinaryFile::BinaryFile()
     B64 = std::make_unique<TextCodec>(1);
 
     ItemAdd(BinaryFileItem(Str(SystemFile0), std::make_shared<TextCodec>(65001), 4, -1, false));
-    ItemAdd(BinaryFileItem(Str(SystemFile1), std::make_shared<TextCodec>(65001), 3, -1, false));
+    ItemAdd(BinaryFileItem(Str(SystemFile1), std::make_shared<TextCodec>(65001), 4, -1, false));
 
     Disp.Clear();
     for (int I = 0; I < ListItems.Count; I++)
@@ -13,7 +13,7 @@ BinaryFile::BinaryFile()
         Str N;
         N.AddRange(ListItems[I].Name);
         N.Add(PtrSep);
-        N.AddString(std::to_string(I));
+        N.AddString(I);
         Disp.Add(N);
     }
 }
@@ -85,6 +85,11 @@ void BinaryFile::SetDir(Str Dir)
 {
     int StdDir = true;
 
+    if (Dir == Str("."))
+    {
+        StdDir = false;
+    }
+
     if (Dir == Str("/"))
     {
         StdDir = false;
@@ -148,7 +153,7 @@ void BinaryFile::SetDir(Str Dir)
                     if (DirPos < 0)
                     {
                         N.AddRange(DispSepX);
-                        N.AddString(std::to_string(I));
+                        N.AddString(I);
                         N.RemoveRange(0, ListDir.Count + 1);
                         Disp.AddSort(N);
                     }
@@ -172,7 +177,7 @@ void BinaryFile::SetDir(Str Dir)
             if (DirPos < 0)
             {
                 N.AddRange(DispSepX);
-                N.AddString(std::to_string(I));
+                N.AddString(I);
                 Disp.AddSort(N);
             }
             else
@@ -193,10 +198,10 @@ void BinaryFile::SetDir(Str Dir)
         Disp.Insert(Str("..~"));
     }
 
-    ListIndex = 0;
-    while (ItemType(ListIndex) < 0)
+    ItemIndex = 0;
+    while (ItemType(ItemIndex) < 0)
     {
-        ListIndex++;
+        ItemIndex++;
     }
 }
 
@@ -208,17 +213,17 @@ void BinaryFile::SetCRLF(int CR, int LF)
 
 void BinaryFile::Save(Str &Text)
 {
-    if (ItemType(ListIndex) >= 0)
+    if (ItemType(ItemIndex) >= 0)
     {
-        ListItems[ItemType(ListIndex)].Save(Text, TempData);
+        ListItems[ItemType(ItemIndex)].Save(Text, TempData);
     }
 }
 
 void BinaryFile::Load(Str &Text)
 {
-    if (ItemType(ListIndex) >= 0)
+    if (ItemType(ItemIndex) >= 0)
     {
-        ListItems[ItemType(ListIndex)].Load(TempData, Text);
+        ListItems[ItemType(ItemIndex)].Load(TempData, Text);
     }
 }
 
@@ -237,11 +242,11 @@ void BinaryFile::SaveFromString(std::string S)
 
 bool BinaryFile::IsSystemFile()
 {
-    if (ItemName(ListIndex).ToString() == SystemFile0)
+    if (ItemName(ItemIndex).ToString() == SystemFile0)
     {
         return true;
     }
-    if (ItemName(ListIndex).ToString() == SystemFile1)
+    if (ItemName(ItemIndex).ToString() == SystemFile1)
     {
         return true;
     }
@@ -250,14 +255,16 @@ bool BinaryFile::IsSystemFile()
 
 void BinaryFile::FileImportSys(int Idx)
 {
-    ListItems[ItemType(Idx)].EventId = Screen::FileImport(9, ListItems[Idx].Name.ToString());
+    FileImportWaiting = true;
+    ListItems[ItemType(Idx)].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString());
 }
 
 void BinaryFile::FileImport(int Idx)
 {
+    FileImportWaiting = true;
     if (Idx < 0)
     {
-        Idx = ListIndex;
+        Idx = ItemIndex;
     }
     Idx = ItemType0(Idx);
 
@@ -268,7 +275,7 @@ void BinaryFile::FileExport(int Idx)
 {
     if (Idx < 0)
     {
-        Idx = ListIndex;
+        Idx = ItemIndex;
     }
     Idx = ItemType0(Idx);
 
@@ -308,13 +315,17 @@ bool BinaryFile::EventFileImport(int Id, int Kind, std::string Data)
             if (Kind < 10)
             {
                 ListItems[I].EventId = 0;
+                FileImportWaiting = false;
             }
 
-            if (Kind < 9)
+            if (PreInit)
+            {
+                return false;
+            }
+            else
             {
                 return true;
             }
-            return false;
         }
     }
     return false;
@@ -340,4 +351,19 @@ bool BinaryFile::EventFileExport(int Id, int Kind)
 void BinaryFile::SysSaveConfig()
 {
     FileExport(0);
+}
+
+void BinaryFile::ManagerInfoPush()
+{
+    ItemIndex_ = ItemIndex;
+    ListDispOffset_ = ListDispOffset;
+    ListDir_ = ListDir.Copy();
+}
+
+void BinaryFile::ManagerInfoPop()
+{
+    ListDir = ListDir_.Copy();
+    SetDir(Str("."));
+    ItemIndex = ItemIndex_;
+    ListDispOffset = ListDispOffset_;
 }

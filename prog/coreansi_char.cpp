@@ -153,7 +153,7 @@ void CoreAnsi::AnsiChar(int X, int Y, int Ch, int ColB, int ColF, int FontW, int
 
     if (AnsiScreenWork)
     {
-        ScreenPutChar(X, Y, Ch, ColB, ColF, FontW, FontH, ColA);
+        Screen::ScreenChar(X, Y, Ch, ColB, ColF, ColA, FontW, FontH);
     }
     while (AnsiState_.__AnsiLineOccupy__.CountLines() <= Y)
     {
@@ -243,7 +243,7 @@ void CoreAnsi::AnsiScreenNegative(bool IsNega)
                 AnsiState_.__AnsiLineOccupy__.Item_ColorA = AnsiState_.__AnsiLineOccupy__.Item_ColorA & 0x7F;
             }
             AnsiState_.__AnsiLineOccupy__.Set(Y, X);
-            ScreenPutChar(X, Y, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH, AnsiState_.__AnsiLineOccupy__.Item_ColorA);
+            Screen::ScreenChar(X, Y, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_ColorA, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH);
         }
     }
 }

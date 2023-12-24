@@ -13,9 +13,12 @@ void Core1Player::Init()
     Stopwatch_.Reset();
 
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
+    DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
+    DisplayConfig_.get()->PopupBack = PopupBack;
+    DisplayConfig_.get()->PopupFore = PopupFore;
     CoreAnsi_.get()->__AnsiProcessDelayFactor = CF.get()->ParamGetI("FileDelayFrame");
 
-    LoadFileTimeChunk = (CF.get()->ParamGetI("WinTimer") * LoadFileTimeFactor) / 100;
+    LoadFileTimeChunk = (CF.get()->ParamGetI("TimerPeriod") * LoadFileTimeFactor) / 100;
 
     ServerPort = CF.get()->ParamGetI("ServerPort");
     ServerTelnet = CF.get()->ParamGetB("ServerTelnet");
@@ -124,7 +127,7 @@ void Core1Player::EventTick()
                 Screen_WriteLine();
                 Screen_WriteText(". - File manager");
                 Screen_WriteLine();
-                //!!!!!!!!!!!!!!Screen_WriteText("\\ - Display configuration");
+                Screen_WriteText("\\ - Display configuration");
                 Screen_WriteLine();
                 Screen_WriteLine();
                 Screen_WriteLine();
@@ -135,9 +138,6 @@ void Core1Player::EventTick()
             }
             break;
         case WorkStateSDef::InfoScreenWaitForKey: // Waiting for user key press before opening file
-            {
-
-            }
             break;
         case WorkStateSDef::FileOpenFile0: // Waiting for file contents
             {
@@ -148,9 +148,6 @@ void Core1Player::EventTick()
             }
             break;
         case WorkStateSDef::FileOpenFile: // Waiting for file contents
-            {
-
-            }
             break;
         case WorkStateSDef::FileMan: // File manager
             break;
@@ -209,8 +206,8 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
 
-                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->ListIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()));
-                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->ItemName(BinaryFile_.get()->ListIndex).ToString());
+                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->ItemIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()));
+                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex).ToString());
                 AnsiSauce_.NonSauceInfo("Steps", MovieLength);
                 AnsiSauce_.NonSauceInfo("Characters", CoreAnsi_.get()->AnsiState_.AnsiBufferI);
                 AnsiSauce_.NonSauceInfo("Overwrites/writes", std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter));
@@ -378,8 +375,6 @@ void Core1Player::EventTick()
             }
             break;
         case WorkStateSDef::DisplayPause: // Display paused
-            {
-            }
             break;
         case WorkStateSDef::DisplayInfo: // Sauce info
             {
@@ -419,14 +414,41 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 Repaint(true);
                 FileManager_.Repaint();
             }
-            if (FileManager_.RequestClose)
+            if (FileManager_.RequestCloseOld)
             {
+                Repaint(true);
+                WorkStateS = WorkStateSDef::DisplayPause;
+                EventTickX();
+            }
+            if (FileManager_.RequestCloseNew)
+            {
+                Repaint(true);
                 WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
             }
             return;
         case WorkStateSDef::DispConf:
-            //!!!!DisplayConfig_.ProcessKey(KeyName, KeyChar);
+            DisplayConfig_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            DisplayConfig_.get()->Repaint();
+            if (DisplayConfig_.get()->RequestRepaint)
+            {
+                Repaint(true);
+                DisplayConfig_.get()->Repaint();
+            }
+            if (DisplayConfig_.get()->RequestClose)
+            {
+                WorkStateS = WorkStateSDef::DisplayPause;
+                Repaint(true);
+            }
+            else
+            {
+                if (DisplayConfig_.get()->RequestResize)
+                {
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 0, 0);
+                }
+                DisplayConfig_.get()->Repaint();
+            }
+            EventTickX();
             return;
     }
 
@@ -543,15 +565,15 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 int FType = -1;
                 while (FType < 0)
                 {
-                    if (BinaryFile_.get()->ListIndex > 0)
+                    if (BinaryFile_.get()->ItemIndex > 0)
                     {
-                        BinaryFile_.get()->ListIndex--;
+                        BinaryFile_.get()->ItemIndex--;
                     }
                     else
                     {
-                        BinaryFile_.get()->ListIndex = (BinaryFile_.get()->ItemCount() - 1);
+                        BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
                     }
-                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ListIndex);
+                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ItemIndex);
                 }
                 WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
@@ -562,15 +584,15 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 int FType = -1;
                 while (FType < 0)
                 {
-                    if (BinaryFile_.get()->ListIndex < (BinaryFile_.get()->ItemCount() - 1))
+                    if (BinaryFile_.get()->ItemIndex < (BinaryFile_.get()->ItemCount() - 1))
                     {
-                        BinaryFile_.get()->ListIndex++;
+                        BinaryFile_.get()->ItemIndex++;
                     }
                     else
                     {
-                        BinaryFile_.get()->ListIndex = 0;
+                        BinaryFile_.get()->ItemIndex = 0;
                     }
-                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ListIndex);
+                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ItemIndex);
                 }
                 WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
@@ -620,6 +642,9 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             FileManager_.Open();
             return;
         case _("1_Backslash"):
+            WorkStateS = WorkStateSDef::DispConf;
+            DisplayConfig_.get()->Open();
+            EventTickX();
             return;
         case _("2_ArrowUp"):
             InfoPosV--;
@@ -704,9 +729,9 @@ void Core1Player::Repaint(bool Force)
                 {
                     Str CharMsgIdx(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
                     CharMsgIdx.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
-                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->ListIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()) + (AnsiSauce_.Exists ? "= " : ": "));
+                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->ItemIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()) + (AnsiSauce_.Exists ? "= " : ": "));
 
-                    CharMsg.AddRange(BinaryFile_.get()->ItemName(BinaryFile_.get()->ListIndex));
+                    CharMsg.AddRange(BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex));
                     int MaxS = (ScreenW - CharMsgIdx.Count);
                     if (CharMsg.Count > MaxS)
                     {

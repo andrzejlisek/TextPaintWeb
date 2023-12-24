@@ -190,9 +190,11 @@ void AnsiLineOccupyEx::PadRightTab(int Y, int Size)
     ItemTempSave();
     BlankChar();
     Item_Char = '\t';
-    while (CountItems(Y) < Size)
+    int CountF = CountItems(Y);
+    while (CountF < Size)
     {
         Append(Y);
+        CountF++;
     }
     ItemTempLoad();
 }
@@ -201,18 +203,22 @@ void AnsiLineOccupyEx::PadRightSpace(int Y, int Size)
 {
     ItemTempSave();
     BlankChar();
-    while (CountItems(Y) < Size)
+    int CountF = CountItems(Y);
+    while (CountF < Size)
     {
         Append(Y);
+        CountF++;
     }
     ItemTempLoad();
 }
 
 void AnsiLineOccupyEx::PadRight(int Y, int Size)
 {
-    while (CountItems(Y) < Size)
+    int CountF = CountItems(Y);
+    while (CountF < Size)
     {
         Append(Y);
+        CountF++;
     }
 }
 
@@ -253,11 +259,14 @@ void AnsiLineOccupyEx::Crop(int Y, int Start, int Size)
 
 void AnsiLineOccupyEx::LineCopy(AnsiLineOccupyEx Src, int SrcY, int DstY)
 {
-    Data[DstY].Clear();
+    Data[DstY] = Src.Data[SrcY];
+    //Str Temp;
+    //Temp.AddRange();
+    /*Data[DstY].Clear();
     for (int i = 0; i < Src.Data[SrcY].Count; i++)
     {
         Data[DstY].Add(Src.Data[SrcY][i]);
-    }
+    }*/
 }
 
 void AnsiLineOccupyEx::AppendLineCopy(AnsiLineOccupyEx Src, int SrcY)
@@ -276,7 +285,7 @@ void AnsiLineOccupyEx::Insert(int Y, int X, int L)
     DataX.Add(Item_Char);
     DataX.Add(Item_ColorB);
     DataX.Add(Item_ColorF);
-    DataX.Add(Item_ColorA + (Item_Type << 8));
+    DataX.Add(Item_ColorA);
     DataX.Add(Item_FontW);
     DataX.Add(Item_FontH);
     while (L > 0)
@@ -297,7 +306,7 @@ void AnsiLineOccupyEx::Append(int Y, int L)
     DataX.Add(Item_Char);
     DataX.Add(Item_ColorB);
     DataX.Add(Item_ColorF);
-    DataX.Add(Item_ColorA + (Item_Type << 8));
+    DataX.Add(Item_ColorA);
     DataX.Add(Item_FontW);
     DataX.Add(Item_FontH);
     while (L > 0)

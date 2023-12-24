@@ -22,6 +22,7 @@ public:
     Str TrimEnd();
     Str Substring(int Pos, int Count_);
 
+    void AddString(int T);
     void AddString(std::string T);
 
     std::string ToString();

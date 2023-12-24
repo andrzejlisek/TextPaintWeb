@@ -4,6 +4,7 @@
 #include "xlist.h"
 #include "str.h"
 #include <string>
+#include <iostream>
 
 class Screen
 {
@@ -11,6 +12,7 @@ public:
     Screen();
     static inline int CharDoubleTable[18 * 65536];
     static inline int CharDoubleTableInv[18 * 65536];
+    static inline bool WinAuto = true;
     static void AddDoubleRange(int X1, int X2);
     static void StaticInit();
     static int CharDouble(int C);
@@ -20,16 +22,23 @@ public:
     static inline int TerminalCellW = 8;
     static inline int TerminalCellH = 16;
 
-    static inline void (*ScreenClear)( int, int );
-    static inline void (*ScreenChar)( int, int, int, int, int, int, int, int );
+    static inline void (*ScreenSetConfig)( );
+    static inline void (*ScreenClear_)( int, int );
+    static inline void (*ScreenChar_)( int, int, int, int, int, int, int, int );
     static inline void (*ScreenResize_)( int, int );
     static inline void (*ScreenCursorMove_)( int, int );
-    static inline void (*ScreenTextMove)( int, int, int, int, int, int );
+    static inline void (*ScreenTextMove_)( int, int, int, int, int, int );
     static inline void (*ScreenLineOffset)( int, int, int, int, int, int );
     static inline void (*WorkerSend)( int, std::string );
+    static void ScreenClear(int Back, int Fore);
+    static void ScreenChar(int X, int Y, int C, int ColorBack, int ColorFore, int ColorAttr, int FontW, int FontH);
+    static void ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H);
     static void ScreenResize(int NewW, int NewH);
     static void ScreenCursorMove(int X, int Y);
     static void ScreenRefresh();
+
+    static inline XList<int> ScreenMemo1;
+    static inline XList<int> ScreenMemo2;
 
     static void ScreenWriteChar(int Chr, int Back, int Fore);
     static void ScreenWriteChar0(int Chr, int Back, int Fore);

@@ -6,48 +6,50 @@ function ScreenTimerStart()
     }
     else
     {
-        setTimeout(ScreenTimerStart, 20);
+        setTimeout(ScreenTimerStart, WaitTimeout);
     }
 }
 
 function ScreenTimerTick()
 {
     ScreenTimerCounter++;
-    
-    switch (ScreenTimerCounter)
+    if (ScreenTimerCounter == ScreenTimerCounterLoop)
     {
-        case 1:
-        case 3:
-        case 7:
-        case 9:
-            ScreenDrawCursor(ScreenCursorSteady);
-            ProgEventTick();
-            VTTEST_.VTData("");
-            break;
-        case 5:
-            ScreenDrawCursor(ScreenCursorSteady);
-            ScreenDrawBlink(true);
-            ProgEventTick();
-            VTTEST_.VTData("");
-            break;
-        case 0:
-        case 2:
-        case 4:
-        case 6:
-        case 8:
-            ScreenDrawCursor(true);
-            ProgEventTick();
-            VTTEST_.VTData("");
-            break;
-        case 10:
-            ScreenDrawCursor(true);
-            ScreenDrawBlink(false);
-            ProgEventTick();
-            VTTEST_.VTData("");
-            ScreenTimerCounter = 0;
-            break;
+        ScreenTimerCounter = 0;
     }
     
+    if ((ScreenTimerCounter % ScreenTimerCursor) == 0)
+    {
+        ScreenTimerCursorDisp = !ScreenTimerCursorDisp;
+        if (ScreenTimerCursorDisp)
+        {
+            ScreenDrawCursor(true);
+        }
+        else
+        {
+            ScreenDrawCursor(ScreenCursorSteady);
+        }
+    }
+
+    if ((ScreenTimerCounter % ScreenTimerBlink) == 0)
+    {
+        ScreenTimerBlinkDisp = !ScreenTimerBlinkDisp;
+        if (ScreenTimerBlinkDisp)
+        {
+            ScreenDrawBlink(true);
+        }
+        else
+        {
+            ScreenDrawBlink(false);
+        }
+    }
+ 
+    if ((ScreenTimerCounter % ScreenTimerTickEvent) == 0)
+    {
+        ProgEventTick();
+    }
+
+    VTTEST_.VTData("");
 
     setTimeout(ScreenTimerTick, ScreenTimerPeriod);
 }

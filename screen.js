@@ -67,6 +67,23 @@ let ScreenAttrS = true;
 
 function ScreenSetDisplayConfig(Repaint)
 {
+    let IsChanged = false;
+
+    if (ScreenCursorSteady != ConfigFileB("WinSteadyCursor")) IsChanged = true;
+    if (ScreenSET_ANSIIgnoreConcealed != ConfigFileB("ANSIIgnoreConcealed")) IsChanged = true;
+    if (ScreenSET_ANSIReverseMode != ConfigFileI("ANSIReverseMode")) IsChanged = true;
+    if (ScreenSET_ANSIColors != ConfigFileB("ANSIColors")) IsChanged = true;
+    if (ScreenSET_ANSIColorBlink != ConfigFileB("ANSIColorBlink")) IsChanged = true;
+    if (ScreenSET_ANSIColorBold != ConfigFileB("ANSIColorBold")) IsChanged = true;
+
+    if (ScreenAttrB != ((ConfigFileI("DisplayAttrib") & 1) > 0)) IsChanged = true;
+    if (ScreenAttrI != ((ConfigFileI("DisplayAttrib") & 2) > 0)) IsChanged = true;
+    if (ScreenAttrU != ((ConfigFileI("DisplayAttrib") & 4) > 0)) IsChanged = true;
+    if (ScreenAttrS != ((ConfigFileI("DisplayAttrib") & 8) > 0)) IsChanged = true;
+
+    if (ScreenSET_Blink != ConfigFileI("DisplayBlink")) IsChanged = true;
+
+
     ScreenCursorSteady = ConfigFileB("WinSteadyCursor");
     ScreenSET_ANSIIgnoreConcealed = ConfigFileB("ANSIIgnoreConcealed");
     ScreenSET_ANSIReverseMode = ConfigFileI("ANSIReverseMode");
@@ -81,10 +98,11 @@ function ScreenSetDisplayConfig(Repaint)
 
     ScreenSET_Blink = ConfigFileI("DisplayBlink");
     
+    
     ScreenGlyphBuf0 = {};
     ScreenGlyphBuf1 = {};
     
-    if (Repaint)
+    if (Repaint && IsChanged)
     {
         ScreenRepaint();
     }
@@ -96,10 +114,10 @@ let ScreenCalcColor_Fore = 7;
 let ScreenCalcColor_Temp = 0;
 function ScreenCalcColor(Back, Fore, Attr)
 {
-    if (ScreenSET_ANSIColors)
+    if (ScreenSET_ANSIColors || (Back > 15) || (Fore > 15))
     {
-        ScreenCalcColor_Back = (Back >= 0) ? Back : ScreenDefaultBack;
-        ScreenCalcColor_Fore = (Fore >= 0) ? Fore : ScreenDefaultFore;
+        ScreenCalcColor_Back = (Back >= 0) ? (Back & 15) : ScreenDefaultBack;
+        ScreenCalcColor_Fore = (Fore >= 0) ? (Fore & 15) : ScreenDefaultFore;
     }
     else
     {
@@ -194,7 +212,7 @@ function ScreenCharBlank(Buf, ScrIdx)
     let FontW = 0;
     let FontH = 0;
 
-    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (Back << 12) + (Fore << 8) + (Attr)) : 0;
+    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (Back_ << 12) + (Fore_ << 8) + (Attr)) : 0;
     let CharData0 = ScreenGlyphBuf0[CharIdx];
     let CharData1 = ScreenGlyphBuf1[CharIdx];
     
@@ -302,7 +320,7 @@ function ScreenCharGlyph(Buf, ScrIdx)
     let FontW = ScreenDataW[ScrIdx];
     let FontH = ScreenDataH[ScrIdx];
 
-    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (Back << 12) + (Fore << 8) + (Attr)) : 0;
+    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (Back_ << 12) + (Fore_ << 8) + (Attr)) : 0;
     let CharData0 = ScreenGlyphBuf0[CharIdx];
     let CharData1 = ScreenGlyphBuf1[CharIdx];
     
@@ -432,16 +450,18 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
     if (X >= ScreenW) { return; }
     if (Y >= ScreenH) { return; }
     
-    let ScrIdx = Y * ScreenW + X;
-    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (Back << 12) + (Fore << 8) + (Attr)) : 0;
-    let CharIdx_ = (FontW << 8) + (FontH);
+
+    ScreenCalcColor(Back, Fore, Attr);
+
     
+    let ScrIdx = Y * ScreenW + X;
+    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (ScreenCalcColor_Back << 12) + (ScreenCalcColor_Fore << 8) + (Attr)) : 0;
+    let CharIdx_ = (FontW << 8) + (FontH);
     if ((CharIdx != 0) && (ScreenData_0[ScrIdx] == CharIdx) && (ScreenData_1[ScrIdx] == CharIdx_))
     {
         return;
     }
     
-    ScreenCalcColor(Back, Fore, Attr);
     ScreenData_0[ScrIdx] = CharIdx;
     ScreenData_1[ScrIdx] = CharIdx_;
     ScreenDataC[ScrIdx] = Chr;
@@ -983,7 +1003,11 @@ function ScreenInit2()
     if (ScreenFont1.Ready && ScreenFont2.Ready)
     {
         ScreenSetDisplayConfig(false);
-        ScreenTimerPeriod = ConfigFileI("WinTimer");
+        ScreenTimerPeriod = ConfigFileI("TimerPeriod");
+        ScreenTimerCounterLoop = ConfigFileI("TimerLoop");
+        ScreenTimerCursor = ConfigFileI("TimerCursor");
+        ScreenTimerBlink = ConfigFileI("TimerBlink");
+        ScreenTimerTickEvent = ConfigFileI("TimerTick");
     
         ScreenCellW = ScreenFont1.CellW;
         ScreenCellH = ScreenFont1.CellH;

@@ -157,6 +157,11 @@ Str Str::Substring(int Pos, int Count_)
     return X;
 }
 
+void Str::AddString(int T)
+{
+    AddString(std::to_string(T));
+}
+
 void Str::AddString(std::string T)
 {
     AddRange(Str::FromString(T));

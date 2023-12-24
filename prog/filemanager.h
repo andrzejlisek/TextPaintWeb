@@ -22,8 +22,12 @@ public:
     void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void Open();
     bool RequestRepaint = false;
-    bool RequestClose = false;
+    bool RequestCloseNew = false;
+    bool RequestCloseOld = false;
     int RepaintDepth = 0;
+private:
+    int MarginHead = 1;
+    int MarginFoot = 3;
 };
 
 #endif // FILEMANAGER_H

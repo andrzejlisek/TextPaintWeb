@@ -156,7 +156,7 @@ void CoreAnsi::UpdateConfig(std::shared_ptr<ConfigFile> CF)
 
 void CoreAnsi::AnsiRepaint(bool AdditionalBuffers)
 {
-    ScreenClear(-1, -1);
+    Screen::ScreenClear(-1, -1);
     __ScreenMinX = 0;
     __ScreenMinY = 0;
     __ScreenMaxX = 0;
@@ -193,7 +193,7 @@ void CoreAnsi::AnsiRepaint(bool AdditionalBuffers)
                 if (__ScreenMaxY < Y__) { __ScreenMaxY = Y__; }
 
                 __AnsiLineOccupyX.Get(Y, X);
-                ScreenPutChar(X, Y__, __AnsiLineOccupyX.Item_Char, __AnsiLineOccupyX.Item_ColorB, __AnsiLineOccupyX.Item_ColorF, __AnsiLineOccupyX.Item_FontW, __AnsiLineOccupyX.Item_FontH, __AnsiLineOccupyX.Item_ColorA);
+                Screen::ScreenChar(X, Y__, __AnsiLineOccupyX.Item_Char, __AnsiLineOccupyX.Item_ColorB, __AnsiLineOccupyX.Item_ColorF, __AnsiLineOccupyX.Item_ColorA, __AnsiLineOccupyX.Item_FontW, __AnsiLineOccupyX.Item_FontH);
             }
         }
         if (BufI == 1)
@@ -220,11 +220,11 @@ void CoreAnsi::AnsiRepaintLine(int Y)
                 if (X < L)
                 {
                     AnsiState_.__AnsiLineOccupy__.Get(Y, X);
-                    ScreenPutChar(X, Y, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH, AnsiState_.__AnsiLineOccupy__.Item_ColorA);
+                    Screen::ScreenChar(X, Y, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_ColorA, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH);
                 }
                 else
                 {
-                    ScreenPutChar(X, Y, ' ', -1, -1, 0, 0, 0);
+                    Screen::ScreenChar(X, Y, ' ', -1, -1, 0, 0, 0);
                 }
             }
         }
@@ -232,7 +232,7 @@ void CoreAnsi::AnsiRepaintLine(int Y)
         {
             for (int X = 0; X < AnsiMaxX; X++)
             {
-                ScreenPutChar(X, Y, ' ', -1, -1, 0, 0, 0);
+                Screen::ScreenChar(X, Y, ' ', -1, -1, 0, 0, 0);
             }
         }
     }
@@ -240,10 +240,6 @@ void CoreAnsi::AnsiRepaintLine(int Y)
 
 void CoreAnsi::AnsiResize(int NewW, int NewH)
 {
-    /*!!!!!!!!!!!if (Core_.WorkMode != 2)
-    {
-        Monitor.Enter(AnsiResizeMonitor);
-    }*/
     if (NewW < 0)
     {
         NewW = AnsiMaxX;
@@ -254,19 +250,13 @@ void CoreAnsi::AnsiResize(int NewW, int NewH)
     }
     if ((NewW != AnsiMaxX) || (NewH != AnsiMaxY))
     {
-        if (ScreenWinAuto)
+        if (Screen::WinAuto)
         {
             if (AnsiScreenWork)
             {
-                ScreenAppResize(NewW, NewH, false);
-                //NewW = Screen::CurrentW;
-                //NewH = Screen::CurrentH;
+                Screen::ScreenResize(NewW, NewH);
             }
             AnsiTerminalResize(NewW, NewH);
         }
     }
-    /*!!!!!!!!!!!!!!!!!if (Core_.WorkMode != 2)
-    {
-        Monitor.Exit(AnsiResizeMonitor);
-    }*/
 }

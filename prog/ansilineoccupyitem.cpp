@@ -13,7 +13,6 @@ void AnsiLineOccupyItem::BlankChar()
     Item_ColorA = 0;
     Item_FontW = 0;
     Item_FontH = 0;
-    Item_Type = 0;
 }
 
 void AnsiLineOccupyItem::BlankChar(int ColorB_, int ColorF_, int ColorA_)
@@ -24,7 +23,6 @@ void AnsiLineOccupyItem::BlankChar(int ColorB_, int ColorF_, int ColorA_)
     Item_ColorA = ColorA_;
     Item_FontW = 0;
     Item_FontH = 0;
-    Item_Type = 0;
 }
 
 void AnsiLineOccupyItem::CopyItem(AnsiLineOccupyItem &Src)
@@ -35,7 +33,6 @@ void AnsiLineOccupyItem::CopyItem(AnsiLineOccupyItem &Src)
     Item_ColorA = Src.Item_ColorA;
     Item_FontW = Src.Item_FontW;
     Item_FontH = Src.Item_FontH;
-    Item_Type = Src.Item_Type;
 }
 
 AnsiLineOccupyItem AnsiLineOccupyItem::CopyItemObj()

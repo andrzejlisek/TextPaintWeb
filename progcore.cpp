@@ -13,7 +13,7 @@
 void RespondClear()
 {
     BufClear();
-    BufTxt("_TestOK2([");
+    BufTxt("_ProgCallback([");
 }
 
 void RespondFinish()
@@ -32,6 +32,19 @@ void RespondPartial()
         emscripten_worker_respond_provisionally(IOBuf, IOBufPtr);
         RespondClear();
     }
+}
+
+std::shared_ptr<ConfigFile> CF;
+
+void FileConfig(std::string Param)
+{
+    BufNum(113);
+    BufTxt("\"");
+    BufStr(Param);
+    BufTxt("\",\"");
+    BufStr(CF.get()->ParamGetS(Param));
+    BufTxt("\",");
+    RespondPartial();
 }
 
 void ScreenChar(int X, int Y, int Chr, int Back, int Fore, int Attr, int FontW, int FontH)
@@ -96,6 +109,24 @@ void ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore
     RespondPartial();
 }
 
+void ScreenSetConfig()
+{
+    FileConfig("DisplayBlink");
+    FileConfig("DisplayAttrib");
+    FileConfig("ANSIColors");
+    FileConfig("ANSIReverseMode");
+    FileConfig("ANSIColorBlink");
+    FileConfig("ANSIColorBold");
+    FileConfig("ANSIIgnoreConcealed");
+
+    FileConfig("ANSIDOS");
+    FileConfig("ANSI8bit");
+    FileConfig("ANSIPrintBackspace");
+    FileConfig("ANSIPrintTab");
+    FileConfig("ANSIReadCR");
+    FileConfig("ANSIReadLF");
+}
+
 void WorkerSend(int T, std::string X)
 {
     BufNum(200 + T);
@@ -129,24 +160,18 @@ void FileExport(int Id, int Kind, std::string Name, std::string Data)
     RespondPartial();
 }
 
-std::shared_ptr<ConfigFile> CF;
-
-void FileConfig(std::string Param)
-{
-    BufNum(113);
-    BufTxt("\"");
-    BufStr(Param);
-    BufTxt("\",\"");
-    BufStr(CF.get()->ParamGetS(Param));
-    BufTxt("\",");
-    RespondPartial();
-}
-
 std::unique_ptr<CoreCommon> Core;
 std::shared_ptr<BinaryFile> BinaryFile_;
 
 extern "C"
 {
+    // 1 - First init
+    // 2 - Waiting for "config.txt"
+    // 3 - Waiting for "system.txt"
+    // 4 - Program run
+    int InitState = 0;
+
+
     bool ProgMenu = true;
 
     void Init0()
@@ -191,12 +216,13 @@ extern "C"
         switch (InitMode)
         {
             case '1': // Create structures and execute "config.txt" import
-                Screen::ScreenChar = ScreenChar;
-                Screen::ScreenClear = ScreenClear;
+                Screen::ScreenChar_ = ScreenChar;
+                Screen::ScreenClear_ = ScreenClear;
                 Screen::ScreenResize_ = ScreenResize;
                 Screen::ScreenCursorMove_ = ScreenCursorMove;
-                Screen::ScreenTextMove = ScreenTextMove;
+                Screen::ScreenTextMove_ = ScreenTextMove;
                 Screen::ScreenLineOffset = ScreenLineOffset;
+                Screen::ScreenSetConfig = ScreenSetConfig;
                 Screen::WorkerSend = WorkerSend;
                 Screen::FileImport_ = FileImport;
                 Screen::FileExport_ = FileExport;
@@ -212,75 +238,83 @@ extern "C"
                 RespondFinish();
                 break;
             case '2': // After importing "config.txt", execute "system.txt" import
-                CF.get()->ParamClear();
-                CF.get()->FileLoad(0, BinaryFile_.get()->LoadToString());
+                if (BinaryFile_.get()->FileImportWaiting)
+                {
+                    RespondClear();
+                    BufNum(97);
+                    RespondFinish();
+                }
+                else
+                {
+                    CF.get()->ParamClear();
+                    CF.get()->FileLoad(0, BinaryFile_.get()->LoadToString());
             
-                RespondClear();
-                BinaryFile_.get()->FileImportSys(1);
-                BufNum(98);
-                RespondFinish();
+                    RespondClear();
+                    BinaryFile_.get()->FileImportSys(1);
+                    BufNum(98);
+                    RespondFinish();
+                }
                 break;
             case '3': // After importing both system files, prepare configuration structure for use in JavaScript
-                CF.get()->FileLoad(1, BinaryFile_.get()->LoadToString());
-
-                RespondClear();
-                FileConfig("WinTouchScreen");
-                FileConfig("ColorKeyboard");
-                FileConfig("WinFontName");
-                FileConfig("DuospaceFontName");
-                FileConfig("DuospaceMode");
-                FileConfig("DuospaceDoubleChars");
-                FileConfig("WinTimer");
-                FileConfig("WinScreenSize");
-                FileConfig("WinKeyboardSize");
-                FileConfig("WinSteadyCursor");
-                FileConfig("WinColorBlending");
+                if (BinaryFile_.get()->FileImportWaiting)
                 {
-                    int I_ = 1;
-                    while (CF.get()->ParamExists("WinColorBlending_" + std::to_string(I_)))
-                    {
-                        FileConfig("WinColorBlending_" + std::to_string(I_));
-                        I_++;
-                    }
+                    RespondClear();
+                    BufNum(98);
+                    RespondFinish();
                 }
-                FileConfig("WinPaletteR");
-                FileConfig("WinPaletteG");
-                FileConfig("WinPaletteB");
-                FileConfig("WinPaletteBlinkR");
-                FileConfig("WinPaletteBlinkG");
-                FileConfig("WinPaletteBlinkB");
+                else
+                {
+                    CF.get()->FileLoad(1, BinaryFile_.get()->LoadToString());
 
-                FileConfig("DisplayBlink");
-                FileConfig("DisplayAttrib");
-                FileConfig("ANSIColors");
-                FileConfig("ANSIReverseMode");
-                FileConfig("ANSIColorBlink");
-                FileConfig("ANSIColorBold");
-                FileConfig("ANSIIgnoreConcealed");
+                    RespondClear();
+                    FileConfig("WinTouchScreen");
+                    FileConfig("ColorKeyboard");
+                    FileConfig("WinFontName");
+                    FileConfig("DuospaceFontName");
+                    FileConfig("DuospaceMode");
+                    FileConfig("DuospaceDoubleChars");
+                    FileConfig("TimerPeriod");
+                    FileConfig("TimerLoop");
+                    FileConfig("TimerCursor");
+                    FileConfig("TimerBlink");
+                    FileConfig("TimerTick");
+                    FileConfig("WinScreenSize");
+                    FileConfig("WinKeyboardSize");
+                    FileConfig("WinSteadyCursor");
+                    FileConfig("WinColorBlending");
+                    {
+                        int I_ = 1;
+                        while (CF.get()->ParamExists("WinColorBlending_" + std::to_string(I_)))
+                        {
+                            FileConfig("WinColorBlending_" + std::to_string(I_));
+                            I_++;
+                        }
+                    }
+                    FileConfig("WinPaletteR");
+                    FileConfig("WinPaletteG");
+                    FileConfig("WinPaletteB");
+                    FileConfig("WinPaletteBlinkR");
+                    FileConfig("WinPaletteBlinkG");
+                    FileConfig("WinPaletteBlinkB");
+                    
+                    ScreenSetConfig();
 
-                FileConfig("ANSIDOS");
-                FileConfig("ANSI8bit");
-                FileConfig("ANSIPrintBackspace");
-                FileConfig("ANSIPrintTab");
-                FileConfig("ANSIReadCR");
-                FileConfig("ANSIReadLF");
+            // Default configuration
+    /*ANSIWidth=0
+    ANSIHeight=0
+    ANSIDOS=0
+    */
 
-
-        // Default configuration
-/*ANSIWidth=0
-ANSIHeight=0
-ANSIDOS=0
-*/
-
-        CF.get()->ParamSet("WinW", "80");
-        CF.get()->ParamSet("WinH", "24");
+            CF.get()->ParamSet("WinW", "80");
+            CF.get()->ParamSet("WinH", "24");
 
 
 
 
 
-                BufNum(99);
-                RespondFinish();
+                    BufNum(99);
+                    RespondFinish();
+                }
                 break;
                 
             case '4': // Execute program
@@ -395,7 +429,6 @@ ANSIDOS=0
         }
         if (EvtName == "Resize")
         {
-            //ScreenResize(EvtParam1, EvtParam2);
             Fire = true;
         }
         if (Fire)

@@ -22,7 +22,6 @@ public:
     int Item_ColorA;
     int Item_FontW;
     int Item_FontH;
-    int Item_Type;
     void BlankChar();
     void BlankChar(int ColorB_, int ColorF_, int ColorA_);
     void CopyItem(AnsiLineOccupyItem &Src);

@@ -1,14 +1,8 @@
-function StopwatchReset()
-{
-    console.log("<<<");
-    Stopwatch = performance.now();
-}
-
-function StopwatchTime()
-{
-    let StopwatchTime = performance.now() - Stopwatch;
-    console.log(">>> " + StopwatchTime);
-}
+let _ProgInit;
+let _ProgEventKey;
+let _ProgEventTick;
+let ProgEventOther;
+let ProgEventOtherFile;
 
 function ProgStart()
 {
@@ -21,57 +15,24 @@ function ProgEventTick()
 {
     if (ProgStarted)
     {
-        Module.ccall("EventTick", null, null, null);
+        _ProgEventTick();
     }
-}
-
-function ProgEventOther(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4)
-{
-    Module.ccall("EventOther", null, ["string", "string", "number", "number", "number", "number"], [EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4]);
-}
-
-function ProgEventOtherFile(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4)
-{
-    Module.ccall("EventOtherFile", null, ["string", "string", "number", "number", "number", "number"], [EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4]);
 }
 
 function VTTestData(X)
 {
-    Module.ccall("EventOther", null, ["string", "string", "number", "number", "number", "number"], ["Received", X, 0, 0, 0, 0]);
+    ProgEventOther("Received", X, 0, 0, 0, 0);
 }
 
 function ProgEventKey(KeyName, KeyChr, KeyS, KeyC, KeyA)
 {
     if (ProgStarted)
     {
-        Module.ccall("EventKey", null, ["string", "number", "number", "number", "number"], [KeyName, KeyChr, KeyS, KeyC, KeyA]);
+        _ProgEventKey(KeyName, KeyChr, KeyS, KeyC, KeyA);
     }
 }
 
-function ProgTestProc()
-{
-    let Napis = "1ą🬔ę2";
-    //Napis = "qwerty";
-    let Napis2 = Module.ccall("EventOther", null, ["string", "string", "number", "number", "number", "number"], ["TextPaste", Napis, Napis.length > 0 ? 1 : 0, 0, 0, 0]);
-    //alert(Napis2);
-}
-
-function ProgTestVT()
-{
-    
-    //document.getElementById('targetFrame').contentWindow.targetFunction();
-
-    //Module.ccall("EventVT0", null, ["string"], ["TextPaste"]);
-}
-
-function TestOK()
-{
-    if (ProgStarted)
-    {
-    }
-}
-
-function _TestOK2(D)
+function _ProgCallback(D)
 {
     let I = 0;
     let Proc = D[0];
@@ -81,15 +42,15 @@ function _TestOK2(D)
             switch (Proc)
             {
                 case 97:
-                    setTimeout(ProgInitResult1, WaitTimeout);
+                    _ProgInit("2");
                     I += 1;
                     break;
                 case 98:
-                    setTimeout(ProgInitResult2, WaitTimeout);
+                    _ProgInit("3");
                     I += 1;
                     break;
                 case 99:
-                    ProgInitResult3();
+                    ScreenInit1();
                     I += 1;
                     break;
                 case 100:
@@ -130,6 +91,10 @@ function _TestOK2(D)
                     break;
                 case 113:
                     ConfigFileGet(D[I+1],D[I+2]);
+                    if (ProgStarted)
+                    {
+                        ScreenSetDisplayConfig(true);
+                    }
                     I += 3;
                     break;
                 case 200:
@@ -150,10 +115,6 @@ function _TestOK2(D)
     }
 }
 
-function _TestOK3(D)
-{
-    console.log(D);
-}    
 
       var Module = {
         print: (function() {

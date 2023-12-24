@@ -2677,12 +2677,13 @@ void CoreAnsi::AnsiRepaintCursor()
 {
     if (AnsiGetFontSize(AnsiState_.__AnsiY) > 0)
     {
-        ScreenSetCursorPosition(AnsiState_.__AnsiX << 1, AnsiState_.__AnsiY);
+        Screen::ScreenCursorMove(AnsiState_.__AnsiX << 1, AnsiState_.__AnsiY);
     }
     else
     {
-        ScreenSetCursorPosition(AnsiState_.__AnsiX, AnsiState_.__AnsiY);
+        Screen::ScreenCursorMove(AnsiState_.__AnsiX, AnsiState_.__AnsiY);
     }
+    Screen::ScreenRefresh();
 }
 
 bool CoreAnsi::AnsiCharNotCmd(int CharCode)
@@ -2869,7 +2870,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         AnsiState_.AnsiRingBellCount++;
                         if (AnsiRingBell)
                         {
-                            ScreenBell();
+                            //!!!!ScreenBell();
                         }
                     }
                     break;
