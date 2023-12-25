@@ -41,12 +41,8 @@ function _ProgCallback(D)
         {
             switch (Proc)
             {
-                case 97:
-                    _ProgInit("2");
-                    I += 1;
-                    break;
                 case 98:
-                    _ProgInit("3");
+                    _ProgInit("2");
                     I += 1;
                     break;
                 case 99:
@@ -82,12 +78,12 @@ function _ProgCallback(D)
                     I += 7;
                     break;
                 case 111:
-                    FileImport(D[I+1],D[I+2],D[I+3]);
-                    I += 4;
+                    FileImport(D[I+1],D[I+2],D[I+3],D[I+4]);
+                    I += 5;
                     break;
                 case 112:
-                    FileExport(D[I+1],D[I+2],D[I+3],D[I+4]);
-                    I += 5;
+                    FileExport(D[I+1],D[I+2],D[I+3],D[I+4],D[I+5]);
+                    I += 6;
                     break;
                 case 113:
                     ConfigFileGet(D[I+1],D[I+2]);
@@ -183,4 +179,5 @@ function _ProgCallback(D)
 
 
 ProgInit();
+FileDbOpen();
 

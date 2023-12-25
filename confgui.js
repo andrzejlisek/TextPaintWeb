@@ -1,3 +1,62 @@
+let ConfResetTimeout = 10000;
+let ConfResetTime = 0 - ConfResetTimeout - ConfResetTimeout;
+let ConfResetCounter = 0;
+
+StopwatchOffset = performance.now();
+
+function ConfResetPrepare()
+{
+    if ((ConfResetTime + ConfResetTimeout) > performance.now())
+    {
+        ConfResetCounter++;
+    }
+    else
+    {
+        ConfResetTime = performance.now();
+        ConfResetCounter = 0;
+    }
+}
+
+function ConfReserPerform()
+{
+    if (confirm("Reset configuration?"))
+    {
+        ConfigFileReset();
+        if (confirm("Clear file index?"))
+        {
+            IndexClear();
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+
+    /*if ((ConfResetTime + ConfResetTimeout) > performance.now())
+    {
+        if (ConfResetCounter >= 5)
+        {
+            if (confirm("Reset configuration?"))
+            {
+                ConfigFileReset();
+                if (confirm("Clear file index?"))
+                {
+                    IndexClear();
+                }
+            }
+        }
+        ConfResetCounter = 0;
+        ConfResetTime = 0;
+        return true;
+    }
+    else
+    {
+        ConfResetCounter = 0;
+        return false;
+    }*/
+}
 
 
 let ConfLbl1 = document.getElementById("ConfLbl1");
@@ -201,13 +260,18 @@ function ConfClick(id)
     switch (id)
     {
         case 11:
+            ConfResetPrepare();
             KeybTouch = 1 - KeybTouch;
             ConfigFileGui("WinTouchScreen", KeybTouch);
             break;
         case 12:
-            location.reload(true);
+            if (!ConfReserPerform())
+            {
+                location.reload(true);
+            }
             break;
         case 13:
+            ConfResetPrepare();
             ConfFullScreen();
             break;
         case 14:

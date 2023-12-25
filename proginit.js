@@ -1,6 +1,6 @@
 function ProgInit()
 {
-    if (ProgLoaded)
+    if (ProgLoaded && FileLsReady && FileDbReady)
     {
         _ProgInit = Module.cwrap("Init", null, ["string"]);
         _ProgEventKey = Module.cwrap("EventKey", null, ["string", "number", "number", "number", "number"]);
@@ -19,7 +19,7 @@ function ProgInit()
 function ProgInitAfterConf()
 {
     ConfRepaint();
-    _ProgInit("4");
+    _ProgInit("3");
 }
 
 

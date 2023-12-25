@@ -4,6 +4,7 @@
 #include <memory>
 #include "str.h"
 #include "textcodec.h"
+#include <iostream>
 
 class BinaryFileItem
 {
@@ -13,7 +14,11 @@ public:
     bool Ansi;
     Str Name;
     std::shared_ptr<TextCodec> Codec;
-    BinaryFileItem(Str Name_, std::shared_ptr<TextCodec> Codec_, int Type_, int EventId_, bool Ansi_);
+    BinaryFileItem(Str Name_, int Type_, int EventId_, int Codec_, bool Ansi_);
+    BinaryFileItem(Str Name_, int Type_, int EventId_, std::string Attrib_);
+
+    std::string AttribGet();
+    void AttribSet(std::string Attrib);
 
     bool operator!= (BinaryFileItem &_) { return Name != _.Name; }
     bool operator>  (BinaryFileItem &_) { return Name >  _.Name; }

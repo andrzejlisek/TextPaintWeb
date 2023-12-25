@@ -635,7 +635,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Comma"):
             Clipboard_.SetText(CoreAnsi_.get()->AnsiState_.GetScreen(0, 0, ScreenW - 1, ScreenH - 1));
-            Screen::FileExport(0, "", Clipboard_.SystemText);
+            Screen::FileExport(0, "", "", Clipboard_.SystemText);
             return;
         case _("1_Period"):
             WorkStateS = WorkStateSDef::FileMan;

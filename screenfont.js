@@ -60,7 +60,7 @@ class ScreenFont
     {
         this.ImgW = this.Img.width;
         this.ImgH = this.Img.height;
-        this.Cnv = document.getElementById("testbmp1");
+        this.Cnv = document.getElementById("fontbmp");
         this.Cnv.width = this.ImgW;
         this.Cnv.height = this.ImgH;
         this.Ctx = this.Cnv.getContext('2d');

@@ -960,10 +960,10 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
 
         case _("KeyC"):
             EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, false, EditorSemi_.get()->DiamondType);
-            Screen::FileExport(0, "", EditorClipboard_.get()->SysClpTextCopy);
+            Screen::FileExport(0, "", "", EditorClipboard_.get()->SysClpTextCopy);
             break;
         case _("KeyV"):
-            Screen::FileImport(0, "");
+            Screen::FileImport(0, "", "");
             break;
 
 
@@ -1132,10 +1132,10 @@ void Core0Editor::EventKey_Editor_4(std::string KeyName, int KeyChar, bool ModSh
 
         case _("KeyC"):
             EditorPixelPaint_.get()->ClipboardCopy();
-            Screen::FileExport(0, "", EditorClipboard_.get()->SysClpTextCopy);
+            Screen::FileExport(0, "", "", EditorClipboard_.get()->SysClpTextCopy);
             break;
         case _("KeyV"):
-            Screen::FileImport(0, "");
+            Screen::FileImport(0, "", "");
             break;
 
         case _("Digit1"):

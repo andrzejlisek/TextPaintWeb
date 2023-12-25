@@ -4,8 +4,7 @@ BinaryFile::BinaryFile()
 {
     B64 = std::make_unique<TextCodec>(1);
 
-    ItemAdd(BinaryFileItem(Str(SystemFile0), std::make_shared<TextCodec>(65001), 4, -1, false));
-    ItemAdd(BinaryFileItem(Str(SystemFile1), std::make_shared<TextCodec>(65001), 4, -1, false));
+    ItemAdd(BinaryFileItem(Str(SystemFile0), 5, -1, 65001, false));
 
     Disp.Clear();
     for (int I = 0; I < ListItems.Count; I++)
@@ -18,8 +17,26 @@ BinaryFile::BinaryFile()
     }
 }
 
+int BinaryFile::FindName(Str Name)
+{
+    int Pos = -1;
+    for (int I = 0; I < ListItems.Count; I++)
+    {
+        if (ListItems[I].Name == Name)
+        {
+            return I;
+        }
+    }
+    return Pos;
+}
+
 void BinaryFile::ItemAdd(BinaryFileItem X)
 {
+    int Pos = FindName(X.Name);
+    if (Pos >= 0)
+    {
+        ListItems.Remove(Pos);
+    }
     ListItems.Add(X);
 }
 
@@ -205,12 +222,6 @@ void BinaryFile::SetDir(Str Dir)
     }
 }
 
-void BinaryFile::SetCRLF(int CR, int LF)
-{
-    //ListItems[ListIndex].Codec.get()->CR = CR;
-    //ListItems[ListIndex].Codec.get()->LF = LF;
-}
-
 void BinaryFile::Save(Str &Text)
 {
     if (ItemType(ItemIndex) >= 0)
@@ -234,6 +245,44 @@ std::string BinaryFile::LoadToString()
     return X.ToString();
 }
 
+std::string BinaryFile::LoadToStringConfig()
+{
+    Str X;
+    Load(X);
+    X.Add('\n');
+    int I = 0;
+
+    XList<Str> Index;
+    Str Index_;
+
+    while (X[I] == '~')
+    {
+        Index_.Clear();
+        while (X[I] != '\n')
+        {
+            Index_.Add(X[I]);
+            I++;
+        }
+        Index_.PopFirst();
+        Index.Add(Index_);
+        I++;
+    }
+    X.PopLast();
+    X.RemoveRange(0, I + 1);
+
+    if ((Index.Count % 2) != 0)
+    {
+        Index.PopLast();
+    }
+
+    for (int I = 0; I < Index.Count; I += 2)
+    {
+        ItemAdd(BinaryFileItem(Index[I], 5, 0, Index[I + 1].ToString()));
+    }
+
+    return X.ToString();
+}
+
 void BinaryFile::SaveFromString(std::string S)
 {
     Str X = Str::FromString(S);
@@ -246,17 +295,17 @@ bool BinaryFile::IsSystemFile()
     {
         return true;
     }
-    if (ItemName(ItemIndex).ToString() == SystemFile1)
-    {
-        return true;
-    }
     return false;
 }
 
-void BinaryFile::FileImportSys(int Idx)
+void BinaryFile::FileImportSys()
 {
     FileImportWaiting = true;
-    ListItems[ItemType(Idx)].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString());
+    int Idx = FindName(SystemFile0);
+    if (Idx >= 0)
+    {
+        ListItems[Idx].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet());
+    }
 }
 
 void BinaryFile::FileImport(int Idx)
@@ -268,7 +317,7 @@ void BinaryFile::FileImport(int Idx)
     }
     Idx = ItemType0(Idx);
 
-    ListItems[Idx].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString());
+    ListItems[Idx].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet());
 }
 
 void BinaryFile::FileExport(int Idx)
@@ -281,70 +330,78 @@ void BinaryFile::FileExport(int Idx)
 
     if (IsSystemFile() && TempData.Count < 2)
     {
-        ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type + 100, ListItems[Idx].Name.ToString(), "");
+        ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type + 100, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), "");
     }
     else
     {
         Str B64Data;
         B64.get()->Reset();
         B64.get()->Decode(TempData, B64Data);
-        ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), B64Data.ToString());
+        ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), B64Data.ToString());
     }
 }
 
-bool BinaryFile::EventFileImport(int Id, int Kind, std::string Data)
+bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4)
 {
-    if (Kind == 0)
+    if (EvtParam2 == 0)
     {
         return true;
     }
-    for (int I = 0; I < ListItems.Count; I++)
+
+    if (EvtName == "FileImport")
     {
-        if (ListItems[I].EventId == Id)
+        if (EvtParam4 == 0)
         {
-            if ((Kind >= 20) && (Kind < 30))
+            if ((EvtParam2 >= 20) && (EvtParam2 < 30))
             {
-                B64.get()->Reset();
-                TempData.Clear();
+                EventFileName = EvtParam0;
             }
-
-            Str B64Data = Str::FromString(Data);
-            B64.get()->EnqueueStr(B64Data);
-            B64.get()->DequeueRaw(TempData);
-
-            if (Kind < 10)
+            int Idx = FindName(EventFileName);
+            if (Idx >= 0)
             {
-                ListItems[I].EventId = 0;
-                FileImportWaiting = false;
-            }
+                if ((EvtParam2 >= 20) && (EvtParam2 < 30))
+                {
+                    B64.get()->Reset();
+                    TempData.Clear();
+                }
 
-            if (PreInit)
-            {
-                return false;
+                if (EvtParam2 < 20)
+                {
+                    Str B64Data = Str::FromString(EvtParam0);
+                    B64.get()->EnqueueStr(B64Data);
+                    B64.get()->DequeueRaw(TempData);
+                }
+
+                if (EvtParam2 < 10)
+                {
+                    FileImportWaiting = false;
+                }
+
+                if (PreInit)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
-            else
+        }
+    }
+
+    if (EvtName == "FileExport")
+    {
+        if (EvtParam4 == 0)
+        {
+            EventFileName = EvtParam0;
+            int Idx = FindName(EventFileName);
+            if (Idx >= 0)
             {
                 return true;
             }
         }
     }
-    return false;
-}
 
-bool BinaryFile::EventFileExport(int Id, int Kind)
-{
-    if (Kind == 0)
-    {
-        return true;
-    }
-    for (int I = 0; I < ListItems.Count; I++)
-    {
-        if (ListItems[I].EventId == Id)
-        {
-            ListItems[I].EventId = 0;
-            return true;
-        }
-    }
     return false;
 }
 

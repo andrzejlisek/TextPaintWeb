@@ -136,24 +136,28 @@ void WorkerSend(int T, std::string X)
     RespondPartial();
 }
 
-void FileImport(int Id, int Kind, std::string Name)
+void FileImport(int Id, int Kind, std::string Name, std::string Attrib)
 {
     BufNum(111);
     BufNum(Id);
     BufNum(Kind);
     BufTxt("\"");
     BufStr(Name);
+    BufTxt("\",\"");
+    BufStr(Attrib);
     BufTxt("\",");
     RespondPartial();
 }
 
-void FileExport(int Id, int Kind, std::string Name, std::string Data)
+void FileExport(int Id, int Kind, std::string Name, std::string Attrib, std::string Data)
 {
     BufNum(112);
     BufNum(Id);
     BufNum(Kind);
     BufTxt("\"");
     BufStr(Name);
+    BufTxt("\",\"");
+    BufStr(Attrib);
     BufTxt("\",\"");
     BufStr(Data);
     BufTxt("\",");
@@ -229,42 +233,25 @@ extern "C"
 
                 BufInit();
                 RespondClear();
-               
+
                 BinaryFile_ = std::make_shared<BinaryFile>();
                 CF = std::make_shared<ConfigFile>();
 
-                BinaryFile_.get()->FileImportSys(0);
-                BufNum(97);
+                BinaryFile_.get()->FileImportSys();
+                BufNum(98);
                 RespondFinish();
                 break;
-            case '2': // After importing "config.txt", execute "system.txt" import
+            case '2': // After importing "config.txt", prepare configuration structure for use in JavaScript
                 if (BinaryFile_.get()->FileImportWaiting)
                 {
                     RespondClear();
-                    BufNum(97);
+                    BufNum(98);
                     RespondFinish();
                 }
                 else
                 {
                     CF.get()->ParamClear();
-                    CF.get()->FileLoad(0, BinaryFile_.get()->LoadToString());
-            
-                    RespondClear();
-                    BinaryFile_.get()->FileImportSys(1);
-                    BufNum(98);
-                    RespondFinish();
-                }
-                break;
-            case '3': // After importing both system files, prepare configuration structure for use in JavaScript
-                if (BinaryFile_.get()->FileImportWaiting)
-                {
-                    RespondClear();
-                    BufNum(98);
-                    RespondFinish();
-                }
-                else
-                {
-                    CF.get()->FileLoad(1, BinaryFile_.get()->LoadToString());
+                    CF.get()->FileLoad(0, BinaryFile_.get()->LoadToStringConfig());
 
                     RespondClear();
                     FileConfig("WinTouchScreen");
@@ -302,7 +289,6 @@ extern "C"
             // Default configuration
     /*ANSIWidth=0
     ANSIHeight=0
-    ANSIDOS=0
     */
 
             CF.get()->ParamSet("WinW", "80");
@@ -317,7 +303,7 @@ extern "C"
                 }
                 break;
                 
-            case '4': // Execute program
+            case '3': // Execute program
 
                 CF.get()->ParamSet("WorkMode", "9");
 
@@ -405,13 +391,9 @@ extern "C"
         int EvtParam4 = BufGetNum();
 
         bool Fire = true;
-        if (EvtName == "FileImport")
+        if ((EvtName == "FileImport") || (EvtName == "FileExport"))
         {
-            Fire = BinaryFile_.get()->EventFileImport(EvtParam1, EvtParam2, EvtParam0);
-        }
-        if (EvtName == "FileExport")
-        {
-            Fire = BinaryFile_.get()->EventFileExport(EvtParam1, EvtParam2);
+            Fire = BinaryFile_.get()->EventFile(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4);
         }
         RespondClear();
         if (EvtName == "ConfigSet")

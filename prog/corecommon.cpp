@@ -37,8 +37,7 @@ void CoreCommon::ReadColor(std::string SettingValue, int &ColorB, int &ColorF)
 
 void CoreCommon::InitCommon()
 {
-    BinaryFile_.get()->PreInit = false;
-    if (BinaryFile_.get()->ItemCount() <= BinaryFile_.get()->SystemFileCount)
+    if (BinaryFile_.get()->PreInit)
     {
         int I = 1;
         int XCodec = 0;
@@ -55,11 +54,12 @@ void CoreCommon::InitCommon()
             {
                 XAnsi = CF.get()->ParamGetB("File" + std::to_string(I) + "Ansi");
             }
-            BinaryFile_.get()->ItemAdd(BinaryFileItem(XFile, std::make_shared<TextCodec>(XCodec), 4, 0, XAnsi));
+            BinaryFile_.get()->ItemAdd(BinaryFileItem(XFile, 5, 0, XCodec, XAnsi));
             I++;
         }
         BinaryFile_.get()->SetDir(Str("/"));
     }
+    BinaryFile_.get()->PreInit = false;
 
     DisplayConfig_ = std::make_shared<DisplayConfig>();
     DisplayConfig_.get()->CF = CF;

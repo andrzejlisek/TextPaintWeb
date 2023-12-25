@@ -60,10 +60,10 @@ public:
     static void MouseActive(bool X);
 
     static inline int FilePortId = 0;
-    static inline void (*FileImport_)( int, int, std::string );
-    static inline void (*FileExport_)( int, int, std::string, std::string );
-    static int FileImport(int Kind, std::string Name);
-    static int FileExport(int Kind, std::string Name, std::string Data);
+    static inline void (*FileImport_)( int, int, std::string, std::string );
+    static inline void (*FileExport_)( int, int, std::string, std::string, std::string );
+    static int FileImport(int Kind, std::string Name, std::string Attrib);
+    static int FileExport(int Kind, std::string Name, std::string Attrib, std::string Data);
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;

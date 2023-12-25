@@ -152,30 +152,15 @@
             <br>
         </div>
 
-
-
-
         <div style="background-color:#ffffff;display:none">
+            <span id="info"></span>
+            <iframe id="vttest" width="1" height="1" src="progvttest.html"></iframe>
+            <canvas id="fontbmp"></canvas>
 
-
-        <span id="info"></span>
-
-        
-        <iframe id="vttest" width="1" height="1" src="progvttest.html"></iframe>
-
-        <br>
-
+            <a target="_blank" id="FileDownload"></a>
+            <input type="file" id="FileUpload" onchange="FileBrwUploadEvent()">
+            
         </div>
-        <div style="background-color:#ffffff;display:none">
-
-        <canvas id="testbmp1"></canvas>
-        <br>
-        <canvas id="testbmp2"></canvas>
-        <br>
-        <input type="button" value="Fullscreen" onclick="ToggleFullScreen()">
-        <input type="button" value="Refresh" onclick="test()">
-        </div>
-
 
         <script type="text/javascript" src="confgui.js"></script>
         <script type="text/javascript" src="global.js"></script>
@@ -184,6 +169,10 @@
         <script type="text/javascript" src="screentimer.js"></script>
         <script type="text/javascript" src="screen.js"></script>
         <script type="text/javascript" src="keyboard.js"></script>
+        <script type="text/javascript" src="fileclp.js"></script>
+        <script type="text/javascript" src="filels.js"></script>
+        <script type="text/javascript" src="filedb.js"></script>
+        <script type="text/javascript" src="filebrw.js"></script>
         <script type="text/javascript" src="fileport.js"></script>
 
         <script type="text/javascript" src="proginit.js"></script>

@@ -66,3 +66,20 @@ function StopwatchTime()
     Stopwatch.push(performance.now() - StopwatchOffset);
 }
 
+function ASCII(CharVal, NonPrintable)
+{
+    if ((CharVal >= 32) && (CharVal <= 126))
+    {
+        return CharVal;
+    }
+    if (CharVal == 13)
+    {
+        return 10;
+    }
+    if (CharVal == 10)
+    {
+        return 10;
+    }
+    return NonPrintable;
+}
+

@@ -1,7 +1,15 @@
+let FileSystemName = "!!config.txt";
+
 let FileBufSize = 10000;
 
 let FileIndexLS = {};
+let FileIndexLSAttr = {};
 let FileIndexLSNum = 1;
+
+let FileIndexDB = {};
+let FileIndexDBAttr = {};
+let FileIndexDBNum = 1;
+
 let FileIndexName = "TextPaintFileIndex";
 let FileIndexTempl = "TextPaintFile";
 let FileIndexSepa = "\n";
@@ -11,6 +19,7 @@ let FileFreeSpaceSafe = 100;
 
 let ConfigFileJS = {};
 
+let FileIndexToProgram = true;
 
 function ConfigFileS(Param)
 {
@@ -77,108 +86,157 @@ function ConfigFileSet(Param, Value)
     ProgEventOtherFile("ConfigSet", Param + "=" + Value, Param.length, 0, 0, 0);
 }
 
-function IndexImportLS()
+
+
+function ConfigFileReset()
+{
+    FileDelete(0, 1, FileSystemName);
+    FileDelete(0, 2, FileSystemName);
+}
+
+function IndexClear()
 {
     FileIndexLS = {};
-    if (DataExists(FileIndexName))
+    FileIndexLSAttr = {};
+    IndexExportLS();
+
+    FileIndexDB = {};
+    FileIndexDBAttr = {};
+    IndexExportDB();
+}
+
+function IndexImport(IndexRaw0, AttribOffset)
+{
+    let FileIndex__ = {};
+    let IndexRaw = IndexRaw0.split(FileIndexSepa);
+    for (let I = 0; I < IndexRaw.length; I += 3)
     {
-        let IndexRaw = DataGet(FileIndexName).split(FileIndexSepa);
-        for (let I = 0; I < IndexRaw.length; I += 2)
+        if (IndexRaw.length > (I + 2))
         {
-            if (IndexRaw.length > (I + 1))
+            if (IndexRaw[I] && (IndexRaw[I] != ""))
             {
-                if (IndexRaw[I] && (IndexRaw[I] != ""))
+                if (AttribOffset == 0)
                 {
                     let N = parseInt(IndexRaw[I + 1]);
-                    if (DataExists(FileIndexTempl + N))
+                    if (FileIndexDBNum <= N)
                     {
-                        if (FileIndexLSNum <= N)
-                        {
-                            FileIndexLSNum = N + 1;
-                        }
-                        FileIndexLS[IndexRaw[I]] = N;
+                        FileIndexDBNum = N + 1;
                     }
+                    FileIndex__[IndexRaw[I]] = N;
+                }
+                if (AttribOffset == 1)
+                {
+                    FileIndex__[IndexRaw[I]] = IndexRaw[I + 2];
                 }
             }
         }
     }
-    IndexMeasureSpaceLS();
+    return FileIndex__;
 }
+
+function IndexExport(FileIndex__, FileIndex__Attr)
+{
+    let IndexRaw = "";
+    for (let k in FileIndex__)
+    {
+        IndexRaw = IndexRaw + k + FileIndexSepa + FileIndex__[k] + FileIndexSepa + FileIndex__Attr[k] + FileIndexSepa;
+    }
+    return IndexRaw;
+}
+
+
 
 function IndexExportLS()
 {
-    let IndexRaw = "";
-    for (let k in FileIndexLS)
-    {
-        IndexRaw = IndexRaw + k + FileIndexSepa + FileIndexLS[k] + FileIndexSepa;
-    }
+    let IndexRaw = IndexExport(FileIndexLS, FileIndexLSAttr);
     DataSet(FileIndexName, IndexRaw);
 }
 
-function IndexMeasureSpaceLS()
+function IndexExportDB()
 {
-    FileFreeSpaceLS = 0;
-    FileFreeSpaceDB = 0;
-    if (LS())
-    {
-        let DummySize = 1;
-        let TestName = "TextPaintTest";
-        let MeasuredSize;
-        let DummyData;
+    let IndexRaw = IndexExport(FileIndexDB, FileIndexDBAttr);
+    FileDbSet(0, 0, 0, "", "", IndexRaw);
+}
 
-        while (true)
+function IndexAttribText()
+{
+    let Attrib1 = [];
+    let Attrib2 = [];
+
+    for (let k in FileIndexLS)
+    {
+        if (Attrib1.indexOf(FileIndexLS[k]) < 0)
         {
-            DummySize = DummySize * 10;
-            DummyData = "".padEnd(DummySize, 'X');
-            try
-            {
-                localStorage.setItem(TestName, DummyData);
-                localStorage.removeItem(TestName);
-            }
-            catch (E)
-            {
-                DummySize = DummySize / 10;
-                break;
-            }
+            Attrib1.push(k);
+            Attrib2.push(FileIndexLSAttr[k]);
         }
-        DataDelete(TestName);
-        MeasuredSize = DummySize;
-        while (DummySize >= 1)
-        {
-            while (true)
-            {
-                MeasuredSize = MeasuredSize + DummySize;
-                DummyData = "".padEnd(MeasuredSize, 'X');
-                try
-                {
-                    localStorage.setItem(TestName, DummyData);
-                    localStorage.removeItem(TestName);
-                }
-                catch (E)
-                {
-                    localStorage.removeItem(TestName);
-                    MeasuredSize = MeasuredSize - DummySize;
-                    DummySize = DummySize / 10;
-                    break;
-                }
-            }
-        }
-        FileFreeSpaceLS = MeasuredSize + TestName.length;
     }
+    for (let k in FileIndexDB)
+    {
+        if (Attrib1.indexOf(FileIndexDB[k]) < 0)
+        {
+            Attrib1.push(k);
+            Attrib2.push(FileIndexDBAttr[k]);
+        }
+    }
+
+    let IndexTxt = "";
+    for (var I = 0; I < Attrib1.length; I++)
+    {
+        IndexTxt = IndexTxt + "~" + Attrib1[I] + "\n"
+        IndexTxt = IndexTxt + "~" + Attrib2[I] + "\n"
+    }
+    IndexTxt = IndexTxt + "\n";
+    
+    FileIndexToProgram = false;
+    return btoa(IndexTxt);
+}
+
+function FileCreatePreview(Data)
+{
+    let Base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let Preview = "";
+    for (var I = 0; I < Data.length; I += 4)
+    {
+        let Byte0 = Base64Chars.indexOf(Data.charAt(I + 0));
+        let Byte1 = Base64Chars.indexOf(Data.charAt(I + 1));
+        let Byte2 = Base64Chars.indexOf(Data.charAt(I + 2));
+        let Byte3 = Base64Chars.indexOf(Data.charAt(I + 3));
+        
+        if ((Byte0 >= 0) && (Byte1 >= 0))
+        {
+            let CharVal = ASCII(((Byte0 << 2) + (Byte1 >> 4)) & 255, 95);
+            Preview = Preview + String.fromCharCode(CharVal);
+        }
+        if ((Byte1 >= 0) && (Byte2 >= 0))
+        {
+            let CharVal = ASCII(((Byte1 << 4) + (Byte2 >> 2)) & 255, 95);
+            Preview = Preview + String.fromCharCode(CharVal);
+        }
+        if ((Byte2 >= 0) && (Byte3 >= 0))
+        {
+            let CharVal = ASCII(((Byte2 << 6) + (Byte3)) & 255, 95);
+            Preview = Preview + String.fromCharCode(CharVal);
+        }
+    }
+    return Preview;
 }
 
 
-IndexImportLS();
-
-function FileImportFinish(Id, Kind, Name, Data, Err)
+function FileImportFinish(Id, Kind, Name, Attrib, Data, Err)
 {
     if (Err > 0)
     {
-        ProgEventOtherFile("FileImport", Data, Id, Kind, 0, 1);
+        ProgEventOtherFile("FileImport", Name, Id, Kind, 0, 1);
     }
     else
     {
-        ProgEventOtherFile("FileImport", "", Id, Kind + 20, 0, 0);
+        if (FileIndexToProgram && (Name == FileSystemName))
+        {
+            Data = IndexAttribText() + Data;
+        }
+    
+        ProgEventOtherFile("FileImport", Name, Id, Kind + 20, 0, 0);
         
         let Data_ = Data;
         while (Data_.length > FileBufSize)
@@ -191,6 +249,11 @@ function FileImportFinish(Id, Kind, Name, Data, Err)
         }
         ProgEventOtherFile("FileImport", Data_, Id, Kind, 0, Err);
     }
+}
+
+function FileExportFinish(Id, Kind, Name, Attrib, Data, Err)
+{
+    ProgEventOther("FileExport", Name, Id, Kind, 0, Err);
 }
 
 function FileFetchBlobBase64(blob)
@@ -211,223 +274,99 @@ function FileFetchTruncateBase64(blob)
     return blob.substr(Idx + 1);
 }
 
-function FileFetch(Id, Kind, Name)
+function FileFetch(Id, Kind, Name, Attrib)
 {
     let file = "files/" + Name;
-    //fetch(file)
-    //.then(x => x.text())
-    //.then(y => FileImportFinish(Id, Kind, Name, btoa(y), 0));
-
-
     fetch(file)
     .then(_1 => _1.blob())
     .then(_2 => FileFetchBlobBase64(_2))
-    .then(_3 => FileImportFinish(Id, Kind, Name, FileFetchTruncateBase64(_3), 0));
+    .then(_3 => FileImportFinish(Id, Kind, Name, Attrib, FileFetchTruncateBase64(_3), 0));
 }    
 
-
-
-
-function FileImport(Id, Kind, Name)
+function FileImport(Id, Kind, Name, Attrib)
 {
     switch (Kind)
     {
         case 0: // System clipboard
-            if (navigator.clipboard.readText)
-            {
-                navigator.clipboard.readText().then(clipText => ProgEventOther("FileImport", clipText, Id, Kind, 0, 0)).catch(error => ProgEventOther("FileImport", "", Id, Kind, 0, 1));
-            }
-            else
-            {
-                ProgEventOther("FileImport", "", Id, Kind, 0, 1);
-            }
+            FileClpCopy(Id);
             break;
         case 1: // Local storage
         case 4: // Local storage - if not exists, then fetch
-            if (FileIndexLS[Name])
+            if (Name in FileIndexLS)
             {
                 FileIdx = FileIndexLS[Name];
                 let Data = DataGet(FileIndexTempl + FileIdx);
-                FileImportFinish(Id, Kind, Name, Data, 0);
+                FileImportFinish(Id, Kind, Name, Attrib, Data, 0);
             }
             else
             {
                 if (Kind == 1)
                 {
-                    FileImportFinish(Id, Kind, Name, "", 1);
+                    FileImportFinish(Id, Kind, Name, Attrib, "", 1);
                 }
                 if (Kind == 4)
                 {
-                    FileFetch(Id, Kind, Name);
+                    FileFetch(Id, Kind, Name, Attrib);
                 }
             }
             break;
         case 2: // Database
         case 5: // Database - if not exists, then fetch
-            if (Kind == 5)
+            if (Name in FileIndexDB)
             {
-                FileFetch(Id, Kind, Name);
+                FileIdx = FileIndexDB[Name];
+                FileDbGet(FileIdx, Id, Kind, Name, Attrib);
             }
+            else
+            {
+                if (Kind == 2)
+                {
+                    FileImportFinish(Id, Kind, Name, Attrib, "", 1);
+                }
+                if (Kind == 5)
+                {
+                    FileFetch(Id, Kind, Name, Attrib);
+                }
+            }
+            break;
+        case 6: // File upload
+            FileBrwUpload();
             break;
         case 3: // Fetch - read only
             {
-                FileFetch(Id, Kind, Name);
+                FileFetch(Id, Kind, Name, Attrib);
             }
             break;
     }
 }
 
-function FileExport(Id, Kind, Name, Data)
+function FileExport(Id, Kind, Name, Attrib, Data)
 {
     if (Kind >= 100)
     {
-        FileDelete(Id, Kind - 100, Name);
+        FileDelete(Id, Kind - 100, Name, Attrib);
         return;
     }
     
     switch (Kind)
     {
         case 0: // System clipboard
-            if (navigator.clipboard.writeText)
-            {
-                let Data_ = "";
-                let DataNum = false;
-                let RawDataNum = 0;
-                let Temp = [0, 0, 0, 0, 0, 0, 0, 0];
-                let DequeueTextState = 0;
-                for (let I = 0; I < Data.length; I++)
-                {
-                    if (DataNum)
-                    {
-                        if (Data[I] == ',')
-                        {
-                            DataNum = false;
-                            switch (DequeueTextState)
-                            {
-                                case 0:
-                                    if (RawDataNum < 128)
-                                    {
-                                        Data_ = Data_ + String.fromCharCode(RawDataNum);
-                                    }
-                                    else
-                                    {
-                                        // 110_____
-                                        if ((RawDataNum >= 0xC0) && (RawDataNum <= 0xDF))
-                                        {
-                                            DequeueTextState = 1;
-                                            Temp[1] = RawDataNum & 0x1F;
-                                        }
-
-                                        // 1110____
-                                        if ((RawDataNum >= 0xE0) && (RawDataNum <= 0xEF))
-                                        {
-                                            DequeueTextState = 2;
-                                            Temp[2] = RawDataNum & 0x0F;
-                                        }
-
-                                        // 11110___
-                                        if ((RawDataNum >= 0xF0) && (RawDataNum <= 0xF7))
-                                        {
-                                            DequeueTextState = 3;
-                                            Temp[3] = RawDataNum & 0x07;
-                                        }
-
-                                        // 111110__
-                                        if ((RawDataNum >= 0xF8) && (RawDataNum <= 0xFB))
-                                        {
-                                            DequeueTextState = 4;
-                                            Temp[4] = RawDataNum & 0x03;
-                                        }
-
-                                        // 1111110_
-                                        if ((RawDataNum >= 0xFC) && (RawDataNum <= 0xFD))
-                                        {
-                                            DequeueTextState = 5;
-                                            Temp[5] = RawDataNum & 0x01;
-                                        }
-                                    }
-                                    break;
-                                case 1:
-                                case 2:
-                                case 3:
-                                case 4:
-                                case 5:
-                                    if ((RawDataNum >= 0x80) && (RawDataNum <= 0xBF))
-                                    {
-                                        Temp[5] = Temp[5] << 6;
-                                        Temp[4] = Temp[4] << 6;
-                                        Temp[3] = Temp[3] << 6;
-                                        Temp[2] = Temp[2] << 6;
-                                        Temp[1] = Temp[1] << 6;
-                                        Temp[0] = Temp[0] << 6;
-
-                                        DequeueTextState--;
-                                        Temp[DequeueTextState] = (RawDataNum & 0x3F);
-                                        if (DequeueTextState == 0)
-                                        {
-                                            let CharCode = Temp[5] + Temp[4] + Temp[3] + Temp[2] + Temp[1] + Temp[0];
-                                            if (CharCode <= 65535)
-                                            {
-                                                Data_ = Data_ + String.fromCharCode(CharCode);
-                                            }
-
-                                            Temp[0] = 0;
-                                            Temp[1] = 0;
-                                            Temp[2] = 0;
-                                            Temp[3] = 0;
-                                            Temp[4] = 0;
-                                            Temp[5] = 0;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        DequeueTextState = 0;
-                                        Temp[0] = 0;
-                                        Temp[1] = 0;
-                                        Temp[2] = 0;
-                                        Temp[3] = 0;
-                                        Temp[4] = 0;
-                                        Temp[5] = 0;
-                                        I--;
-                                    }
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            RawDataNum = RawDataNum * 10;
-                            RawDataNum = RawDataNum + (Data.charCodeAt(I) - 48);
-                        }
-                    }
-                    else
-                    {
-                        if (Data[I] == '_')
-                        {
-                            DataNum = true;
-                            RawDataNum = 0;
-                        }
-                        else
-                        {
-                            Data_ = Data_ + Data[I];
-                        }
-                    }
-                }
-                navigator.clipboard.writeText(Data_);
-                ProgEventOther("FileExport", Data_, Id, Kind, 0, 0);
-            }
+            FileClpPaste(Id, Data);
             break;
         case 1: // Local storage
         case 4: // Local storage - if not exists, then fetch
             {
                 let FileIdx = 0;
-                if (FileIndexLS[Name])
+                if (Name in FileIndexLS)
                 {
                     FileIdx = FileIndexLS[Name];
+                    FileIndexLSAttr[Name] = Attrib;
                 }
                 else
                 {
                     FileIdx = FileIndexLSNum;
                     FileIndexLS[Name] = FileIdx;
+                    FileIndexLSAttr[Name] = Attrib;
                     FileIndexLSNum++;
                     IndexExportLS();
                 }
@@ -435,23 +374,45 @@ function FileExport(Id, Kind, Name, Data)
                 {
                     DataSet(FileIndexTempl + FileIdx, Data);
                     IndexMeasureSpaceLS();
-                    ProgEventOther("FileExport", "", Id, Kind, 0, 0);
+                    FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
                 }
                 else
                 {
-                    ProgEventOther("FileExport", "", Id, Kind, 0, 0);
+                    FileExportFinish(Id, Kind, Name, Attrib, Data, 1)
                 }
             }
             break;
         case 2: // Database
         case 5: // Database - if not exists, then fetch
+            {
+                let FileIdx = 0;
+                if (Name in FileIndexDB)
+                {
+                    FileIdx = FileIndexDB[Name];
+                    FileIndexDBAttr[Name] = Attrib;
+                }
+                else
+                {
+                    FileIdx = FileIndexDBNum;
+                    FileIndexDB[Name] = FileIdx;
+                    FileIndexDBAttr[Name] = Attrib;
+                    FileIndexDBNum++;
+                    IndexExportDB();
+                }
+                FileDbSet(FileIdx, Id, Kind, Name, Attrib, Data);                
+            }
+            break;
+        case 6: // File download
+            FileBrwDownload(Name, Data);
+            FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
             break;
         case 3: // Fetch - not possible
+            FileExportFinish(Id, Kind, Name, Attrib, Data, 1);
             break;
     }
 }
 
-function FileDelete(Id, Kind, Name)
+function FileDelete(Id, Kind, Name, Attrib)
 {
     switch (Kind)
     {
@@ -460,24 +421,38 @@ function FileDelete(Id, Kind, Name)
         case 1: // Local storage
         case 4: // Local storage - if not exists, then fetch
             {
-                let FileIdx = 0;
-                if (FileIndexLS[Name])
+                if (Name in FileIndexLS)
                 {
-                    FileIdx = FileIndexLS[Name];
-                    FileIdx = FileIndexLS[Name];
+                    let FileIdx = FileIndexLS[Name];
                     DataDelete(FileIndexTempl + FileIdx);
                     delete FileIndexLS[Name];
+                    delete FileIndexLSAttr[Name];
                     IndexExportLS();
                 }
                 IndexMeasureSpaceLS();
-                ProgEventOther("FileExport", "", Id, Kind, 0, 0);
+                FileExportFinish(Id, Kind, Name, Attrib, "", 0);
             }
             break;
         case 2: // Database
         case 5: // Database - if not exists, then fetch
+            {
+                if (Name in FileIndexDB)
+                {
+                    let FileIdx = FileIndexDB[Name];
+                    FileDbDelete(FileIdx, Id, Kind, Name);
+                    delete FileIndexDB[Name];
+                    delete FileIndexDBAttr[Name];
+                    IndexExportDB();
+                }
+            }
             break;
         case 3: // Fetch - not possible
+        case 6: // File upload/download - not possible
+            FileExportFinish(Id, Kind, Name, Attrib, "", 1);
             break;
     }
 }
+
+
+IndexImportLS();
 

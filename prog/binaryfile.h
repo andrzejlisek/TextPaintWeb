@@ -26,29 +26,31 @@ public:
 
     void SetDir(Str Dir);
 
-    void SetCRLF(int CR, int LF);
     void Save(Str &Text);
     void Load(Str &Text);
     std::string LoadToString();
+    std::string LoadToStringConfig();
     void SaveFromString(std::string S);
     bool IsSystemFile();
 
-    void FileImportSys(int Idx);
+    void FileImportSys();
     void FileImport(int Idx);
     void FileExport(int Idx);
 
-    bool EventFileImport(int Id, int Kind, std::string Data);
-    bool EventFileExport(int Id, int Kind);
+    bool EventFile(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
 
     void SysSaveConfig();
 
     void ManagerInfoPush();
     void ManagerInfoPop();
 
-    int SystemFileCount = 2;
+    int SystemFileCount = 1;
     bool FileImportWaiting = false;
     bool PreInit = true;
 private:
+    int FindName(Str Name);
+    std::string EventFileName = "";
+
     XList<Str> Disp;
     XList<BinaryFileItem> ListItems;
     int PtrSep = 126;
@@ -56,7 +58,6 @@ private:
 
     Raw TempData;
     std::string SystemFile0 = "!!config.txt";
-    std::string SystemFile1 = "!!system.txt";
     std::unique_ptr<TextCodec> B64;
 
     int ItemIndex_ = 0;

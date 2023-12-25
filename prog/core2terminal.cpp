@@ -251,13 +251,13 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                     {
                                         WorkStateC = WorkStateCDef::Session;
                                         Clipboard_.SetText(CoreAnsi_.get()->AnsiState_.GetScreen(0, 0, ScreenW - 1, ScreenH - 1));
-                                        Screen::FileExport(0, "", Clipboard_.SystemText);
+                                        Screen::FileExport(0, "", "", Clipboard_.SystemText);
                                     }
                                     break;
                                 case '.':
                                     {
                                         WorkStateC = WorkStateCDef::Session;
-                                        Screen::FileImport(0, "");
+                                        Screen::FileImport(0, "", "");
                                     }
                                     break;
                                 default:
