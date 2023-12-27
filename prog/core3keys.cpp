@@ -7,9 +7,9 @@ Core3Keys::Core3Keys()
 
 void Core3Keys::Init()
 {
-    for (int I = 0; I < 65536; I++)
+    for (int I = 0; I < TextCodec::CodecListNumber.Count; I++)
     {
-        TextCodec E(I);
+        TextCodec E(TextCodec::CodecListNumber[I]);
         if (E.EncodingNumber >= 0)
         {
             EncodingList.Add(E);

@@ -83,3 +83,65 @@ function ASCII(CharVal, NonPrintable)
     return NonPrintable;
 }
 
+function StringASCII(Str, NonPrintable, Type)
+{
+    if ((typeof NonPrintable) == "string")
+    {
+        NonPrintable = NonPrintable.charCodeAt(0);
+    }
+    let StrASCII = "";
+    for (let I = 0; I < Str.length; I++)
+    {
+        StrASCII = StrASCII + String.fromCharCode(ASCII(Str.charCodeAt(I), NonPrintable));
+    }
+    return StrASCII;
+}
+
+function StringBufDecode(Str)
+{
+    let StrDec = "";
+    let DecodeState = 0;
+    let TempNum = 0;
+    for (let I = 0; I < Str.length; I++)
+    {
+        switch (DecodeState)
+        {
+            case 0:
+                if (Str[I] == '_')
+                {
+                    DecodeState = 1;
+                    TempNum = 0;
+                }
+                else
+                {
+                    StrDec = StrDec + Str[I];
+                }
+                break;
+            case 1:
+                if (Str[I] == ',')
+                {
+                    DecodeState = 0;
+                    StrDec = StrDec + String.fromCharCode(TempNum);
+                }
+                else
+                {
+                    TempNum = TempNum * 10;
+                    TempNum = TempNum + Str.charCodeAt(I) - 48;
+                }
+                break;
+        }
+    }
+    return StrDec;
+}
+
+function DataTextToBlob(Data)
+{
+    const DataStr = atob(Data);
+    const DataNum = new Array(DataStr.length);
+    for (let i = 0; i < DataStr.length; i++)
+    {
+        DataNum[i] = DataStr.charCodeAt(i);
+    }
+    return new Blob([new Uint8Array(DataNum)], {type: "application/octet-stream"});
+}
+

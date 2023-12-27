@@ -1329,3 +1329,42 @@ void TextCodec::Transcode(Raw &S, int CodecSrc, int CodecDst)
     S.Clear();
     Codec1.DequeueRaw(S);
 }
+
+void TextCodec::CodecListCreateItem(int Num)
+{
+    TextCodec E(Num);
+    if (E.EncodingNumber >= 0)
+    {
+        CodecListName.Add(E.EncodingName);
+        CodecListNumber.Add(E.EncodingNumber);
+    }
+}
+
+void TextCodec::CodecListCreate()
+{
+    CodecListNumber.Clear();
+    CodecListName.Clear();
+    CodecListCreateItem(0);
+    CodecListCreateItem(1);
+    CodecListCreateItem(2);
+    CodecListCreateItem(37);
+    for (int I = 437; I <= 1260; I++)
+    {
+        CodecListCreateItem(I);
+    }
+    for (int I = 10000; I <= 12005; I++)
+    {
+        CodecListCreateItem(I);
+    }
+    for (int I = 20105; I <= 21866; I++)
+    {
+        CodecListCreateItem(I);
+    }
+    for (int I = 28590; I <= 28605; I++)
+    {
+        CodecListCreateItem(I);
+    }
+    CodecListCreateItem(29001);
+    CodecListCreateItem(38598);
+    CodecListCreateItem(65001);
+}

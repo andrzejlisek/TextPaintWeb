@@ -25,6 +25,9 @@ public:
     void AddString(int T);
     void AddString(std::string T);
 
+    void InsertString(int T);
+    void InsertString(std::string T);
+
     std::string ToString();
 
     static Str FromString(std::string T);

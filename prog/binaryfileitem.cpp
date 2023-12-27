@@ -78,3 +78,21 @@ void BinaryFileItem::Load(Raw &Data, Str &Text)
     Codec.get()->RemoveBOM();
     Codec.get()->DequeueStr(Text);
 }
+
+void BinaryFileItem::Browser(int Set)
+{
+    switch (Set)
+    {
+        case 0:
+            {
+                Type = Type_;
+            }
+            break;
+        case 1:
+            {
+                Type_ = Type;
+                Type = 6;
+            }
+            break;
+    }
+}

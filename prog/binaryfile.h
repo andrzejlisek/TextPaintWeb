@@ -17,8 +17,11 @@ public:
     int ListDispOffset = 0;
     Str ListDir;
 
+    std::unique_ptr<BinaryFileItem> DefaultAttrib;
     BinaryFileItem &ItemGet(int idx);
     void ItemAdd(BinaryFileItem X);
+    void ItemAdd(Str FileName);
+    void ItemRemove(Str FileName);
     Str ItemName(int Idx);
     int ItemType0(int Idx);
     int ItemType(int Idx);
@@ -34,8 +37,10 @@ public:
     bool IsSystemFile();
 
     void FileImportSys();
-    void FileImport(int Idx);
-    void FileExport(int Idx);
+    void FileImport(int Idx, bool Absolute);
+    void FileExport(int Idx, bool Absolute);
+
+    int IdxCurrent;
 
     bool EventFile(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
 
@@ -47,6 +52,14 @@ public:
     int SystemFileCount = 1;
     bool FileImportWaiting = false;
     bool PreInit = true;
+
+    void FileUpload();
+    void FileDownload();
+
+    void EvenTick();
+
+    Str ProcessInfo;
+
 private:
     int FindName(Str Name);
     std::string EventFileName = "";
@@ -63,6 +76,13 @@ private:
     int ItemIndex_ = 0;
     int ListDispOffset_ = 0;
     Str ListDir_;
+
+    int BrowserUploadCurrent;
+    int BrowserUploadCount;
+    int BrowserDownloadCount;
+    XList<int> BrowserDownload;
+    bool BrowserDownloadWaiting = false;
+    void BrowserDownloadProc(int Idx);
 };
 
 #endif // BINARYFILE_H

@@ -19,15 +19,34 @@ public:
     int SizeW = 32;
     int SizeH = 16;
     void Repaint();
+    void RepaintFiles(int PosX, int PosY);
+    void RepaintAttrib(int PosX, int PosY);
+    void RepaintInsert(int PosX, int PosY);
+    void RepaintDelete(int PosX, int PosY);
+    void RepaintProcess(int PosX, int PosY);
+    void EventTick();
     void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
+    void EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
+    void EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
+    void EventKeyInsert(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
+    void EventKeyDelete(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void Open();
     bool RequestRepaint = false;
     bool RequestCloseNew = false;
     bool RequestCloseOld = false;
     int RepaintDepth = 0;
+
 private:
+    Str InsertFileName;
     int MarginHead = 1;
-    int MarginFoot = 3;
+    int MarginFoot = 4;
+    enum ManagerStateDef { Files, Insert, Delete, Process, Attrib };
+    ManagerStateDef ManagerState = ManagerStateDef::Files;
+
+    int AttribParam = 0;
+    int AttribVal[2];
+    int AttribValMax[2];
+    int AttribValOffset[2];
 };
 
 #endif // FILEMANAGER_H

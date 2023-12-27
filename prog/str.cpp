@@ -167,6 +167,17 @@ void Str::AddString(std::string T)
     AddRange(Str::FromString(T));
 }
 
+void Str::InsertString(int T)
+{
+    InsertString(std::to_string(T));
+}
+
+void Str::InsertString(std::string T)
+{
+    InsertRange(Str::FromString(T));
+}
+
+
 Str Str::BlkCol(int I)
 {
     Str L;

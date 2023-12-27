@@ -192,6 +192,13 @@ function IndexAttribText()
     return btoa(IndexTxt);
 }
 
+
+function FileGoodName(Str)
+{
+    return StringASCII(Str, "_", 0);
+}
+
+
 function FileCreatePreview(Data)
 {
     let Base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -227,7 +234,7 @@ function FileImportFinish(Id, Kind, Name, Attrib, Data, Err)
 {
     if (Err > 0)
     {
-        ProgEventOtherFile("FileImport", Name, Id, Kind, 0, 1);
+        ProgEventOtherFile("FileImport", Name, Id, Kind, 0, Err);
     }
     else
     {
@@ -236,7 +243,7 @@ function FileImportFinish(Id, Kind, Name, Attrib, Data, Err)
             Data = IndexAttribText() + Data;
         }
     
-        ProgEventOtherFile("FileImport", Name, Id, Kind + 20, 0, 0);
+        ProgEventOtherFile("FileImport", Name, Id, Kind + 20, 0, Err);
         
         let Data_ = Data;
         while (Data_.length > FileBufSize)
@@ -330,7 +337,7 @@ function FileImport(Id, Kind, Name, Attrib)
             }
             break;
         case 6: // File upload
-            FileBrwUpload();
+            FileBrwUpload(Name, Attrib);
             break;
         case 3: // Fetch - read only
             {
@@ -403,8 +410,11 @@ function FileExport(Id, Kind, Name, Attrib, Data)
             }
             break;
         case 6: // File download
-            FileBrwDownload(Name, Data);
-            FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
+            FileBrwDownload(Name, Attrib, Data);
+            if (Name != "/")
+            {
+                //FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
+            }
             break;
         case 3: // Fetch - not possible
             FileExportFinish(Id, Kind, Name, Attrib, Data, 1);

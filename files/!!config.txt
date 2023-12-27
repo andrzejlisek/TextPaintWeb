@@ -568,10 +568,3 @@ File106Name=test/colors256.ans
 File107Name=test/format.ans
 File108Name=test/test.ans
 
-File109Name=blank1.txt
-File109Codec=65001
-File110Name=blank2.txt
-File111Name=blank3.txt
-File112Name=blank4.txt
-File113Name=blank5.txt
-

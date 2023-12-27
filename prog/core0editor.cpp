@@ -90,6 +90,10 @@ void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case DisplayStateDef::DispConfig:
             DisplayConfig_.get()->Repaint();
             DisplayConfig_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            if (DisplayConfig_.get()->RequestSave)
+            {
+                SaveConfig();
+            }
             if (DisplayConfig_.get()->RequestRepaint)
             {
                 DisplayState = DisplayStateDef::Charmap;
@@ -1295,6 +1299,10 @@ void Core0Editor::EventTick()
             EditorScreenRefresh();
             ScreenRefresh(true);
         }
+    }
+    if (DisplayState == DisplayStateDef::FileMan)
+    {
+        FileManager_.EventTick();
     }
 }
 
@@ -2509,7 +2517,7 @@ void Core0Editor::CharmapPaint(int Depth)
 
 void Core0Editor::FileLoad()
 {
-    BinaryFile_.get()->FileImport(-1);
+    BinaryFile_.get()->FileImport(-1, false);
     //FileLoad2();
 }
 
@@ -2530,7 +2538,7 @@ void Core0Editor::FileLoad2()
     BinaryFile_.get()->Load(FileTxt);
 
 
-    if (UseAnsiLoad && (!BinaryFile_.get()->IsSystemFile()))
+    if (BinaryFile_.get()->ItemGet(-1).Ansi)
     {
         CoreAnsi_.get()->AnsiProcessReset(true, false, 0);
         CoreAnsi_.get()->AnsiRingBell = false;
@@ -2622,16 +2630,16 @@ void Core0Editor::FileSave()
     Str FileTxt;
     for (int i = 0; i < EditorData_.get()->TextBuffer.CountLines(); i++)
     {
-        if (UseAnsiSave && (!BinaryFile_.get()->IsSystemFile()))
+        if (BinaryFile_.get()->ItemGet(-1).Ansi)
         {
             FileTxt.AddRange(AnsiFile_.Process(EditorData_.get()->TextBuffer, i, CoreAnsi_.get()->AnsiMaxX));
         }
         else
         {
             FileTxt.AddRange(EditorData_.get()->TextBuffer.GetLineString(i));
-            FileTxt.Add('\n'); //!!!!!!!!!!!
+            FileTxt.Add('\n');
         }
     }
     BinaryFile_.get()->Save(FileTxt);
-    BinaryFile_.get()->FileExport(-1);
+    BinaryFile_.get()->FileExport(-1, false);
 }

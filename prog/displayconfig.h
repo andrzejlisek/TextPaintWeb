@@ -21,6 +21,7 @@ public:
     bool RequestClose = false;
     bool RequestResize = false;
     bool RequestReload = false;
+    bool RequestSave = false;
     int ResizeW = 1;
     int ResizeH = 1;
 private:

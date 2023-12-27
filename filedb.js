@@ -118,7 +118,7 @@ function FileDbDelete(ItemId, EvtId, Kind, Name, Attrib)
     DbTrans.addEventListener('complete', () => {
         if (EvtId > 0)
         {
-            FileExportFinish(EvtId, Kind, Name, Attrib, Data, 0);
+            FileExportFinish(EvtId, Kind, Name, Attrib, "", 0);
         }
     });
 }

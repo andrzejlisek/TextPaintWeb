@@ -373,9 +373,8 @@ extern "C"
         int EvtParam3 = BufGetNum();
         int EvtParam4 = BufGetNum();
 
-        Core.get()->EventOther(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4);
-
         RespondClear();
+        Core.get()->EventOther(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4);
         RespondFinish();
     }
 
@@ -390,12 +389,12 @@ extern "C"
         int EvtParam3 = BufGetNum();
         int EvtParam4 = BufGetNum();
 
+        RespondClear();
         bool Fire = true;
         if ((EvtName == "FileImport") || (EvtName == "FileExport"))
         {
             Fire = BinaryFile_.get()->EventFile(EvtName, EvtParam0, EvtParam1, EvtParam2, EvtParam3, EvtParam4);
         }
-        RespondClear();
         if (EvtName == "ConfigSet")
         {
             std::string _Param = EvtParam0.substr(0, EvtParam1);

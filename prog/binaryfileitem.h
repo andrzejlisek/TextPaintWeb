@@ -29,6 +29,9 @@ public:
 
     void Save(Str &Text, Raw &Data);
     void Load(Raw &Data, Str &Text);
+    void Browser(int Set);
+private:
+    int Type_;
 };
 
 #endif // BINARYFILEITEM_H

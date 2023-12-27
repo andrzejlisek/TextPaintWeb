@@ -88,52 +88,5 @@ extern "C"
         BufChr(0);
         emscripten_call_worker(worker, "EventOtherFile", IOBuf, IOBufPtr, Callback, (void*)0);
     }
-
-    EMSCRIPTEN_KEEPALIVE
-    void TestString(char * Str1, wchar_t * Str2)
-    {
-
-        EventOther("TextPaste", ",Na_pis,", 1, 2, 0, 0);
-
-        std::cout << "test znaku start" << std::endl;
-
-
-        std::string xString(Str1);
-        std::wstring xWString(Str2);
-        /*std::u16string xString16(Str1);
-        std::u32string xString32(Str1);*/
-
-        std::cout << "1. " << xString.size() << "  ";
-        for (int I = 0; I < xString.size(); I++)
-        {
-            int TT = (int)(xString[I]);
-            if (TT < 0) TT += 256;
-            std::cout << "  " << TT;
-        }
-        std::cout << std::endl;
-
-        std::cout << "2. " << xWString.size() << "  ";
-        for (int I = 0; I < xWString.size(); I++)
-        {
-            std::cout << "  " << (int)(xWString[I]);
-        }
-        std::cout << std::endl;
-
-        /*std::cout << "3. " << xString16.size() << "  ";
-        for (int I = 0; I < xString16.size(); I++)
-        {
-            std::cout << "  " << (int)(xString16[I]);
-        }
-        std::cout << std::endl;
-
-        std::cout << "4. " << xString32.size() << "  ";
-        for (int I = 0; I < xString32.size(); I++)
-        {
-            std::cout << "  " << (int)(xString32[I]);
-        }
-        std::cout << std::endl;*/
-    
-        std::cout << "test znaku stop" << std::endl;
-    }
 }
 

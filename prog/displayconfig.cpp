@@ -122,6 +122,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
     RequestRepaint = false;
     RequestClose = false;
     RequestReload = false;
+    RequestSave = false;
     int Temp;
 
     switch (_(KeyName.c_str()))
@@ -170,6 +171,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
         case _("KeyQ"):
             CF.get()->ParamSet("ANSIColors", !CF.get()->ParamGetB("ANSIColors"));
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyW"):
             Temp = CF.get()->ParamGetI("ANSIReverseMode");
@@ -177,44 +179,66 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             if (Temp == 3) Temp = 0;
             CF.get()->ParamSet("ANSIReverseMode", Temp);
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyE"):
             CF.get()->ParamSet("ANSIColorBold", !CF.get()->ParamGetB("ANSIColorBold"));
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyR"):
             CF.get()->ParamSet("ANSIColorBlink", !CF.get()->ParamGetB("ANSIColorBlink"));
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyT"):
             CF.get()->ParamSet("ANSIIgnoreConcealed", !CF.get()->ParamGetB("ANSIIgnoreConcealed"));
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
 
         case _("KeyK"):
             CoreAnsi_.get()->ANSIDOS = ((CoreAnsi_.get()->ANSIDOS + 1) % 3);
             CoreAnsi_.get()->ANSIDOS_ = (CoreAnsi_.get()->ANSIDOS == 1);
+            CF.get()->ParamSet("ANSIDOS", CoreAnsi_.get()->ANSIDOS);
+            Screen::ScreenSetConfig();
             RequestReload = true;
+            RequestSave = true;
             break;
         case _("KeyL"):
             CoreAnsi_.get()->ANSI8bit = !CoreAnsi_.get()->ANSI8bit;
+            CF.get()->ParamSet("ANSI8bit", CoreAnsi_.get()->ANSI8bit ? 1 : 0);
+            Screen::ScreenSetConfig();
             RequestReload = true;
+            RequestSave = true;
             break;
         case _("KeyU"):
             CoreAnsi_.get()->ANSIPrintBackspace = !CoreAnsi_.get()->ANSIPrintBackspace;
+            CF.get()->ParamSet("ANSIPrintBackspace", CoreAnsi_.get()->ANSIPrintBackspace ? 1 : 0);
+            Screen::ScreenSetConfig();
             RequestReload = true;
+            RequestSave = true;
             break;
         case _("KeyI"):
             CoreAnsi_.get()->ANSIPrintTab = !CoreAnsi_.get()->ANSIPrintTab;
+            CF.get()->ParamSet("ANSIPrintTab", CoreAnsi_.get()->ANSIPrintTab ? 1 : 0);
+            Screen::ScreenSetConfig();
             RequestReload = true;
+            RequestSave = true;
             break;
         case _("KeyO"):
             CoreAnsi_.get()->ANSI_CR = ((CoreAnsi_.get()->ANSI_CR + 1) % 3);
+            CF.get()->ParamSet("ANSIReadCR", CoreAnsi_.get()->ANSI_CR);
+            Screen::ScreenSetConfig();
             RequestReload = true;
+            RequestSave = true;
             break;
         case _("KeyP"):
             CoreAnsi_.get()->ANSI_LF = ((CoreAnsi_.get()->ANSI_LF + 1) % 3);
+            CF.get()->ParamSet("ANSIReadLF", CoreAnsi_.get()->ANSI_LF);
+            Screen::ScreenSetConfig();
             RequestReload = true;
+            RequestSave = true;
             break;
 
         case _("KeyS"):
@@ -223,6 +247,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             if (Temp == 3) Temp = 0;
             CF.get()->ParamSet("DisplayBlink", Temp);
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyD"):
             Temp = CF.get()->ParamGetI("DisplayAttrib");
@@ -236,6 +261,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             }
             CF.get()->ParamSet("DisplayAttrib", Temp);
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyF"):
             Temp = CF.get()->ParamGetI("DisplayAttrib");
@@ -249,6 +275,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             }
             CF.get()->ParamSet("DisplayAttrib", Temp);
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyG"):
             Temp = CF.get()->ParamGetI("DisplayAttrib");
@@ -262,6 +289,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             }
             CF.get()->ParamSet("DisplayAttrib", Temp);
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
         case _("KeyH"):
             Temp = CF.get()->ParamGetI("DisplayAttrib");
@@ -275,6 +303,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             }
             CF.get()->ParamSet("DisplayAttrib", Temp);
             Screen::ScreenSetConfig();
+            RequestSave = true;
             break;
     }
 }

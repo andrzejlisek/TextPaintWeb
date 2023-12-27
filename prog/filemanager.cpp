@@ -33,6 +33,40 @@ void FileManager::Repaint()
         }
     }
 
+    if (RepaintDepth <= 2)
+    {
+        for (int YY = 1; YY < (SizeH + 1); YY++)
+        {
+            for (int XX = 1; XX < (SizeW + 1); XX++)
+            {
+                Screen::ScreenChar(PosX + XX, PosY + YY, 32, PopupBack, PopupFore, 0, 0, 0);
+            }
+        }
+    }
+
+    switch (ManagerState)
+    {
+        case ManagerStateDef::Files:
+            RepaintFiles(PosX, PosY);
+            return;
+        case ManagerStateDef::Attrib:
+            RepaintAttrib(PosX, PosY);
+            return;
+        case ManagerStateDef::Insert:
+            RepaintInsert(PosX, PosY);
+            return;
+        case ManagerStateDef::Delete:
+            RepaintDelete(PosX, PosY);
+            return;
+        case ManagerStateDef::Process:
+            RepaintProcess(PosX, PosY);
+            return;
+    }
+
+}
+
+void FileManager::RepaintFiles(int PosX, int PosY)
+{
     int DispLen = SizeH - MarginHead - MarginFoot;
 
     if (BinaryFile_.get()->ListDispOffset < (BinaryFile_.get()->ItemIndex - DispLen + 1))
@@ -51,19 +85,15 @@ void FileManager::Repaint()
     // File list
     if (RepaintDepth <= 2)
     {
-        for (int YY = 1; YY < (SizeH + 1); YY++)
-        {
-            for (int XX = 1; XX < (SizeW + 1); XX++)
-            {
-                Screen::ScreenChar(PosX + XX, PosY + YY, 32, PopupBack, PopupFore, 0, 0, 0);
-            }
-        }
-
         int DirL = std::min(BinaryFile_.get()->ListDir.Count, SizeW);
         int DirO = BinaryFile_.get()->ListDir.Count - DirL;
         for (int I = 0; I < DirL; I++)
         {
             Screen::ScreenChar(PosX + I + 1, PosY + 1, BinaryFile_.get()->ListDir[I + DirO], PopupBack, PopupFore, 0, 0, 0);
+        }
+        for (int I = DirL; I < SizeW; I++)
+        {
+            Screen::ScreenChar(PosX + I + 1, PosY + 1, ' ', PopupBack, PopupFore, 0, 0, 0);
         }
 
         for (int Idx = BinaryFile_.get()->ListDispOffset; Idx < std::min(BinaryFile_.get()->ItemCount(), DispLen + BinaryFile_.get()->ListDispOffset); Idx++)
@@ -81,6 +111,10 @@ void FileManager::Repaint()
             for (int I = 0; I < ItemL; I++)
             {
                 Screen::ScreenChar(PosX + I + 2, ItemY, BinaryFile_.get()->ItemName(Idx)[I + ItemO], PopupBack_, PopupFore_, 0, 0, 0);
+            }
+            for (int I = ItemL; I < (SizeW - 1); I++)
+            {
+                Screen::ScreenChar(PosX + I + 2, ItemY, ' ', PopupBack, PopupFore, 0, 0, 0);
             }
             if (ItemO > 0)
             {
@@ -113,6 +147,7 @@ void FileManager::Repaint()
     Str Info1;
     Str Info2;
     Str Info3;
+    Str Info4;
     int ItemIdx = BinaryFile_.get()->ItemIndex;
     if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
     {
@@ -125,22 +160,186 @@ void FileManager::Repaint()
     }
     else
     {
-        Info1.AddString("Directory");
+        Info1.AddString("Ansi: ");
+        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Ansi ? "Y" : "N");
+        Info1.AddString("  Codec: ");
+        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->EncodingNumber);
+        Info1.AddString("/");
+        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->EncodingName);
     }
     Info2.AddString("Ins - New file  Home - Upload");
     Info3.AddString("Del - Remove    End - Download");
+    if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+    {
+        Info4.AddString("Space - File attributes");
+    }
+    else
+    {
+        Info4.AddString("Space - Default attributes");
+    }
     Info1.AddPad(SizeW, 32);
     Info2.AddPad(SizeW, 32);
     Info3.AddPad(SizeW, 32);
+    Info4.AddPad(SizeW, 32);
     for (int I = 0; I < SizeW; I++)
     {
         Screen::ScreenChar(PosX + 1 + I, PosY + 1 + SizeH - MarginFoot, Info1[I], PopupBack, PopupFore, 0, 0, 0);
         Screen::ScreenChar(PosX + 1 + I, PosY + 2 + SizeH - MarginFoot, Info2[I], PopupBack, PopupFore, 0, 0, 0);
         Screen::ScreenChar(PosX + 1 + I, PosY + 3 + SizeH - MarginFoot, Info3[I], PopupBack, PopupFore, 0, 0, 0);
+        Screen::ScreenChar(PosX + 1 + I, PosY + 4 + SizeH - MarginFoot, Info4[I], PopupBack, PopupFore, 0, 0, 0);
     }
 
     Screen::ScreenCursorMove(PosX + 1, PosY + 2 + Sel);
     Screen::ScreenRefresh();
+}
+
+void FileManager::RepaintAttrib(int PosX, int PosY)
+{
+    Screen::ScreenCursorMove(PosX + 1, PosY + 1);
+    switch (AttribParam)
+    {
+        case 0:
+            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str(" Type "), PopupFore, PopupBack);
+            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str(" Codec "), PopupBack, PopupFore);
+
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2);
+            Screen::ScreenWriteText(Str(" Text"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 3);
+            Screen::ScreenWriteText(Str(" Ansi"), PopupBack, PopupFore);
+
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[0]);
+            Screen::ScreenWriteText(Str(">"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[0]);
+
+            break;
+        case 1:
+            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str(" Type "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str(" Codec "), PopupFore, PopupBack);
+
+            if (AttribValOffset[1] >= AttribVal[1])
+            {
+                AttribValOffset[1] =  AttribVal[1];
+            }
+
+            if (AttribValOffset[1] <= (AttribVal[1] - SizeH + 2))
+            {
+                AttribValOffset[1] =  (AttribVal[1] - SizeH + 2);
+            }
+
+            for (int I = 0; I < (SizeH - 1); I++)
+            {
+                Screen::ScreenCursorMove(PosX + 1, PosY + 2 + I);
+                if (((I + AttribValOffset[1]) >= 0) && ((I + (AttribValOffset[1])) < TextCodec::CodecListNumber.Count))
+                {
+                    Screen::ScreenWriteText(Str(" " + std::to_string(TextCodec::CodecListNumber[I + AttribValOffset[1]]) + "/" + TextCodec::CodecListName[I + AttribValOffset[1]]), PopupBack, PopupFore);
+                }
+            }
+
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[1] - AttribValOffset[1]);
+            Screen::ScreenWriteText(Str(">"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[1] - AttribValOffset[1]);
+            break;
+    }
+
+
+    Screen::ScreenRefresh();
+}
+
+void FileManager::RepaintInsert(int PosX, int PosY)
+{
+    Screen::ScreenCursorMove(PosX + 1, PosY + 1);
+    Screen::ScreenWriteText(Str("Enter file name and press ENTER."), PopupBack, PopupFore);
+
+    Screen::ScreenCursorMove(PosX + 1, PosY + 2);
+    Screen::ScreenWriteText(Str("To create sub-dir, use '/'"), PopupBack, PopupFore);
+
+    Screen::ScreenCursorMove(PosX + 1, PosY + 3);
+    Screen::ScreenWriteText(Str("in name, but not at the end."), PopupBack, PopupFore);
+
+    Screen::ScreenCursorMove(PosX + 1, PosY + 4);
+    Screen::ScreenWriteText(Str("You can not create empty dir."), PopupBack, PopupFore);
+
+
+    int StrPosX = 1;
+    int StrPosY = 6;
+    Screen::ScreenCursorMove(PosX + StrPosX, PosY + StrPosY);
+
+    for (int I = 0; I < InsertFileName.Count; I++)
+    {
+        Screen::ScreenWriteChar(InsertFileName[I], PopupBack, PopupFore);
+        StrPosX++;
+        if (StrPosX >= (SizeW + 1))
+        {
+            StrPosX = 1;
+            StrPosY++;
+            Screen::ScreenCursorMove(PosX + StrPosX, PosY + StrPosY);
+        }
+    }
+
+    Screen::ScreenCursorMove(PosX + StrPosX, PosY + StrPosY);
+
+    Screen::ScreenRefresh();
+}
+
+void FileManager::RepaintDelete(int PosX, int PosY)
+{
+    Screen::ScreenCursorMove(PosX + 2, PosY + 2);
+
+    int ItemIdx = BinaryFile_.get()->ItemIndex;
+    if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+    {
+        Screen::ScreenWriteText(Str("Press ENTER to delete file."), PopupBack, PopupFore);
+    }
+    else
+    {
+        Screen::ScreenWriteText(Str("Press ENTER to delete sub-dir."), PopupBack, PopupFore);
+    }
+
+    Screen::ScreenCursorMove(PosX + 2, PosY + 4);
+    Screen::ScreenWriteText(Str("Press other key to cancel."), PopupBack, PopupFore);
+
+
+    Screen::ScreenRefresh();
+}
+
+void FileManager::RepaintProcess(int PosX, int PosY)
+{
+    int L = BinaryFile_.get()->ProcessInfo.Count;
+    for (int I = 0; I < L; I++)
+    {
+        Screen::ScreenChar(PosX + 1 + I, PosY + 1, BinaryFile_.get()->ProcessInfo[I], PopupBack, PopupFore, 0, 0, 0);
+    }
+
+    Screen::ScreenCursorMove(PosX + 1 + L, PosY + 1);
+    Screen::ScreenRefresh();
+    if (L > 0)
+    {
+        if (BinaryFile_.get()->ProcessInfo[0] == '~')
+        {
+            BinaryFile_.get()->ProcessInfo.Clear();
+            BinaryFile_.get()->SetDir(Str("."));
+            ManagerState = ManagerStateDef::Files;
+            Repaint();
+        }
+    }
+}
+
+void FileManager::EventTick()
+{
+    if (BinaryFile_)
+    {
+        BinaryFile_.get()->EvenTick();
+    }
+    if (BinaryFile_.get()->ProcessInfo.Count > 0)
+    {
+        ManagerState = ManagerStateDef::Process;
+        RepaintDepth = 2;
+        Repaint();
+    }
 }
 
 void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
@@ -148,14 +347,32 @@ void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
     RequestRepaint = false;
     RequestCloseOld = false;
     RequestCloseNew = false;
+    switch (ManagerState)
+    {
+        case ManagerStateDef::Files:
+            EventKeyFiles(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            return;
+        case ManagerStateDef::Attrib:
+            EventKeyAttrib(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            return;
+        case ManagerStateDef::Insert:
+            EventKeyInsert(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            return;
+        case ManagerStateDef::Delete:
+            EventKeyDelete(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
+            return;
+        case ManagerStateDef::Process:
+            return;
+    }
+}
+
+void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
+{
     switch (_(KeyName.c_str()))
     {
         case _("ArrowUp"):
-            if (BinaryFile_.get()->ItemIndex > 0)
-            {
-                BinaryFile_.get()->ItemIndex--;
-            }
-            else
+            BinaryFile_.get()->ItemIndex--;
+            if (BinaryFile_.get()->ItemIndex < 0)
             {
                 BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
             }
@@ -163,11 +380,26 @@ void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             Repaint();
             break;
         case _("ArrowDown"):
-            if (BinaryFile_.get()->ItemIndex < (BinaryFile_.get()->ItemCount() - 1))
+            BinaryFile_.get()->ItemIndex++;
+            if (BinaryFile_.get()->ItemIndex > (BinaryFile_.get()->ItemCount() - 1))
             {
-                BinaryFile_.get()->ItemIndex++;
+                BinaryFile_.get()->ItemIndex = 0;
             }
-            else
+            RepaintDepth = 3;
+            Repaint();
+            break;
+        case _("PageUp"):
+            BinaryFile_.get()->ItemIndex -= 10;
+            if (BinaryFile_.get()->ItemIndex < 0)
+            {
+                BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
+            }
+            RepaintDepth = 3;
+            Repaint();
+            break;
+        case _("PageDown"):
+            BinaryFile_.get()->ItemIndex += 10;
+            if (BinaryFile_.get()->ItemIndex > (BinaryFile_.get()->ItemCount() - 1))
             {
                 BinaryFile_.get()->ItemIndex = 0;
             }
@@ -202,11 +434,224 @@ void FileManager::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 Repaint();
             }
             break;
+        case _("Home"):
+            BinaryFile_.get()->FileUpload();
+            break;
+        case _("End"):
+            BinaryFile_.get()->FileDownload();
+            break;
+        case _("Insert"):
+            InsertFileName.Clear();
+            ManagerState = ManagerStateDef::Insert;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("Delete"):
+            ManagerState = ManagerStateDef::Delete;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("Space"):
+            AttribParam = 0;
+            int ItemIdx = BinaryFile_.get()->ItemIndex;
+            if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+            {
+                AttribVal[0] = BinaryFile_.get()->ItemGet(ItemIdx).Ansi;
+                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->EncodingNumber);
+            }
+            else
+            {
+                AttribVal[0] = BinaryFile_.get()->DefaultAttrib.get()->Ansi;
+                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->EncodingNumber);
+            }
+            AttribValMax[0] = 2;
+            AttribValMax[1] = TextCodec::CodecListNumber.Count;
+            AttribValOffset[0] = 0;
+            AttribValOffset[1] = 0;
+            ManagerState = ManagerStateDef::Attrib;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+    }
+}
+
+void FileManager::EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
+{
+    switch (_(KeyName.c_str()))
+    {
+        case _("Tab"):
+            Pos++;
+            if (Pos == 4)
+            {
+                Pos = 0;
+            }
+            RequestRepaint = true;
+            RepaintDepth = 0;
+            break;
+        case _("ArrowUp"):
+            AttribVal[AttribParam]--;
+            if (AttribVal[AttribParam] < 0)
+            {
+                AttribVal[AttribParam] = AttribValMax[AttribParam] - 1;
+            }
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("ArrowDown"):
+            AttribVal[AttribParam]++;
+            if (AttribVal[AttribParam] >= AttribValMax[AttribParam])
+            {
+                AttribVal[AttribParam] = 0;
+            }
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("PageUp"):
+            AttribVal[AttribParam] -= 10;
+            if (AttribVal[AttribParam] < 0)
+            {
+                AttribVal[AttribParam] = AttribValMax[AttribParam] - 1;
+            }
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("PageDown"):
+            AttribVal[AttribParam] += 10;
+            if (AttribVal[AttribParam] >= AttribValMax[AttribParam])
+            {
+                AttribVal[AttribParam] = 0;
+            }
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("ArrowLeft"):
+            AttribParam--;
+            if (AttribParam < 0)
+            {
+                AttribParam = 1;
+            }
+            Repaint();
+            break;
+        case _("ArrowRight"):
+            AttribParam++;
+            if (AttribParam > 1)
+            {
+                AttribParam = 0;
+            }
+            Repaint();
+            break;
+        case _("Escape"):
+        case _("Enter"):
+        case _("NumpadEnter"):
+        case _("Space"):
+            int ItemIdx = BinaryFile_.get()->ItemIndex;
+            if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+            {
+                BinaryFile_.get()->ItemGet(ItemIdx).Ansi = AttribVal[0];
+                BinaryFile_.get()->ItemGet(ItemIdx).Codec = std::make_shared<TextCodec>(TextCodec::CodecListNumber[AttribVal[1]]);
+            }
+            else
+            {
+                BinaryFile_.get()->DefaultAttrib.get()->Ansi = AttribVal[0];
+                BinaryFile_.get()->DefaultAttrib.get()->Codec = std::make_shared<TextCodec>(TextCodec::CodecListNumber[AttribVal[1]]);
+            }
+            ManagerState = ManagerStateDef::Files;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+    }
+}
+
+void FileManager::EventKeyInsert(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
+{
+    switch (_(KeyName.c_str()))
+    {
+        case _("Tab"):
+            Pos++;
+            if (Pos == 4)
+            {
+                Pos = 0;
+            }
+            RequestRepaint = true;
+            RepaintDepth = 0;
+            break;
+        case _("Enter"):
+        case _("NumpadEnter"):
+            BinaryFile_.get()->ItemAdd(InsertFileName);
+            BinaryFile_.get()->SetDir(Str("."));
+            ManagerState = ManagerStateDef::Files;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("Escape"):
+            ManagerState = ManagerStateDef::Files;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        case _("Backspace"):
+            if (InsertFileName.Count > 0)
+            {
+                InsertFileName.PopLast();
+            }
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        default:
+            switch (KeyChar)
+            {
+                case '<':
+                case '>':
+                case '\\':
+                case '\"':
+                case '?':
+                case '*':
+                case ':':
+                case '|':
+                    break;
+                default:
+                    if ((KeyChar >= 32) && (KeyChar <= 126))
+                    {
+                        InsertFileName.Add(KeyChar);
+                    }
+                    RepaintDepth = 2;
+                    Repaint();
+                    break;
+            }
+    }
+}
+
+void FileManager::EventKeyDelete(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
+{
+    switch (_(KeyName.c_str()))
+    {
+        case _("Tab"):
+            Pos++;
+            if (Pos == 4)
+            {
+                Pos = 0;
+            }
+            RequestRepaint = true;
+            RepaintDepth = 0;
+            break;
+        case _("Enter"):
+        case _("NumpadEnter"):
+            BinaryFile_.get()->ItemRemove(BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex));
+            BinaryFile_.get()->SetDir(Str("."));
+            ManagerState = ManagerStateDef::Files;
+            RepaintDepth = 2;
+            Repaint();
+            break;
+        default:
+            ManagerState = ManagerStateDef::Files;
+            RepaintDepth = 2;
+            Repaint();
+            break;
     }
 }
 
 void FileManager::Open()
 {
+    ManagerState = ManagerStateDef::Files;
     BinaryFile_.get()->ManagerInfoPush();
     RequestRepaint = false;
     RequestCloseOld = false;

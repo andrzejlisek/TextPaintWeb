@@ -36,6 +36,7 @@ public:
     bool AppExit = false;
     std::shared_ptr<BinaryFile> BinaryFile_;
     FileManager FileManager_;
+    void SaveConfig();
 protected:
     void ReadColor(std::string SettingValue, int &ColorB, int &ColorF);
     int ScreenW = 80;

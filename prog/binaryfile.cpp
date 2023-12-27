@@ -4,6 +4,8 @@ BinaryFile::BinaryFile()
 {
     B64 = std::make_unique<TextCodec>(1);
 
+    DefaultAttrib = std::make_unique<BinaryFileItem>(Str(), 0, 0, 65001, true);
+
     ItemAdd(BinaryFileItem(Str(SystemFile0), 5, -1, 65001, false));
 
     Disp.Clear();
@@ -40,9 +42,82 @@ void BinaryFile::ItemAdd(BinaryFileItem X)
     ListItems.Add(X);
 }
 
+void BinaryFile::ItemAdd(Str FileName)
+{
+    if (FileName.Count == 0)
+    {
+        return;
+    }
+    if (ListDir.Count > 0)
+    {
+        FileName.InsertString("/");
+        FileName.InsertRange(ListDir);
+    }
+    int Idx = FindName(FileName);
+    if (Idx >= 0)
+    {
+        ListItems[Idx].AttribSet(DefaultAttrib.get()->AttribGet());
+    }
+    else
+    {
+        ItemAdd(BinaryFileItem(FileName, 2, -1, DefaultAttrib.get()->AttribGet()));
+        SetDir(Str("."));
+    }
+    Idx = FindName(FileName);
+    if (Idx > 0)
+    {
+        TempData.Clear();
+        FileExport(Idx, true);
+        for (int I = 0; I < Disp.Count; I++)
+        {
+            if (ItemName(I) == FileName)
+            {
+                ItemIndex = I;
+            }
+        }
+    }
+}
+
+void BinaryFile::ItemRemove(Str FileName)
+{
+    if (FileName.Count == 0)
+    {
+        return;
+    }
+    if (ListDir.Count > 0)
+    {
+        FileName.InsertString("/");
+        FileName.InsertRange(ListDir);
+    }
+
+    for (int I = 0; I < ListItems.Count; I++)
+    {
+        if ((ListItems[I].Name.Count >= FileName.Count) && (ListItems[I].Name!= Str(SystemFile0)))
+        {
+            if (ListItems[I].Name.GetRange(0, FileName.Count) == FileName)
+            {
+                TempData.Clear();
+                ListItems[I].Type += 100;
+                FileExport(I, true);
+                ListItems[I].Type -= 100;
+                ListItems.Remove(I);
+                I--;
+            }
+        }
+    }
+}
+
 BinaryFileItem &BinaryFile::ItemGet(int Idx)
 {
-    int T = ItemType(Idx);
+    int T = 0;
+    if (Idx >= 0)
+    {
+        T = ItemType(Idx);
+    }
+    else
+    {
+        T = IdxCurrent;
+    }
     if (T >= 0)
     {
         return ListItems[T];
@@ -101,10 +176,19 @@ int BinaryFile::ItemCount()
 void BinaryFile::SetDir(Str Dir)
 {
     int StdDir = true;
+    bool Recursive = false;
+    bool ResetCursor = true;
+
+    if (Dir[0] == '?')
+    {
+        Recursive = true;
+        Dir.PopFirst();
+    }
 
     if (Dir == Str("."))
     {
         StdDir = false;
+        ResetCursor = false;
     }
 
     if (Dir == Str("/"))
@@ -130,7 +214,7 @@ void BinaryFile::SetDir(Str Dir)
 
     if (Dir[0] == '/')
     {
-        Dir.Remove(0);
+        Dir.PopFirst();
     }
 
     if (StdDir && (Dir.Count > 0))
@@ -167,7 +251,7 @@ void BinaryFile::SetDir(Str Dir)
                 if ((N.Substring(0, ListDir.Count) == ListDir) && (N[ListDir.Count] == '/'))
                 {
                     int DirPos = N.IndexOf('/', ListDir.Count + 1);
-                    if (DirPos < 0)
+                    if ((DirPos < 0) || (Recursive))
                     {
                         N.AddRange(DispSepX);
                         N.AddString(I);
@@ -191,7 +275,7 @@ void BinaryFile::SetDir(Str Dir)
         else
         {
             int DirPos = N.IndexOf('/');
-            if (DirPos < 0)
+            if ((DirPos < 0) || (Recursive))
             {
                 N.AddRange(DispSepX);
                 N.AddString(I);
@@ -215,10 +299,22 @@ void BinaryFile::SetDir(Str Dir)
         Disp.Insert(Str("..~"));
     }
 
-    ItemIndex = 0;
-    while (ItemType(ItemIndex) < 0)
+    if (ResetCursor)
     {
-        ItemIndex++;
+        ItemIndex = 0;
+        /*while (ItemType(ItemIndex) < 0)
+        {
+            ItemIndex++;
+        }*/
+        ListDispOffset = 0;
+    }
+    if ((ItemIndex > 0) && (ItemIndex >= Disp.Count) && (Disp.Count > 0))
+    {
+        ItemIndex = Disp.Count - 1;
+    }
+    if (ListDispOffset > ItemIndex)
+    {
+        ListDispOffset = ItemIndex;
     }
 }
 
@@ -308,27 +404,33 @@ void BinaryFile::FileImportSys()
     }
 }
 
-void BinaryFile::FileImport(int Idx)
+void BinaryFile::FileImport(int Idx, bool Absolute)
 {
     FileImportWaiting = true;
-    if (Idx < 0)
+    if (!Absolute)
     {
-        Idx = ItemIndex;
+        if (Idx < 0)
+        {
+            Idx = ItemIndex;
+        }
+        Idx = ItemType0(Idx);
     }
-    Idx = ItemType0(Idx);
 
     ListItems[Idx].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet());
 }
 
-void BinaryFile::FileExport(int Idx)
+void BinaryFile::FileExport(int Idx, bool Absolute)
 {
-    if (Idx < 0)
+    if (!Absolute)
     {
-        Idx = ItemIndex;
+        if (Idx < 0)
+        {
+            Idx = ItemIndex;
+        }
+        Idx = ItemType0(Idx);
     }
-    Idx = ItemType0(Idx);
 
-    if (IsSystemFile() && TempData.Count < 2)
+    if (IsSystemFile() && (TempData.Count < 2) && (!Absolute))
     {
         ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type + 100, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), "");
     }
@@ -350,6 +452,30 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
 
     if (EvtName == "FileImport")
     {
+        if ((EvtParam4 == 2) && (EvtParam2 == 6))
+        {
+            Str NumX(EvtParam0);
+            Str NumXOp(EvtParam0);
+            int NumX_ = NumX.IndexOf('|');
+
+            NumXOp.RemoveRange(NumX_);
+            NumX.RemoveRange(0, NumX_ + 1);
+
+            if (NumXOp.ToString() == "NUMBER")
+            {
+                BrowserUploadCurrent = 1;
+                BrowserUploadCount = std::stoi(NumX.ToString());
+            }
+            if (NumXOp.ToString() == "NUMADD")
+            {
+                BrowserUploadCount += std::stoi(NumX.ToString());
+            }
+
+            ProcessInfo.Clear();
+            ProcessInfo.AddString(BrowserUploadCurrent);
+            ProcessInfo.AddString("/");
+            ProcessInfo.AddString(BrowserUploadCount);
+        }
         if (EvtParam4 == 0)
         {
             if ((EvtParam2 >= 20) && (EvtParam2 < 30))
@@ -357,6 +483,22 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
                 EventFileName = EvtParam0;
             }
             int Idx = FindName(EventFileName);
+            if (Idx < 0)
+            {
+                if (EvtParam2 == 26)
+                {
+                    ItemAdd(BinaryFileItem(Str(EventFileName), 2, -1, DefaultAttrib.get()->AttribGet()));
+                    Idx = FindName(EventFileName);
+                }
+            }
+            else
+            {
+                if (EvtParam2 == 26)
+                {
+                    ListItems[Idx].AttribSet(DefaultAttrib.get()->AttribGet());
+                }
+            }
+            IdxCurrent = Idx;
             if (Idx >= 0)
             {
                 if ((EvtParam2 >= 20) && (EvtParam2 < 30))
@@ -375,6 +517,24 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
                 if (EvtParam2 < 10)
                 {
                     FileImportWaiting = false;
+                    BrowserDownloadProc(Idx);
+                }
+
+                if (EvtParam2 == 6)
+                {
+                    BrowserUploadCurrent++;
+                    ProcessInfo.Clear();
+                    if (BrowserUploadCurrent > BrowserUploadCount)
+                    {
+                        ProcessInfo.AddString("~");
+                    }
+                    else
+                    {
+                        ProcessInfo.AddString(BrowserUploadCurrent);
+                        ProcessInfo.AddString("/");
+                        ProcessInfo.AddString(BrowserUploadCount);
+                    }
+                    FileExport(Idx, true);
                 }
 
                 if (PreInit)
@@ -395,6 +555,7 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
         {
             EventFileName = EvtParam0;
             int Idx = FindName(EventFileName);
+            IdxCurrent = Idx;
             if (Idx >= 0)
             {
                 return true;
@@ -407,7 +568,7 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
 
 void BinaryFile::SysSaveConfig()
 {
-    FileExport(0);
+    FileExport(0, false);
 }
 
 void BinaryFile::ManagerInfoPush()
@@ -423,4 +584,101 @@ void BinaryFile::ManagerInfoPop()
     SetDir(Str("."));
     ItemIndex = ItemIndex_;
     ListDispOffset = ListDispOffset_;
+}
+
+void BinaryFile::FileUpload()
+{
+    if (ListDir.Count > 0)
+    {
+        Screen::FileImport(6, ListDir.ToString() + "/", "~BROWSE");
+    }
+    else
+    {
+        Screen::FileImport(6, "", "~BROWSE");
+    }
+}
+
+void BinaryFile::FileDownload()
+{
+
+    int ItemPtr = ItemType(ItemIndex);
+
+    Str FileName = ItemName(ItemIndex);
+    if (ListDir.Count > 0) { FileName.Insert('/'); }
+    FileName.InsertRange(ListDir);
+    Screen::FileExport(6, FileName.ToString(), "~BEGIN", "");
+
+    BrowserDownload.Clear();
+
+    if (ItemPtr >= 0)
+    {
+        BrowserDownload.Add(ItemPtr);
+    }
+    else
+    {
+        if (ItemName(ItemIndex) != Str(".."))
+        {
+            Str ListDir__ = ListDir.Copy();
+            int ItemIndex__ = ItemIndex;
+            int ListDispOffset__ = ListDispOffset;
+
+            Str DirX = ItemName(ItemIndex);
+            DirX.Insert('?');
+            SetDir(DirX);
+
+            for (int I = 0; I < Disp.Count; I++)
+            {
+                if (ItemType(I) >= 0)
+                {
+                    BrowserDownload.Add(ItemType(I));
+                }
+            }
+
+            ListDir = ListDir__.Copy();
+            SetDir(Str("."));
+            ItemIndex = ItemIndex__;
+            ListDispOffset = ListDispOffset__;
+        }
+    }
+
+    BrowserDownloadCount = BrowserDownload.Count;
+
+    BrowserDownloadWaiting = true;
+}
+
+void BinaryFile::BrowserDownloadProc(int Idx)
+{
+    int Pos = BrowserDownload.IndexOf(Idx);
+
+    if (Pos >= 0)
+    {
+        ListItems[Idx].Browser(1);
+        FileExport(Idx, true);
+        ListItems[Idx].Browser(0);
+        BrowserDownload.Remove(Pos);
+        BrowserDownloadWaiting = true;
+    }
+}
+
+void BinaryFile::EvenTick()
+{
+    if (BrowserDownloadWaiting)
+    {
+        BrowserDownloadWaiting = false;
+
+        ProcessInfo.Clear();
+        if (BrowserDownload.Count > 0)
+        {
+            ProcessInfo.AddString((BrowserDownloadCount - BrowserDownload.Count + 1));
+            ProcessInfo.AddString("/");
+            ProcessInfo.AddString(BrowserDownloadCount);
+
+            FileImport(BrowserDownload[0], true);
+        }
+        else
+        {
+            ProcessInfo.AddString("~");
+            Screen::FileExport(6, "", "~END", "");
+        }
+    }
 }

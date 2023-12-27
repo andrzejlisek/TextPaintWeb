@@ -51,11 +51,8 @@ If you click the screen, there will be show the GUI interface usable both on tou
 This version is not completed yet and now there are need to do following:
 
 
-* Optimize text editor display \- when loaded larger file, the application slows down while writing or navigating
 * Support for various font sizes above 2 \- now there are supported single and double size only \(enough for embedded animations and VTTEST\)\.
 * XTERM mouse support\.
-* File contents preservation \(now, the changes will lost after application refresh or exit\)\.
-* File import and export\.
 * Integration with file system and telnet using WebSocket and separated \.NET/Java application\.
 * And much more\.\.\.
 

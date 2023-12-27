@@ -40,6 +40,11 @@ public:
     static void Transcode(Str &S, int CodecSrc, int CodecDst);
     static void Transcode(Raw &S, int CodecSrc, int CodecDst);
     bool Unicode = false;
+
+    static inline XList<int> CodecListNumber;
+    static inline XList<std::string> CodecListName;
+    static void CodecListCreateItem(int Num);
+    static void CodecListCreate();
 private:
     char Base64Chars[66] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     char HexChars[33] = "0123456789ABCDEF0123456789abcdef";

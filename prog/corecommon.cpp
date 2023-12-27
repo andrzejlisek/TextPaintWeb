@@ -39,6 +39,8 @@ void CoreCommon::InitCommon()
 {
     if (BinaryFile_.get()->PreInit)
     {
+        TextCodec::CodecListCreate();
+
         int I = 1;
         int XCodec = 0;
         bool XAnsi = false;
@@ -158,4 +160,10 @@ void CoreCommon::Screen_Refresh()
         Screen::ScreenWriteText(ScreenWelcomeBuf[i], Screen::TextNormalBack, Screen::TextNormalFore);
     }
     Screen::ScreenRefresh();
+}
+
+void CoreCommon::SaveConfig()
+{
+    BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+    BinaryFile_.get()->SysSaveConfig();
 }

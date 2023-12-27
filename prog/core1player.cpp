@@ -71,18 +71,6 @@ void Core1Player::CalcFileDelayStep()
 
 void Core1Player::EventTick()
 {
-    // Measuring timer period
-    /*if (LoadFileMeasuring && TimerTick)
-    {
-        Stopwatch_.Tick();
-        if (Stopwatch_.TickPeriod >= 0)
-        {
-            LoadFileTimeChunk = (Stopwatch_.TickPeriod * LoadFileTimeFactor) / 100;
-            LoadFileMeasuring = false;
-        }
-    }*/
-
-
     switch (WorkStateS)
     {
         case WorkStateSDef::None:
@@ -144,12 +132,10 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
                 WorkStateS = WorkStateSDef::FileOpenFile;
-                BinaryFile_.get()->FileImport(-1);
+                BinaryFile_.get()->FileImport(-1, false);
             }
             break;
         case WorkStateSDef::FileOpenFile: // Waiting for file contents
-            break;
-        case WorkStateSDef::FileMan: // File manager
             break;
         case WorkStateSDef::FileOpen: // Opening file
             {
@@ -381,7 +367,10 @@ void Core1Player::EventTick()
                 DisplayInfoText(false);
             }
             break;
-        case WorkStateSDef::DispConf:
+        case WorkStateSDef::FileMan: // File manager
+            FileManager_.EventTick();
+            break;
+        case WorkStateSDef::DispConf: // Display configuration
             break;
     }
 }
@@ -430,6 +419,10 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case WorkStateSDef::DispConf:
             DisplayConfig_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
             DisplayConfig_.get()->Repaint();
+            if (DisplayConfig_.get()->RequestSave)
+            {
+                SaveConfig();
+            }
             if (DisplayConfig_.get()->RequestRepaint)
             {
                 Repaint(true);
@@ -698,9 +691,25 @@ void Core1Player::EventOther(std::string EvtName, std::string EvtParam0, int Evt
             }
             break;
         case _("FileImport"):
-            if (EvtParam2 != 0)
             {
-                WorkStateS = WorkStateSDef::FileOpen;
+                bool ImportAllowed = false;
+                if (WorkStateS == WorkStateSDef::FileOpenFile)
+                {
+                    ImportAllowed = true;
+                }
+                if ((WorkStateS == WorkStateSDef::FileMan) && (FileManager_.RequestCloseOld || FileManager_.RequestCloseNew))
+                {
+                    ImportAllowed = true;
+                }
+                if (ImportAllowed)
+                {
+                    FileManager_.RequestCloseOld = false;
+                    FileManager_.RequestCloseNew = false;
+                    if (EvtParam2 != 0)
+                    {
+                        WorkStateS = WorkStateSDef::FileOpen;
+                    }
+                }
             }
             break;
     }

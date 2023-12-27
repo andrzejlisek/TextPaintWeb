@@ -386,6 +386,10 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
         case WorkStateCDef::DispConf:
             DisplayConfig_.get()->EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
             DisplayConfig_.get()->Repaint();
+            if (DisplayConfig_.get()->RequestSave)
+            {
+                SaveConfig();
+            }
             if (DisplayConfig_.get()->RequestRepaint)
             {
                 CoreAnsi_.get()->AnsiRepaint(false);
