@@ -33,16 +33,21 @@ href="https://andrzejlisek.github.io/TextPaintWeb/index.html">https://andrzejlis
         <td>WebAssembly version (current state)</td>
     </tr>
     <tr>
-        <td>Reads and writes file directly.</td>
-        <td>Uses internal file storage with files from server,
-        you can upload or download files.</td>
+        <td>Reads and writes file directly</td>
+        <td>Uses internal file storage and files from server</td>
     </tr>
     <tr>
-        <td>Terminal: Supports Telnet, SSH, Serial connections.</td>
+        <td>Editor: Tho states of character selector by pressing
+        F3</td>
+        <td>Three states, the third state is the file list and
+        you can select the file and press Enter.</td>
+    </tr>
+    <tr>
+        <td>Terminal: Supports Telnet, SSH, Serial connections</td>
         <td>Has embedded VTTEST 2.7 only.</td>
     </tr>
     <tr>
-        <td>Run as command with parameters.</td>
+        <td>Run as command with parameters</td>
         <td>Has menu displayed at the begin and exit command
         returns into the menu.</td>
     </tr>
@@ -51,11 +56,12 @@ href="https://andrzejlisek.github.io/TextPaintWeb/index.html">https://andrzejlis
 <h1>File manager</h1>
 
 <p>This version of TextPaint has the internal file manager, which
-now allows to browse and edit the <strong>!!config.txt</strong>
+now allows to browse the system files (<strong>!!config.txt</strong>
+ans <strong>!!system.txt</strong>) and the files defined in <strong>!!system.txt</strong>
 configuration file. If you modify any file, the file will be
 stored at local storage and replaces the original default file.</p>
 
-<p>The file manager is available in editor (press <strong>F10</strong>
+<p>The file manager is available in editor (press <strong>F11</strong>
 key) and in the animation player (press <strong>dot/period</strong>
 key). In the file manager, there are posiible the following keys:</p>
 
@@ -63,18 +69,8 @@ key). In the file manager, there are posiible the following keys:</p>
     <li><strong>Tab</strong> - Move the popup.</li>
     <li><strong>Up arrow</strong> and <strong>Down arrow</strong>
         - select item.</li>
-    <li><strong>Page Up</strong>, <strong>Page Down</strong> -
-        step by 10 items.</li>
     <li><strong>Enter</strong> - Exit from the file manager when
         selected file or enter into directory or upper directory.</li>
-    <li><strong>Insert</strong> - Insert new, blank file.</li>
-    <li><strong>Delete</strong> - Delete file or directory.</li>
-    <li><strong>Home</strong> - Upload file. If you upload ZIP
-        file, the files will be extracted as directory.</li>
-    <li><strong>End</strong> - Download file or directory. The
-        directory will be packed as ZIP file.</li>
-    <li><strong>Space</strong> - Set file attributes (type and
-        codec).</li>
 </ul>
 
 <p>In editor: You have to press the F8 again to load selected
@@ -84,6 +80,11 @@ selected file.</p>
 <p>In player. The file manager is needed for change the current
 directory. After closing the file manager, the selected animation
 will be loaded.</p>
+
+<p><strong>Note:</strong> Currently, the file manager has a
+certain bug: Sometimes, the other files than the two system siles
+is not visible. If the problem occurs, just restart the
+application (refresh page in browser).</p>
 
 <h1>GUI interface</h1>
 
@@ -114,8 +115,6 @@ following rows:</p>
     <li><strong>Colors</strong>, <strong>Font</strong>- Set the
         color and font display options. The result will be shown
         immediately and the affect the screen display only.</li>
-    <li><strong>Screen width</strong>, <strong>Screen height</strong>
-        - Change screen resolution.</li>
 </ul>
 
 <h1>To do</h1>
@@ -127,7 +126,6 @@ following:</p>
     <li>Duospace font support.</li>
     <li>XTERM mouse support.</li>
     <li>Clean-up config file.</li>
-    <li>Rewrite README files from the old TextPaint project.</li>
     <li>Integration with file system and telnet using WebSocket
         and separated .NET/Java application.</li>
     <li>And much more...</li>

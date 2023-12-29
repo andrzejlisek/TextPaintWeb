@@ -29,7 +29,7 @@ var ScreenData0;
 var ScreenData1;
 var ScreenDataChr0;
 var ScreenDataChr1;
-
+let ScreenCursorData;
 
 let ScreenLineOffsetVal = [];
 let ScreenLineOffsetBlank = [];
@@ -347,8 +347,8 @@ function ScreenCharGlyph(Buf, ScrIdx, Blank)
     
         let CharVals = ScreenFont1.GetGlyph(Chr);
         
-        CharData0 = ScreenCtx.createImageData(ScreenCellW, ScreenCellH);
-        CharData1 = ScreenCtx.createImageData(ScreenCellW, ScreenCellH);
+        CharData0 = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCellH);
+        CharData1 = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCellH);
         let N = ScreenCellW * ScreenCellH;
         let Ptr4 = 0;
         let PxlOn = false;
@@ -784,8 +784,8 @@ function ScreenResize(NewW, NewH)
     ScreenObj.height = ScreenHH;
 
     ScreenCtx = ScreenObj.getContext('2d');
-    ScreenData0 = ScreenCtx.createImageData(ScreenWW, ScreenHH);
-    ScreenData1 = ScreenCtx.createImageData(ScreenWW, ScreenHH);
+    ScreenData0 = ScreenCtx.getImageData(0, 0, ScreenWW, ScreenHH);
+    ScreenData1 = ScreenCtx.getImageData(0, 0, ScreenWW, ScreenHH);
     N = ScreenWW * ScreenHH;
     for (let I = 0; I < N; I++)
     {
@@ -799,14 +799,25 @@ function ScreenResize(NewW, NewH)
         ScreenData1.data[I * 4 + 3] = 255;
     }
 
-    ScreenDataChr0 = ScreenCtx.createImageData(ScreenCellW, ScreenCellH);
-    ScreenDataChr1 = ScreenCtx.createImageData(ScreenCellW, ScreenCellH);
+    ScreenDataChr0 = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCellH);
+    ScreenDataChr1 = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCellH);
     N = ScreenCellW * ScreenCellH;
     for (let I = 0; I < N; I++)
     {
         ScreenDataChr0.data[I * 4 + 3] = 255;
         ScreenDataChr1.data[I * 4 + 3] = 255;
     }
+
+    ScreenCursorData = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCursorSize);
+    N = ScreenCellW * ScreenCursorSize;
+    for (let I = 0; I < N; I++)
+    {
+        ScreenCursorData.data[I * 4 + 3] = 255;
+    }
+    
+    
+    
+    
     
     ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
     //ScreenRepaint();
@@ -955,7 +966,6 @@ function ScreenDrawCursorWork()
     {
         let CursorX_ = ScreenCursorX * ScreenCellW;
         let CursorY_ = ScreenCursorY * ScreenCellH + (ScreenCellH - ScreenCursorSize);
-        let CursorData = ScreenCtx.createImageData(ScreenCellW, ScreenCursorSize);
         let Ptr1 = 0;
         let Ptr2 = (CursorY_ * (ScreenWW)) + CursorX_ << 2;
         let PtrX = ScreenCursorY * ScreenW + ScreenCursorX;
@@ -963,10 +973,9 @@ function ScreenDrawCursorWork()
         {
             for (let II = 0; II < ScreenCellW; II++)
             {
-                CursorData.data[Ptr1 + 0] = ScreenPaletteR[ScreenDataF_[PtrX]];
-                CursorData.data[Ptr1 + 1] = ScreenPaletteG[ScreenDataF_[PtrX]];
-                CursorData.data[Ptr1 + 2] = ScreenPaletteB[ScreenDataF_[PtrX]];
-                CursorData.data[Ptr1 + 3] = 255;
+                ScreenCursorData.data[Ptr1 + 0] = ScreenPaletteR[ScreenDataF_[PtrX]];
+                ScreenCursorData.data[Ptr1 + 1] = ScreenPaletteG[ScreenDataF_[PtrX]];
+                ScreenCursorData.data[Ptr1 + 2] = ScreenPaletteB[ScreenDataF_[PtrX]];
                 ScreenData0.data[Ptr2 + 0] = ScreenPaletteR[ScreenDataF_[PtrX]];
                 ScreenData0.data[Ptr2 + 1] = ScreenPaletteR[ScreenDataF_[PtrX]];
                 ScreenData0.data[Ptr2 + 2] = ScreenPaletteR[ScreenDataF_[PtrX]];
@@ -978,7 +987,7 @@ function ScreenDrawCursorWork()
             }
             Ptr2 = Ptr2 - (ScreenCellW << 2) + ((ScreenWW) << 2);
         }
-        ScreenCtx.putImageData(CursorData, CursorX_, CursorY_);
+        ScreenCtx.putImageData(ScreenCursorData, CursorX_, CursorY_);
     }
 }
 
@@ -1022,9 +1031,9 @@ function ScreenInit1()
         ParamStr = ConfigFileS("ColorBlending_" + ParamI);
     }
     
-    ScreenPaletteR = [];
-    ScreenPaletteG = [];
-    ScreenPaletteB = [];
+    ScreenPaletteR = [0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255];
+    ScreenPaletteG = [0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255];
+    ScreenPaletteB = [0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255];
 
     const PalR = ConfigFileS("PaletteR");
     const PalG = ConfigFileS("PaletteG");

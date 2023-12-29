@@ -438,8 +438,8 @@ function KeybRepaint()
 
                 KeybSvgTxt.style.left = K_X + "px";
                 KeybSvgTxt.style.top = K_Y + "px";
-                KeybSvgTxt.style.width = (K_W + 1) + "px";
-                KeybSvgTxt.style.height = (K_H + 1) + "px";
+                KeybSvgTxt.style.width = K_W + "px";
+                KeybSvgTxt.style.height = K_H + "px";
                 KeybSvgTxt.style.display = "block";
             }
             break;
