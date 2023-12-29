@@ -196,7 +196,7 @@ KeybLayout[0].push([ 0, 11,  3,  2, "_Ctrl",        "Ctrl", ""]);
 KeybLayout[0].push([ 3, 11,  3,  2, "_Alt",         "Alt", ""]);
 KeybLayout[0].push([ 6, 11,  2,  2, "ArrowLeft",    String.fromCharCode(0x2190), ""]);
 KeybLayout[0].push([ 8, 11,  2,  2, "ArrowRight",   String.fromCharCode(0x2192), ""]);
-KeybLayout[0].push([10, 11,  9,  2, "Space",        "Space", ""]);
+KeybLayout[0].push([10, 11,  9,  2, "Space",        "Space", "", 32]);
 KeybLayout[0].push([19, 11,  2,  2, "ArrowUp",      String.fromCharCode(0x2191), ""]);
 KeybLayout[0].push([21, 11,  2,  2, "ArrowDown",    String.fromCharCode(0x2193), ""]);
 KeybLayout[0].push([23, 11,  3,  2, "_Switch1",     "SWITCH", "KEYB"]);
@@ -263,7 +263,7 @@ KeybLayout[2].push([ 6,  2,  2,  2, "Backquote",    "`", "~", 96, 126]);
 KeybLayout[2].push([ 8,  2,  2,  2, "Period",       ".", ">", 46, 62]);
 
 KeybLayout[2].push([ 2,  6,  2,  2, "Home",         "Home", ""]);
-KeybLayout[2].push([ 4,  6,  4,  2, "Space",        "Space", ""]);
+KeybLayout[2].push([ 4,  6,  4,  2, "Space",        "Space", "", 32]);
 KeybLayout[2].push([ 8,  6,  2,  2, "End",          "End", ""]);
 
 KeybLayout[2].push([ 2,  4,  2,  2, "ArrowLeft",    String.fromCharCode(0x2190), ""]);
