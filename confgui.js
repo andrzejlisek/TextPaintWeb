@@ -1,64 +1,3 @@
-let ConfResetTimeout = 10000;
-let ConfResetTime = 0 - ConfResetTimeout - ConfResetTimeout;
-let ConfResetCounter = 0;
-
-StopwatchOffset = performance.now();
-
-function ConfResetPrepare()
-{
-    if ((ConfResetTime + ConfResetTimeout) > performance.now())
-    {
-        ConfResetCounter++;
-    }
-    else
-    {
-        ConfResetTime = performance.now();
-        ConfResetCounter = 0;
-    }
-}
-
-function ConfReserPerform()
-{
-    if (confirm("Reset configuration?"))
-    {
-        ConfigFileReset();
-        if (confirm("Clear file index?"))
-        {
-            IndexClear();
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-
-
-    /*if ((ConfResetTime + ConfResetTimeout) > performance.now())
-    {
-        if (ConfResetCounter >= 5)
-        {
-            if (confirm("Reset configuration?"))
-            {
-                ConfigFileReset();
-                if (confirm("Clear file index?"))
-                {
-                    IndexClear();
-                }
-            }
-        }
-        ConfResetCounter = 0;
-        ConfResetTime = 0;
-        return true;
-    }
-    else
-    {
-        ConfResetCounter = 0;
-        return false;
-    }*/
-}
-
-
 let ConfLbl1 = document.getElementById("ConfLbl1");
 let ConfLbl2 = document.getElementById("ConfLbl2");
 let ConfLbl3 = document.getElementById("ConfLbl3");
@@ -82,12 +21,14 @@ let ConfBtn32 = document.getElementById("ConfBtn32");
 let ConfBtn33 = document.getElementById("ConfBtn33");
 let ConfBtn34 = document.getElementById("ConfBtn34");
 let ConfBtn35 = document.getElementById("ConfBtn35");
+let ConfBtn36 = document.getElementById("ConfBtn36");
 
 let ConfBtn41 = document.getElementById("ConfBtn41");
 let ConfBtn42 = document.getElementById("ConfBtn42");
 let ConfBtn43 = document.getElementById("ConfBtn43");
 let ConfBtn44 = document.getElementById("ConfBtn44");
 let ConfBtn45 = document.getElementById("ConfBtn45");
+let ConfBtn46 = document.getElementById("ConfBtn46");
 
 let ConfBtn51 = document.getElementById("ConfBtn51");
 let ConfBtn52 = document.getElementById("ConfBtn52");
@@ -109,8 +50,8 @@ let ConfBtn74 = document.getElementById("ConfBtn74");
 let ConfBtnAll = [];
 ConfBtnAll.push([ConfBtn11, ConfBtn12, ConfBtn13, ConfBtn14]);
 ConfBtnAll.push([ConfBtn21, ConfBtn22, ConfBtn23, ConfBtn24]);
-ConfBtnAll.push([ConfBtn31, ConfBtn32, ConfBtn33, ConfBtn34, ConfBtn35]);
-ConfBtnAll.push([ConfBtn41, ConfBtn42, ConfBtn43, ConfBtn44, ConfBtn45]);
+ConfBtnAll.push([ConfBtn31, ConfBtn32, ConfBtn33, ConfBtn34, ConfBtn35, ConfBtn36]);
+ConfBtnAll.push([ConfBtn41, ConfBtn42, ConfBtn43, ConfBtn44, ConfBtn45, ConfBtn46]);
 ConfBtnAll.push([ConfBtn51, ConfBtn52, ConfBtn53, ConfBtn54, ConfBtn55, ConfBtn56]);
 ConfBtnAll.push([ConfBtn61, ConfBtn62, ConfBtn63, ConfBtn64]);
 ConfBtnAll.push([ConfBtn71, ConfBtn72, ConfBtn73, ConfBtn74]);
@@ -210,6 +151,7 @@ function ConfRepaint()
     ConfBtn33.value = ScreenSET_ANSIColorBold ? "Bold\nas color" : "No bold\ncolor";
     ConfBtn34.value = ScreenSET_ANSIColorBlink ? "Blink\nas color" : "No blink\ncolor";
     ConfBtn35.value = ScreenSET_ANSIIgnoreConcealed ? "Ignore\nconce" : "Use\nconce";
+    ConfBtn36.value = ScreenColorBlending ? "Blend\ncolors" : "Do not\nblend";
 
     if (ScreenSET_Blink == 0) ConfBtn41.value = "Steady";
     if (ScreenSET_Blink == 1) ConfBtn41.value = "VTx\nblink";
@@ -218,6 +160,10 @@ function ConfRepaint()
     ConfBtn43.value = ScreenAttrI ? "Use\nItalic" : "No\nItalic";
     ConfBtn44.value = ScreenAttrU ? "Use\nunder" : "No\nunder";
     ConfBtn45.value = ScreenAttrS ? "Use\nstrike" : "No\nstrike";
+    if (ScreenDisplayInterpolate == 0) ConfBtn46.value = "Stretch\nNo inter";
+    if (ScreenDisplayInterpolate == 1) ConfBtn46.value = "Stretch\nInter";
+    if (ScreenDisplayInterpolate == 2) ConfBtn46.value = "No\nstretch";
+
 
     let ScrS = ScreenW + "x" + ScreenH;
 
@@ -260,18 +206,26 @@ function ConfClick(id)
     switch (id)
     {
         case 11:
-            ConfResetPrepare();
             KeybTouch = 1 - KeybTouch;
             ConfigFileGui("WinTouchScreen", KeybTouch);
             break;
         case 12:
-            if (!ConfReserPerform())
             {
-                location.reload(true);
+                if (confirm("Reset configuration?"))
+                {
+                    ConfigFileReset();
+                    if (confirm("Clear file index?"))
+                    {
+                        IndexClear();
+                    }
+                }
+                else
+                {
+                    location.reload(true);
+                }
             }
             break;
         case 13:
-            ConfResetPrepare();
             ConfFullScreen();
             break;
         case 14:
@@ -362,6 +316,10 @@ function ConfClick(id)
             ConfigFileGui("ANSIIgnoreConcealed", !ScreenSET_ANSIIgnoreConcealed);
             ScreenSetDisplayConfig(true);
             break;
+        case 36:
+            ConfigFileGui("ColorBlending", !ScreenColorBlending);
+            ScreenSetDisplayConfig(true);
+            break;
             
         case 41:
             ConfigFileGui("DisplayBlink", (ScreenSET_Blink + 1) % 3);
@@ -403,7 +361,11 @@ function ConfClick(id)
             ConfigFileGui("DisplayAttrib", Temp);
             ScreenSetDisplayConfig(true);
             break;
-            
+        case 46:
+            ConfigFileGui("DisplayInterpolate", (ScreenDisplayInterpolate + 1) % 3);
+            ScreenSetDisplayConfig(true);
+            break;            
+
         case 61:
             ProgEventOtherFile("Resize", "", ScreenW - 10, ScreenH, 0, 0);
             break;

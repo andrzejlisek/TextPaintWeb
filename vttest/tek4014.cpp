@@ -109,10 +109,10 @@ tek_point(int pen, int y, int x)
           0x40 | (((x & LOBITS) >> SHIFTLO) & FIVEBITS));   /* must be last */
   fakeio::_fprintf(stdout, "%s", temp);
   if (LOG_ENABLED) {
-    fprintf(log_fp, "*Set point (%d,%d)\n", y, x);
-    fputs("Send: ", log_fp);
+    fakeio::_fprintf(log_fp, "*Set point (%d,%d)\n", y, x);
+    fakeio::_fputs("Send: ", log_fp);
     put_string(log_fp, temp);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 }
 
@@ -130,15 +130,15 @@ log_mouse_click(char *report)
   if (LOG_ENABLED) {
     int new_x = tek_coord(report, 1);
     int new_y = tek_coord(report, 3);
-    fprintf(log_fp, "Report: ");
+    fakeio::_fprintf(log_fp, "Report: ");
     if ((report[0] & 0x80) != 0
         && strchr("lmrLMR", report[0] & 0x7f) != 0) {
-      fprintf(log_fp, "mouse %c", report[0] & 0x7f);
+      fakeio::_fprintf(log_fp, "mouse %c", report[0] & 0x7f);
     } else {
-      fprintf(log_fp, "key %d", CharOf(report[0]));
+      fakeio::_fprintf(log_fp, "key %d", CharOf(report[0]));
     }
-    fprintf(log_fp, " (%d,%d)\n", new_y, new_x);
-    fflush(log_fp);
+    fakeio::_fprintf(log_fp, " (%d,%d)\n", new_y, new_x);
+    fakeio::_fflush(log_fp);
   }
 }
 

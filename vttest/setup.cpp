@@ -66,8 +66,8 @@ find_levels(void)
   }
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, "Max Operating Level: %d\n", max_level);
-    fprintf(log_fp, "Cur Operating Level: %d\n", cur_level);
+    fakeio::_fprintf(log_fp, "Max Operating Level: %d\n", max_level);
+    fakeio::_fprintf(log_fp, "Cur Operating Level: %d\n", cur_level);
   }
 
   restore_ttymodes();
@@ -160,7 +160,7 @@ void
 enable_logging(void)
 {
   static char my_name[] = "vttest.log";
-  log_fp = fopen(my_name, "w");
+  log_fp = fakeio::_fopen(my_name, "w");
   if (log_fp == 0) {
     failed(my_name);
   }
@@ -190,7 +190,7 @@ save_level(VTLEVEL *save)
   save->output_8bits = output_8bits;
 
   if (LOG_ENABLED)
-    fprintf(log_fp, "save_level(%d) in=%d, out=%d\n", cur_level,
+    fakeio::_fprintf(log_fp, "save_level(%d) in=%d, out=%d\n", cur_level,
             input_8bits ? 8 : 7,
             output_8bits ? 8 : 7);
 }
@@ -208,7 +208,7 @@ set_level(int request)
     find_levels();
 
   if (LOG_ENABLED)
-    fprintf(log_fp, "set_level(%d)\n", request);
+    fakeio::_fprintf(log_fp, "set_level(%d)\n", request);
 
   if (request > max_level) {
     printxx("Sorry, this terminal supports only VT%d\n", terminal_id());
@@ -241,7 +241,7 @@ set_level(int request)
   }
 
   if (LOG_ENABLED)
-    fprintf(log_fp, "...set_level(%d) in=%d, out=%d\n", cur_level,
+    fakeio::_fprintf(log_fp, "...set_level(%d) in=%d, out=%d\n", cur_level,
             input_8bits ? 8 : 7,
             output_8bits ? 8 : 7);
 

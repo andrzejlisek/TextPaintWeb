@@ -51,8 +51,10 @@ If you click the screen, there will be show the GUI interface usable both on tou
 This version is not completed yet and now there are need to do following:
 
 
-* Support for various font sizes above 2 \- now there are supported single and double size only \(enough for embedded animations and VTTEST\)\.
+* Duospace font support\.
 * XTERM mouse support\.
+* Clean\-up config file\.
+* Rewrite README files from the old TextPaint project\.
 * Integration with file system and telnet using WebSocket and separated \.NET/Java application\.
 * And much more\.\.\.
 

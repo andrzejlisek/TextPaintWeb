@@ -1,5 +1,5 @@
 let KeybTouch = 0;
-let KeybLineWidth = 2;
+let KeybLineWidth = 1;
 let KeybTextSize = 12;
 let KeybBack = 'rgb(128, 128, 128)';
 let KeybFore = 'rgb(255, 255, 255)';
@@ -204,7 +204,8 @@ KeybLayout[0].push([26, 11,  3,  2, "_Ctrl",        "Ctrl", ""]);
 
 // Right part
 KeybLayout[1].push([ 0,  0, 15, 13, "",             "", ""]);
-KeybLayout[1].push([ 7,  0,  8,  2, "",             "", ""]);
+KeybLayout[1].push([ 7,  0,  6,  2, "",             "", ""]);
+KeybLayout[1].push([13,  0,  2,  2, "Backspace",    "Back", "", 8]);
 
 KeybLayout[1].push([ 0,  0,  2,  2, "_Shift",       "Shift", ""]);
 KeybLayout[1].push([ 2,  0,  2,  2, "_Ctrl",        "Ctrl", ""]);
@@ -437,8 +438,8 @@ function KeybRepaint()
 
                 KeybSvgTxt.style.left = K_X + "px";
                 KeybSvgTxt.style.top = K_Y + "px";
-                KeybSvgTxt.style.width = K_W + "px";
-                KeybSvgTxt.style.height = K_H + "px";
+                KeybSvgTxt.style.width = (K_W + 1) + "px";
+                KeybSvgTxt.style.height = (K_H + 1) + "px";
                 KeybSvgTxt.style.display = "block";
             }
             break;
@@ -585,9 +586,9 @@ function KeybSetSize(W, H, H0)
 
 function KeybColorToStyle(N)
 {
-    let HexR = ScreenPalette1R[N].toString(16).padStart(2, '0');
-    let HexG = ScreenPalette1G[N].toString(16).padStart(2, '0');
-    let HexB = ScreenPalette1B[N].toString(16).padStart(2, '0');
+    let HexR = ScreenPaletteR[N].toString(16).padStart(2, '0');
+    let HexG = ScreenPaletteG[N].toString(16).padStart(2, '0');
+    let HexB = ScreenPaletteB[N].toString(16).padStart(2, '0');
     return "#" + HexR + HexG + HexB;
 }
 
@@ -602,10 +603,12 @@ function KeybInit()
     let KeybColorB = HexToNum4(ConfigFileS("ColorKeyboard")[0]);
     let KeybColorF = HexToNum4(ConfigFileS("ColorKeyboard")[1]);
     
-    ScreenObj.style.width = Math.floor(WinW) + "px";
-    ScreenObj.style.height = Math.floor((Obj1 * WinH) / 100) + "px";
+    ScreenDiv.style.width = Math.floor(WinW) + "px";
+    ScreenDiv.style.height = Math.floor((Obj1 * WinH) / 100) + "px";
 
     document.getElementById("app").style["background-color"] = KeybColorToStyle(KeybColorB);
+    document.getElementById("screendiv").style["background-color"] = KeybColorToStyle(KeybColorB);
+    
     KeybBack = KeybColorToStyle(KeybColorB);
     KeybFore = KeybColorToStyle(KeybColorF);
 
@@ -615,5 +618,7 @@ function KeybInit()
     KeybSetSize(KeybW, KeybH, Math.floor(WinH));
     KeybRepaint();
     KeybReady = true;
+    
+    ScreenDisplayResize();
 }
 

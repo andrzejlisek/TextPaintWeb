@@ -10,7 +10,7 @@ void DisplayConfig::Repaint()
     int OffsetX = 0;
     int OffsetY = 0;
     int InfoW = 31;
-    int InfoH = 20;
+    int InfoH = 21;
 
     XList<Str> MenuInfo;
     MenuInfo.Add(Str(" Screen size: " + std::to_string(Screen::CurrentW) + "x" + std::to_string(Screen::CurrentH) + (Screen::WinAuto ? " auto" : "     ")));
@@ -58,7 +58,7 @@ void DisplayConfig::Repaint()
     MenuInfo.Add(Str(" F. Italic: " + (((CF.get()->ParamGetI("DisplayAttrib") & 2) > 0) ? std::string("Yes") : std::string("No "))));
     MenuInfo.Add(Str(" G. Underline: " + (((CF.get()->ParamGetI("DisplayAttrib") & 4) > 0) ? std::string("Yes") : std::string("No "))));
     MenuInfo.Add(Str(" H. Strikethrough: " + (((CF.get()->ParamGetI("DisplayAttrib") & 8) > 0) ? std::string("Yes") : std::string("No "))));
-
+    MenuInfo.Add(Str(" J. Color blending: " + (CF.get()->ParamGetB("ColorBlending") ? std::string("Yes") : std::string("No "))));
 
     if ((MenuPos == 1) || (MenuPos == 3))
     {
@@ -302,6 +302,11 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                 Temp = CoreStatic::SetAttribBit(Temp, 3, 1);
             }
             CF.get()->ParamSet("DisplayAttrib", Temp);
+            Screen::ScreenSetConfig();
+            RequestSave = true;
+            break;
+        case _("KeyJ"):
+            CF.get()->ParamSet("ColorBlending", !CF.get()->ParamGetB("ColorBlending"));
             Screen::ScreenSetConfig();
             RequestSave = true;
             break;

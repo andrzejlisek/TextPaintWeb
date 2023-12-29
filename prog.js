@@ -7,6 +7,7 @@ let ProgEventOtherFile;
 function ProgStart()
 {
     ProgStarted = true;
+    ScreenTimerStart();
     
     KeybInit();
 }
@@ -86,7 +87,7 @@ function _ProgCallback(D)
                     I += 6;
                     break;
                 case 113:
-                    ConfigFileGet(D[I+1],D[I+2]);
+                    ConfigFileGet(StringBufDecode(D[I+1]),StringBufDecode(D[I+2]));
                     if (ProgStarted)
                     {
                         ScreenSetDisplayConfig(true);
@@ -154,11 +155,12 @@ function _ProgCallback(D)
             //progressElement.hidden = true;
             //if (!text) spinnerElement.style.display = 'none';
           }
-          console.log("Status: " + text);
+          //console.log("Status: " + text);
           
           if (text == "")
           {
             ProgLoaded = true;
+            ProgInit();
           }
         },
         totalDependencies: 0,
@@ -178,6 +180,6 @@ function _ProgCallback(D)
       };
 
 
-ProgInit();
 FileDbOpen();
+IndexImportLS();
 

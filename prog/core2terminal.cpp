@@ -7,8 +7,8 @@ Core2Terminal::Core2Terminal()
 
 void Core2Terminal::Init()
 {
-    B64 = std::make_unique<TextCodec>(1);
-    HexText = std::make_unique<TextCodec>(2);
+    B64 = std::make_unique<TextCodec>(TextCodec::BASE64);
+    HexText = std::make_unique<TextCodec>(TextCodec::HEX);
 
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
     DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
@@ -466,7 +466,7 @@ std::string Core2Terminal::EscapeKeyId(std::string KeyName, int KeyChar)
 
 void Core2Terminal::SendHex(std::string STR)
 {
-    if (Command_8bit)
+    if (Command_8bit && (!CoreAnsi_.get()->AnsiState_.__AnsiVT52))
     {
         for (int i = 0x40; i < 0x60; i++)
         {

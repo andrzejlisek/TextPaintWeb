@@ -2,7 +2,7 @@
 
 TerminalConnWorker::TerminalConnWorker()
 {
-    B64 = std::make_unique<TextCodec>(1);
+    B64 = std::make_unique<TextCodec>(TextCodec::BASE64);
 }
 
 TerminalConnWorker::~TerminalConnWorker()

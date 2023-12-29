@@ -2253,14 +2253,6 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     {
                         for (int X = RecX1; X <= RecX2; X++)
                         {
-                            AnsiGetF(X, Y);
-                            int TempC = AnsiGetLast.Item_Char;
-                            int TempB = AnsiGetLast.Item_ColorB;
-                            int TempF = AnsiGetLast.Item_ColorF;
-                            int TempA = AnsiGetLast.Item_ColorA;
-                            AnsiState_.__AnsiBack = TempB;
-                            AnsiState_.__AnsiFore = TempF;
-                            AnsiState_.__AnsiAttr = TempA;
                             AnsiCharF(X, Y, ' ');
                         }
                         AnsiRepaintLine(Y);
@@ -2684,21 +2676,6 @@ void CoreAnsi::AnsiRepaintCursor()
         Screen::ScreenCursorMove(AnsiState_.__AnsiX, AnsiState_.__AnsiY);
     }
     Screen::ScreenRefresh();
-}
-
-bool CoreAnsi::AnsiCharNotCmd(int CharCode)
-{
-    if (ANSI8bit)
-    {
-        if ((CharCode >= 0x80) && (CharCode <= 0x9F))
-        {
-            AnsiState_.__AnsiCmd.Clear();
-            AnsiState_.__AnsiCmd.Add(CharCode - 0x40);
-            AnsiState_.__AnsiCommand = true;
-            return false;
-        }
-    }
-    return true;
 }
 
 void CoreAnsi::AnsiCharPrint(int TextFileLine_i)

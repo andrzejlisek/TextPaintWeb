@@ -126,7 +126,7 @@ void
 log_ttymodes(char *file, int line)
 {
   if (LOG_ENABLED)
-    fprintf(log_fp, "%s @%d\n", file, line);
+    fakeio::_fprintf(log_fp, "%s @%d\n", file, line);
 }
 #endif
 
@@ -137,19 +137,19 @@ dump_ttymodes(char *tag, int flag)
 #ifdef UNIX
   TTY tmp_modes;
   if (LOG_ENABLED) {
-    fprintf(log_fp, "%s (%d):\n", tag, flag);
+    fakeio::_fprintf(log_fp, "%s (%d):\n", tag, flag);
 # if USE_POSIX_TERMIOS || USE_TERMIO
     tcgetattr(0, &tmp_modes);
-    fprintf(log_fp, " iflag %08o\n", tmp_modes.c_iflag);
-    fprintf(log_fp, " oflag %08o\n", tmp_modes.c_oflag);
-    fprintf(log_fp, " lflag %08o\n", tmp_modes.c_lflag);
+    fakeio::_fprintf(log_fp, " iflag %08o\n", tmp_modes.c_iflag);
+    fakeio::_fprintf(log_fp, " oflag %08o\n", tmp_modes.c_oflag);
+    fakeio::_fprintf(log_fp, " lflag %08o\n", tmp_modes.c_lflag);
     if (!tmp_modes.c_lflag & ICANON) {
-      fprintf(log_fp, " %d:min  =%d\n", VMIN, tmp_modes.c_cc[VMIN]);
-      fprintf(log_fp, " %d:time =%d\n", VTIME, tmp_modes.c_cc[VTIME]);
+      fakeio::_fprintf(log_fp, " %d:min  =%d\n", VMIN, tmp_modes.c_cc[VMIN]);
+      fakeio::_fprintf(log_fp, " %d:time =%d\n", VTIME, tmp_modes.c_cc[VTIME]);
     }
 # else
     gtty(0, &tmp_modes);
-    fprintf(log_fp, " flags %08o\n", tmp_modes.sg_flags);
+    fakeio::_fprintf(log_fp, " flags %08o\n", tmp_modes.sg_flags);
 # endif
   }
 #endif

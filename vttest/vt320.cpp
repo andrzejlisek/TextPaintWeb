@@ -1086,7 +1086,7 @@ any_RQM(MENU_ARGS, RQM_DATA * table, int tablesize, int private_)
     report = instr();
     printxx("\n     %4d: %-10s ", table[j].mode, table[j].name);
     if (LOG_ENABLED)
-      fprintf(log_fp, "Testing %s\n", table[j].name);
+      fakeio::_fprintf(log_fp, "Testing %s\n", table[j].name);
     chrprint2(report, row + 1, 23);
     if ((report = skip_csi(report)) != 0
         && sscanf(report, (private_

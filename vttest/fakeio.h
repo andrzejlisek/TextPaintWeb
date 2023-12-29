@@ -9,7 +9,7 @@
 #include <thread>
 #include "../prog/stopwatch.h"
 
-#define fake_array_size 256
+#define fake_array_size 1024
 
 class fakeio
 {
@@ -42,15 +42,20 @@ public:
     static int _fprintf(FILE * stream, const char * format, ...);
 
     static void _sleep(int T);
+
+    static FILE * _fopen (const char * filename, const char * modes);
+    static int _fclose (FILE * stream);
 private:
     static inline std::deque<int> fake_i;
     static inline std::deque<int> fake_o;
     static inline std::mutex fake_i_mtx;
     static inline std::mutex fake_o_mtx;
 
-    static inline int ReportState = 0;
-    static void Report(int Chr);
-    static inline char EscapeEnd[59] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@`{}~|";
+    static inline FILE * LogHandle = NULL;
+
+    static inline std::string LogBuf = "";
+
+    static void LogFlush(bool Force);
 };
 
 #endif // FAKEIO_H

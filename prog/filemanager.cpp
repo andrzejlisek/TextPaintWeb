@@ -549,6 +549,7 @@ void FileManager::EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift
             {
                 BinaryFile_.get()->ItemGet(ItemIdx).Ansi = AttribVal[0];
                 BinaryFile_.get()->ItemGet(ItemIdx).Codec = std::make_shared<TextCodec>(TextCodec::CodecListNumber[AttribVal[1]]);
+                BinaryFile_.get()->FileExportAttr(ItemIdx, false);
             }
             else
             {

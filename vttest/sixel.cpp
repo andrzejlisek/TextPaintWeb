@@ -174,9 +174,9 @@ find_char(int chr)
 static void
 display_head(FILE *fp)
 {
-  fprintf(fp, "Font %d \"%s\", Matrix %dx%d (%s, %s)\n",
+  fakeio::_fprintf(fp, "Font %d \"%s\", Matrix %dx%d (%s, %s)\n",
           FontNumber, FontName, MatrixWide, MatrixHigh, WidthAttr, TextCell);
-  fprintf(fp, "Start %d, Erase %s\n",
+  fakeio::_fprintf(fp, "Start %d, Erase %s\n",
           StartingCharNum, EraseCtl);
 }
 
@@ -192,7 +192,7 @@ display_char(FILE *fp, int chr)
     int n;
     char bits[6][MAX_WIDTH];
 
-    fprintf(fp, "Glyph '%c'\n", chr);
+    fakeio::_fprintf(fp, "Glyph '%c'\n", chr);
     do {
       if (*s >= '?' && *s <= '~') {
         for (n = 0; n < 6; n++)
@@ -201,7 +201,7 @@ display_char(FILE *fp, int chr)
       } else if ((*s == ';' || *s == '/') && bit) {
         for (n = 0; (n < 6) && (high++ < MatrixHigh); n++) {
           bits[n][bit] = '\0';
-          fprintf(fp, "%s\n", bits[n]);
+          fakeio::_fprintf(fp, "%s\n", bits[n]);
         }
         bit = 0;
       }
@@ -335,7 +335,7 @@ setup_softchars(const char *filename)
   }
   for (s = buffer; (*s++ = *first++) != '\0';) ;
   if (LOG_ENABLED && first != 0)
-    fprintf(log_fp, "Font String:\n%s\n", buffer);
+    fakeio::_fprintf(log_fp, "Font String:\n%s\n", buffer);
 
   font_string = buffer;
 

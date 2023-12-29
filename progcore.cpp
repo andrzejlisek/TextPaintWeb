@@ -113,6 +113,8 @@ void ScreenSetConfig()
 {
     FileConfig("DisplayBlink");
     FileConfig("DisplayAttrib");
+    FileConfig("DisplayInterpolate");
+
     FileConfig("ANSIColors");
     FileConfig("ANSIReverseMode");
     FileConfig("ANSIColorBlink");
@@ -125,6 +127,8 @@ void ScreenSetConfig()
     FileConfig("ANSIPrintTab");
     FileConfig("ANSIReadCR");
     FileConfig("ANSIReadLF");
+
+    FileConfig("ColorBlending");
 }
 
 void WorkerSend(int T, std::string X)
@@ -256,7 +260,8 @@ extern "C"
                     RespondClear();
                     FileConfig("WinTouchScreen");
                     FileConfig("ColorKeyboard");
-                    FileConfig("WinFontName");
+                    FileConfig("FontName1");
+                    FileConfig("FontName2");
                     FileConfig("DuospaceFontName");
                     FileConfig("DuospaceMode");
                     FileConfig("DuospaceDoubleChars");
@@ -267,29 +272,23 @@ extern "C"
                     FileConfig("TimerTick");
                     FileConfig("WinScreenSize");
                     FileConfig("WinKeyboardSize");
-                    FileConfig("WinSteadyCursor");
-                    FileConfig("WinColorBlending");
+                    FileConfig("SteadyCursor");
                     {
                         int I_ = 1;
-                        while (CF.get()->ParamExists("WinColorBlending_" + std::to_string(I_)))
+                        while (CF.get()->ParamExists("ColorBlending_" + std::to_string(I_)))
                         {
-                            FileConfig("WinColorBlending_" + std::to_string(I_));
+                            FileConfig("ColorBlending_" + std::to_string(I_));
                             I_++;
                         }
                     }
-                    FileConfig("WinPaletteR");
-                    FileConfig("WinPaletteG");
-                    FileConfig("WinPaletteB");
-                    FileConfig("WinPaletteBlinkR");
-                    FileConfig("WinPaletteBlinkG");
-                    FileConfig("WinPaletteBlinkB");
+                    FileConfig("PaletteR");
+                    FileConfig("PaletteG");
+                    FileConfig("PaletteB");
                     
                     ScreenSetConfig();
 
-            // Default configuration
-    /*ANSIWidth=0
-    ANSIHeight=0
-    */
+
+
 
             CF.get()->ParamSet("WinW", "80");
             CF.get()->ParamSet("WinH", "24");

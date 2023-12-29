@@ -5,7 +5,7 @@
  */
 #include "vttest.h"
 #include "esc.h"
-
+#include "fakeio.h"
 /* the values, where specified, correspond to the keyboard-language codes */
 typedef enum {
   ASCII = 1,
@@ -222,7 +222,7 @@ send32(int row, int upper, const char *not11)
   char buffer[33 * 8];
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, "Note: send32 row %d, upper %d, not11:%s\n",
+    fakeio::_fprintf(log_fp, "Note: send32 row %d, upper %d, not11:%s\n",
             row, upper, not11 ? not11 : "");
   }
   for (col = 0; col <= 31; col++) {

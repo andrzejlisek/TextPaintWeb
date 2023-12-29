@@ -2,11 +2,11 @@
 
 BinaryFile::BinaryFile()
 {
-    B64 = std::make_unique<TextCodec>(1);
+    B64 = std::make_unique<TextCodec>(TextCodec::BASE64);
 
     DefaultAttrib = std::make_unique<BinaryFileItem>(Str(), 0, 0, 65001, true);
 
-    ItemAdd(BinaryFileItem(Str(SystemFile0), 5, -1, 65001, false));
+    ItemAdd(BinaryFileItem(Str(SystemFile0), 5, -1, 65001, false), true);
 
     Disp.Clear();
     for (int I = 0; I < ListItems.Count; I++)
@@ -32,11 +32,15 @@ int BinaryFile::FindName(Str Name)
     return Pos;
 }
 
-void BinaryFile::ItemAdd(BinaryFileItem X)
+void BinaryFile::ItemAdd(BinaryFileItem X, bool Replace)
 {
     int Pos = FindName(X.Name);
     if (Pos >= 0)
     {
+        if (!Replace)
+        {
+            return;
+        }
         ListItems.Remove(Pos);
     }
     ListItems.Add(X);
@@ -60,7 +64,7 @@ void BinaryFile::ItemAdd(Str FileName)
     }
     else
     {
-        ItemAdd(BinaryFileItem(FileName, 2, -1, DefaultAttrib.get()->AttribGet()));
+        ItemAdd(BinaryFileItem(FileName, 2, -1, DefaultAttrib.get()->AttribGet()), false);
         SetDir(Str("."));
     }
     Idx = FindName(FileName);
@@ -334,6 +338,12 @@ void BinaryFile::Load(Str &Text)
     }
 }
 
+void BinaryFile::LoadRaw(Raw &Text)
+{
+    Text.Clear();
+    Text.AddRange(TempData);
+}
+
 std::string BinaryFile::LoadToString()
 {
     Str X;
@@ -373,7 +383,15 @@ std::string BinaryFile::LoadToStringConfig()
 
     for (int I = 0; I < Index.Count; I += 2)
     {
-        ItemAdd(BinaryFileItem(Index[I], 5, 0, Index[I + 1].ToString()));
+        ItemAdd(BinaryFileItem(Index[I], 2, 0, Index[I + 1].ToString()), false);
+    }
+
+    if (X.Count > 0)
+    {
+        if (X[0] == TextCodec::BOM)
+        {
+            X.PopFirst();
+        }
     }
 
     return X.ToString();
@@ -430,17 +448,24 @@ void BinaryFile::FileExport(int Idx, bool Absolute)
         Idx = ItemType0(Idx);
     }
 
-    if (IsSystemFile() && (TempData.Count < 2) && (!Absolute))
+    Str B64Data;
+    B64.get()->Reset();
+    B64.get()->Decode(TempData, B64Data);
+    ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), B64Data.ToString());
+}
+
+void BinaryFile::FileExportAttr(int Idx, bool Absolute)
+{
+    if (!Absolute)
     {
-        ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type + 100, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), "");
+        if (Idx < 0)
+        {
+            Idx = ItemIndex;
+        }
+        Idx = ItemType0(Idx);
     }
-    else
-    {
-        Str B64Data;
-        B64.get()->Reset();
-        B64.get()->Decode(TempData, B64Data);
-        ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), B64Data.ToString());
-    }
+
+    ListItems[Idx].EventId = Screen::FileExport(ListItems[Idx].Type + 200, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet(), "");
 }
 
 bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4)
@@ -487,7 +512,7 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
             {
                 if (EvtParam2 == 26)
                 {
-                    ItemAdd(BinaryFileItem(Str(EventFileName), 2, -1, DefaultAttrib.get()->AttribGet()));
+                    ItemAdd(BinaryFileItem(Str(EventFileName), 2, -1, DefaultAttrib.get()->AttribGet()), true);
                     Idx = FindName(EventFileName);
                 }
             }
@@ -543,7 +568,14 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
                 }
                 else
                 {
-                    return true;
+                    if (EvtParam2 < 10)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
         }

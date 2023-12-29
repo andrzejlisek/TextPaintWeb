@@ -288,7 +288,23 @@ function FileFetch(Id, Kind, Name, Attrib)
     .then(_1 => _1.blob())
     .then(_2 => FileFetchBlobBase64(_2))
     .then(_3 => FileImportFinish(Id, Kind, Name, Attrib, FileFetchTruncateBase64(_3), 0));
-}    
+}
+
+
+
+function FileFetchSave(Id, Kind, Name, Attrib)
+{
+    if ((Kind != 4) && (Kind != 5))
+    {
+        return;
+    }
+    
+    let file = "files/" + Name;
+    fetch(file)
+    .then(_1 => _1.blob())
+    .then(_2 => FileFetchBlobBase64(_2))
+    .then(_3 => FileExport(Id, Kind + 300, Name, Attrib, FileFetchTruncateBase64(_3)));
+}
 
 function FileImport(Id, Kind, Name, Attrib)
 {
@@ -349,10 +365,24 @@ function FileImport(Id, Kind, Name, Attrib)
 
 function FileExport(Id, Kind, Name, Attrib, Data)
 {
+    let FireEvent = true;
     if (Kind >= 100)
     {
-        FileDelete(Id, Kind - 100, Name, Attrib);
-        return;
+        if ((Kind >= 100) && (Kind < 200))
+        {
+            FileDelete(Id, Kind - 100, Name, Attrib);
+            return;
+        }
+        if ((Kind >= 200) && (Kind < 300))
+        {
+            FileAttr(Id, Kind - 200, Name, Attrib);
+            return;
+        }
+        if ((Kind >= 300) && (Kind < 400))
+        {
+            Kind -= 300;
+            FireEvent = false;
+        }
     }
     
     switch (Kind)
@@ -367,7 +397,11 @@ function FileExport(Id, Kind, Name, Attrib, Data)
                 if (Name in FileIndexLS)
                 {
                     FileIdx = FileIndexLS[Name];
-                    FileIndexLSAttr[Name] = Attrib;
+                    if (FileIndexLSAttr[Name] != Attrib)
+                    {
+                        FileIndexLSAttr[Name] = Attrib;
+                        IndexExportLS();
+                    }
                 }
                 else
                 {
@@ -381,11 +415,17 @@ function FileExport(Id, Kind, Name, Attrib, Data)
                 {
                     DataSet(FileIndexTempl + FileIdx, Data);
                     IndexMeasureSpaceLS();
-                    FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
+                    if (FireEvent)
+                    {
+                        FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
+                    }
                 }
                 else
                 {
-                    FileExportFinish(Id, Kind, Name, Attrib, Data, 1)
+                    if (FireEvent)
+                    {
+                        FileExportFinish(Id, Kind, Name, Attrib, Data, 1)
+                    }
                 }
             }
             break;
@@ -396,7 +436,11 @@ function FileExport(Id, Kind, Name, Attrib, Data)
                 if (Name in FileIndexDB)
                 {
                     FileIdx = FileIndexDB[Name];
-                    FileIndexDBAttr[Name] = Attrib;
+                    if (FileIndexDBAttr[Name] != Attrib)
+                    {
+                        FileIndexDBAttr[Name] = Attrib;
+                        IndexExportDB();
+                    }
                 }
                 else
                 {
@@ -413,11 +457,17 @@ function FileExport(Id, Kind, Name, Attrib, Data)
             FileBrwDownload(Name, Attrib, Data);
             if (Name != "/")
             {
-                //FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
+                if (FireEvent)
+                {
+                    //FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
+                }
             }
             break;
         case 3: // Fetch - not possible
-            FileExportFinish(Id, Kind, Name, Attrib, Data, 1);
+            if (FireEvent)
+            {
+                FileExportFinish(Id, Kind, Name, Attrib, Data, 1);
+            }
             break;
     }
 }
@@ -433,7 +483,7 @@ function FileDelete(Id, Kind, Name, Attrib)
             {
                 if (Name in FileIndexLS)
                 {
-                    let FileIdx = FileIndexLS[Name];
+                    const FileIdx = FileIndexLS[Name];
                     DataDelete(FileIndexTempl + FileIdx);
                     delete FileIndexLS[Name];
                     delete FileIndexLSAttr[Name];
@@ -448,7 +498,7 @@ function FileDelete(Id, Kind, Name, Attrib)
             {
                 if (Name in FileIndexDB)
                 {
-                    let FileIdx = FileIndexDB[Name];
+                    const FileIdx = FileIndexDB[Name];
                     FileDbDelete(FileIdx, Id, Kind, Name);
                     delete FileIndexDB[Name];
                     delete FileIndexDBAttr[Name];
@@ -463,6 +513,52 @@ function FileDelete(Id, Kind, Name, Attrib)
     }
 }
 
-
-IndexImportLS();
+function FileAttr(Id, Kind, Name, Attrib)
+{
+    switch (Kind)
+    {
+        case 0: // System clipboard - not possible
+            break;
+        case 1: // Local storage
+        case 4: // Local storage - if not exists, then fetch
+            {
+                if (Name in FileIndexLS)
+                {
+                    const FileIdx = FileIndexLS[Name];
+                    if (FileIndexLSAttr[Name] != Attrib)
+                    {
+                        FileIndexLSAttr[Name] = Attrib;
+                        IndexExportLS();
+                    }
+                }
+                else
+                {
+                    FileFetchSave(Id, Kind, Name, Attrib);
+                }
+                IndexMeasureSpaceLS();
+            }
+            break;
+        case 2: // Database
+        case 5: // Database - if not exists, then fetch
+            {
+                if (Name in FileIndexDB)
+                {
+                    const FileIdx = FileIndexDB[Name];
+                    if (FileIndexDBAttr[Name] != Attrib)
+                    {
+                        FileIndexDBAttr[Name] = Attrib;
+                        IndexExportDB();
+                    }
+                }
+                else
+                {
+                    FileFetchSave(Id, Kind, Name, Attrib);
+                }
+            }
+            break;
+        case 3: // Fetch - not possible
+        case 6: // File upload/download - not possible
+            break;
+    }
+}
 

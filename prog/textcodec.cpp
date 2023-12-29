@@ -36,6 +36,13 @@ TextCodec::TextCodec(int CodePage)
     BOM__[0] = 0;
     switch (CodePage)
     {
+        case DOS:
+            EncodingName = "DOS";
+            Map0 = "00,01,02,03,04,05,06,07,08,09,0A,0B,0C,0D,0E,0F,10,11,12,13,14,15,16,17,18,19,1A,1B,1C,1D,1E,1F,20,21,22,23,24,25,26,27,28,29,2A,2B,2C,2D,2E,2F,30,31,32,33,34,35,36,37,38,39,3A,3B,3C,3D,3E,3F,";
+            Map1 = "40,41,42,43,44,45,46,47,48,49,4A,4B,4C,4D,4E,4F,50,51,52,53,54,55,56,57,58,59,5A,5B,5C,5D,5E,5F,60,61,62,63,64,65,66,67,68,69,6A,6B,6C,6D,6E,6F,70,71,72,73,74,75,76,77,78,79,7A,7B,7C,7D,7E,7F,";
+            Map2 = "C7,FC,E9,E2,E4,E0,E5,E7,EA,EB,E8,EF,EE,EC,C4,C5,C9,E6,C6,F4,F6,F2,FB,F9,FF,D6,DC,A2,A3,A5,20A7,0192,E1,ED,F3,FA,F1,D1,AA,BA,BF,2310,AC,BD,BC,A1,AB,BB,2591,2592,2593,2502,2524,2561,2562,2556,2555,2563,2551,2557,255D,255C,255B,2510,";
+            Map3 = "2514,2534,252C,251C,2500,253C,255E,255F,255A,2554,2569,2566,2560,2550,256C,2567,2568,2564,2565,2559,2558,2552,2553,256B,256A,2518,250C,2588,2584,258C,2590,2580,0251,03D0,1D26,1D28,2211,01A1,B5,1D1B,0278,03F4,2126,1E9F,221E,2205,2208,2229,2261,B1,2265,2264,2320,2321,F7,2248,B0,2219,B7,221A,207F,B2,25A0,A0,";
+            break;
         case 37:
             EncodingName = "IBM37";
             Map0 = "00,01,02,03,9C,09,86,7F,97,8D,8E,0B,0C,0D,0E,0F,10,11,12,13,9D,85,08,87,18,19,92,8F,1C,1D,1E,1F,80,81,82,83,84,0A,17,1B,88,89,8A,8B,8C,05,06,07,90,91,16,93,94,95,96,04,98,99,9A,9B,14,15,9E,1A,";
@@ -797,10 +804,10 @@ TextCodec::TextCodec(int CodePage)
 void TextCodec::BOMPrepare(unsigned int N, unsigned int B1, unsigned int B2, unsigned int B3, unsigned int B4)
 {
     BOM__[0] = N;
-    BOM__[0] = B1;
-    BOM__[0] = B2;
-    BOM__[0] = B3;
-    BOM__[0] = B4;
+    BOM__[1] = B1;
+    BOM__[2] = B2;
+    BOM__[3] = B3;
+    BOM__[4] = B4;
 }
 
 void TextCodec::Reset()
@@ -1346,7 +1353,6 @@ void TextCodec::CodecListCreate()
     CodecListName.Clear();
     CodecListCreateItem(0);
     CodecListCreateItem(1);
-    CodecListCreateItem(2);
     CodecListCreateItem(37);
     for (int I = 437; I <= 1260; I++)
     {

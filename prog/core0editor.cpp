@@ -36,25 +36,12 @@ void Core0Editor::Init()
     TextBeyondEndBack += 16;
     TextBeyondEndFore += 16;
 
-    UseAnsiLoad = CF.get()->ParamGetB("ANSIRead");
-    UseAnsiSave = CF.get()->ParamGetB("ANSIWrite");
-    FileReadSteps = CF.get()->ParamGetI("FileReadSteps");
-    FileREnc = CF.get()->ParamGetI("FileReadEncoding");
-    FileWEnc = CF.get()->ParamGetI("FileWriteEncoding");
-
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 TEST
-    UseAnsiLoad = true;
-    UseAnsiSave = true;
     FileReadSteps = 0;
-    FileREnc = TextCodec::UTF8;
-    FileWEnc = TextCodec::UTF8;
-
-
 
     EditorScreenRefresh();
     ScreenRefresh(true);
 
-    FileLoad();
+    //FileLoad();
 }
 
 void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
@@ -1953,87 +1940,78 @@ void Core0Editor::ScreenRefresh(bool Force)
 
 void Core0Editor::TextRepaint(bool Force)
 {
-    if (DisplayState == DisplayStateDef::Editor)
+    switch (DisplayState)
     {
-        int CountLinesDispY = EditorData_.get()->TextBuffer.CountLines() - DisplayY;
-        for (int Y = 0; Y < WinTxtH; Y++)
-        {
-            for (int X = 0; X < WinTxtW; X++)
+        case DisplayStateDef::Editor:
+        case DisplayStateDef::Charmap:
+        case DisplayStateDef::DispConfig:
+        case DisplayStateDef::FileMan:
             {
-                if (!EditorData_.get()->TextBuffer.Get_(Y + DisplayY, X + DisplayX))
+                int CountLinesDispY = EditorData_.get()->TextBuffer.CountLines() - DisplayY;
+                for (int Y = 0; Y < WinTxtH; Y++)
                 {
-                    EditorData_.get()->TextBuffer.BlankChar();
-                    EditorData_.get()->TextBuffer.Item_Char = 32;
-                    if (Y < CountLinesDispY)
+                    for (int X = 0; X < WinTxtW; X++)
                     {
-                        EditorData_.get()->TextBuffer.Item_ColorB = TextBeyondLineBack;
-                        EditorData_.get()->TextBuffer.Item_ColorF = TextBeyondLineFore;
-                    }
-                    else
-                    {
-                        EditorData_.get()->TextBuffer.Item_ColorB = TextBeyondEndBack;
-                        EditorData_.get()->TextBuffer.Item_ColorF = TextBeyondEndFore;
-                    }
-                }
-                EditorData_.get()->ScrCharDisp_.Get(Y, X);
-                EditorData_.get()->ScrCharDisp_.CopyItem(EditorData_.get()->TextBuffer);
-                EditorData_.get()->ScrCharDisp_.Set(Y, X);
-                Screen::ScreenChar(X, Y, EditorData_.get()->TextBuffer.Item_Char, EditorData_.get()->TextBuffer.Item_ColorB, EditorData_.get()->TextBuffer.Item_ColorF, EditorData_.get()->TextBuffer.Item_ColorA, EditorData_.get()->TextBuffer.Item_FontW, EditorData_.get()->TextBuffer.Item_FontH);
-            }
-        }
-
-        for (int I = 0; I < CursorSetX.Count; I++)
-        {
-            int X = CursorSetX[I];
-            int Y = CursorSetY[I];
-            EditorData_.get()->ScrCharDisp_.Get(Y, X);
-            int ColorB = EditorData_.get()->ScrCharDisp_.Item_ColorB;
-            int ColorF = EditorData_.get()->ScrCharDisp_.Item_ColorF;
-            if (ColorB < 0) ColorB = Screen::TextNormalBack;
-            if (ColorF < 0) ColorF = Screen::TextNormalFore;
-            EditorData_.get()->ScrCharDisp_.Item_ColorB = CoreStatic::ColorNegative(ColorB);
-            EditorData_.get()->ScrCharDisp_.Item_ColorF = CoreStatic::ColorNegative(ColorF);
-            Screen::ScreenChar(X, Y, EditorData_.get()->ScrCharDisp_.Item_Char, EditorData_.get()->ScrCharDisp_.Item_ColorB, EditorData_.get()->ScrCharDisp_.Item_ColorF, 0, EditorData_.get()->ScrCharDisp_.Item_FontW, EditorData_.get()->ScrCharDisp_.Item_FontH);
-        }
-    }
-    if (DisplayState == DisplayStateDef::Info)
-    {
-
-        /*!!!!!!!!!!!!!!!!!!for (int i = 0; i < WinTxtH - 0; i++)
-        {
-            if (i < (EditorInfo_.get()->Info.Count - EditorInfo_.get()->InfoY))
-            {
-                std::string InfoTemp = EditorInfo_.get()->Info[i + EditorInfo_.get()->InfoY];
-                if (InfoTemp.length() > EditorInfo_.get()->InfoX)
-                {
-                    InfoTemp = InfoTemp.substr(EditorInfo_.get()->InfoX, InfoTemp.length() - EditorInfo_.get()->InfoX);
-                    if (InfoTemp.length() > WinTxtW)
-                    {
-                        InfoTemp = InfoTemp.substr(0, WinTxtW);
+                        if (!EditorData_.get()->TextBuffer.Get_(Y + DisplayY, X + DisplayX))
+                        {
+                            EditorData_.get()->TextBuffer.BlankChar();
+                            EditorData_.get()->TextBuffer.Item_Char = 32;
+                            if (Y < CountLinesDispY)
+                            {
+                                EditorData_.get()->TextBuffer.Item_ColorB = TextBeyondLineBack;
+                                EditorData_.get()->TextBuffer.Item_ColorF = TextBeyondLineFore;
+                            }
+                            else
+                            {
+                                EditorData_.get()->TextBuffer.Item_ColorB = TextBeyondEndBack;
+                                EditorData_.get()->TextBuffer.Item_ColorF = TextBeyondEndFore;
+                            }
+                        }
+                        EditorData_.get()->ScrCharDisp_.Get(Y, X);
+                        EditorData_.get()->ScrCharDisp_.CopyItem(EditorData_.get()->TextBuffer);
+                        EditorData_.get()->ScrCharDisp_.Set(Y, X);
+                        Screen::ScreenChar(X, Y, EditorData_.get()->TextBuffer.Item_Char, EditorData_.get()->TextBuffer.Item_ColorB, EditorData_.get()->TextBuffer.Item_ColorF, EditorData_.get()->TextBuffer.Item_ColorA, EditorData_.get()->TextBuffer.Item_FontW, EditorData_.get()->TextBuffer.Item_FontH);
                     }
                 }
-                else
+
+                for (int I = 0; I < CursorSetX.Count; I++)
                 {
-                    InfoTemp = "";
+                    int X = CursorSetX[I];
+                    int Y = CursorSetY[I];
+                    EditorData_.get()->ScrCharDisp_.Get(Y, X);
+                    int ColorB = EditorData_.get()->ScrCharDisp_.Item_ColorB;
+                    int ColorF = EditorData_.get()->ScrCharDisp_.Item_ColorF;
+                    if (ColorB < 0) ColorB = Screen::TextNormalBack;
+                    if (ColorF < 0) ColorF = Screen::TextNormalFore;
+                    EditorData_.get()->ScrCharDisp_.Item_ColorB = CoreStatic::ColorNegative(ColorB);
+                    EditorData_.get()->ScrCharDisp_.Item_ColorF = CoreStatic::ColorNegative(ColorF);
+                    Screen::ScreenChar(X, Y, EditorData_.get()->ScrCharDisp_.Item_Char, EditorData_.get()->ScrCharDisp_.Item_ColorB, EditorData_.get()->ScrCharDisp_.Item_ColorF, 0, EditorData_.get()->ScrCharDisp_.Item_FontW, EditorData_.get()->ScrCharDisp_.Item_FontH);
                 }
-                EditorData_.get()->ScrChar_.SetLineString(i, InfoTemp);
-                EditorData_.get()->ScrChar_.PadRightSpace(i, WinTxtW);
             }
-            else
+            break;
+        case DisplayStateDef::Info:
             {
-                EditorData_.get()->ScrChar_.SetLineString(i, "");
-                EditorData_.get()->ScrChar_.PadRightSpace(i, WinTxtW);
+                for (int Y = 0; Y < WinTxtH; Y++)
+                {
+                    int Y_ = Y + EditorInfo_.get()->InfoY;
+                    Str InfoTextLine;
+                    if (Y_ < (EditorInfo_.get()->Info.Count))
+                    {
+                        int X_ = EditorInfo_.get()->InfoX;
+                        if (X_ < (EditorInfo_.get()->Info[Y_].size()))
+                        {
+                            InfoTextLine.AddString(EditorInfo_.get()->Info[Y_].substr(X_));
+                        }
+                    }
+                    InfoTextLine.AddPad(WinTxtW, 32);
+
+                    for (int X = 0; X < WinTxtW; X++)
+                    {
+                        Screen::ScreenChar(X, Y, InfoTextLine[X], Screen::TextNormalBack + 16, Screen::TextNormalFore + 16, 0, 0, 0);
+                    }
+                }
             }
-        }*/
-
-
-        for (int Y = 0; Y < WinTxtH; Y++)
-        {
-            for (int X = 0; X < WinTxtW; X++)
-            {
-
-            }
-        }
+            break;
     }
 }
 

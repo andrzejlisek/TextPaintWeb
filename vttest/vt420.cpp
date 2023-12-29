@@ -40,7 +40,7 @@ reset_colors(void)
     sgr("0");
     use_colors = FALSE;
     if (LOG_ENABLED) {
-      fprintf(log_fp, "Note: turned off colors\n");
+      fakeio::_fprintf(log_fp, "Note: turned off colors\n");
     }
   }
 }
@@ -54,7 +54,7 @@ set_colors(const char *value)
     sgr(value);
     use_colors = strcmp(value, "0");
     if (LOG_ENABLED) {
-      fprintf(log_fp, "Note: turned %s colors\n", use_colors ? "on" : "off");
+      fakeio::_fprintf(log_fp, "Note: turned %s colors\n", use_colors ? "on" : "off");
     }
   }
 }
@@ -293,7 +293,7 @@ fill_outside(int ch)
   int row, col;
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, "Note: filling outside margins with '%c'\n", ch);
+    fakeio::_fprintf(log_fp, "Note: filling outside margins with '%c'\n", ch);
   }
 
   if (!do_colors)
@@ -2219,7 +2219,7 @@ tst_DECSNLS(MENU_ARGS)
 
     row += 2;
     sprintf(temp, "%d Lines/Screen:", rows);
-    fputs(temp, stdout);
+    fakeio::_fputs(temp, stdout);
     decsnls(rows);
     decrqss("*|");
     chrprint2(instr(), row, (int) strlen(temp));
@@ -2289,7 +2289,7 @@ tst_DSR_area_sum(MENU_ARGS, int g)
   set_tty_echo(FALSE);
 
   vt_move(1, 1);
-  fputs(buffer, stdout);
+  fakeio::_fputs(buffer, stdout);
 
   /* compute a checksum on the title line, which contains some text */
   sprintf(buffer, "%d;%d;1;1;%d;%d*y", pid, page, rows, min_cols);
@@ -2332,17 +2332,17 @@ tst_DSR_area_sum(MENU_ARGS, int g)
       if (ch > ch_end) {
         sgr("1;4");
         sprintf(buffer, "All");
-        fputs(buffer, stdout);
+        fakeio::_fputs(buffer, stdout);
         memcpy(&lines[r - 1][c - 1], buffer, strlen(buffer));
         sgr("0;1");
         sprintf(buffer, ": ");
-        fputs(buffer, stdout);
+        fakeio::_fputs(buffer, stdout);
         memcpy(&lines[r - 1][c + 2], buffer, strlen(buffer));
         sgr("0");
         do_csi("%d;%d*y", pid, page);
       } else {
         sprintf(buffer, "%c %02X ", ch, ch);
-        fputs(buffer, stdout);
+        fakeio::_fputs(buffer, stdout);
         memcpy(&lines[r - 1][c - 1], buffer, strlen(buffer));
         do_csi("%d;%d;%d;%d;%d;%d*y", pid, page, r, c, r, c);
       }
@@ -2388,7 +2388,7 @@ tst_DSR_area_sum(MENU_ARGS, int g)
               }
             }
             if (LOG_ENABLED) {
-              fprintf(log_fp,
+              fakeio::_fprintf(log_fp,
                       "Check: %04X %2d:%s\n",
                       CHK(full), y + 1, lines[y]);
             }
@@ -2403,15 +2403,15 @@ tst_DSR_area_sum(MENU_ARGS, int g)
           if (LOG_ENABLED) {
             unsigned actual;
             int ok = sscanf(s, "%x", &actual);
-            fprintf(log_fp, "Actual: %.4s\n", s);
-            fprintf(log_fp, "actual: %04x\n", ok ? actual : 0);
-            fprintf(log_fp, "Expect: %04X\n", CHK(full));
+            fakeio::_fprintf(log_fp, "Actual: %.4s\n", s);
+            fakeio::_fprintf(log_fp, "actual: %04x\n", ok ? actual : 0);
+            fakeio::_fprintf(log_fp, "Expect: %04X\n", CHK(full));
           }
-          fputs(buffer, stdout);
+          fakeio::_fputs(buffer, stdout);
           vt_hilite(FALSE);
         } else {
           sprintf(buffer, "%.4s", test);
-          fputs(buffer, stdout);
+          fakeio::_fputs(buffer, stdout);
         }
         memcpy(&lines[r - 1][c + 4], buffer, (size_t) 4);
       }

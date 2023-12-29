@@ -11,8 +11,8 @@ static void
 give_up(SIG_ARGS GCC_UNUSED)
 {
   if (LOG_ENABLED) {
-    fprintf(log_fp, "** killing program due to timeout\n");
-    fflush(log_fp);
+    fakeio::_fprintf(log_fp, "** killing program due to timeout\n");
+    fakeio::_fflush(log_fp);
   }
   fakeio::_kill(getpid(), (int) SIGTERM);
 }
@@ -54,10 +54,10 @@ inchar(void)
   reading = FALSE;
 #ifdef DEBUG
   {
-    FILE *fp = fopen("ttymodes.log", "a");
+    FILE *fp = fakeio::_fopen("ttymodes.log", "a");
     if (fp != 0) {
-      fprintf(fp, "%d>%#x\n", brkrd, ch);
-      fclose(fp);
+      fakeio::_fprintf(fp, "%d>%#x\n", brkrd, ch);
+      fakeio::_fclose(fp);
     }
   }
 #endif
@@ -125,9 +125,9 @@ instr(void)
   (void) read_buffer(result + i, (int) sizeof(result) - 2);
 
   if (LOG_ENABLED) {
-    fputs("Reply: ", log_fp);
+    fakeio::_fputs("Reply: ", log_fp);
     put_string(log_fp, result);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 
   return (result);
@@ -148,9 +148,9 @@ get_reply(void)
   } while (new_len != 0 && old_len < (BUF_SIZE - 2));
 
   if (LOG_ENABLED) {
-    fputs("Reply: ", log_fp);
+    fakeio::_fputs("Reply: ", log_fp);
     put_string(log_fp, result);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 
   return (result);
@@ -235,7 +235,7 @@ zleep(int t)
 {
 #ifdef HAVE_USLEEP
   unsigned msecs = (unsigned) (t * 1000);
-  usleep(msecs);
+  fakeio::_sleep(t);
 #else
   unsigned secs = (unsigned) (t / 1000);
   if (secs == 0)

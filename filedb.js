@@ -39,7 +39,6 @@ function FileDbGet(ItemId, EvtId, Kind, Name, Attrib)
 
 
         const cursor = e.target.result;
-
         if(cursor)
         {
             NoDataRead = false;
@@ -48,6 +47,7 @@ function FileDbGet(ItemId, EvtId, Kind, Name, Attrib)
                 FileIndexDB = IndexImport(cursor.value.data, 0);
                 FileIndexDBAttr = IndexImport(cursor.value.data, 1);
                 FileDbReady = true;
+                ProgInit();
             }
             else
             {
@@ -64,6 +64,7 @@ function FileDbGet(ItemId, EvtId, Kind, Name, Attrib)
                 if (ItemId == 0)
                 {
                     FileDbReady = true;
+                    ProgInit();
                 }
                 else
                 {
@@ -100,7 +101,6 @@ function FileDbSet(ItemId, EvtId, Kind, Name, Attrib, Data)
     });
 
     DbTrans.addEventListener('error', () => {
-        console.log('FileDb: Transaction not opened due to error');
         if (ItemId != 0)
         {
             FileExportFinish(EvtId, Kind, Name, Attrib, Data, 1);

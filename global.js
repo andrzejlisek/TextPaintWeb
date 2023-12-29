@@ -4,6 +4,7 @@ let KeybBlockShortcuts = true;
 let GuiSettingsShown = false;
 let ProgLoaded = false;
 let ProgStarted = false;
+let ScreenStarted = false;
 let Stopwatch = [];
 let StopwatchOffset = 0;
 let VTTEST_ = document.getElementById("vttest").contentWindow;
@@ -19,7 +20,7 @@ let ScreenTimerBlink = 5;
 let ScreenTimerBlinkDisp = false;
 let ScreenTimerTickEvent = 1;
 
-let WaitTimeout = 100;
+let WaitTimeout = 500;
 
 let ScreenCursorSteady = false;
 
@@ -53,6 +54,17 @@ function HexToNum8(X)
     let N1 = HexToNum4(X[0]);
     let N2 = HexToNum4(X[1]);
     return (N1 << 4) + N2;
+}
+
+function HexToNum(X)
+{
+    let N = 0;
+    for (let I = 0; I < X.length; I++)
+    {
+        N = N * 16;
+        N = N + HexToNum4(X[I]);
+    }
+    return N;
 }
 
 function StopwatchReset()

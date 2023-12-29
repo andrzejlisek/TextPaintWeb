@@ -109,7 +109,7 @@ can_do_pixels(void)
     restore_ttymodes();
 
     if (result && LOG_ENABLED) {
-      fprintf(log_fp, "Screen %dx%d at %d,%d (cell %dx%d)\n",
+      fakeio::_fprintf(log_fp, "Screen %dx%d at %d,%d (cell %dx%d)\n",
               pixels_high, pixels_wide,
               pixels_ypos, pixels_xpos,
               pixels_ychr, pixels_xchr);
@@ -1003,7 +1003,7 @@ toggle_ExtCoords(MENU_ARGS)
   }
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, "Toggle: from %s to %s\n",
+    fakeio::_fprintf(log_fp, "Toggle: from %s to %s\n",
             nameOfExtCoords(old_ExtCoords),
             nameOfExtCoords(do_ExtCoords));
   }

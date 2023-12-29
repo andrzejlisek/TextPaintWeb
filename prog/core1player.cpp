@@ -16,7 +16,9 @@ void Core1Player::Init()
     DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
     DisplayConfig_.get()->PopupBack = PopupBack;
     DisplayConfig_.get()->PopupFore = PopupFore;
-    CoreAnsi_.get()->__AnsiProcessDelayFactor = CF.get()->ParamGetI("FileDelayFrame");
+    CoreAnsi_.get()->__AnsiProcessDelayFactor = CF.get()->ParamGetI("PlayerDelayFrame");
+
+    FileOpenAtEnd = CF.get()->ParamGetB("PlayerEnd");
 
     LoadFileTimeChunk = (CF.get()->ParamGetI("TimerPeriod") * LoadFileTimeFactor) / 100;
 
@@ -30,14 +32,8 @@ void Core1Player::Init()
         ANSIBrowseWildcard = "*";
     }
 
-    FileDelayTime = CF.get()->ParamGetI("FileDelayTime");
-    FileDelayStep = CF.get()->ParamGetI("FileDelayStep");
-    FileDelayOffset = CF.get()->ParamGetI("FileDelayOffset");
+    FileDelayStep = CF.get()->ParamGetI("PlayerStep");
 
-    if (FileDelayTime < 0)
-    {
-        FileDelayTime = 0;
-    }
     if (FileDelayStep <= 0)
     {
         FileDelayStep = 1;
@@ -143,7 +139,9 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
                 FileCtX.Clear();
+                FileCtX_.Clear();
                 BinaryFile_.get()->Load(FileCtX);
+                BinaryFile_.get()->LoadRaw(FileCtX_);
                 DispBuffer.Clear();
                 AnsiSauce_.Info.Clear();
                 AnsiSauce_.LoadRaw(FileCtX_);
@@ -210,25 +208,18 @@ void Core1Player::EventTick()
                     Server_.Send(UniConn.HexToRaw(Server_.TerminalResetCommand));
                 }*/
 
-                /*!!!!!!!!!!!!if (FileDelayOffset < 0)
+
+
+                WorkSeekAdvance = FileOpenAtEnd ? MovieLength : 0;
+                Repaint(true);
+                if (WorkSeekAdvance > 0)
                 {
-                    WorkSeekAdvance = MovieLength + FileDelayOffset;
-                    if (WorkSeekAdvance < 0)
-                    {
-                        WorkSeekAdvance = 0;
-                    }
+                    WorkStateS = WorkStateSDef::DisplayFwdStep;
                 }
                 else
                 {
-                    WorkSeekAdvance = FileDelayOffset;
-                    if (WorkSeekAdvance > MovieLength)
-                    {
-                        WorkSeekAdvance = MovieLength;
-                    }
-                }*/
-                WorkSeekAdvance = 0;
-                Repaint(true);
-                WorkStateS = WorkStateSDef::DisplayPause;
+                    WorkStateS = WorkStateSDef::DisplayPause;
+                }
             }
             break;
         case WorkStateSDef::DisplayFwdStep: // Play forward
@@ -396,6 +387,9 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case WorkStateSDef::DisplayInfo:
             WorkDisp = "2_";
             break;
+        case WorkStateSDef::FileOpenWait:
+            WorkDisp = "3_";
+            break;
         case WorkStateSDef::FileMan:
             FileManager_.EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
             if (FileManager_.RequestRepaint)
@@ -535,6 +529,12 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Home"):
             {
+                if (MoviePos == 0)
+                {
+                    FileOpenAtEnd = false;
+                    CF.get()->ParamSet("PlayerEnd", 0);
+                    SaveConfig();
+                }
                 WorkSeekAdvance = MovieLength;
                 WorkStateS = WorkStateSDef::DisplayRevStep;
                 EventTickX();
@@ -542,18 +542,26 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_End"):
             {
+                if (MoviePos == MovieLength)
+                {
+                    FileOpenAtEnd = true;
+                    CF.get()->ParamSet("PlayerEnd", 1);
+                    SaveConfig();
+                }
                 WorkSeekAdvance = MovieLength;
                 WorkStateS = WorkStateSDef::DisplayFwdStep;
                 EventTickX();
             }
             return;
         case _("1_Escape"):
+        case _("3_Escape"):
             {
                 WorkStateS = WorkStateSDef::InfoScreen;
                 EventTickX();
             }
             return;
         case _("1_PageUp"):
+        case _("3_PageUp"):
             {
                 int FType = -1;
                 while (FType < 0)
@@ -573,6 +581,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             }
             return;
         case _("1_PageDown"):
+        case _("3_PageDown"):
             {
                 int FType = -1;
                 while (FType < 0)
@@ -858,7 +867,12 @@ void Core1Player::DisplayInfoText(bool Forced)
         if (InfoPosV < 0) { InfoPosV = 0; }
         if (InfoPosV >= AnsiSauce_.Info.Count) { InfoPosV = AnsiSauce_.Info.Count - 1; }
         Screen_Clear();
-        for (int i = InfoPosV; i < AnsiSauce_.Info.Count; i++)
+        int CountX = AnsiSauce_.Info.Count;
+        if (ScreenH < AnsiSauce_.Info.Count - InfoPosV)
+        {
+            CountX = ScreenH + InfoPosV;
+        }
+        for (int i = InfoPosV; i < CountX; i++)
         {
             std::string T = AnsiSauce_.Info[i];
             if (InfoPosH > 0)
@@ -872,8 +886,26 @@ void Core1Player::DisplayInfoText(bool Forced)
                     T = "";
                 }
             }
-            Screen_WriteText(T);
-            Screen_WriteLine();
+            if (i < (ScreenH + InfoPosV - 1))
+            {
+                if (T.size() > ScreenW)
+                {
+                    T = T.substr(0, ScreenW);
+                }
+                Screen_WriteText(T);
+                if (T.size() < ScreenW)
+                {
+                    Screen_WriteLine();
+                }
+            }
+            else
+            {
+                if (T.size() >= ScreenW)
+                {
+                    T = T.substr(0, ScreenW - 1);
+                }
+                Screen_WriteText(T);
+            }
         }
         Screen_Refresh();
         DisplayInfoRepaint = false;

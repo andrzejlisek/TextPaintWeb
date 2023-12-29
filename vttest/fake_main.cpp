@@ -71,7 +71,7 @@ failed(const char *msg)
   const char *why = (errno > 0 && errno < sys_nerr) ? sys_errlist[errno] : "?";
   fakeio::_fprintf(stderr, "%s: %s: %s\n", program, msg, why ? why : "?");
 #else
-  perror(msg);
+  fakeio::_printf("%s", msg); //perror(msg);
 #endif
   fakeio::_exit(EXIT_FAILURE);
 }
@@ -144,7 +144,7 @@ fake_main(int argc, char *argv[])
               usage();
             opt = *++argv;
           }
-          setup_softchars(opt);
+          //setup_softchars(opt);
           opt = "?";
           break;
         case 'l':
@@ -274,7 +274,7 @@ tst_movements(MENU_ARGS)
     hlfxtra = (width - 80) / 2;
 
     if (LOG_ENABLED)
-      fprintf(log_fp, "tst_movements box(%d cols)\n", pass ? max_cols : min_cols);
+      fakeio::_fprintf(log_fp, "tst_movements box(%d cols)\n", pass ? max_cols : min_cols);
 
     decaln();
     cup(9, inner_l);
@@ -379,7 +379,7 @@ tst_movements(MENU_ARGS)
     int region = max_lines - 6;
 
     if (LOG_ENABLED)
-      fprintf(log_fp, "tst_movements wrap(%d cols)\n", pass ? max_cols : min_cols);
+      fakeio::_fprintf(log_fp, "tst_movements wrap(%d cols)\n", pass ? max_cols : min_cols);
 
     /* note: DECCOLM clears the screen */
     if (pass == 0) {
@@ -434,7 +434,7 @@ tst_movements(MENU_ARGS)
   deccolm(FALSE);   /* 80 cols */
 
   if (LOG_ENABLED)
-    fprintf(log_fp, "tst_movements cursor-controls in ESC sequences\n");
+    fakeio::_fprintf(log_fp, "tst_movements cursor-controls in ESC sequences\n");
 
   vt_clear(2);
   vt_move(1, 1);
@@ -463,7 +463,7 @@ tst_movements(MENU_ARGS)
   holdit();
 
   if (LOG_ENABLED)
-    fprintf(log_fp, "tst_movements leading zeros in ESC sequences\n");
+    fakeio::_fprintf(log_fp, "tst_movements leading zeros in ESC sequences\n");
 
   vt_clear(2);
   vt_move(1, 1);
@@ -1351,7 +1351,7 @@ int
 setup_terminal(MENU_ARGS)
 {
   if (LOG_ENABLED)
-    fprintf(log_fp, "Setup Terminal with test-defaults\n");
+    fakeio::_fprintf(log_fp, "Setup Terminal with test-defaults\n");
 
   default_level();  /* Enter ANSI mode (if in VT52 mode)    */
   decckm(FALSE);  /* cursor keys normal   */
@@ -1373,7 +1373,7 @@ bye(void)
 {
   /* Force my personal prejudices upon the poor luser   */
   if (LOG_ENABLED)
-    fprintf(log_fp, "Cleanup & exit\n");
+    fakeio::_fprintf(log_fp, "Cleanup & exit\n");
 
   default_level();  /* Enter ANSI mode (if in VT52 mode)    */
   decckm(FALSE);  /* cursor keys normal   */
@@ -1395,7 +1395,7 @@ bye(void)
   close_tty();
 
   if (LOG_ENABLED) {
-    fclose(log_fp);
+    fakeio::_fclose(log_fp);
   }
 
   fakeio::_exit(EXIT_SUCCESS);
@@ -1580,14 +1580,14 @@ menu2(MENU *table, int top)
             const char *save = push_menu(choice);
             const char *name = table[choice].description;
             if (LOG_ENABLED)
-              fprintf(log_fp, "Menu %s: %s\n", current_menu, name);
+              fakeio::_fprintf(log_fp, "Menu %s: %s\n", current_menu, name);
             if ((*table[choice].dispatch) (name) == MENU_HOLD)
               holdit();
             pop_menu(save);
           }
         }
         if (LOG_ENABLED)
-          fflush(log_fp);
+          fakeio::_fflush(log_fp);
         return 1;
       } else if (choice <= tablesize) {
         vt_clear(2);
@@ -1595,13 +1595,13 @@ menu2(MENU *table, int top)
           const char *save = push_menu(choice);
           const char *name = table[choice].description;
           if (LOG_ENABLED)
-            fprintf(log_fp, "Menu %s: %s\n", current_menu, name);
+            fakeio::_fprintf(log_fp, "Menu %s: %s\n", current_menu, name);
           if ((*table[choice].dispatch) (name) != MENU_NOHOLD)
             holdit();
           pop_menu(save);
         }
         if (LOG_ENABLED)
-          fflush(log_fp);
+          fakeio::_fflush(log_fp);
         return (table[choice].dispatch != 0);
       }
       printxx("          Bad choice, try again: ");
@@ -1863,7 +1863,7 @@ strip_terminator(char *src)
     }
   }
   if (!ok && LOG_ENABLED)
-    fprintf(log_fp, "Missing ST\n");
+    fakeio::_fprintf(log_fp, "Missing ST\n");
   return ok;
 }
 
@@ -1943,11 +1943,11 @@ show_result(const char *fmt, ...)
   va_end(ap);
 
   if (LOG_ENABLED) {
-    fputs("Result: ", log_fp);
+    fakeio::_fputs("Result: ", log_fp);
     va_start(ap, fmt);
     my_vfprintf(log_fp, ap, fmt);
     va_end(ap);
-    fputc('\n', log_fp);
+    fakeio::_fputc('\n', log_fp);
   }
 }
 

@@ -19,7 +19,7 @@ public:
 
     std::unique_ptr<BinaryFileItem> DefaultAttrib;
     BinaryFileItem &ItemGet(int idx);
-    void ItemAdd(BinaryFileItem X);
+    void ItemAdd(BinaryFileItem X, bool Replace);
     void ItemAdd(Str FileName);
     void ItemRemove(Str FileName);
     Str ItemName(int Idx);
@@ -31,6 +31,7 @@ public:
 
     void Save(Str &Text);
     void Load(Str &Text);
+    void LoadRaw(Raw &Text);
     std::string LoadToString();
     std::string LoadToStringConfig();
     void SaveFromString(std::string S);
@@ -39,6 +40,7 @@ public:
     void FileImportSys();
     void FileImport(int Idx, bool Absolute);
     void FileExport(int Idx, bool Absolute);
+    void FileExportAttr(int Idx, bool Absolute);
 
     int IdxCurrent;
 

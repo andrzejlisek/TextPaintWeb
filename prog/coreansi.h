@@ -137,7 +137,6 @@ private:
     void AnsiProcess_CSI_m(XList<std::string> AnsiParams);
     int AnsiProcessGetXMin(bool Origin);
     int AnsiProcessGetXMax(bool Origin);
-    bool AnsiCharNotCmd(int CharCode);
     void AnsiCharPrint(int TextFileLine_i);
 
     int AnsiCharPrintLast = -1;

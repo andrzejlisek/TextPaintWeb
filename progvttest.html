@@ -20,9 +20,14 @@
                 }
             }
 
+            function VTReload()
+            {
+                location.reload(true);
+            }
+
             function VTStart()
             {
-                Module.ccall("EventStart", null, ["string"], [""]);
+                Module.ccall("EventStart", null, ["string", "number"], ["", 0]);
                 VTRunning = true;
             }
 

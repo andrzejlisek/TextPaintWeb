@@ -14,6 +14,8 @@ public:
     void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void EventOther(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
 private:
+    bool FileOpenAtEnd = false;
+
     void CalcFileDelayStep();
 
     void EventTickX();
@@ -46,9 +48,7 @@ private:
     bool ServerTelnet = false;
     std::shared_ptr<TextCodec> ServerEncoding;
 
-    int FileDelayTime = 100;
     int FileDelayStep = 1;
-    int FileDelayOffset = 0;
 
     Clipboard Clipboard_;
     Raw FileCtX_;
@@ -58,7 +58,6 @@ private:
 
     bool ForceRepaint = false;
     long FileTimerOffset = 0;
-    long FileDelayTimeL = 0;
     int ActionRequestParam = 0;
     int ActionRequest = 0;
     int WorkSeekAdvance = 1;

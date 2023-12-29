@@ -22,11 +22,7 @@ public:
 private:
     int TickRepaintX = 2;
     int TickRepaint = 0;
-    bool UseAnsiLoad = false;
-    bool UseAnsiSave = false;
     int FileReadSteps = 0;
-    int FileREnc = 0;
-    int FileWEnc = 0;
 
     XList<int> CursorSetX;
     XList<int> CursorSetY;

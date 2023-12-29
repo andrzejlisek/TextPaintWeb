@@ -3,7 +3,7 @@
 #include "vttest.h"
 #include "ttymodes.h"
 #include "esc.h"
-
+#include "fakeio.h"
 /* Test of:
      - DECLL   (Load LEDs)
      - Keyboard return messages
@@ -628,7 +628,7 @@ tst_AutoRepeat(MENU_ARGS)
   decarm(FALSE);  /* DECARM */
   inputline(arptstring);
   if (LOG_ENABLED)
-    fprintf(log_fp, "Input: %s\n", arptstring);
+    fakeio::_fprintf(log_fp, "Input: %s\n", arptstring);
   if (strlen(arptstring) == 0)
     println("No characters read!??");
   else if (strlen(arptstring) == 1)
@@ -642,7 +642,7 @@ tst_AutoRepeat(MENU_ARGS)
   decarm(TRUE);
   inputline(arptstring);
   if (LOG_ENABLED)
-    fprintf(log_fp, "Input: %s\n", arptstring);
+    fakeio::_fprintf(log_fp, "Input: %s\n", arptstring);
   if (strlen(arptstring) == 0)
     println("No characters read!??");
   else if (strlen(arptstring) == 1)
@@ -729,7 +729,7 @@ tst_ControlKeys(MENU_ARGS)
     if (kbdc < 32) {
       tprintf("  %s", ckeytab[kbdc].csymbol);
       if (LOG_ENABLED)
-        fprintf(log_fp, "Key: %s\n", ckeytab[kbdc].csymbol);
+        fakeio::_fprintf(log_fp, "Key: %s\n", ckeytab[kbdc].csymbol);
     } else {
       sprintf(kbds, "%c", kbdc);
       chrprint2(kbds, row, col);

@@ -38,8 +38,11 @@ class ScreenFont
         }
     }
 
-    constructor(ImgUrl)
+    constructor(ImgUrl, CallbackFunction_, CallbackParam_)
     {
+        this.CallbackFunction = CallbackFunction_;
+        this.CallbackParam = CallbackParam_;
+    
         this.Ready = false;
         this.Idx = [];
         if (ImgUrl)
@@ -53,6 +56,7 @@ class ScreenFont
         {
             this.Img = null;
             this.Ready = true;
+            this.CallbackFunction(this.CallbackParam);
         }
     }
     
@@ -95,11 +99,13 @@ class ScreenFont
                 Val0 = Val;
             }
         }
+        ConfigFileSet("_WinBitmapFontPageN", IdxI);
         
         this.CellW = Math.round((this.ImgW - 16) / 256);
         this.CellH = Math.round((this.ImgH) / IdxI);
         this.Blank = this.GetGlyph(32);
         this.Ready = true;
+        this.CallbackFunction(this.CallbackParam);
     }
 }
 

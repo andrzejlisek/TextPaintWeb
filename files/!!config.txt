@@ -8,48 +8,54 @@ WinScreenSize=70
 WinKeyboardSize=30
 WinTouchScreen=0
 
-Bell=1
-
-WinFontName=files/fonts/dos08x16.png
+FontName1=files/fonts/dos08x16.png
 0WinFontName=files/fonts/unscii08x16.png
 
-WinFixed=0
-WinSteadyCursor=0
+SteadyCursor=0
+
+ColorBlending=1
+
+ColorBlending_1=2591,2588,3,1,0
+ColorBlending_2=2592,2588,1,1,0
+ColorBlending_3=2593,2588,1,3,0
+ColorBlending_4=1FB8C,258C,1,1,0
+ColorBlending_5=1FB8D,2590,1,1,0
+ColorBlending_6=1FB8E,2580,1,1,0
+ColorBlending_7=1FB8F,2584,1,1,0
+ColorBlending_8=1FB9C,25E4,1,1,0
+ColorBlending_9=1FB9D,25E5,1,1,0
+ColorBlending_10=1FB9E,25E2,1,1,0
+ColorBlending_11=1FB9F,25E3,1,1,0
+ColorBlending_12=1FB90,0020,1,1,1
+ColorBlending_13=1FB91,2580,1,1,1
+ColorBlending_14=1FB92,2584,1,1,1
+ColorBlending_15=1FB93,258C,1,1,1
+ColorBlending_16=1FB94,2590,1,1,1
+
+PaletteR=00AA00AA00AA00AA55FF55FF55FF55FF007100710071007139AA39AA39AA39AA
+PaletteG=0000AAAA0000AAAA5555FFFF5555FFFF00007171000071713939AAAA3939AAAA
+PaletteB=00000000AAAAAAAA55555555FFFFFFFF000000007171717139393939AAAAAAAA
+
+
+
 
 WinW=80
 WinH=24
 
-WinColorBlending=1
-
-WinColorBlending_1=2591,2588,3,1,0
-WinColorBlending_2=2592,2588,1,1,0
-WinColorBlending_3=2593,2588,1,3,0
-WinColorBlending_4=1FB8C,258C,1,1,0
-WinColorBlending_5=1FB8D,2590,1,1,0
-WinColorBlending_6=1FB8E,2580,1,1,0
-WinColorBlending_7=1FB8F,2584,1,1,0
-WinColorBlending_8=1FB9C,25E4,1,1,0
-WinColorBlending_9=1FB9D,25E5,1,1,0
-WinColorBlending_10=1FB9E,25E2,1,1,0
-WinColorBlending_11=1FB9F,25E3,1,1,0
-WinColorBlending_12=1FB90,20,1,1,1
-WinColorBlending_13=1FB91,2580,1,1,1
-WinColorBlending_14=1FB92,2584,1,1,1
-WinColorBlending_15=1FB93,258C,1,1,1
-WinColorBlending_16=1FB94,2590,1,1,1
-
-WinPaletteR=00AA00AA00AA00AA55FF55FF55FF55FF
-WinPaletteG=0000AAAA0000AAAA5555FFFF5555FFFF
-WinPaletteB=00000000AAAAAAAA55555555FFFFFFFF
-
-WinPaletteBlinkR=00AA00AA00AA00AA55FF55FF55FF55FF
-WinPaletteBlinkG=0000AAAA0000AAAA5555FFFF5555FFFF
-WinPaletteBlinkB=00000000AAAAAAAA55555555FFFFFFFF
-
+DisplayInterpolate=0
 DisplayBlink=1
 DisplayAttrib=14
 
 Space=20,A0,2800
+
+
+
+==== DO USUNIECIA START
+
+Bell=1
+
+WinFixed=0
+
 
 FileReadEncoding=65001
 FileWriteEncoding=65001
@@ -61,6 +67,9 @@ CipherEnd=005D
 CipherAlphabet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 CipherAutoKey=0
 CipherPassword=
+
+==== DO USUNIECIA STOP
+
 
 Frame1_0=Simple,2D,7C,2B,2B,2B,2B,2B,2B,2B,2B,2B
 Frame1_1=Single,2500,2502,250C,252C,2510,251C,253C,2524,2514,2534,2518
@@ -152,11 +161,15 @@ ANSICharsVT52=0020,0020,2588,00B9,00B3,2075,2077,00B0,00B1,2192,2026,00F7,2193,2
 ANSIColorThresholdBlackWhite=48
 ANSIColorThresholdGray=20
 
-FileDelayStep=200
-FileDelayOffset=1000000000
-FileDelayTime=40
-FileDelayFrame=200
+PlayerEnd=0
+PlayerStep=200
+PlayerDelayFrame=200
+
+
+
 FileBrowseWildcard=*.txt;*.TXT;*.ans;*.ANS;*.vt;*.VT;*.nfo;*.NFO;*.diz;*.DIZ
+
+
 ServerPort=0
 ServerEncoding=65001
 ServerTelnet=1
@@ -567,4 +580,8 @@ File105Name=test/colors16.ans
 File106Name=test/colors256.ans
 File107Name=test/format.ans
 File108Name=test/test.ans
+
+File109Name=test/font.ans
+File109Codec=65001
+File110Name=test/blend.ans
 

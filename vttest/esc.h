@@ -229,7 +229,7 @@ void pp(void);
 void ppa(int pn);
 void ppb(int pn);
 void ppr(int pn);
-void put_char(FILE *fp, int c);
+void put_char(FILE * fp, int c);
 void put_string(FILE *fp, const char *s);
 void readnl(void);
 void rep(int pn);

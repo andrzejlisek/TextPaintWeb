@@ -166,10 +166,10 @@ printxx(const char *fmt, ...)
 
   if (LOG_ENABLED) {
     va_start(ap, fmt);
-    fprintf(log_fp, TELL_STR);
-    vfprintf(log_fp, fmt, ap);
+    fakeio::_fprintf(log_fp, TELL_STR);
+    fakeio::_vfprintf(log_fp, fmt, ap);
     if (endl)
-      fputs("\n", log_fp);
+      fakeio::_fputs("\n", log_fp);
     va_end(ap);
   }
   return 1;
@@ -180,7 +180,7 @@ println(const char *s)
 {
   fakeio::_printf("%s\r\n", s);
   if (LOG_ENABLED) {
-    fprintf(log_fp, "%s%s\n", TELL_STR, s);
+    fakeio::_fprintf(log_fp, "%s%s\n", TELL_STR, s);
   }
   return 1;
 }
@@ -193,9 +193,9 @@ put_char(FILE *fp, int c)
   else {
     c &= 0xff;
     if (c <= ' ' || c >= '\177')
-      fprintf(fp, "<%d> ", c);
+      fakeio::_fprintf(fp, "<%d> ", c);
     else
-      fprintf(fp, "%c ", c);
+      fakeio::_fprintf(fp, "%c ", c);
   }
 }
 
@@ -263,11 +263,11 @@ tprintf(const char *fmt, ...)
   FLUSH;
 
   if (LOG_ENABLED) {
-    fputs(DATA_STR, log_fp);
+    fakeio::_fputs(DATA_STR, log_fp);
     va_start(ap, fmt);
     va_out(log_fp, ap, fmt);
     va_end(ap);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
   return 1;
 }
@@ -284,12 +284,12 @@ do_csi(const char *fmt, ...)
   FLUSH;
 
   if (LOG_ENABLED) {
-    fputs(SEND_STR, log_fp);
+    fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, csi_output());
     va_start(ap, fmt);
     va_out(log_fp, ap, fmt);
     va_end(ap);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 }
 
@@ -307,12 +307,12 @@ do_dcs(const char *fmt, ...)
 
   if (LOG_ENABLED) {
     va_start(ap, fmt);
-    fputs(SEND_STR, log_fp);
+    fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, dcs_output());
     va_out(log_fp, ap, fmt);
     va_end(ap);
     put_string(log_fp, st_output());
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 }
 
@@ -330,12 +330,12 @@ do_osc(const char *fmt, ...)
 
   if (LOG_ENABLED) {
     va_start(ap, fmt);
-    fputs(SEND_STR, log_fp);
+    fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, osc_output());
     va_out(log_fp, ap, fmt);
     va_end(ap);
     put_string(log_fp, st_output());
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 }
 
@@ -345,9 +345,9 @@ print_chr(int c)
   fakeio::_printf("%c", c);
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, SEND_STR);
+    fakeio::_fprintf(log_fp, SEND_STR);
     put_char(log_fp, c);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
   return 1;
 }
@@ -359,11 +359,11 @@ print_str(const char *s)
   fakeio::_printf("%s", s);
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, SEND_STR);
+    fakeio::_fprintf(log_fp, SEND_STR);
     while (*s) {
       put_char(log_fp, *s++);
     }
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
   return result;
 }
@@ -374,10 +374,10 @@ esc(const char *s)
   fakeio::_printf("%c%s", ESC, s);
 
   if (LOG_ENABLED) {
-    fprintf(log_fp, SEND_STR);
+    fakeio::_fprintf(log_fp, SEND_STR);
     put_char(log_fp, ESC);
     put_string(log_fp, s);
-    fputs("\n", log_fp);
+    fakeio::_fputs("\n", log_fp);
   }
 }
 

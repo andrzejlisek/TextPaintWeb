@@ -11,18 +11,21 @@ EditorChar::EditorChar()
 void EditorChar::Init(std::shared_ptr<ConfigFile> CF_)
 {
     CF = CF_;
-    int I = 0;
-    while (CF.get()->ParamGetS("_WinBitmapFontPage" + std::to_string(I)) != "")
+    int N = CF.get()->ParamGetI("_WinBitmapFontPageN");
+    for (int I = 0; I < N; I++)
     {
         WinBitmapPage.Add(CF.get()->ParamGetI("_WinBitmapFontPage" + std::to_string(I)));
-        I++;
     }
 
-    for (I = 0; I < 256; I++)
+    for (int I = 0; I < 256; I++)
     {
-        if (CF.get()->ParamGetS("FavChar" + std::to_string(I)) != "")
+        if (CF.get()->ParamExists("FavChar" + std::to_string(I)))
         {
             FavChar[I] = CF.get()->ParamGetI("FavChar" + std::to_string(I));
+        }
+        else
+        {
+            FavChar[I] = 32;
         }
     }
 }

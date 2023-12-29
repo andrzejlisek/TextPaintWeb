@@ -33,7 +33,6 @@ void AnsiSauce::CreateInfo()
         if (GetByte(SauceIdx + 5) != 'E') { SauceIdx = -1; }
     }
 
-
     Field01Version = "";
     Field02Title = "";
     Field03Author = "";
@@ -74,11 +73,11 @@ void AnsiSauce::CreateInfo()
 
         std::string Info_;
 
-        Info.Add("Version: " + TextWork::Trim(Field01Version));
-        Info.Add("Title: " + TextWork::Trim(Field02Title));
-        Info.Add("Author: " + TextWork::Trim(Field03Author));
-        Info.Add("Group: " + TextWork::Trim(Field04Group));
-        Info.Add("Date: " + TextWork::Trim(Field05Date));
+        Info.Add("Version: " + (Field01Version));
+        Info.Add("Title: " + (Field02Title));
+        Info.Add("Author: " + (Field03Author));
+        Info.Add("Group: " + (Field04Group));
+        Info.Add("Date: " + (Field05Date));
         Info.Add("FileSize: " + std::to_string(Field06FileSize));
         if (Field07DataType <= 8)
         {
@@ -91,54 +90,63 @@ void AnsiSauce::CreateInfo()
                     while (NameFileType0[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType0[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 1:
                     while (NameFileType1[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType1[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 2:
                     while (NameFileType2[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType2[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 3:
                     while (NameFileType3[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType3[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 4:
                     while (NameFileType4[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType4[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 5:
                     while (NameFileType5[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType5[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 6:
                     while (NameFileType6[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType6[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 7:
                     while (NameFileType7[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType7[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
                 case 8:
                     while (NameFileType8[CopyIdx] != "_")
                     {
                         Name_.Add(NameFileType8[CopyIdx]);
+                        CopyIdx++;
                     }
                     break;
             }
@@ -211,10 +219,31 @@ void AnsiSauce::CreateInfo()
                 break;
         }
         Info.Add(Info_);
-        Info.Add("Text info: " + TextWork::Trim(Field15TInfoS));
-        for (int i = 0; i < Comment.Count; i++)
+        Info.Add("Text info: " + (Field15TInfoS));
+
+        std::string CommentNum1 = "";
+        std::string CommentNum2 = "";
+        std::string CommentNum3 = "";
+        if ((Comment.Count >= 10))
         {
-            Info.Add("Comment " + std::to_string(i + 1) + ": " + TextWork::Trim(Comment[i]));
+            CommentNum1 = " ";
+        }
+        if (Comment.Count >= 100)
+        {
+            CommentNum1 = "  ";
+            CommentNum2 = " ";
+        }
+        for (int i = 0; i < std::min(Comment.Count, 9); i++)
+        {
+            Info.Add("Comment " + CommentNum1 + std::to_string(i + 1) + ": " + (Comment[i]));
+        }
+        for (int i = 9; i < std::min(Comment.Count, 99); i++)
+        {
+            Info.Add("Comment " + CommentNum2 + std::to_string(i + 1) + ": " + (Comment[i]));
+        }
+        for (int i = 99; i < Comment.Count; i++)
+        {
+            Info.Add("Comment " + CommentNum3 + std::to_string(i + 1) + ": " + (Comment[i]));
         }
     }
     else
@@ -257,13 +286,13 @@ std::string AnsiSauce::GetChar(int Idx)
     }
     else
     {
-        if (X == 0)
+        if ((X == 0) || (X == 8) || (X == 9) || (X == 10) || (X == 13))
         {
             return " ";
         }
         else
         {
-            return "#";
+            return ".";
         }
     }
 }

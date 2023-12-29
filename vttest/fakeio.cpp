@@ -7,6 +7,13 @@ fakeio::fakeio()
 
 void fakeio::io_clear()
 {
+    if (LogHandle != ((FILE*)0))
+    {
+        free(LogHandle);
+    }
+    LogHandle = 0;
+    LogFlush(false);
+
     fake_i_mtx.lock();
     fake_o_mtx.lock();
     fake_i.clear();
@@ -63,46 +70,6 @@ int fakeio::o_count()
     return Val;
 }
 
-void fakeio::Report(int Chr)
-{
-    /*if (Chr < 0)
-    {
-        Chr += 256;
-    }
-
-    if (ReportState == 9)
-    {
-        ReportState = 0;
-    }
-
-    switch (ReportState)
-    {
-        case 0:
-            if (Chr == 0x1b) { ReportState = 1; }
-            if (Chr == 0x9b) { ReportState = 2; }
-            if (Chr == 0x9c) { ReportState = 9; }
-            break;
-        case 1:
-            if (Chr == '/')  { ReportState = 2; }
-            if (Chr == '[')  { ReportState = 2; }
-            if (Chr == '\\') { ReportState = 9; }
-            break;
-        case 2:
-            {
-                int I = 0;
-                while (EscapeEnd[I] != 0)
-                {
-                    if (EscapeEnd[I] == Chr)
-                    {
-                        ReportState = 9;
-                    }
-                    I++;
-                }
-            }
-            break;
-    }*/
-}
-
 
 int fakeio::_putchar(int character)
 {
@@ -122,8 +89,7 @@ int fakeio::_getchar( void )
         _sleep(20);
     }
     int Chr = i_pop();
-    Report(Chr);
-    if (Echo && (ReportState == 0))
+    if (Echo)
     {
         if (Chr == '\r')
         {
@@ -154,8 +120,7 @@ int fakeio::_read(int fd, void * buf, int nbytes)
         while ((N < nbytes) && (i_count() > 0))
         {
             int Chr = i_pop();
-            Report(Chr);
-            if (Echo && (ReportState == 0))
+            if (Echo)
             {
                 if (Chr == '\r')
                 {
@@ -193,19 +158,37 @@ int fakeio::_fputc(int character, FILE * stream)
     {
         _putchar(character);
     }
+    else
+    {
+        if ((LogHandle != (FILE*)0) && (LogHandle == stream))
+        {
+            if (character == '\n')
+            {
+                LogFlush(true);
+            }
+            else
+            {
+                if ((character >= 32) && (character <= 126))
+                {
+                    LogBuf.push_back(character);
+                }
+                else
+                {
+                    LogBuf.push_back('.');
+                }
+            }
+        }
+    }
     return 0;
 }
 
 int fakeio::_fputs(const char * str, FILE * stream)
 {
-    if ((stream == stdout) || (stream == stderr))
+    int I = 0;
+    while (str[I] != 0)
     {
-        int I = 0;
-        while (str[I] != 0)
-        {
-            _putchar(str[I]);
-            I++;
-        }
+        _fputc(str[I], stream);
+        I++;
     }
     return 0;
 }
@@ -217,12 +200,9 @@ int fakeio::_fflush(FILE * stream)
 
 int fakeio::_vfprintf(FILE * stream, const char * format, va_list arg)
 {
-    if ((stream == stdout) || (stream == stderr))
-    {
-        char buf[fake_array_size];
-        vsnprintf(buf, fake_array_size, format, arg);
-        _fputs(buf, stdout);
-    }
+    char buf[fake_array_size];
+    vsnprintf(buf, fake_array_size, format, arg);
+    _fputs(buf, stream);
     return 0;
 }
 
@@ -237,13 +217,10 @@ int fakeio::_printf(const char * format, ...)
 
 int fakeio::_fprintf(FILE * stream, const char * format, ...)
 {
-    if ((stream == stdout) || (stream == stderr))
-    {
-        va_list valist;
-        va_start(valist, format);
-        _vfprintf(stdout, format, valist);
-        va_end(valist);
-    }
+    va_list valist;
+    va_start(valist, format);
+    _vfprintf(stream, format, valist);
+    va_end(valist);
     return 0;
 }
 
@@ -251,3 +228,63 @@ void fakeio::_sleep(int T)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(T));
 }
+
+FILE * fakeio::_fopen(const char * filename, const char * modes)
+{
+    char LogName[] = "vttest.log";
+
+    bool IsLog = true;
+    int I = 0;
+
+    while (LogName[I] != 0)
+    {
+        if (filename[I] == 0)
+        {
+            IsLog = false;
+            break;
+        }
+        if (LogName[I] != filename[I])
+        {
+            IsLog = false;
+            break;
+        }
+        I++;
+    }
+
+    if (IsLog)
+    {
+        LogFlush(false);
+        if (LogHandle == ((FILE*)0))
+        {
+            LogHandle = (FILE*)malloc(32);
+        }
+        std::cout << "VTTEST log open" << std::endl;
+        return LogHandle;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int fakeio::_fclose(FILE * stream)
+{
+    if (stream == LogHandle)
+    {
+        LogFlush(false);
+        free(LogHandle);
+        LogHandle = 0;
+        std::cout << "VTTEST log closed" << std::endl;
+    }
+    return 0;
+}
+
+void fakeio::LogFlush(bool Force)
+{
+    if (Force || (LogBuf.size() > 0))
+    {
+        std::cout << "VTTEST:" << LogBuf << std::endl;
+    }
+    LogBuf = "";
+}
+

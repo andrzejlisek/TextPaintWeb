@@ -229,25 +229,38 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
 
             int CharToPrint = AnsiBuffer[AnsiState_.AnsiBufferI];
             AnsiState_.AnsiBufferI++;
+
+            bool CharNoCommandStarting = true;
+
+            if (CharToPrint == 27)
+            {
+                AnsiState_.__AnsiCmd.Clear();
+                AnsiState_.__AnsiCommand = true;
+                CharNoCommandStarting = false;
+            }
+            else
+            {
+                if (ANSI8bit && (CharToPrint >= 0x80) && (CharToPrint <= 0x9F))
+                {
+                    AnsiState_.__AnsiCmd.Clear();
+                    AnsiState_.__AnsiCmd.Add(CharToPrint - 0x40);
+                    AnsiState_.__AnsiCommand = true;
+                    CharNoCommandStarting = false;
+                }
+            }
+
             if (AnsiState_.__AnsiCommand)
             {
-                if (CharToPrint < 32)
+                if (CharNoCommandStarting)
                 {
-                    if (CharToPrint == 27)
+                    if (CharToPrint >= 32)
                     {
-                        AnsiState_.__AnsiCmd.Clear();
+                        AnsiState_.__AnsiCmd.Add(CharToPrint);
                     }
                     else
                     {
-                        if (AnsiCharNotCmd(CharToPrint))
-                        {
-                            AnsiCharPrint(CharToPrint);
-                        }
+                        AnsiCharPrint(CharToPrint);
                     }
-                }
-                else
-                {
-                    AnsiState_.__AnsiCmd.Add(CharToPrint);
                 }
 
                 if (AnsiState_.__AnsiCmd.Count > 0)
@@ -297,23 +310,15 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
             }
             else
             {
-                if (CharToPrint == 27)
+                if (CharNoCommandStarting)
                 {
-                    AnsiState_.__AnsiCmd.Clear();
-                    AnsiState_.__AnsiCommand = true;
-                }
-                else
-                {
-                    if (AnsiCharNotCmd(CharToPrint))
+                    if (AnsiState_.__AnsiDCS_)
                     {
-                        if (AnsiState_.__AnsiDCS_)
-                        {
-                            AnsiState_.__AnsiDCS = AnsiState_.__AnsiDCS + Str::IntToStr(CharToPrint);
-                        }
-                        else
-                        {
-                            AnsiCharPrint(CharToPrint);
-                        }
+                        AnsiState_.__AnsiDCS = AnsiState_.__AnsiDCS + Str::IntToStr(CharToPrint);
+                    }
+                    else
+                    {
+                        AnsiCharPrint(CharToPrint);
                     }
                 }
             }

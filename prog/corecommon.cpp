@@ -56,7 +56,7 @@ void CoreCommon::InitCommon()
             {
                 XAnsi = CF.get()->ParamGetB("File" + std::to_string(I) + "Ansi");
             }
-            BinaryFile_.get()->ItemAdd(BinaryFileItem(XFile, 5, 0, XCodec, XAnsi));
+            BinaryFile_.get()->ItemAdd(BinaryFileItem(XFile, 5, 0, XCodec, XAnsi), false);
             I++;
         }
         BinaryFile_.get()->SetDir(Str("/"));

@@ -1,12 +1,8 @@
 function ScreenTimerStart()
 {
-    if (ProgStarted)
+    if (ScreenStarted && ProgStarted)
     {
         ScreenTimerTick();
-    }
-    else
-    {
-        setTimeout(ScreenTimerStart, WaitTimeout);
     }
 }
 

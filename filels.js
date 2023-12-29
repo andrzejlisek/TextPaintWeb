@@ -62,5 +62,6 @@ function IndexImportLS()
     }
     IndexMeasureSpaceLS();
     FileLsReady = true;
+    ProgInit();
 }
 

@@ -149,6 +149,7 @@ void CoreAnsi::UpdateConfig(std::shared_ptr<ConfigFile> CF)
     ANSI_CR = CF.get()->ParamGetI("ANSIReadCR");
     ANSI_LF = CF.get()->ParamGetI("ANSIReadLF");
     ANSIDOS = CF.get()->ParamGetI("ANSIDOS");
+    ANSIDOS_ = (ANSIDOS == 1);
     ANSI8bit = CF.get()->ParamGetB("ANSI8bit");
     ANSIPrintBackspace = CF.get()->ParamGetB("ANSIPrintBackspace");
     ANSIPrintTab = CF.get()->ParamGetB("ANSIPrintTab");

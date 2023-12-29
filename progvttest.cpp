@@ -1,7 +1,5 @@
-//#include "progcommon.cpp"
 #include "vttest/fakeio.h"
 #include <emscripten/emscripten.h>
-//#include <emscripten/wasm_worker.h>
 #include <thread>
 
 int fake_main(int argc, char *argv[]);
@@ -108,30 +106,53 @@ char * ProgArgs[2];
 
 void main0()
 {
-    fake_main(1, ProgArgs);
+    if (ProgArgs[1][0] == 0)
+    {
+        fake_main(1, ProgArgs);
+    }
+    else
+    {
+        fake_main(2, ProgArgs);
+    }
 }
 
-void PrintStr(char * SS, int L)
+void PrintStr(char * SS, int L, int StrType)
 {
+    char HexNum[17] = "0123456789ABCDEF";
     for (int I = 0; I < L; I++)
     {
         int T = (int)Base64Raw[I];
-        if ((T < 32) || (T > 126))
+        
+        switch (StrType)
         {
-            if (T < 0) T += 256;
-            std::cout << "<";
-            std::cout << T;
-            std::cout << ">";
-        }
-        else
-        {
-            std::cout << (char)Base64Raw[I];
+            case 0:
+                if ((T < 32) || (T > 126))
+                {
+                    if (T < 0) T += 256;
+                    std::cout << "<";
+                    std::cout << T;
+                    std::cout << ">";
+                }
+                else
+                {
+                    std::cout << (char)Base64Raw[I];
+                }
+                break;
+            case 1:
+                {
+                    if (T < 0) T += 256;
+                    std::cout << (char)HexNum[T >> 4];
+                    std::cout << (char)HexNum[T & 15];
+                }
+                break;
         }
     }
 }
 
 extern "C"
 {
+    int DebugParams;
+
     EMSCRIPTEN_KEEPALIVE
     void EventData(char * data)
     {
@@ -151,10 +172,23 @@ extern "C"
                 fakeio::i_push((char)Base64Raw[I]);
             }
 
-            //Base64Raw[Base64RawL] = 0;
-            //std::cout << "Nadawanie: ";
-            //PrintStr(Base64Raw, Base64RawL);
-            //std::cout << std::endl;
+            if (DebugParams > 0)
+            {
+                if ((DebugParams & 1) > 0)
+                {
+                    Base64Raw[Base64RawL] = 0;
+                    std::cout << "Send: ";
+                    PrintStr(Base64Raw, Base64RawL, 0);
+                    std::cout << std::endl;
+                }
+                if ((DebugParams & 2) > 0)
+                {
+                    Base64Raw[Base64RawL] = 0;
+                    std::cout << "Send: ";
+                    PrintStr(Base64Raw, Base64RawL, 1);
+                    std::cout << std::endl;
+                }
+            }
         }
     
     
@@ -169,10 +203,25 @@ extern "C"
             while (CountLimit > 0)
             {
                 int ChrX = fakeio::o_pop();
-                Base64Raw[Base64RawL] = (char)ChrX;
-                Base64RawL++;
-                if (ChrX < 32) ChrX = 33;
-                CountLimit--;
+                if (ChrX < 0)
+                {
+                    ChrX += 256;
+                }
+                if (ChrX > 128)
+                {
+                    Base64Raw[Base64RawL] = (char)(0xC0 + (ChrX >> 6));
+                    Base64RawL++;
+                    CountLimit--;
+                    Base64Raw[Base64RawL] = (char)(0x80 + (ChrX & 63));
+                    Base64RawL++;
+                    CountLimit--;
+                }
+                else
+                {
+                    Base64Raw[Base64RawL] = (char)ChrX;
+                    Base64RawL++;
+                    CountLimit--;
+                }
             }
             if (Base64RawL > 0)
             {
@@ -180,10 +229,23 @@ extern "C"
                 Base64Raw2Str();
                 memcpy(Base64Str + Base64StrL, StrSuffix, StrSuffixL + 1);
 
-                //Base64Raw[Base64RawL] = 0;
-                //std::cout << "Odbior: ";
-                //PrintStr(Base64Raw, Base64RawL);
-                //std::cout << std::endl;
+                if (DebugParams > 0)
+                {
+                    if ((DebugParams & 1) > 0)
+                    {
+                        Base64Raw[Base64RawL] = 0;
+                        std::cout << "Receive: ";
+                        PrintStr(Base64Raw, Base64RawL, 0);
+                        std::cout << std::endl;
+                    }
+                    if ((DebugParams & 2) > 0)
+                    {
+                        Base64Raw[Base64RawL] = 0;
+                        std::cout << "Receive: ";
+                        PrintStr(Base64Raw, Base64RawL, 1);
+                        std::cout << std::endl;
+                    }
+                }
 
                 emscripten_run_script(Base64Str);
             }
@@ -191,10 +253,11 @@ extern "C"
     }
 
     EMSCRIPTEN_KEEPALIVE
-    void EventStart(char * arg)
+    void EventStart(char * arg, int DebugParams_)
     {
+        DebugParams = DebugParams_;
         strcpy(ProgArgs[0], "/test/vttest");
-        strcpy(ProgArgs[1], "");
+        strcpy(ProgArgs[1], arg);
         fakeio::io_clear();
         Wrk = new std::thread(main0);
     }
@@ -202,7 +265,9 @@ extern "C"
     EMSCRIPTEN_KEEPALIVE
     void EventStop()
     {
-        //!!!!!!!!!delete Wrk;
+        pthread_cancel(Wrk->native_handle());
+        Wrk->join();
+        delete Wrk;
         Wrk = NULL;
     }
 }
