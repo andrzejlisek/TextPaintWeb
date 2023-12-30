@@ -2,6 +2,7 @@
 #define XLIST_H
 
 #include <vector>
+#include <deque>
 #include <stdarg.h>
 #include <algorithm>
 
@@ -57,18 +58,62 @@ public:
 
     int AddSort(T Val)
     {
-        for (int I = 0; I < Count; I++)
+        if (Count == 0)
         {
-            if (Data[I] > Val)
-            {
-                Data.insert(Data.begin() + I, Val);
-                Count++;
-                return I;
-            }
+            Data.push_back(Val);
+            Count++;
+            return (Count - 1);
         }
-        Data.push_back(Val);
+
+        int Idx = std::abs(IndexOfBin(Val));
+
+        if (Idx > Count)
+        {
+            Data.insert(Data.begin(), Val);
+            Count++;
+            return 0;
+        }
+
+        if (Idx == Count)
+        {
+            Data.push_back(Val);
+            Count++;
+            return (Count - 1);
+        }
+
+        Data.insert(Data.begin() + Idx, Val);
         Count++;
-        return (Count - 1);
+        return Idx;
+    }
+
+    int AddSortByIndex(int Idx, T Val)
+    {
+        if (Count == 0)
+        {
+            Data.push_back(Val);
+            Count++;
+            return (Count - 1);
+        }
+
+        Idx = std::abs(Idx);
+
+        if (Idx > Count)
+        {
+            Data.insert(Data.begin(), Val);
+            Count++;
+            return 0;
+        }
+
+        if (Idx == Count)
+        {
+            Data.push_back(Val);
+            Count++;
+            return (Count - 1);
+        }
+
+        Data.insert(Data.begin() + Idx, Val);
+        Count++;
+        return Idx;
     }
 
     void AddRange(T * Vals, unsigned int ValsC)
@@ -187,6 +232,42 @@ public:
     {
         return IndexOf(Val, 0);
     }
+
+    int IndexOfBin(T Val, int StartPos, int EndPos)
+    {
+        if (Count == 0)
+        {
+            return -1;
+        }
+        if (Val < Data[0])
+        {
+            return 0 - 1 - Count;
+        }
+        int MidPos = 0;
+        while (StartPos <= EndPos)
+        {
+            MidPos = (StartPos + EndPos) >> 1;
+            if (Data[MidPos] == Val)
+            {
+                return MidPos;
+            }
+            if (Data[MidPos] > Val)
+            {
+                EndPos = MidPos - 1;
+            }
+            else
+            {
+                StartPos = MidPos + 1;
+            }
+        }
+        return 0 - StartPos;
+    }
+
+    int IndexOfBin(T Val)
+    {
+        return IndexOfBin(Val, 0, Count - 1);
+    }
+
 
     T& operator [](int Pos)
     {

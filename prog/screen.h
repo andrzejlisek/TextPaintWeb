@@ -64,6 +64,9 @@ public:
     static inline void (*FileExport_)( int, int, std::string, std::string, std::string );
     static int FileImport(int Kind, std::string Name, std::string Attrib);
     static int FileExport(int Kind, std::string Name, std::string Attrib, std::string Data);
+
+    static int DefaultW(int ScrW, int ANSIDOS);
+    static int DefaultH(int ScrH, int ANSIDOS);
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;

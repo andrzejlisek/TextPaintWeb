@@ -431,7 +431,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             {
                 if (DisplayConfig_.get()->RequestResize)
                 {
-                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 0, 0);
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 1, 0);
                 }
                 DisplayConfig_.get()->Repaint();
             }
@@ -495,7 +495,6 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 {
                     DisplayStatus -= 3;
                 }
-                ForceRepaint = true;
                 Repaint(true);
             }
             return;
@@ -609,7 +608,6 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             {
                 DisplayStatus -= 12;
             }
-            ForceRepaint = true;
             Repaint(true);
             return;
         case _("1_Minus"):
@@ -622,6 +620,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 FileDelayStepFactor--;
             }
             CalcFileDelayStep();
+            Repaint(false);
             return;
         case _("1_BracketRight"):
             FileDelayStepFactor++;
@@ -630,6 +629,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 FileDelayStepFactor--;
             }
             CalcFileDelayStep();
+            Repaint(false);
             return;
         case _("1_Slash"):
             FileDelayStepFactor = 0;

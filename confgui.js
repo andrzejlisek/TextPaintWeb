@@ -177,9 +177,9 @@ function ConfRepaint()
     ConfBtn73.value = ScrS + "\n+1 row";
     ConfBtn74.value = ScrS + "\n+10 rows";
     
-    let FntSizeW = Math.floor((window.innerWidth * 1.0) / 40.0);
-    let FntSizeH = Math.floor((window.innerHeight * 1.0) / 30.0);
-    let FntSize = (FntSizeW < FntSizeH) ? FntSizeW : FntSizeH;
+    const FntSizeW = Math.floor((BrowserW() * 1.0) / 40.0);
+    const FntSizeH = Math.floor((BrowserH() * 1.0) / 30.0);
+    const FntSize = Math.min(FntSizeW, FntSizeH);
     for (let I = 0; I < ConfBtnAll.length; I++)
     {
         for (let II = 0; II < ConfBtnAll[I].length; II++)
@@ -367,29 +367,29 @@ function ConfClick(id)
             break;            
 
         case 61:
-            ProgEventOtherFile("Resize", "", ScreenW - 10, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW - 10, ScreenH, 1, 0);
             break;
         case 62:
-            ProgEventOtherFile("Resize", "", ScreenW -  1, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW -  1, ScreenH, 1, 0);
             break;
         case 63:
-            ProgEventOtherFile("Resize", "", ScreenW +  1, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW +  1, ScreenH, 1, 0);
             break;
         case 64:
-            ProgEventOtherFile("Resize", "", ScreenW + 10, ScreenH, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW + 10, ScreenH, 1, 0);
             break;
             
         case 71:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH - 10, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH - 10, 1, 0);
             break;
         case 72:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH -  1, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH -  1, 1, 0);
             break;
         case 73:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH +  1, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH +  1, 1, 0);
             break;
         case 74:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH + 10, 0, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH + 10, 1, 0);
             break;
     }
     

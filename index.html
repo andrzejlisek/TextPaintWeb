@@ -74,6 +74,19 @@
             position:absolute;
             text-align:center;
         }
+        .initdiv
+        {
+            background-color:#FFFFFF80;
+            width:100vw;
+            height:100vh;
+            position:absolute;
+            left:0;
+            top:0;
+            color:#000000;
+            display:inline-block;
+            text-align:center;
+            vertical-align: middle;
+        }
         .configdiv
         {
             color:#ffffff;
@@ -105,6 +118,9 @@
         <div class="keybdiv">
             <svg id="KeybSvgBlank" width="100" height="100" onclick="ConfShow()">
             </svg>
+        </div>
+
+        <div id="InitScreen" class="initdiv" style="display:block;">
         </div>
 
 
@@ -152,6 +168,7 @@
         <script type="text/javascript" src="jszip.js"></script>
         <script type="text/javascript" src="confgui.js"></script>
         <script type="text/javascript" src="global.js"></script>
+        <script type="text/javascript" src="splash.js"></script>
         <script type="text/javascript" src="unistorage.js"></script>
         <script type="text/javascript" src="screenfont.js"></script>
         <script type="text/javascript" src="screentimer.js"></script>

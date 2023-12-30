@@ -1,4 +1,4 @@
-class ScreenFont
+class ScreenFontBmp
 {
     GetPixelBin(X, Y)
     {
@@ -38,8 +38,9 @@ class ScreenFont
         }
     }
 
-    constructor(ImgUrl, CallbackFunction_, CallbackParam_)
+    constructor(ImgUrl, CallbackFunction_, CallbackSender_, CallbackParam_)
     {
+        this.CallbackSender = CallbackSender_;
         this.CallbackFunction = CallbackFunction_;
         this.CallbackParam = CallbackParam_;
     
@@ -56,7 +57,7 @@ class ScreenFont
         {
             this.Img = null;
             this.Ready = true;
-            this.CallbackFunction(this.CallbackParam);
+            this.CallbackFunction(this.CallbackSender, this.CallbackParam);
         }
     }
     
@@ -105,7 +106,37 @@ class ScreenFont
         this.CellH = Math.round((this.ImgH) / IdxI);
         this.Blank = this.GetGlyph(32);
         this.Ready = true;
-        this.CallbackFunction(this.CallbackParam);
+        this.CallbackFunction(this.CallbackSender, this.CallbackParam);
+    }
+}
+
+
+class ScreenFontCplx
+{
+    constructor(ImgUrl1, ImgUrl2, DblUrl, Mode, CallbackFunction_)
+    {
+        this.Ready1 = false;
+        this.Ready2 = false;
+        this.CallbackFunction = CallbackFunction_;
+        this.Font1 = new ScreenFontBmp(ImgUrl1, this.constCallback, this, 1);
+        this.Font2 = new ScreenFontBmp(ImgUrl2, this.constCallback, this, 2);
+    }
+    
+    constCallback(Sender, N)
+    {
+        if (N == 1) { Sender.Ready1 = true; }
+        if (N == 2) { Sender.Ready2 = true; }
+        if (Sender.Ready1 && Sender.Ready2)
+        {
+            Sender.CellW = Sender.Font1.CellW;
+            Sender.CellH = Sender.Font1.CellH;
+            Sender.CallbackFunction();
+        }
+    }
+    
+    GetGlyph(Chr)
+    {
+        return this.Font1.GetGlyph(Chr);
     }
 }
 

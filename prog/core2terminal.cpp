@@ -8,7 +8,6 @@ Core2Terminal::Core2Terminal()
 void Core2Terminal::Init()
 {
     B64 = std::make_unique<TextCodec>(TextCodec::BASE64);
-    HexText = std::make_unique<TextCodec>(TextCodec::HEX);
 
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
     DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
@@ -44,7 +43,9 @@ void Core2Terminal::Init()
         TerminalKeyboard_.TerminalAnswerBack = TerminalKeyboard_.TerminalAnswerBack + "_" + TextWork::CharToStr(TerminalAnswerBack0[i]);
     }
 
-    TerminalCodec = std::make_shared<TextCodec>(CF.get()->ParamGetI("TerminalEncoding"));
+    //TerminalCodec = std::make_shared<TextCodec>(CF.get()->ParamGetI("TerminalEncoding"));
+    TerminalCodecS = std::make_shared<TextCodec>(0);
+    TerminalCodecR = std::make_shared<TextCodec>(0);
 
     std::string TelnetKeyboardConf_ = std::to_string(CF.get()->ParamGetI("TerminalKeys"));
     TerminalKeyboard_.TelnetKeyboardConf = "";
@@ -404,7 +405,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             {
                 if (DisplayConfig_.get()->RequestResize)
                 {
-                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 0, 0);
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 1, 0);
                 }
                 CoreAnsi_.get()->AnsiRepaint(false);
             }
@@ -444,7 +445,7 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
                     Clipboard_.SystemText = EvtParam0;
                     Str Text = Clipboard_.GetText();
                     Raw Data;
-                    TerminalCodec.get()->Encode(Text, Data);
+                    TerminalCodecS.get()->Encode(Text, Data);
                     Conn.get()->Send(Data);
                 }
             }
@@ -480,8 +481,8 @@ void Core2Terminal::SendHex(std::string STR)
     }
     Str STR0 = Str::FromString(STR);
     Raw STR_;
-    HexText.get()->Reset();
-    HexText.get()->Encode(STR0, STR_);
+    TextCodec::Transcode(STR0, TextCodec::HEX, 0);
+    TerminalCodecS.get()->Encode(STR0, STR_);
     Conn.get()->Send(STR_);
 }
 
@@ -491,7 +492,8 @@ void Core2Terminal::ConnOpen()
     Screen::ScreenCursorMove(0, 0);
     Screen::ScreenRefresh();
 
-    TerminalCodec.get()->Reset();
+    TerminalCodecS.get()->Reset();
+    TerminalCodecR.get()->Reset();
     ServerCodec.get()->Reset();
 
     //Conn = std::make_unique<TerminalConnTest>();
@@ -545,7 +547,7 @@ void Core2Terminal::ProcessReceived(Raw &Data)
     if (Data.Count > 0)
     {
         Str Data_;
-        TerminalCodec.get()->Decode(Data, Data_);
+        TerminalCodecR.get()->Decode(Data, Data_);
         if (Data_.Count > 0)
         {
             CoreAnsi_.get()->AnsiProcessSupply(Data_);

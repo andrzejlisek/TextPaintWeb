@@ -1,6 +1,3 @@
-let FileLsReady = false;
-
-
 function IndexMeasureSpaceLS()
 {
     FileFreeSpaceLS = 0;

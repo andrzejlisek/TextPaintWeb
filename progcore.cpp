@@ -129,6 +129,7 @@ void ScreenSetConfig()
     FileConfig("ANSIReadLF");
 
     FileConfig("ColorBlending");
+    FileConfig("ColorBlendingGamma");
 }
 
 void WorkerSend(int T, std::string X)
@@ -257,14 +258,19 @@ extern "C"
                     CF.get()->ParamClear();
                     CF.get()->FileLoad(0, BinaryFile_.get()->LoadToStringConfig());
 
+                    int TempWinW = Screen::DefaultW(CF.get()->ParamGetI("WinW"), CF.get()->ParamGetI("ANSIDOS"));
+                    int TempWinH = Screen::DefaultH(CF.get()->ParamGetI("WinH"), CF.get()->ParamGetI("ANSIDOS"));
+                    
+                    CF.get()->ParamSet("WinW", TempWinW);
+                    CF.get()->ParamSet("WinH", TempWinH);
+
                     RespondClear();
                     FileConfig("WinTouchScreen");
                     FileConfig("ColorKeyboard");
                     FileConfig("FontName1");
                     FileConfig("FontName2");
-                    FileConfig("DuospaceFontName");
-                    FileConfig("DuospaceMode");
-                    FileConfig("DuospaceDoubleChars");
+                    FileConfig("FontChars");
+                    FileConfig("FontMode");
                     FileConfig("TimerPeriod");
                     FileConfig("TimerLoop");
                     FileConfig("TimerCursor");
@@ -284,19 +290,9 @@ extern "C"
                     FileConfig("PaletteR");
                     FileConfig("PaletteG");
                     FileConfig("PaletteB");
+
                     
                     ScreenSetConfig();
-
-
-
-
-            CF.get()->ParamSet("WinW", "80");
-            CF.get()->ParamSet("WinH", "24");
-
-
-
-
-
                     BufNum(99);
                     RespondFinish();
                 }
@@ -409,6 +405,13 @@ extern "C"
         }
         if (EvtName == "Resize")
         {
+            if (EvtParam3 == 1)
+            {
+                CF.get()->ParamSet("WinW", EvtParam1);
+                CF.get()->ParamSet("WinH", EvtParam2);
+                BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                BinaryFile_.get()->SysSaveConfig();
+            }
             Fire = true;
         }
         if (Fire)

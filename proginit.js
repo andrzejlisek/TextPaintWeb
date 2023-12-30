@@ -1,16 +1,13 @@
 function ProgInit()
 {
+    ProgInitScreen();
     if (ProgLoaded && FileLsReady && FileDbReady)
     {
-        FileLsReady = false;
-        FileDbReady = false;
-    
         _ProgInit = Module.cwrap("Init", null, ["string"]);
         _ProgEventKey = Module.cwrap("EventKey", null, ["string", "number", "number", "number", "number"]);
         _ProgEventTick = Module.cwrap("EventTick", null, null);
         ProgEventOther = Module.cwrap("EventOther", null, ["string", "string", "number", "number", "number", "number"]);
         ProgEventOtherFile = Module.cwrap("EventOtherFile", null, ["string", "string", "number", "number", "number", "number"]);
-
         _ProgInit("1");
     }
 }
@@ -28,6 +25,7 @@ function ProgInitAfterConf()
 
 function WindowResize()
 {
+    ProgInitScreen();
     if (KeybReady)
     {
         ConfRepaint();

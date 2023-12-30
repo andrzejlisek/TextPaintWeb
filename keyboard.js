@@ -594,14 +594,14 @@ function KeybColorToStyle(N)
 
 function KeybInit()
 {
-    let WinW = window.innerWidth;
-    let WinH = window.innerHeight;
+    const WinW = BrowserW();
+    const WinH = BrowserH();
 
-    let Obj1 = ConfigFileI("WinScreenSize");
-    let Obj2 = ConfigFileI("WinKeyboardSize");
+    const Obj1 = ConfigFileI("WinScreenSize");
+    const Obj2 = ConfigFileI("WinKeyboardSize");
     
-    let KeybColorB = HexToNum4(ConfigFileS("ColorKeyboard")[0]);
-    let KeybColorF = HexToNum4(ConfigFileS("ColorKeyboard")[1]);
+    const KeybColorB = HexToNum4(ConfigFileS("ColorKeyboard")[0]);
+    const KeybColorF = HexToNum4(ConfigFileS("ColorKeyboard")[1]);
     
     ScreenDiv.style.width = Math.floor(WinW) + "px";
     ScreenDiv.style.height = Math.floor((Obj1 * WinH) / 100) + "px";

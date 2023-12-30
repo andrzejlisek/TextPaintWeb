@@ -13,7 +13,7 @@ let ScreenCellFontY = [];
 
 var ScreenDiv = document.getElementById("screendiv");
 var ScreenObj = document.getElementById("Screen");
-var ScreenCtx = ScreenObj.getContext('2d');
+var ScreenCtx = ScreenObj.getContext("2d", { willReadFrequently: true });
 
 var ScreenDataC = [];
 var ScreenDataB = [];
@@ -66,6 +66,9 @@ let ScreenAttrI = true;
 let ScreenAttrU = true;
 let ScreenAttrS = true;
 let ScreenColorBlending = false;
+let ScreenColorBlendingGamma = 0;
+let ScreenColorBlendingGamma1 = 0;
+let ScreenColorBlendingGamma2 = 0;
 let ScreenColorBlendingChars = {};
 let ScreenDisplayInterpolate = 0;
 let ScreenDisplayInterpolate_ = 0;
@@ -97,7 +100,9 @@ function ScreenGlyphBufClear()
 function ScreenSetDisplayConfig(Repaint)
 {
     let IsChanged = false;
+    let CalcGamma = false;
 
+    if (ScreenColorBlendingGamma != ConfigFileI("ColorBlendingGamma")) { IsChanged = true; CalcGamma = true; }
     if (ScreenDisplayInterpolate != ConfigFileI("DisplayInterpolate")) IsChanged = true;
     if (ScreenColorBlending != ConfigFileB("ColorBlending")) IsChanged = true;
     if (ScreenCursorSteady != ConfigFileB("SteadyCursor")) IsChanged = true;
@@ -115,6 +120,7 @@ function ScreenSetDisplayConfig(Repaint)
     if (ScreenSET_Blink != ConfigFileI("DisplayBlink")) IsChanged = true;
 
 
+    ScreenColorBlendingGamma = ConfigFileI("ColorBlendingGamma");
     ScreenDisplayInterpolate = ConfigFileI("DisplayInterpolate");
     ScreenColorBlending = ConfigFileB("ColorBlending");
     ScreenCursorSteady = ConfigFileB("SteadyCursor");
@@ -150,7 +156,13 @@ function ScreenSetDisplayConfig(Repaint)
     }
     
     ScreenGlyphBufClear();
-    
+
+    if (CalcGamma)
+    {
+        ScreenColorBlendingGamma1 = ScreenColorBlendingGamma / 1000.0;
+        ScreenColorBlendingGamma2 = 1000.0 / ScreenColorBlendingGamma;
+        ScreenCalcBlendMap = {};
+    }
     if (Repaint && IsChanged)
     {
         ScreenRepaint();
@@ -261,9 +273,9 @@ function ScreenCalcBlend(Val1, Prop1, Val2, Prop2)
     }
     else
     {
-        const _Val1 = Math.pow(Val1 / 255.0, 2.2) * Prop1;
-        const _Val2 = Math.pow(Val2 / 255.0, 2.2) * Prop2;
-        const Val = Math.round(Math.pow((_Val1 + _Val2) / (Prop1 + Prop2), 1 / 2.2) * 255.0);
+        const _Val1 = Math.pow(Val1 / 255.0, ScreenColorBlendingGamma1) * Prop1;
+        const _Val2 = Math.pow(Val2 / 255.0, ScreenColorBlendingGamma1) * Prop2;
+        const Val = Math.round(Math.pow((_Val1 + _Val2) / (Prop1 + Prop2), ScreenColorBlendingGamma2) * 255.0);
         ScreenCalcBlendMap[Key] = Val;
         return Val;
     }
@@ -345,7 +357,7 @@ function ScreenCharGlyph(Buf, ScrIdx, Blank)
             }
         }
     
-        let CharVals = ScreenFont1.GetGlyph(Chr);
+        let CharVals = ScreenFont.GetGlyph(Chr);
         
         CharData0 = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCellH);
         CharData1 = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCellH);
@@ -462,17 +474,16 @@ function ScreenCharGlyph(Buf, ScrIdx, Blank)
     }
 }
 
-            
+
+
 function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
 {
     if (X < 0) { return; }
     if (Y < 0) { return; }
     if (X >= ScreenW) { return; }
     if (Y >= ScreenH) { return; }
-    
 
     ScreenCalcColor(Back, Fore, Attr);
-
     
     let ScrIdx = Y * ScreenW + X;
     let CharIdx = (Chr < 65536) ? ((Chr << 16) + (ScreenCalcColor_Back << 12) + (ScreenCalcColor_Fore << 8) + (Attr)) : 0;
@@ -783,7 +794,7 @@ function ScreenResize(NewW, NewH)
     ScreenObj.width = ScreenWW;
     ScreenObj.height = ScreenHH;
 
-    ScreenCtx = ScreenObj.getContext('2d');
+    ScreenCtx = ScreenObj.getContext("2d", { willReadFrequently: true });
     ScreenData0 = ScreenCtx.getImageData(0, 0, ScreenWW, ScreenHH);
     ScreenData1 = ScreenCtx.getImageData(0, 0, ScreenWW, ScreenHH);
     N = ScreenWW * ScreenHH;
@@ -895,14 +906,14 @@ function ScreenTextMove(X1, Y1, X2, Y2, W, H)
     {
         for (let X = XStart; X != XStop; X += XAdv)
         {
-            let ScrIdx = (Y + YDelta) * ScreenW + (X + XDelta);
+            const ScrIdx = (Y + YDelta) * ScreenW + (X + XDelta);
 
-            let _C = ScreenDataC[ScrIdx];
-            let _B = ScreenDataB[ScrIdx];
-            let _F = ScreenDataF[ScrIdx];
-            let _A = ScreenDataA[ScrIdx];
-            let _W = ScreenDataW[ScrIdx];
-            let _H = ScreenDataH[ScrIdx];
+            const _C = ScreenDataC[ScrIdx];
+            const _B = ScreenDataB[ScrIdx];
+            const _F = ScreenDataF[ScrIdx];
+            const _A = ScreenDataA[ScrIdx];
+            const _W = ScreenDataW[ScrIdx];
+            const _H = ScreenDataH[ScrIdx];
             
             ScreenChar(X, Y, _C, _B, _F, _A, _W, _H);
         }
@@ -1009,8 +1020,7 @@ function ScreenDrawCursor(State)
 
 
 
-let ScreenFont1;
-let ScreenFont2;
+let ScreenFont;
 
 
 function ScreenInit1()
@@ -1049,87 +1059,83 @@ function ScreenInit1()
         }
     }
 
-    ScreenFont1 = new ScreenFont(ConfigFileS("FontName1"), ScreenInit2, 1);
-    ScreenFont2 = new ScreenFont(ConfigFileS("FontName2"), ScreenInit2, 2);
+    ScreenFont = new ScreenFontCplx(ConfigFileS("FontName1"), ConfigFileS("FontName2"), ConfigFileS("FontChars"), ConfigFileI("FontMode"), ScreenInit2);
 }
 
-function ScreenInit2(Nr)
+function ScreenInit2()
 {
-    if (ScreenFont1.Ready && ScreenFont2.Ready)
+    ScreenSetDisplayConfig(false);
+    ScreenTimerPeriod = ConfigFileI("TimerPeriod");
+    ScreenTimerCounterLoop = ConfigFileI("TimerLoop");
+    ScreenTimerCursor = ConfigFileI("TimerCursor");
+    ScreenTimerBlink = ConfigFileI("TimerBlink");
+    ScreenTimerTickEvent = ConfigFileI("TimerTick");
+
+    ScreenCellW = ScreenFont.CellW;
+    ScreenCellH = ScreenFont.CellH;
+    ScreenCellH2 = ScreenCellH / 2;
+    ScreenCursorSize = Math.floor(ScreenFont.CellH / 8);
+
+    ScreenCellFontX = [];
+    ScreenCellFontY = [];
+    for (let FontSize = 1; FontSize <= 32; FontSize++)
     {
-        ScreenSetDisplayConfig(false);
-        ScreenTimerPeriod = ConfigFileI("TimerPeriod");
-        ScreenTimerCounterLoop = ConfigFileI("TimerLoop");
-        ScreenTimerCursor = ConfigFileI("TimerCursor");
-        ScreenTimerBlink = ConfigFileI("TimerBlink");
-        ScreenTimerTickEvent = ConfigFileI("TimerTick");
-    
-        ScreenCellW = ScreenFont1.CellW;
-        ScreenCellH = ScreenFont1.CellH;
-        ScreenCellH2 = ScreenCellH / 2;
-        ScreenCursorSize = Math.floor(ScreenFont1.CellH / 8);
-
-        ScreenCellFontX = [];
-        ScreenCellFontY = [];
-        for (let FontSize = 1; FontSize <= 32; FontSize++)
+        let CellFontXNums = [0];
+        for (let I = 0; I < ScreenCellW; I++)
         {
-            let CellFontXNums = [0];
-            for (let I = 0; I < ScreenCellW; I++)
+            for (let II = 0; II < FontSize; II++)
             {
-                for (let II = 0; II < FontSize; II++)
-                {
-                    CellFontXNums.push(I);
-                }
-            }
-            CellFontXNums.push(ScreenCellW - 1);
-
-            let NumX = 0;
-            let NumY = 1;
-            let LineY = 0;
-        
-            for (let Pos = 0; Pos < FontSize; Pos++)
-            {
-                let CellFontXItem = [];
-                
-                for (let NumI = 0; NumI <= (ScreenCellW + 1); NumI++)
-                {
-                    CellFontXItem.push(CellFontXNums[NumX]);
-                    NumX++;
-                }
-                NumX -= 2;
-                
-                ScreenCellFontX.push(CellFontXItem);
-
-                let LineY_ = LineY * ScreenCellW;
-                let CellFontYItem = [];
-                for (let NumI = 0; NumI < ScreenCellH; NumI++)
-                {
-                    if ((NumY % FontSize) == 0)
-                    {
-                        CellFontYItem.push(ScreenCellW);
-                        LineY++;
-                    }
-                    else
-                    {
-                        CellFontYItem.push(0);
-                    }
-                    NumY++;
-                }
-                CellFontYItem.push(LineY_);
-
-                ScreenCellFontY.push(CellFontYItem);
+                CellFontXNums.push(I);
             }
         }
-        
+        CellFontXNums.push(ScreenCellW - 1);
 
-        
-        ScreenResize(80, 24);
-        ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
-        //ScreenTest();
-        ScreenStarted = true;
-        ScreenTimerStart();
-        ProgInitAfterConf();
+        let NumX = 0;
+        let NumY = 1;
+        let LineY = 0;
+    
+        for (let Pos = 0; Pos < FontSize; Pos++)
+        {
+            let CellFontXItem = [];
+            
+            for (let NumI = 0; NumI <= (ScreenCellW + 1); NumI++)
+            {
+                CellFontXItem.push(CellFontXNums[NumX]);
+                NumX++;
+            }
+            NumX -= 2;
+            
+            ScreenCellFontX.push(CellFontXItem);
+
+            let LineY_ = LineY * ScreenCellW;
+            let CellFontYItem = [];
+            for (let NumI = 0; NumI < ScreenCellH; NumI++)
+            {
+                if ((NumY % FontSize) == 0)
+                {
+                    CellFontYItem.push(ScreenCellW);
+                    LineY++;
+                }
+                else
+                {
+                    CellFontYItem.push(0);
+                }
+                NumY++;
+            }
+            CellFontYItem.push(LineY_);
+
+            ScreenCellFontY.push(CellFontYItem);
+        }
     }
+    
+
+    
+    ScreenResize(1, 1);
+    ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
+    //ScreenTest();
+    ScreenStarted = true;
+    ScreenTimerStart();
+    ProgInitAfterConf();
 }
 
 function ScreenDisplayResize()
@@ -1143,8 +1149,8 @@ function ScreenDisplayResize()
     }
     else
     {
-        let ScrW = parseInt(ScreenDiv.style.width.substr(0, ScreenDiv.style.width.length - 2));
-        let ScrH = parseInt(ScreenDiv.style.height.substr(0, ScreenDiv.style.height.length - 2));
+        let ScrW = parseFloat(ScreenDiv.style.width.substr(0, ScreenDiv.style.width.length - 2)) * BrowserF();
+        let ScrH = parseFloat(ScreenDiv.style.height.substr(0, ScreenDiv.style.height.length - 2)) * BrowserF();
         let CanW = (ScrW > ScreenWW) ? Math.floor(ScrW / ScreenWW) * ScreenWW : ScreenWW;
         let CanH = (ScrH > ScreenHH) ? Math.floor(ScrH / ScreenHH) * ScreenHH : ScreenHH;
         while ((ScrW < CanW) && (CanW > 1))
@@ -1155,12 +1161,14 @@ function ScreenDisplayResize()
         {
             CanH = CanH >> 1;
         }
-        ScreenObj.style.width = CanW + "px";
-        ScreenObj.style.height = CanH + "px";
+        ScrW = ScrW / BrowserF();
+        ScrH = ScrH / BrowserF();
+        CanW = CanW / BrowserF();
+        CanH = CanH / BrowserF();
+        ScreenObj.style.width = Math.floor(CanW) + "px";
+        ScreenObj.style.height = Math.floor(CanH) + "px";
         ScreenObj.style.left = Math.floor((ScrW - CanW) / 2) + "px";
         ScreenObj.style.top = Math.floor((ScrH - CanH) / 2) + "px";
     }
-    
-    
 }
 

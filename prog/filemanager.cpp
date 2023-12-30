@@ -154,18 +154,14 @@ void FileManager::RepaintFiles(int PosX, int PosY)
         Info1.AddString("Ansi: ");
         Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Ansi ? "Y" : "N");
         Info1.AddString("  Codec: ");
-        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->EncodingNumber);
-        Info1.AddString("/");
-        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->EncodingName);
+        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->FullName());
     }
     else
     {
         Info1.AddString("Ansi: ");
         Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Ansi ? "Y" : "N");
         Info1.AddString("  Codec: ");
-        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->EncodingNumber);
-        Info1.AddString("/");
-        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->EncodingName);
+        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->FullName());
     }
     Info2.AddString("Ins - New file  Home - Upload");
     Info3.AddString("Del - Remove    End - Download");

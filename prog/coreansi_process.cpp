@@ -39,21 +39,8 @@ void CoreAnsi::AnsiTerminalReset()
 
 bool CoreAnsi::AnsiTerminalResize(int NewW, int NewH)
 {
-    if (NewW <= 0)
-    {
-        NewW = 80;
-    }
-    if (NewH <= 0)
-    {
-        if (ANSIDOS_)
-        {
-            NewH = 25;
-        }
-        else
-        {
-            NewH = 24;
-        }
-    }
+    NewW = Screen::DefaultW(NewW, ANSIDOS);
+    NewH = Screen::DefaultH(NewH, ANSIDOS);
 
     if ((AnsiMaxX == NewW) && (AnsiMaxY == NewH))
     {
@@ -69,14 +56,14 @@ bool CoreAnsi::AnsiTerminalResize(int NewW, int NewH)
         AnsiState_.__AnsiMarginRight = (NewW - 1);
     }
 
-    /*!!!!!!!!!!!!if (Core_.CursorX >= NewW)
+    if (Screen::CurrentX >= NewW)
     {
-        Core_.CursorX = NewW - 1;
+        Screen::CurrentX = NewW - 1;
     }
-    if (Core_.CursorY >= NewH)
+    if (Screen::CurrentY >= NewH)
     {
-        Core_.CursorY = NewH - 1;
-    }*/
+        Screen::CurrentY = NewH - 1;
+    }
 
     if (SeekState.Count > 1)
     {

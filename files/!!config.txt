@@ -9,11 +9,16 @@ WinKeyboardSize=30
 WinTouchScreen=0
 
 FontName1=files/fonts/dos08x16.png
-0WinFontName=files/fonts/unscii08x16.png
+
+#FontName1=files/fonts/unscii08x16.png
+#FontName2=files/fonts/unscii08x16_double.png
+#FontMode=0
+#FontChars=files/fonts/unscii08x16_double.txt
 
 SteadyCursor=0
 
 ColorBlending=1
+ColorBlendingGamma=2200
 
 ColorBlending_1=2591,2588,3,1,0
 ColorBlending_2=2592,2588,1,1,0

@@ -21,7 +21,6 @@ public:
     void ConnClose(bool StopApp);
 private:
     std::unique_ptr<TextCodec> B64;
-    std::unique_ptr<TextCodec> HexText;
     int ServerPort = 0;
     bool ServerTelnet = false;
     std::shared_ptr<TextCodec> ServerCodec;
@@ -46,7 +45,8 @@ private:
     // 5 - VT520
     int TerminalType = 1;
 
-    std::shared_ptr<TextCodec> TerminalCodec;
+    std::shared_ptr<TextCodec> TerminalCodecS;
+    std::shared_ptr<TextCodec> TerminalCodecR;
 
     TerminalKeyboard TerminalKeyboard_;
 

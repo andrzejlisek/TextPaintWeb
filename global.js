@@ -2,7 +2,12 @@ let ExistsSharedArrayBuffer = false;
 let DebugMode = true;
 let KeybBlockShortcuts = true;
 let GuiSettingsShown = false;
+
+let FileLsReady = false;
+let FileDbReady = false;
+
 let ProgLoaded = false;
+let ProgInitialized = false;
 let ProgStarted = false;
 let ScreenStarted = false;
 let Stopwatch = [];
@@ -155,5 +160,20 @@ function DataTextToBlob(Data)
         DataNum[i] = DataStr.charCodeAt(i);
     }
     return new Blob([new Uint8Array(DataNum)], {type: "application/octet-stream"});
+}
+
+function BrowserW()
+{
+    return window.innerWidth;
+}
+
+function BrowserH()
+{
+    return window.innerHeight;
+}
+
+function BrowserF()
+{
+    return window.devicePixelRatio;
 }
 

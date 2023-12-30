@@ -1309,6 +1309,11 @@ void TextCodec::Decode(Raw &Data, Str &Text)
     DequeueStr(Text);
 }
 
+std::string TextCodec::FullName()
+{
+    return std::to_string(EncodingNumber) + "/" + EncodingName;
+}
+
 void TextCodec::Transcode(Str &S, int CodecSrc, int CodecDst)
 {
     TextCodec Codec1(CodecSrc);

@@ -63,11 +63,11 @@ public:
     Str ProcessInfo;
 
 private:
-    int FindName(Str Name);
     std::string EventFileName = "";
 
     XList<Str> Disp;
     XList<BinaryFileItem> ListItems;
+    XList<Str> ListItemsN;
     int PtrSep = 126;
     int PtrSepNum = 8;
 

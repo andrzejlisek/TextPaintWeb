@@ -14,6 +14,7 @@ class TextWork
 public:
     static std::string NumPlusMinus(long Num);
     /*static int CodeChar(std::string C);*/
+    static std::string CharPrint(int C);
     static std::string CharToStr(int C);
 
     static std::string CharCode(int C, int Mode);

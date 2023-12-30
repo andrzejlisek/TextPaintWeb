@@ -87,6 +87,22 @@ std::string TextWork::NumPlusMinus(long Num)
     return Hex::HexToInt(C);
 }*/
 
+std::string TextWork::CharPrint(int C)
+{
+    if ((C >= 32) && (C <= 126))
+    {
+        return CharToStr(C);
+    }
+    else
+    {
+        if (C < 0)
+        {
+            C += 256;
+        }
+        return "<" + std::to_string(C) + ">";
+    }
+}
+
 std::string TextWork::CharToStr(int C)
 {
     std::string Str = "X";

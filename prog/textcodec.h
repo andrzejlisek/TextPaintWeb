@@ -14,16 +14,27 @@ public:
     int LF = 0;
     TextCodec();
     TextCodec(int CodePage);
+
+    // BOM character value
     static constexpr inline int BOM = 0xFEFF;
+
+    // No codec, characters from 0 to 255 as bytes
     static constexpr inline int NONE = 0;
+
+    // Modified IBM437
     static constexpr inline int DOS = 1;
-    static constexpr inline int BASE64 = 2;
-    static constexpr inline int HEX = 3;
+
+    // Standard Unicode codecs
     static constexpr inline int UTF8 = 65001;
     static constexpr inline int UTF16LE = 1200;
     static constexpr inline int UTF16BE = 1201;
     static constexpr inline int UTF32LE = 12000;
     static constexpr inline int UTF32BE = 12001;
+
+    // Special codecs for use internally only
+    static constexpr inline int BASE64 = 65535;
+    static constexpr inline int HEX = 65534;
+
     void Reset();
     void AddBOM();
     void RemoveBOM();
@@ -36,6 +47,7 @@ public:
     bool EncodingOneByte;
     int EncodingNumber;
     std::string EncodingName;
+    std::string FullName();
     int MapByteToText[256];
     std::map<int, unsigned char> MapTextToByte;
     static void Transcode(Str &S, int CodecSrc, int CodecDst);

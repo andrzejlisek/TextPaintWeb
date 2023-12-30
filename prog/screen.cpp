@@ -247,3 +247,34 @@ int Screen::FileExport(int Kind, std::string Name, std::string Attrib, std::stri
     FileExport_(FilePortId, Kind, Name, Attrib, Data);
     return FilePortId;
 }
+
+int Screen::DefaultW(int ScrW, int ANSIDOS)
+{
+    if (ScrW <= 0)
+    {
+        return 80;
+    }
+    else
+    {
+        return ScrW;
+    }
+}
+
+int Screen::DefaultH(int ScrH, int ANSIDOS)
+{
+    if (ScrH <= 0)
+    {
+        if (ANSIDOS == 1)
+        {
+            return 25;
+        }
+        else
+        {
+            return 24;
+        }
+    }
+    else
+    {
+        return ScrH;
+    }
+}

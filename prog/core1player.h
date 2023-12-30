@@ -56,7 +56,6 @@ private:
 
     std::string ANSIBrowseWildcard;
 
-    bool ForceRepaint = false;
     long FileTimerOffset = 0;
     int ActionRequestParam = 0;
     int ActionRequest = 0;

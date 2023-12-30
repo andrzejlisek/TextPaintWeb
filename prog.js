@@ -7,6 +7,7 @@ let ProgEventOtherFile;
 function ProgStart()
 {
     ProgStarted = true;
+    ProgInitScreen();
     ScreenTimerStart();
     
     KeybInit();
@@ -47,6 +48,8 @@ function _ProgCallback(D)
                     I += 1;
                     break;
                 case 99:
+                    ProgInitialized = true;
+                    ProgInitScreen();
                     ScreenInit1();
                     I += 1;
                     break;
@@ -180,6 +183,7 @@ function _ProgCallback(D)
       };
 
 
+ProgInitScreen();
 FileDbOpen();
 IndexImportLS();
 

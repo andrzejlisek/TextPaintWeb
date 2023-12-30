@@ -1,6 +1,5 @@
 let FileDb;
 let FileDbName = "Files";
-let FileDbReady = false;
 
 function FileDbOpen()
 {

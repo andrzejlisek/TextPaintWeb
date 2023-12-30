@@ -45,7 +45,6 @@ public:
 
     static inline int FontMaxSize = 32;
     static inline int FontMaxSizeCode = 527;
-
 };
 
 #endif // CORESTATIC_H

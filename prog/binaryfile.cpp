@@ -9,41 +9,34 @@ BinaryFile::BinaryFile()
     ItemAdd(BinaryFileItem(Str(SystemFile0), 5, -1, 65001, false), true);
 
     Disp.Clear();
-    for (int I = 0; I < ListItems.Count; I++)
+    for (int I = 0; I < ListItemsN.Count; I++)
     {
         Str N;
-        N.AddRange(ListItems[I].Name);
+        N.AddRange(ListItemsN[I]);
         N.Add(PtrSep);
         N.AddString(I);
         Disp.Add(N);
     }
 }
 
-int BinaryFile::FindName(Str Name)
-{
-    int Pos = -1;
-    for (int I = 0; I < ListItems.Count; I++)
-    {
-        if (ListItems[I].Name == Name)
-        {
-            return I;
-        }
-    }
-    return Pos;
-}
-
 void BinaryFile::ItemAdd(BinaryFileItem X, bool Replace)
 {
-    int Pos = FindName(X.Name);
+    int Pos = ListItemsN.IndexOfBin(X.Name);
     if (Pos >= 0)
     {
         if (!Replace)
         {
             return;
         }
-        ListItems.Remove(Pos);
+
+        ListItems[Pos] = X;
+        return;
     }
-    ListItems.Add(X);
+    else
+    {
+        ListItems.AddSortByIndex(Pos, X);
+        ListItemsN.AddSortByIndex(Pos, X.Name);
+    }
 }
 
 void BinaryFile::ItemAdd(Str FileName)
@@ -57,7 +50,7 @@ void BinaryFile::ItemAdd(Str FileName)
         FileName.InsertString("/");
         FileName.InsertRange(ListDir);
     }
-    int Idx = FindName(FileName);
+    int Idx = ListItemsN.IndexOfBin(FileName);
     if (Idx >= 0)
     {
         ListItems[Idx].AttribSet(DefaultAttrib.get()->AttribGet());
@@ -67,7 +60,7 @@ void BinaryFile::ItemAdd(Str FileName)
         ItemAdd(BinaryFileItem(FileName, 2, -1, DefaultAttrib.get()->AttribGet()), false);
         SetDir(Str("."));
     }
-    Idx = FindName(FileName);
+    Idx = ListItemsN.IndexOfBin(FileName);
     if (Idx > 0)
     {
         TempData.Clear();
@@ -94,17 +87,19 @@ void BinaryFile::ItemRemove(Str FileName)
         FileName.InsertRange(ListDir);
     }
 
-    for (int I = 0; I < ListItems.Count; I++)
+    Str SystemFile0_ = Str(SystemFile0);
+    for (int I = 0; I < ListItemsN.Count; I++)
     {
-        if ((ListItems[I].Name.Count >= FileName.Count) && (ListItems[I].Name!= Str(SystemFile0)))
+        if ((ListItemsN[I].Count >= FileName.Count) && (ListItemsN[I] != SystemFile0_))
         {
-            if (ListItems[I].Name.GetRange(0, FileName.Count) == FileName)
+            if (ListItemsN[I].GetRange(0, FileName.Count) == FileName)
             {
                 TempData.Clear();
                 ListItems[I].Type += 100;
                 FileExport(I, true);
                 ListItems[I].Type -= 100;
                 ListItems.Remove(I);
+                ListItemsN.Remove(I);
                 I--;
             }
         }
@@ -245,9 +240,9 @@ void BinaryFile::SetDir(Str Dir)
         DispSepX.Add(PtrSep);
     }
 
-    for (int I = 0; I < ListItems.Count; I++)
+    for (int I = 0; I < ListItemsN.Count; I++)
     {
-        Str N = ListItems[I].Name;
+        Str N = ListItemsN[I];
         if (ListDir.Count > 0)
         {
             if (N.Count > (ListDir.Count))
@@ -363,13 +358,13 @@ std::string BinaryFile::LoadToStringConfig()
 
     while (X[I] == '~')
     {
+        I++;
         Index_.Clear();
         while (X[I] != '\n')
         {
             Index_.Add(X[I]);
             I++;
         }
-        Index_.PopFirst();
         Index.Add(Index_);
         I++;
     }
@@ -415,7 +410,7 @@ bool BinaryFile::IsSystemFile()
 void BinaryFile::FileImportSys()
 {
     FileImportWaiting = true;
-    int Idx = FindName(SystemFile0);
+    int Idx = ListItemsN.IndexOfBin(SystemFile0);
     if (Idx >= 0)
     {
         ListItems[Idx].EventId = Screen::FileImport(ListItems[Idx].Type, ListItems[Idx].Name.ToString(), ListItems[Idx].AttribGet());
@@ -507,13 +502,13 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
             {
                 EventFileName = EvtParam0;
             }
-            int Idx = FindName(EventFileName);
+            int Idx = ListItemsN.IndexOfBin(EventFileName);
             if (Idx < 0)
             {
                 if (EvtParam2 == 26)
                 {
                     ItemAdd(BinaryFileItem(Str(EventFileName), 2, -1, DefaultAttrib.get()->AttribGet()), true);
-                    Idx = FindName(EventFileName);
+                    Idx = ListItemsN.IndexOfBin(EventFileName);
                 }
             }
             else
@@ -586,7 +581,7 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
         if (EvtParam4 == 0)
         {
             EventFileName = EvtParam0;
-            int Idx = FindName(EventFileName);
+            int Idx = ListItemsN.IndexOfBin(EventFileName);
             IdxCurrent = Idx;
             if (Idx >= 0)
             {

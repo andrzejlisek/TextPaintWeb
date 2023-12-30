@@ -97,7 +97,7 @@ void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             {
                 if (DisplayConfig_.get()->RequestResize)
                 {
-                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 0, 0);
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 1, 0);
                 }
                 else
                 {

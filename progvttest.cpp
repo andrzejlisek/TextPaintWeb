@@ -24,9 +24,9 @@ void Base64Raw2Str()
     Base64StrL = StrPrefixL;
     for (int I = 0; I < Base64RawL; I += 3)
     {
-        int Char0 = -1;
-        int Char1 = -1;
-        int Char2 = -1;
+        int Char0 = -260;
+        int Char1 = -260;
+        int Char2 = -260;
         if ((I + 0) < Base64RawL) Char0 = Base64Raw[I + 0];
         if ((I + 1) < Base64RawL) Char1 = Base64Raw[I + 1];
         if ((I + 2) < Base64RawL) Char2 = Base64Raw[I + 2];
@@ -188,6 +188,10 @@ extern "C"
                     PrintStr(Base64Raw, Base64RawL, 1);
                     std::cout << std::endl;
                 }
+                if ((DebugParams & 4) > 0)
+                {
+                    std::cout << "Send: " << Base64Str << std::endl;
+                }
             }
         }
     
@@ -207,21 +211,9 @@ extern "C"
                 {
                     ChrX += 256;
                 }
-                if (ChrX > 128)
-                {
-                    Base64Raw[Base64RawL] = (char)(0xC0 + (ChrX >> 6));
-                    Base64RawL++;
-                    CountLimit--;
-                    Base64Raw[Base64RawL] = (char)(0x80 + (ChrX & 63));
-                    Base64RawL++;
-                    CountLimit--;
-                }
-                else
-                {
-                    Base64Raw[Base64RawL] = (char)ChrX;
-                    Base64RawL++;
-                    CountLimit--;
-                }
+                Base64Raw[Base64RawL] = (char)ChrX;
+                Base64RawL++;
+                CountLimit--;
             }
             if (Base64RawL > 0)
             {
@@ -244,6 +236,10 @@ extern "C"
                         std::cout << "Receive: ";
                         PrintStr(Base64Raw, Base64RawL, 1);
                         std::cout << std::endl;
+                    }
+                    if ((DebugParams & 4) > 0)
+                    {
+                        std::cout << "Receive: " << Base64Str << std::endl;
                     }
                 }
 
