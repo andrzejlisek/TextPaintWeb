@@ -7,21 +7,6 @@ let FileBrwListName = [];
 let FileBrwListData = [];
 
 
-function FileBrwIsZip(Name)
-{
-    if (Name.length > 4)
-    {
-        if (Name.substr(Name.length - 4).toLowerCase() == ".zip")
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-
-
-
 function FileBrwUploadProcess(Name, Data)
 {
     FileImportFinish(0, 6, FileBrwNameStr + FileGoodName(Name), "", Data, 0);
@@ -32,7 +17,7 @@ async function FileBrwUploadProcessZip2(Name, FileList, FileNames)
 {
     Name = Name.substr(0, Name.length - 4);
 
-    for (F in FileList)
+    for (let F in FileList)
     {
         if (F.length > 0)
         {
@@ -81,29 +66,28 @@ function FileBrwUploadEvent()
 {
     FileBrwListName = [];
     FileBrwListData = [];
-    let Fld = document.getElementById("FileUpload");
+    let FileUploadField = document.getElementById("FileUpload");
     
-    FileImportFinish(0, 6, "NUMBER|" + Fld.files.length, "", "", 2);
+    FileImportFinish(0, 6, "NUMBER|" + FileUploadField.files.length, "", "", 2);
     ProgEventTick();
-    for (var I = 0; I < Fld.files.length; I++)
+    for (let I = 0; I < FileUploadField.files.length; I++)
     {
-        let FR = new FileReader();
-        
-        FR.X = Fld.files[I].name;
+        const FileName = FileUploadField.files[I].name;
+        const FR = new FileReader();
         
         FR.onload = function(e)
         {
-            if (FileBrwIsZip(e.target.X))
+            if (FileName.toLowerCase().endsWith(".zip"))
             {
-                FileBrwUploadProcessZip(e.target.X, e.target.result.substr(e.target.result.indexOf(',') + 1));
+                FileBrwUploadProcessZip(FileName, e.target.result.substr(e.target.result.indexOf(',') + 1));
             }
             else
             {
-                FileBrwUploadProcess(e.target.X, e.target.result.substr(e.target.result.indexOf(',') + 1));
+                FileBrwUploadProcess(FileName, e.target.result.substr(e.target.result.indexOf(',') + 1));
             }
         };
         
-        FR.readAsDataURL(Fld.files[I]);
+        FR.readAsDataURL(FileUploadField.files[I]);
     }
 }
 
