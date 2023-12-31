@@ -86,13 +86,15 @@ void BinaryFile::ItemRemove(Str FileName)
         FileName.InsertString("/");
         FileName.InsertRange(ListDir);
     }
+    Str FileName_ = FileName.Copy();
+    FileName_.Add('/');
 
     Str SystemFile0_ = Str(SystemFile0);
     for (int I = 0; I < ListItemsN.Count; I++)
     {
         if ((ListItemsN[I].Count >= FileName.Count) && (ListItemsN[I] != SystemFile0_))
         {
-            if (ListItemsN[I].GetRange(0, FileName.Count) == FileName)
+            if ((ListItemsN[I] == FileName) || ListItemsN[I].GetRange(0, FileName_.Count) == FileName_)
             {
                 TempData.Clear();
                 ListItems[I].Type += 100;
@@ -295,7 +297,9 @@ void BinaryFile::SetDir(Str Dir)
 
     if (ListDir.Count > 0)
     {
-        Disp.Insert(Str("..~"));
+        std::string UpDirName = "..@";
+        UpDirName[2] = PtrSep;
+        Disp.Insert(Str(UpDirName));
     }
 
     if (ResetCursor)
@@ -583,6 +587,7 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
             EventFileName = EvtParam0;
             int Idx = ListItemsN.IndexOfBin(EventFileName);
             IdxCurrent = Idx;
+
             if (Idx >= 0)
             {
                 return true;
@@ -670,7 +675,7 @@ void BinaryFile::FileDownload()
 
     BrowserDownloadCount = BrowserDownload.Count;
 
-    BrowserDownloadWaiting = true;
+    BrowserDownloadProc2();
 }
 
 void BinaryFile::BrowserDownloadProc(int Idx)
@@ -683,29 +688,24 @@ void BinaryFile::BrowserDownloadProc(int Idx)
         FileExport(Idx, true);
         ListItems[Idx].Browser(0);
         BrowserDownload.Remove(Pos);
-        BrowserDownloadWaiting = true;
+        BrowserDownloadProc2();
     }
 }
 
-void BinaryFile::EvenTick()
+void BinaryFile::BrowserDownloadProc2()
 {
-    if (BrowserDownloadWaiting)
+    ProcessInfo.Clear();
+    if (BrowserDownload.Count > 0)
     {
-        BrowserDownloadWaiting = false;
+        ProcessInfo.AddString((BrowserDownloadCount - BrowserDownload.Count + 1));
+        ProcessInfo.AddString("/");
+        ProcessInfo.AddString(BrowserDownloadCount);
 
-        ProcessInfo.Clear();
-        if (BrowserDownload.Count > 0)
-        {
-            ProcessInfo.AddString((BrowserDownloadCount - BrowserDownload.Count + 1));
-            ProcessInfo.AddString("/");
-            ProcessInfo.AddString(BrowserDownloadCount);
-
-            FileImport(BrowserDownload[0], true);
-        }
-        else
-        {
-            ProcessInfo.AddString("~");
-            Screen::FileExport(6, "", "~END", "");
-        }
+        FileImport(BrowserDownload[0], true);
+    }
+    else
+    {
+        ProcessInfo.AddString("~");
+        Screen::FileExport(6, "", "~END", "");
     }
 }

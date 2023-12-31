@@ -326,10 +326,6 @@ void FileManager::RepaintProcess(int PosX, int PosY)
 
 void FileManager::EventTick()
 {
-    if (BinaryFile_)
-    {
-        BinaryFile_.get()->EvenTick();
-    }
     if (BinaryFile_.get()->ProcessInfo.Count > 0)
     {
         ManagerState = ManagerStateDef::Process;

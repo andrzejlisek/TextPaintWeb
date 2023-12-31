@@ -145,13 +145,12 @@ function ScreenSetDisplayConfig(Repaint)
         switch (ScreenDisplayInterpolate)
         {
             case 0:
+            case 2:
+            case 3:
                 ScreenObj.className = "canvas0";
                 break;
             case 1:
                 ScreenObj.className = "canvas1";
-                break;
-            case 2:
-                ScreenObj.className = "canvas0";
                 break;
         }
         ScreenDisplayResize();
@@ -552,7 +551,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                 const T2 = ScreenCellH - OffsetVal;
 
                 ScreenCtx.putImageData(CharData0, XX, YY - T1, 0, T1, ScreenCellW, T2);
-                ScreenCtx.putImageData(CharData1, XX, YY - T1, 0, T1, ScreenCellW, T2 + ScreenHH);
+                ScreenCtx.putImageData(CharData1, XX, YY - T1 + ScreenHH, 0, T1, ScreenCellW, T2);
                 
                 if (OffsetOtherHalf)
                 {
@@ -564,17 +563,9 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                     CharData0_ = ScreenCharGlyph(0, ScrIdx, true);
                     CharData1_ = ScreenCharGlyph(1, ScrIdx, true);
                 }
-                if (ScreenBlinkState)
-                {
-                    CharDataScr_ = CharData1_;
-                }
-                else
-                {
-                    CharDataScr_ = CharData0_;
-                }                
 
                 ScreenCtx.putImageData(CharData0_, XX, YY + T2, 0, 0, ScreenCellW, T1);
-                ScreenCtx.putImageData(CharData1_, XX, YY + T2, 0, 0, ScreenCellW, T1 + ScreenHH);
+                ScreenCtx.putImageData(CharData1_, XX, YY + T2 + ScreenHH, 0, 0, ScreenCellW, T1);
             }
             break;
         case 2:
@@ -583,7 +574,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                 const T2 = ScreenCellH - OffsetVal;
 
                 ScreenCtx.putImageData(CharData0, XX, YY + T1, 0, 0, ScreenCellW, T2);
-                ScreenCtx.putImageData(CharData1, XX, YY + T1, 0, 0, ScreenCellW, T2 + ScreenHH);
+                ScreenCtx.putImageData(CharData1, XX, YY + T1 + ScreenHH, 0, 0, ScreenCellW, T2);
 
                 if (OffsetOtherHalf)
                 {
@@ -595,17 +586,9 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                     CharData0_ = ScreenCharGlyph(0, ScrIdx, true);
                     CharData1_ = ScreenCharGlyph(1, ScrIdx, true);
                 }
-                if (ScreenBlinkState)
-                {
-                    CharDataScr_ = CharData1_;
-                }
-                else
-                {
-                    CharDataScr_ = CharData0_;
-                }
 
                 ScreenCtx.putImageData(CharData0_, XX, YY - T2, 0, T2, ScreenCellW, T1);
-                ScreenCtx.putImageData(CharData1_, XX, YY - T2, 0, T2, ScreenCellW, T1 + ScreenHH);
+                ScreenCtx.putImageData(CharData1_, XX, YY - T2 + ScreenHH, 0, T2, ScreenCellW, T1);
             }
             break;
     }
@@ -851,7 +834,14 @@ function ScreenLineOffset(Y, Offset, Blank, ColorBack, ColorFore, ColorAttr)
     if (Y < 0) { return; }
     if (Y >= ScreenH) { return; }
     let OldOffset = ScreenLineOffsetVal[Y]
-    ScreenLineOffsetVal[Y] = ScreenLineOffsetValArray[Offset];
+    if (Offset >= 0)
+    {
+        ScreenLineOffsetVal[Y] = ScreenLineOffsetValArray[Offset];
+    }
+    else
+    {
+        ScreenLineOffsetVal[Y] = 0 - ScreenLineOffsetValArray[0 - Offset];
+    }
     ScreenLineOffsetBlank[Y] = Blank;
     ScreenLineOffsetBack[Y] = ColorBack;
     ScreenLineOffsetFore[Y] = ColorFore;
@@ -1077,44 +1067,56 @@ function ScreenDisplayResize()
 {
     const ScrW = parseInt(ScreenDiv.style.width.substr(0, ScreenDiv.style.width.length - 2));
     const ScrH = parseInt(ScreenDiv.style.height.substr(0, ScreenDiv.style.height.length - 2));
-    if (ScreenDisplayInterpolate < 2)
+    switch (ScreenDisplayInterpolate)
     {
-        ScreenVP.style.width = ScrW + "px";
-        ScreenVP.style.height = ScrH + "px";
-        ScreenVP.style.left = "0px";
-        ScreenVP.style.top = "0px";
-        
-        ScreenDrawBlinkOffset = "-" + ScrH + "px";
-        ScreenObj.style.width = ScrW + "px";
-        ScreenObj.style.height = (ScrH << 1) + "px";
-    }
-    else
-    {
-        let ScrW_ = parseFloat(ScrW) * BrowserF();
-        let ScrH_ = parseFloat(ScrH) * BrowserF();
-        let CanW = (ScrW_ > ScreenWW) ? Math.floor(ScrW_ / ScreenWW) * ScreenWW : ScreenWW;
-        let CanH = (ScrH_ > ScreenHH) ? Math.floor(ScrH_ / ScreenHH) * ScreenHH : ScreenHH;
-        while ((ScrW_ < CanW) && (CanW > 1))
-        {
-            CanW = CanW >> 1;
-        }
-        while ((ScrH_ < CanH) && (CanH > 1))
-        {
-            CanH = CanH >> 1;
-        }
-        ScrW_ = ScrW_ / BrowserF();
-        ScrH_ = ScrH_ / BrowserF();
-        CanW = CanW / BrowserF();
-        CanH = CanH / BrowserF();
+        case 0:
+        case 1:
+            ScreenVP.style.width = ScrW + "px";
+            ScreenVP.style.height = ScrH + "px";
+            ScreenVP.style.left = "0px";
+            ScreenVP.style.top = "0px";
+            
+            ScreenDrawBlinkOffset = "-" + ScrH + "px";
+            ScreenObj.style.width = ScrW + "px";
+            ScreenObj.style.height = (ScrH << 1) + "px";
+            break;
+        case 2:
+            let ScrW_ = parseFloat(ScrW) * BrowserF();
+            let ScrH_ = parseFloat(ScrH) * BrowserF();
+            let CanW = (ScrW_ > ScreenWW) ? Math.floor(ScrW_ / ScreenWW) * ScreenWW : ScreenWW;
+            let CanH = (ScrH_ > ScreenHH) ? Math.floor(ScrH_ / ScreenHH) * ScreenHH : ScreenHH;
+            while ((ScrW_ < CanW) && (CanW > 1))
+            {
+                CanW = CanW >> 1;
+            }
+            while ((ScrH_ < CanH) && (CanH > 1))
+            {
+                CanH = CanH >> 1;
+            }
+            ScrW_ = ScrW_ / BrowserF();
+            ScrH_ = ScrH_ / BrowserF();
+            CanW = CanW / BrowserF();
+            CanH = CanH / BrowserF();
 
-        ScreenVP.style.width = Math.round(CanW) + "px";
-        ScreenVP.style.height = Math.round(CanH) + "px";
-        ScreenVP.style.left = Math.round((ScrW_ - CanW) / 2) + "px";
-        ScreenVP.style.top = Math.round((ScrH_ - CanH) / 2) + "px";
+            ScreenVP.style.width = Math.round(CanW) + "px";
+            ScreenVP.style.height = Math.round(CanH) + "px";
+            ScreenVP.style.left = Math.round((ScrW_ - CanW) / 2) + "px";
+            ScreenVP.style.top = Math.round((ScrH_ - CanH) / 2) + "px";
 
-        ScreenDrawBlinkOffset = "-" + CanH + "px";
-        ScreenObj.style.width = CanW + "px";
-        ScreenObj.style.height = (CanH << 1) + "px";
+            ScreenDrawBlinkOffset = "-" + CanH + "px";
+            ScreenObj.style.width = CanW + "px";
+            ScreenObj.style.height = (CanH << 1) + "px";
+            break;
+        case 3:
+            ScreenVP.style.width = ScrW + "px";
+            ScreenVP.style.height = ScrH + "px";
+            ScreenVP.style.left = "0px";
+            ScreenVP.style.top = "0px";
+            
+            ScreenDrawBlinkOffset = "0px";
+            ScreenObj.style.width = ScrW + "px";
+            ScreenObj.style.height = ScrH + "px";
+            break;
     }
 
     ScreenDrawBlink(ScreenBlinkState);

@@ -58,8 +58,6 @@ public:
     void FileUpload();
     void FileDownload();
 
-    void EvenTick();
-
     Str ProcessInfo;
 
 private:
@@ -68,7 +66,7 @@ private:
     XList<Str> Disp;
     XList<BinaryFileItem> ListItems;
     XList<Str> ListItemsN;
-    int PtrSep = 126;
+    int PtrSep = 255;
     int PtrSepNum = 8;
 
     Raw TempData;
@@ -83,8 +81,8 @@ private:
     int BrowserUploadCount;
     int BrowserDownloadCount;
     XList<int> BrowserDownload;
-    bool BrowserDownloadWaiting = false;
     void BrowserDownloadProc(int Idx);
+    void BrowserDownloadProc2();
 };
 
 #endif // BINARYFILE_H
