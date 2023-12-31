@@ -181,7 +181,7 @@ ServerTelnet=1
 
 TerminalEncoding=65001
 TerminalName=xterm-256color
-TerminalType=4
+TerminalType=5
 TerminalVTFuncKeys=0
 TerminalVTArrowKeys=0
 TerminalFile=

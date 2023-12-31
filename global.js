@@ -16,6 +16,7 @@ let VTTEST_ = document.getElementById("vttest").contentWindow;
 
 let ProgInit_ConfData = "";
 
+let ScreenTimerCallback = 100000;
 let ScreenTimerPeriod = 100;
 let ScreenTimerCounter = 0;
 let ScreenTimerCounterLoop = 10;

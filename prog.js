@@ -6,6 +6,7 @@ let ProgEventOtherFile;
 
 function ProgStart()
 {
+    ScreenTimerCallback = ScreenTimerPeriod;
     ProgStarted = true;
     ProgInitScreen();
     ScreenTimerStart();
@@ -34,83 +35,91 @@ function ProgEventKey(KeyName, KeyChr, KeyS, KeyC, KeyA)
     }
 }
 
+let CallbackQueue = [];
+let CallbackQueueI = 0;
+
 function _ProgCallback(D)
 {
-    let I = 0;
-    let Proc = D[0];
+    CallbackQueue.push(D);
+    const TimeLimit = performance.now() + ScreenTimerCallback;
+    let AtLeastOneAction = true;
+    while ((CallbackQueue.length > 0) && ((TimeLimit > performance.now()) || AtLeastOneAction))
     {
-        while (Proc != 0)
+        AtLeastOneAction = false;
+        const D = CallbackQueue[0];
+        const Proc = D[CallbackQueueI];
+        switch (Proc)
         {
-            switch (Proc)
-            {
-                case 98:
-                    _ProgInit("2");
-                    I += 1;
-                    break;
-                case 99:
-                    ProgInitialized = true;
-                    ProgInitScreen();
-                    ScreenInit1();
-                    I += 1;
-                    break;
-                case 100:
-                    ProgStart();
-                    I += 1;
-                    break;
-                case 101:
-                    ScreenChar(D[I+1],D[I+2],D[I+3],D[I+4],D[I+5],D[I+6],D[I+7],D[I+8]);
-                    I += 9;
-                    break;
-                case 102:
-                    ScreenClear(D[I+1],D[I+2]);
-                    I += 3;
-                    break;
-                case 103:
-                    ScreenResize(D[I+1],D[I+2]);
-                    I += 3;
-                    break;
-                case 104:
-                    ScreenCursorMove(D[I+1],D[I+2]);
-                    I += 3;
-                    break;
-                case 105:
-                    ScreenTextMove(D[I+1],D[I+2],D[I+3],D[I+4],D[I+5],D[I+6]);
-                    I += 7;
-                    break;
-                case 106:
-                    ScreenLineOffset(D[I+1],D[I+2],D[I+3],D[I+4],D[I+5],D[I+6]);
-                    I += 7;
-                    break;
-                case 111:
-                    FileImport(D[I+1],D[I+2],StringBufDecode(D[I+3]),D[I+4]);
-                    I += 5;
-                    break;
-                case 112:
-                    FileExport(D[I+1],D[I+2],StringBufDecode(D[I+3]),D[I+4],D[I+5]);
-                    I += 6;
-                    break;
-                case 113:
-                    ConfigFileGet(StringBufDecode(D[I+1]),StringBufDecode(D[I+2]));
-                    if (ProgStarted)
-                    {
-                        ScreenSetDisplayConfig(true);
-                    }
-                    I += 3;
-                    break;
-                case 200:
-                    VTTEST_.VTData(D[I+1]);
-                    I += 2;
-                    break;
-                case 201:
-                    VTTEST_.VTStart();
-                    I += 2;
-                    break;
-                case 202:
-                    VTTEST_.VTStop();
-                    I += 2;
-                    break;
-            }
-            Proc = D[I];
+            case 0:
+                CallbackQueue.shift();
+                CallbackQueueI = 0;
+                break;
+            case 98:
+                _ProgInit("2");
+                CallbackQueueI += 1;
+                break;
+            case 99:
+                ProgInitialized = true;
+                ProgInitScreen();
+                ScreenInit1();
+                CallbackQueueI += 1;
+                break;
+            case 100:
+                ProgStart();
+                CallbackQueueI += 1;
+                break;
+            case 101:
+                ScreenChar(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6],D[CallbackQueueI+7],D[CallbackQueueI+8]);
+                CallbackQueueI += 9;
+                break;
+            case 102:
+                ScreenClear(D[CallbackQueueI+1],D[CallbackQueueI+2]);
+                CallbackQueueI += 3;
+                break;
+            case 103:
+                ScreenResize(D[CallbackQueueI+1],D[CallbackQueueI+2]);
+                CallbackQueueI += 3;
+                break;
+            case 104:
+                ScreenCursorMove(D[CallbackQueueI+1],D[CallbackQueueI+2]);
+                CallbackQueueI += 3;
+                break;
+            case 105:
+                ScreenTextMove(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6]);
+                CallbackQueueI += 7;
+                break;
+            case 106:
+                ScreenLineOffset(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6]);
+                CallbackQueueI += 7;
+                break;
+            case 111:
+                FileImport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4]);
+                CallbackQueueI += 5;
+                break;
+            case 112:
+                FileExport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4],D[CallbackQueueI+5]);
+                CallbackQueueI += 6;
+                break;
+            case 113:
+                ConfigFileGet(StringBufDecode(D[CallbackQueueI+1]),StringBufDecode(D[CallbackQueueI+2]));
+                if (ProgStarted)
+                {
+                    ScreenSetDisplayConfig(true);
+                }
+                CallbackQueueI += 3;
+                break;
+            case 200:
+                VTTEST_.VTData(D[CallbackQueueI+1]);
+                CallbackQueueI += 2;
+                break;
+            case 201:
+                VTTEST_.VTStart();
+                CallbackQueueI += 2;
+                break;
+            case 202:
+                VTTEST_.VTStop();
+                CallbackQueueI += 2;
+                break;
         }
     }
 }
