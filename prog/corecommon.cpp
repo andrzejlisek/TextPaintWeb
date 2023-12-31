@@ -73,6 +73,8 @@ void CoreCommon::InitCommon()
     StatusFore += 16;
     PopupBack += 16;
     PopupFore += 16;
+    //ScreenStatusBar = CF.get()->ParamGetI("DisplayStatusBar");
+    ScreenStatusBar = 0;
 
     FileManager_.BinaryFile_ = BinaryFile_;
     FileManager_.PopupBack = PopupBack;
@@ -166,4 +168,22 @@ void CoreCommon::SaveConfig()
 {
     BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
     BinaryFile_.get()->SysSaveConfig();
+}
+
+void CoreCommon::ScreenStatusBarSet(int ScreenStatusBar_)
+{
+    int TermW = Screen::CurrentW;
+    int TermH = Screen::CurrentH;
+    if ((ScreenStatusBar == 0) && (ScreenStatusBar_ > 0))
+    {
+        TermH++;
+        Screen::ScreenResize(TermW, TermH);
+    }
+    if ((ScreenStatusBar > 0) && (ScreenStatusBar_ == 0))
+    {
+        TermH--;
+        Screen::ScreenResize(TermW, TermH);
+    }
+    CoreAnsi_.get()->AnsiTerminalResize(TermW, TermH, ScreenStatusBar_);
+    ScreenStatusBar = ScreenStatusBar_;
 }

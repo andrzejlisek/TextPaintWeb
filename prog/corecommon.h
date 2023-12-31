@@ -37,7 +37,9 @@ public:
     std::shared_ptr<BinaryFile> BinaryFile_;
     FileManager FileManager_;
     void SaveConfig();
+    void ScreenStatusBarSet(int ScreenStatusBar_);
 protected:
+    int ScreenStatusBar = 0;
     void ReadColor(std::string SettingValue, int &ColorB, int &ColorF);
     int ScreenW = 80;
     int ScreenH = 24;

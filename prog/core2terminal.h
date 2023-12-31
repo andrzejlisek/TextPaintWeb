@@ -28,7 +28,13 @@ private:
     bool LocalEcho = false;
     bool Command_8bit = false;
     bool UseCtrlKeys = false;
+    int DisplayStatus = 0;
 
+    void DisplayStatusRepaint();
+    void DisplayStatusPrepare();
+
+    std::string WindowTitleStatus;
+    int WindowTitleStatusSize;
     std::string WindowTitle;
     std::string WindowIcon;
     XList<std::string> WindowTitleSt;

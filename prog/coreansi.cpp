@@ -9,13 +9,17 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
 
     AnsiMaxX = CF.get()->ParamGetI("ANSIWidth");
     AnsiMaxY = CF.get()->ParamGetI("ANSIHeight");
+    ScreenStatusBar = 0;
 
     UpdateConfig(CF);
 
     if ((ANSIDOS < 0) || (ANSIDOS >= 3)) ANSIDOS = 0;
     ANSIDOS_ = (ANSIDOS == 1);
 
-    AnsiTerminalResize(AnsiMaxX, AnsiMaxY);
+    if (ScreenStatusBar > 0)
+    {
+        AnsiTerminalResize(AnsiMaxX, AnsiMaxY + 1, ScreenStatusBar);
+    }
 
     ANSIScrollChars = CF.get()->ParamGetI("ANSIScrollChars");
     ANSIScrollSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
@@ -178,7 +182,7 @@ void CoreAnsi::AnsiRepaint(bool AdditionalBuffers)
                 if (__ScreenMaxY < Y__) { __ScreenMaxY = Y__; }
 
                 __AnsiLineOccupyX.Get(Y, X);
-                Screen::ScreenChar(X, Y__, __AnsiLineOccupyX.Item_Char, __AnsiLineOccupyX.Item_ColorB, __AnsiLineOccupyX.Item_ColorF, __AnsiLineOccupyX.Item_ColorA, __AnsiLineOccupyX.Item_FontW, __AnsiLineOccupyX.Item_FontH);
+                Screen::ScreenChar(X, Y__ + ScreenOffset, __AnsiLineOccupyX.Item_Char, __AnsiLineOccupyX.Item_ColorB, __AnsiLineOccupyX.Item_ColorF, __AnsiLineOccupyX.Item_ColorA, __AnsiLineOccupyX.Item_FontW, __AnsiLineOccupyX.Item_FontH);
             }
         }
         if (BufI == 1)
@@ -205,11 +209,11 @@ void CoreAnsi::AnsiRepaintLine(int Y)
                 if (X < L)
                 {
                     AnsiState_.__AnsiLineOccupy__.Get(Y, X);
-                    Screen::ScreenChar(X, Y, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_ColorA, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH);
+                    Screen::ScreenChar(X, Y + ScreenOffset, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_ColorA, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH);
                 }
                 else
                 {
-                    Screen::ScreenChar(X, Y, ' ', -1, -1, 0, 0, 0);
+                    Screen::ScreenChar(X, Y + ScreenOffset, ' ', -1, -1, 0, 0, 0);
                 }
             }
         }
@@ -217,7 +221,7 @@ void CoreAnsi::AnsiRepaintLine(int Y)
         {
             for (int X = 0; X < AnsiMaxX; X++)
             {
-                Screen::ScreenChar(X, Y, ' ', -1, -1, 0, 0, 0);
+                Screen::ScreenChar(X, Y + ScreenOffset, ' ', -1, -1, 0, 0, 0);
             }
         }
     }
@@ -237,11 +241,15 @@ void CoreAnsi::AnsiResize(int NewW, int NewH)
     {
         if (Screen::WinAuto)
         {
+            if (ScreenStatusBar > 0)
+            {
+                NewH++;
+            }
             if (AnsiScreenWork)
             {
                 Screen::ScreenResize(NewW, NewH);
             }
-            AnsiTerminalResize(NewW, NewH);
+            AnsiTerminalResize(NewW, NewH, ScreenStatusBar);
         }
     }
 }

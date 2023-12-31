@@ -67,7 +67,7 @@ public:
     void AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_);
     void AnsiProcessSupply(Str TextFileLine);
     void AnsiTerminalReset();
-    bool AnsiTerminalResize(int NewW, int NewH);
+    bool AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_);
 
     int AnsiProcess(int ProcessCount);
     void AnsiResize(int NewW, int NewH);
@@ -75,6 +75,10 @@ public:
     bool AnsiSeek(int StepCount);
     void AnsiRepaintCursor();
 private:
+
+    int ScreenStatusBar = 0;
+    int ScreenOffset = 0;
+
     bool AnsiScreenWork = true;
     Str CommandEndChar;
 

@@ -27,6 +27,7 @@ void Core2Terminal::Init()
 
     WindowTitle = "";
     WindowIcon = "";
+    DisplayStatusPrepare();
 
     TerminalConnection = CF.get()->ParamGetS("TerminalConnection");
 
@@ -102,6 +103,21 @@ void Core2Terminal::EventTick()
     {
         TelnetDisplayInfoRepaint = true;
         CoreAnsi_.get()->AnsiRepaintCursor();
+        bool NeedStatusRepaint = false;
+        if (ScreenW != Screen::CurrentW)
+        {
+            NeedStatusRepaint = true;
+            ScreenW = Screen::CurrentW;
+        }
+        if (ScreenH != Screen::CurrentH)
+        {
+            NeedStatusRepaint = true;
+            ScreenH = Screen::CurrentH;
+        }
+        if (NeedStatusRepaint)
+        {
+            DisplayStatusRepaint();
+        }
     }
     for (int i = 0; i < CoreAnsi_.get()->__AnsiResponse.Count; i++)
     {
@@ -122,7 +138,6 @@ void Core2Terminal::EventTick()
         default:
             break;
     }
-
 }
 
 void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
@@ -158,6 +173,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                 switch (_(KeyName.c_str()))
                 {
                     case _("Backspace"):
+                        ScreenStatusBarSet(0);
                         ConnClose(true);
                         return;
 
@@ -306,6 +322,20 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                         switch (KeyChar)
                                         {
                                             case '`':
+                                                {
+                                                    int DisplayStatus_ = DisplayStatus;
+                                                    DisplayStatus++;
+                                                    if (DisplayStatus == 3)
+                                                    {
+                                                        DisplayStatus = 0;
+                                                    }
+                                                    if ((DisplayStatus_ == 0) && (DisplayStatus > 0)) ScreenH++;
+                                                    if ((DisplayStatus_ > 0) && (DisplayStatus == 0)) ScreenH--;
+                                                    ScreenStatusBarSet(DisplayStatus);
+                                                    DisplayStatusRepaint();
+                                                }
+                                                break;
+                                            case '~':
                                                 LocalEcho = !LocalEcho;
                                                 break;
                                             case '|':
@@ -364,6 +394,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                         break;
                 }
                 CoreAnsi_.get()->AnsiRepaint(false);
+                DisplayStatusRepaint();
                 CoreAnsi_.get()->AnsiRepaintCursor();
             }
             break;
@@ -371,6 +402,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             EscapeKey_ = EscapeKeyId(KeyName, KeyChar);
             WorkStateC = WorkStateCDef::Toolbox;
             CoreAnsi_.get()->AnsiRepaint(false);
+            DisplayStatusRepaint();
             CoreAnsi_.get()->AnsiRepaintCursor();
             break;
         case WorkStateCDef::Toolbox_:
@@ -385,12 +417,14 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             if (DisplayConfig_.get()->RequestRepaint)
             {
                 CoreAnsi_.get()->AnsiRepaint(false);
+                DisplayStatusRepaint();
                 DisplayConfig_.get()->Repaint();
             }
             if (DisplayConfig_.get()->RequestClose)
             {
                 WorkStateC = WorkStateCDef::Toolbox;
                 CoreAnsi_.get()->AnsiRepaint(false);
+                DisplayStatusRepaint();
             }
             else
             {
@@ -399,6 +433,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                     EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 1, 0);
                 }
                 CoreAnsi_.get()->AnsiRepaint(false);
+                DisplayStatusRepaint();
             }
             break;
     }
@@ -412,7 +447,8 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
             ScreenW = EvtParam1;
             ScreenH = EvtParam2;
             Screen::ScreenResize(ScreenW, ScreenH);
-            CoreAnsi_.get()->AnsiTerminalResize(ScreenW, ScreenH);
+            CoreAnsi_.get()->AnsiTerminalResize(ScreenW, ScreenH, ScreenStatusBar);
+            DisplayStatusRepaint();
             switch (WorkStateC)
             {
                 case WorkStateCDef::InfoScreen:
@@ -480,6 +516,7 @@ void Core2Terminal::SendHex(std::string STR)
 void Core2Terminal::ConnOpen()
 {
     Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
+    DisplayStatusRepaint();
     Screen::ScreenCursorMove(0, 0);
     Screen::ScreenRefresh();
 
@@ -613,10 +650,12 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                 if (TextWork::StringStartsWith(ReportRequest, "WindowTitle"))
                 {
                     WindowTitle = ReportRequest.substr(11);
+                    DisplayStatusPrepare();
                 }
                 if (TextWork::StringStartsWith(ReportRequest, "WindowIcon"))
                 {
                     WindowIcon = ReportRequest.substr(10);
+                    DisplayStatusPrepare();
                 }
                 if (TextWork::StringStartsEndsWith(ReportRequest, "[", "*y"))
                 {
@@ -815,6 +854,7 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                 {
                     WindowIcon = "";
                 }
+                DisplayStatusPrepare();
             }
             break;
         case _("[23;1t"):
@@ -827,6 +867,7 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                 {
                     WindowIcon = "";
                 }
+                DisplayStatusPrepare();
             }
             break;
         case _("[23;2t"):
@@ -839,6 +880,7 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                 {
                     WindowTitle = "";
                 }
+                DisplayStatusPrepare();
             }
             break;
         case _("[?6n"): // DECXCPR
@@ -1097,6 +1139,7 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
     int CB_ = PopupBack;
     int CF_ = PopupFore;
 
+    DisplayStatusRepaint();
     XList<std::string> InfoMsg;
     int IsConn = Conn.get()->IsConnected();
     if (WorkStateC == WorkStateCDef::Toolbox)
@@ -1110,24 +1153,6 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
             case 3: StatusInfo = "Disconnecting"; break;
         }
         InfoMsg.Add(" Status: " + StatusInfo + " ");
-        if ((WindowTitle != "") || (WindowIcon != ""))
-        {
-            if (WindowTitle == WindowIcon)
-            {
-                InfoMsg.Add(" Title: " + WindowTitle + " ");
-            }
-            else
-            {
-                if ((WindowTitle == "") || (WindowIcon == ""))
-                {
-                    InfoMsg.Add(" Title: " + (WindowIcon + WindowTitle) + " ");
-                }
-                else
-                {
-                    InfoMsg.Add(" Title: " + (WindowIcon + " " + WindowTitle) + " ");
-                }
-            }
-        }
         InfoMsg.Add(" Screen size: " + std::to_string(CoreAnsi_.get()->AnsiMaxX) + "x" + std::to_string(CoreAnsi_.get()->AnsiMaxY) + " ");
         InfoMsg.Add(" Escape key: " + EscapeKey_ + " ");
         InfoMsg.Add(" Esc - Return to terminal ");
@@ -1203,10 +1228,11 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
             InfoMsg.Add(" [ ] - Modifiers: " + TelnetKeyboardMods_ + " ");
             InfoMsg.Add(" / - Connect/disconnect ");
             InfoMsg.Add(" ? - Send screen size ");
-            InfoMsg.Add(" ` - Local echo: " + (LocalEcho ? std::string("on") : std::string("off")));
+            InfoMsg.Add(" ~ - Local echo: " + (LocalEcho ? std::string("on") : std::string("off")));
             InfoMsg.Add(" | - Input commands: " + (Command_8bit ? std::string("8-bit") : std::string("7-bit")));
             InfoMsg.Add(" \\ - Display configuration");
         }
+        InfoMsg.Add(" ` - Title bar");
         InfoMsg.Add(" , - Copy screen as text");
         InfoMsg.Add(" . - Paste text as keystrokes");
     }
@@ -1271,4 +1297,59 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
     }
     Screen::ScreenCursorMove(InfoCX, InfoCY);
     Screen::ScreenRefresh();
+}
+
+void Core2Terminal::DisplayStatusRepaint()
+{
+    if (ScreenStatusBar > 0)
+    {
+        int ScrPos = (ScreenStatusBar == 1) ? 0 : (ScreenH - 1);
+        if (WindowTitleStatusSize > ScreenW)
+        {
+            for (int I = 0; I < ScreenW; I++)
+            {
+                Screen::ScreenChar(I, ScrPos, WindowTitleStatus[I], StatusBack, StatusFore, 0, 0, 0);
+            }
+        }
+        else
+        {
+            int StrOffset = (ScreenW - WindowTitleStatusSize) >> 1;
+            for (int I = 0; I < ScreenW; I++)
+            {
+                Screen::ScreenChar(I, ScrPos, ' ', StatusBack, StatusFore, 0, 0, 0);
+            }
+            for (int I = 0; I < WindowTitleStatusSize; I++)
+            {
+                Screen::ScreenChar(I + StrOffset, ScrPos, WindowTitleStatus[I], StatusBack, StatusFore, 0, 0, 0);
+            }
+        }
+    }
+}
+
+void Core2Terminal::DisplayStatusPrepare()
+{
+    if ((WindowTitle != "") || (WindowIcon != ""))
+    {
+        if (WindowTitle == WindowIcon)
+        {
+            WindowTitleStatus = WindowTitle;
+        }
+        else
+        {
+            if ((WindowTitle == "") || (WindowIcon == ""))
+            {
+                WindowTitleStatus = (WindowIcon + WindowTitle);
+            }
+            else
+            {
+                WindowTitleStatus = (WindowIcon + " " + WindowTitle);
+            }
+        }
+    }
+    else
+    {
+        WindowTitleStatus = "";
+    }
+    WindowTitleStatusSize = WindowTitleStatus.size();
+    DisplayStatusRepaint();
 }

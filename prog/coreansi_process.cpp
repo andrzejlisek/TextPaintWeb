@@ -37,8 +37,19 @@ void CoreAnsi::AnsiTerminalReset()
     }
 }
 
-bool CoreAnsi::AnsiTerminalResize(int NewW, int NewH)
+bool CoreAnsi::AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_)
 {
+    ScreenOffset = 0;
+    ScreenStatusBar = ScreenStatusBar_;
+    if (ScreenStatusBar_ > 0)
+    {
+        NewH--;
+        if (ScreenStatusBar_ == 1)
+        {
+            ScreenOffset = 1;
+        }
+    }
+
     NewW = Screen::DefaultW(NewW, ANSIDOS);
     NewH = Screen::DefaultH(NewH, ANSIDOS);
 

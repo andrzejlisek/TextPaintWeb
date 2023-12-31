@@ -176,21 +176,21 @@ void CoreAnsi::AnsiScrollSetOffset(int Offset)
     {
         if (Offset < 0)
         {
-            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollLast, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
+            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollLast + ScreenOffset, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
             for (int Y = AnsiState_.__AnsiScrollLast - 1; Y > AnsiState_.__AnsiScrollFirst; Y--)
             {
-                Screen::ScreenLineOffset(Y, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
+                Screen::ScreenLineOffset(Y + ScreenOffset, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
             }
-            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollFirst, Offset, 1, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
+            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollFirst + ScreenOffset, Offset, 1, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
         }
         else
         {
-            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollFirst, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
+            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollFirst + ScreenOffset, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
             for (int Y = AnsiState_.__AnsiScrollFirst + 1; Y < AnsiState_.__AnsiScrollLast; Y++)
             {
-                Screen::ScreenLineOffset(Y, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
+                Screen::ScreenLineOffset(Y + ScreenOffset, Offset, 0, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
             }
-            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollLast, Offset, 1, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
+            Screen::ScreenLineOffset(AnsiState_.__AnsiScrollLast + ScreenOffset, Offset, 1, AnsiState_.__AnsiBack, AnsiState_.__AnsiFore, AnsiState_.__AnsiAttr);
         }
     }
 }
@@ -326,7 +326,7 @@ void CoreAnsi::AnsiScrollLines(int Lines)
         }
         if (AnsiScreenWork && (AnsiState_.__AnsiScrollLast > AnsiState_.__AnsiScrollFirst))
         {
-            Screen::ScreenTextMove(ScrollMarginL, AnsiState_.__AnsiScrollFirst, ScrollMarginL, AnsiState_.__AnsiScrollFirst + 1, ScrollMarginR - ScrollMarginL, AnsiState_.__AnsiScrollLast - AnsiState_.__AnsiScrollFirst);
+            Screen::ScreenTextMove(ScrollMarginL, AnsiState_.__AnsiScrollFirst + ScreenOffset, ScrollMarginL, AnsiState_.__AnsiScrollFirst + 1 + ScreenOffset, ScrollMarginR - ScrollMarginL, AnsiState_.__AnsiScrollLast - AnsiState_.__AnsiScrollFirst);
         }
 
         for (int i = AnsiState_.__AnsiScrollLast; i > AnsiState_.__AnsiScrollFirst; i--)
@@ -400,7 +400,7 @@ void CoreAnsi::AnsiScrollLines(int Lines)
         }
         if (AnsiScreenWork && (AnsiState_.__AnsiScrollLast > AnsiState_.__AnsiScrollFirst))
         {
-            Screen::ScreenTextMove(ScrollMarginL, AnsiState_.__AnsiScrollFirst + 1, ScrollMarginL, AnsiState_.__AnsiScrollFirst, ScrollMarginR - ScrollMarginL, AnsiState_.__AnsiScrollLast - AnsiState_.__AnsiScrollFirst);
+            Screen::ScreenTextMove(ScrollMarginL, AnsiState_.__AnsiScrollFirst + 1 + ScreenOffset, ScrollMarginL, AnsiState_.__AnsiScrollFirst + ScreenOffset, ScrollMarginR - ScrollMarginL, AnsiState_.__AnsiScrollLast - AnsiState_.__AnsiScrollFirst);
         }
 
         for (int i = AnsiState_.__AnsiScrollFirst; i < AnsiState_.__AnsiScrollLast; i++)

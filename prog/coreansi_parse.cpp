@@ -2669,11 +2669,11 @@ void CoreAnsi::AnsiRepaintCursor()
 {
     if (AnsiGetFontSize(AnsiState_.__AnsiY) > 0)
     {
-        Screen::ScreenCursorMove(AnsiState_.__AnsiX << 1, AnsiState_.__AnsiY);
+        Screen::ScreenCursorMove(AnsiState_.__AnsiX << 1, AnsiState_.__AnsiY + ScreenOffset);
     }
     else
     {
-        Screen::ScreenCursorMove(AnsiState_.__AnsiX, AnsiState_.__AnsiY);
+        Screen::ScreenCursorMove(AnsiState_.__AnsiX, AnsiState_.__AnsiY + ScreenOffset);
     }
     Screen::ScreenRefresh();
 }

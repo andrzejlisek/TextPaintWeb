@@ -148,7 +148,7 @@ void Core1Player::EventTick()
                 Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
                 FilePos = 0;
                 CoreAnsi_.get()->AnsiProcessReset(true, false, 1);
-                CoreAnsi_.get()->AnsiTerminalResize(Screen::CurrentW, Screen::CurrentH);
+                CoreAnsi_.get()->AnsiTerminalResize(Screen::CurrentW, Screen::CurrentH, ScreenStatusBar);
                 CoreAnsi_.get()->AnsiProcessSupply(FileCtX);
 
 
@@ -451,6 +451,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("0_Tab"):
             {
+                ScreenStatusBarSet(0);
                 Screen_Clear();
                 AppExit = true;
             }
@@ -490,11 +491,15 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Tab"):
             {
+                int DisplayStatus_ = DisplayStatus;
                 DisplayStatus++;
                 if ((DisplayStatus % 3) == 0)
                 {
                     DisplayStatus -= 3;
                 }
+                if ((DisplayStatus_ == 0) && (DisplayStatus > 0)) ScreenH++;
+                if ((DisplayStatus_ > 0) && (DisplayStatus == 0)) ScreenH--;
+                ScreenStatusBarSet(DisplayStatus);
                 Repaint(true);
             }
             return;
@@ -688,7 +693,7 @@ void Core1Player::EventOther(std::string EvtName, std::string EvtParam0, int Evt
             ScreenW = EvtParam1;
             ScreenH = EvtParam2;
             Screen::ScreenResize(ScreenW, ScreenH);
-            CoreAnsi_.get()->AnsiTerminalResize(ScreenW, ScreenH);
+            CoreAnsi_.get()->AnsiTerminalResize(ScreenW, ScreenH, ScreenStatusBar);
             switch (WorkStateS)
             {
                 case WorkStateSDef::InfoScreenWaitForKey:
