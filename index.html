@@ -67,6 +67,14 @@
             border-style:none;
             position:relative;
         }
+        .viewport
+        {
+            margin:0;
+            padding:0;
+            border-style:none;
+            position:absolute;
+            overflow:hidden;
+        }
         .keybfld
         {
             margin:0;
@@ -106,7 +114,9 @@
     </head>
     <body id="app">
         <div id="screendiv" class="keybdiv" style="width:1px;height:1px" onclick="ConfShow()">
-            <canvas id="Screen" class="canvas0" style="width:1px;height:1px;position:absolute" onclick="ConfShow()"></canvas>
+            <div id="screenvp" class="viewport" style="width:1px;height:1px" onclick="ConfShow()">
+                <canvas id="Screen" class="canvas0" style="width:1px;height:1px;position:absolute" onclick="ConfShow()"></canvas>
+            </div>
         </div>
         <div class="keybdiv">
             <svg id="KeybSvg" width="100" height="100">
@@ -119,6 +129,7 @@
             <svg id="KeybSvgBlank" width="100" height="100" onclick="ConfShow()">
             </svg>
         </div>
+    
 
         <div id="InitScreen" class="initdiv" style="display:block;">
         </div>
@@ -162,7 +173,6 @@
 
             <a target="_blank" id="FileDownload"></a>
             <input type="file" id="FileUpload" onchange="FileBrwUploadEvent()" multiple="multiple">
-            
         </div>
 
         <script type="text/javascript" src="jszip.js"></script>

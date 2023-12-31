@@ -72,20 +72,11 @@ void Core2Terminal::Init()
         }
     }
 
-    /*TelnetTimerResolution = CF.ParamGetL("TerminalTimeResolution");
-    TelnetFileName = CF.ParamGetS("TerminalFile");*/
-
     TerminalStep = CF.get()->ParamGetI("TerminalStep");
     if (TerminalStep <= 0)
     {
         TerminalStep = 2000000000;
     }
-
-
-    /*if (TelnetTimerResolution <= 0)
-    {
-        TelnetTimerResolution = 100;
-    }*/
 
     Conn = std::make_unique<TerminalConn>();
 

@@ -225,35 +225,39 @@ TerminalKeyboard::TerminalKeyboard()
     TerminalKeys["PageDown_000_9"] = "##_G";
 
     // Alternate numeric keys
-    TerminalKeys["NumPad_48_0"] = "##_O_p";
-    TerminalKeys["NumPad_49_0"] = "##_O_q";
-    TerminalKeys["NumPad_50_0"] = "##_O_r";
-    TerminalKeys["NumPad_51_0"] = "##_O_s";
-    TerminalKeys["NumPad_52_0"] = "##_O_t";
-    TerminalKeys["NumPad_53_0"] = "##_O_u";
-    TerminalKeys["NumPad_54_0"] = "##_O_v";
-    TerminalKeys["NumPad_55_0"] = "##_O_w";
-    TerminalKeys["NumPad_56_0"] = "##_O_x";
-    TerminalKeys["NumPad_57_0"] = "##_O_y";
-    TerminalKeys["NumPad_46_0"] = "##_O_n";
-    TerminalKeys["NumPad_44_0"] = "##_O_l";
-    TerminalKeys["NumPad_45_0"] = "##_O_m";
-    TerminalKeys["NumPad_43_0"] = "##_O_M";
+    TerminalKeys["NumPad_Numpad0_0"] = "##_O_p";
+    TerminalKeys["NumPad_Numpad1_0"] = "##_O_q";
+    TerminalKeys["NumPad_Numpad2_0"] = "##_O_r";
+    TerminalKeys["NumPad_Numpad3_0"] = "##_O_s";
+    TerminalKeys["NumPad_Numpad4_0"] = "##_O_t";
+    TerminalKeys["NumPad_Numpad5_0"] = "##_O_u";
+    TerminalKeys["NumPad_Numpad6_0"] = "##_O_v";
+    TerminalKeys["NumPad_Numpad7_0"] = "##_O_w";
+    TerminalKeys["NumPad_Numpad8_0"] = "##_O_x";
+    TerminalKeys["NumPad_Numpad9_0"] = "##_O_y";
+    TerminalKeys["NumPad_NumpadDecimal_0"] = "##_O_n";
+    TerminalKeys["NumPad_NumpadAdd_0"] = "##_O_l";
+    TerminalKeys["NumPad_NumpadSubtract_0"] = "##_O_m";
+    TerminalKeys["NumPad_NumpadEnter_0"] = "##_O_M";
+    TerminalKeys["NumPad_NumpadMultiply_0"] = "";
+    TerminalKeys["NumPad_NumpadDivide_0"] = "";
 
-    TerminalKeys["NumPad_48_1"] = "##_?_p";
-    TerminalKeys["NumPad_49_1"] = "##_?_q";
-    TerminalKeys["NumPad_50_1"] = "##_?_r";
-    TerminalKeys["NumPad_51_1"] = "##_?_s";
-    TerminalKeys["NumPad_52_1"] = "##_?_t";
-    TerminalKeys["NumPad_53_1"] = "##_?_u";
-    TerminalKeys["NumPad_54_1"] = "##_?_v";
-    TerminalKeys["NumPad_55_1"] = "##_?_w";
-    TerminalKeys["NumPad_56_1"] = "##_?_x";
-    TerminalKeys["NumPad_57_1"] = "##_?_y";
-    TerminalKeys["NumPad_46_1"] = "##_?_n";
-    TerminalKeys["NumPad_44_1"] = "##_?_l";
-    TerminalKeys["NumPad_45_1"] = "##_?_m";
-    TerminalKeys["NumPad_43_1"] = "##_?_M";
+    TerminalKeys["NumPad_Numpad0_1"] = "##_?_p";
+    TerminalKeys["NumPad_Numpad1_1"] = "##_?_q";
+    TerminalKeys["NumPad_Numpad2_1"] = "##_?_r";
+    TerminalKeys["NumPad_Numpad3_1"] = "##_?_s";
+    TerminalKeys["NumPad_Numpad4_1"] = "##_?_t";
+    TerminalKeys["NumPad_Numpad5_1"] = "##_?_u";
+    TerminalKeys["NumPad_Numpad6_1"] = "##_?_v";
+    TerminalKeys["NumPad_Numpad7_1"] = "##_?_w";
+    TerminalKeys["NumPad_Numpad8_1"] = "##_?_x";
+    TerminalKeys["NumPad_Numpad9_1"] = "##_?_y";
+    TerminalKeys["NumPad_NumpadDecimal_1"] = "##_?_n";
+    TerminalKeys["NumPad_NumpadAdd_1"] = "##_?_l";
+    TerminalKeys["NumPad_NumpadSubtract_1"] = "##_?_m";
+    TerminalKeys["NumPad_NumpadEnter_1"] = "##_?_M";
+    TerminalKeys["NumPad_NumpadMultiply_1"] = "";
+    TerminalKeys["NumPad_NumpadDivide_1"] = "";
 
     // Generating codes for CAS modifiers
     XList<std::string> TerminalKeysCAS;
@@ -353,20 +357,6 @@ std::string TerminalKeyboard::KeyCode(std::string KeyName, int KeyChar, bool Mod
             EchoChar.Add(13);
             EchoChar.Add(10);
             return TerminalKeys["Enter_" + GetTelnetKeyboardConf(4)];
-        case _("NumpadEnter"):
-            EchoChar.Add(13);
-            EchoChar.Add(10);
-            return TerminalKeys["Enter_" + GetTelnetKeyboardConf(4)];
-            /*if (CoreAnsi_.get()->AnsiState_.__AnsiVT52)
-            {
-                return TerminalKeys["NumPad_43_1"];
-            }
-            else
-            {
-                return TerminalKeys["NumPad_43_0"];
-            }*/
-
-
         case _("F1"):
             if (TelnetFuncKeyOther < 2)
             {
@@ -535,33 +525,32 @@ std::string TerminalKeyboard::KeyCode(std::string KeyName, int KeyChar, bool Mod
                 bool StdKey = true;
                 if (GetTelnetKeyboardConf(6) == "1")
                 {
-                    switch (KeyChar)
+                    switch (_(KeyName.c_str()))
                     {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
-                        case '.':
-                        case ',':
-                        case '-':
-                        case '+':
-                            StdKey = false;
+                        case _("Numpad0"):
+                        case _("Numpad1"):
+                        case _("Numpad2"):
+                        case _("Numpad3"):
+                        case _("Numpad4"):
+                        case _("Numpad5"):
+                        case _("Numpad6"):
+                        case _("Numpad7"):
+                        case _("Numpad8"):
+                        case _("Numpad9"):
+                        case _("NumpadDecimal"):
+                        case _("NumpadAdd"):
+                        case _("NumpadSubtract"):
+                        case _("NumpadEnter"):
+                        case _("NumpadMultiply"):
+                        case _("NumpadDivide"):
                             if (CoreAnsi_.get()->AnsiState_.__AnsiVT52)
                             {
-                                return TerminalKeys["NumPad_" + std::to_string(KeyChar) + "_1"];
+                                return TerminalKeys["NumPad_" + KeyName + "_1"];
                             }
                             else
                             {
-                                return TerminalKeys["NumPad_" + std::to_string(KeyChar) + "_0"];
+                                return TerminalKeys["NumPad_" + KeyName + "_0"];
                             }
-                        default:
-                            return "";
                     }
                 }
                 if (StdKey)
@@ -570,6 +559,12 @@ std::string TerminalKeyboard::KeyCode(std::string KeyName, int KeyChar, bool Mod
                     {
                         EchoChar.Add(KeyChar);
                         return "_" + TextWork::CharToStr(KeyChar);
+                    }
+                    if (KeyName == "NumpadEnter")
+                    {
+                        EchoChar.Add(13);
+                        EchoChar.Add(10);
+                        return TerminalKeys["Enter_" + GetTelnetKeyboardConf(4)];
                     }
                 }
                 return "";

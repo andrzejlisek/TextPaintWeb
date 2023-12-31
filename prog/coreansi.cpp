@@ -82,22 +82,6 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
     Color256[232 + 23] = AnsiColor16(255, 255, 255);
     Color256[256] = -1;
 
-    /*if (CF.get()->ParamGetI("WorkMode") == 2)
-    {
-        if (CF.get()->ParamGetL("TerminalTimeResolution") <= 0)
-        {
-            ANSIScrollChars = 0;
-            ANSIScrollBuffer = 0;
-            ANSIScrollSmooth = 0;
-        }
-        if (CF.get()->ParamGetI("TerminalStep") <= 0)
-        {
-            ANSIScrollChars = 0;
-            ANSIScrollBuffer = 0;
-            ANSIScrollSmooth = 0;
-        }
-    }*/
-
     if (ANSIScrollChars <= 0)
     {
         ANSIScrollSmooth = 0;

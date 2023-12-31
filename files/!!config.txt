@@ -1,12 +1,29 @@
+### There is TextPaint configuration file. The lines without equation sign
+### and blank lines are ignored and can be used for comments. The description
+### lines are preceded by ### for clarity only. Any prefix is not required
+### for treat this line as comment.
+###
+### You can change this file using editor and the changes will take effect
+### after application restart or refresh.
+
+
+### Application timer options
 TimerPeriod=100
 TimerLoop=10
 TimerCursor=1
 TimerBlink=5
 TimerTick=1
 
+### Window and screen option
+WinW=80
+WinH=24
 WinScreenSize=70
 WinKeyboardSize=30
 WinTouchScreen=0
+
+
+
+### Font file
 
 FontName1=files/fonts/dos08x16.png
 
@@ -14,6 +31,59 @@ FontName1=files/fonts/dos08x16.png
 #FontName2=files/fonts/unscii08x16_double.png
 #FontMode=0
 #FontChars=files/fonts/unscii08x16_double.txt
+
+
+ANSIRead=0
+ANSIReadCR=0
+ANSIReadLF=0
+ANSIWidth=0
+ANSIHeight=0
+ANSIDOS=0
+ANSI8bit=1
+ANSIColors=1
+ANSIReverseMode=2
+ANSIColorBlink=0
+ANSIColorBold=1
+ANSIIgnoreConcealed=0
+ANSIPrintBackspace=0
+ANSIPrintTab=0
+ANSIWrite=0
+ANSIColorScheme=0
+
+ANSIScrollChars=1000
+ANSIScrollSmooth=4
+
+
+### Player configuration
+
+PlayerEnd=0
+PlayerStep=200
+PlayerDelayFrame=200
+
+
+### Terminal configuration
+
+TerminalEncoding=65001
+TerminalName=xterm-256color
+TerminalType=5
+TerminalVTFuncKeys=0
+TerminalVTArrowKeys=0
+TerminalStep=200
+TerminalKeys=1101000
+TerminalAnswerBack=TextPaint
+
+
+
+#ServerPort=0
+#ServerEncoding=65001
+#ServerTelnet=1
+
+
+### Display options
+
+DisplayInterpolate=0
+DisplayBlink=1
+DisplayAttrib=14
 
 SteadyCursor=0
 
@@ -44,37 +114,29 @@ PaletteB=00000000AAAAAAAA55555555FFFFFFFF000000007171717139393939AAAAAAAA
 
 
 
-WinW=80
-WinH=24
 
-DisplayInterpolate=0
-DisplayBlink=1
-DisplayAttrib=14
+
+RenderType=PNG
+RenderFile=File.png
+RenderStep=50
+RenderOffset=0
+RenderCursor=1
+RenderFrame=200
+RenderSliceX=0
+RenderSliceY=0
+RenderSliceW=0
+RenderSliceH=0
+RenderLeading=0
+RenderTrailing=0
+RenderBlinkPeriod=10
+RenderBlinkOffset=0
+
+
+
+
+### Editor configuration
 
 Space=20,A0,2800
-
-
-
-==== DO USUNIECIA START
-
-Bell=1
-
-WinFixed=0
-
-
-FileReadEncoding=65001
-FileWriteEncoding=65001
-FileReadSteps=0
-
-CipherMode=0
-CipherBegin=005B
-CipherEnd=005D
-CipherAlphabet=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
-CipherAutoKey=0
-CipherPassword=
-
-==== DO USUNIECIA STOP
-
 
 Frame1_0=Simple,2D,7C,2B,2B,2B,2B,2B,2B,2B,2B,2B
 Frame1_1=Single,2500,2502,250C,252C,2510,251C,253C,2524,2514,2534,2518
@@ -137,25 +199,9 @@ ColorPopup=0F
 ColorKeyboard=8F
 BeyondLineMargin=-1
 
-ANSIRead=0
-ANSIReadCR=0
-ANSIReadLF=0
-ANSIWidth=0
-ANSIHeight=0
-ANSIDOS=0
-ANSI8bit=0
-ANSIColors=1
-ANSIReverseMode=2
-ANSIColorBlink=0
-ANSIColorBold=1
-ANSIIgnoreConcealed=0
-ANSIPrintBackspace=0
-ANSIPrintTab=0
-ANSIWrite=0
-ANSIColorScheme=0
 
-ANSIScrollChars=1000
-ANSIScrollSmooth=4
+
+### Special ANSI configuration
 
 ANSIBufferAbove=1
 ANSIBufferBelow=1
@@ -166,44 +212,9 @@ ANSICharsVT52=0020,0020,2588,00B9,00B3,2075,2077,00B0,00B1,2192,2026,00F7,2193,2
 ANSIColorThresholdBlackWhite=48
 ANSIColorThresholdGray=20
 
-PlayerEnd=0
-PlayerStep=200
-PlayerDelayFrame=200
 
 
-
-FileBrowseWildcard=*.txt;*.TXT;*.ans;*.ANS;*.vt;*.VT;*.nfo;*.NFO;*.diz;*.DIZ
-
-
-ServerPort=0
-ServerEncoding=65001
-ServerTelnet=1
-
-TerminalEncoding=65001
-TerminalName=xterm-256color
-TerminalType=5
-TerminalVTFuncKeys=0
-TerminalVTArrowKeys=0
-TerminalFile=
-TerminalTimeResolution=80
-TerminalStep=200
-TerminalKeys=1101000
-TerminalAnswerBack=TextPaint
-
-RenderType=PNG
-RenderFile=File.png
-RenderStep=50
-RenderOffset=0
-RenderCursor=1
-RenderFrame=200
-RenderSliceX=0
-RenderSliceY=0
-RenderSliceW=0
-RenderSliceH=0
-RenderLeading=0
-RenderTrailing=0
-RenderBlinkPeriod=10
-RenderBlinkOffset=0
+### Favorite character table, you can store up to 256 characters
 
 FavChar0=32
 FavChar1=32
@@ -463,14 +474,13 @@ FavChar254=32
 FavChar255=32
 
 
-
-There are files, which can be loaded as samples.
-One item consists of three parameters:
-- File?Name - File name in the "files" subdirectory
-- File?Codec - Text codec used for read and save file
-- File?Ansi - 0 meand text file, 1 means ANSI file
-If the File?Codec or File?Ansi is not provided,
-there will be used values from prevoius item.
+### There are files, which can be loaded as default.
+### One item consists of three parameters:
+### - File?Name - File name in the "files" subdirectory
+### - File?Codec - Text codec used for read and save file
+### - File?Ansi - 0 meand text file, 1 means ANSI file
+### If the File?Codec or File?Ansi is not provided,
+### there will be used values from prevoius item.
 
 File1Name=xmas/xmas0.txt
 File1Codec=0

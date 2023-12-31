@@ -40,7 +40,10 @@ let CallbackQueueI = 0;
 
 function _ProgCallback(D)
 {
-    CallbackQueue.push(D);
+    if (D.length > 1)
+    {
+        CallbackQueue.push(D);
+    }
     const TimeLimit = performance.now() + ScreenTimerCallback;
     let AtLeastOneAction = true;
     while ((CallbackQueue.length > 0) && ((TimeLimit > performance.now()) || AtLeastOneAction))

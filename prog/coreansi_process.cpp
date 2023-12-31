@@ -334,7 +334,8 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                 }
                 else
                 {
-                    if (AnsiBuffer[AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars] < 32)
+                    int AnsiBufChr = AnsiBuffer[AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars];
+                    if ((AnsiBufChr < 32) || (ANSI8bit && (AnsiBufChr >= 0x80) && (AnsiBufChr <= 0x9F)))
                     {
                         BufStop = true;
                     }

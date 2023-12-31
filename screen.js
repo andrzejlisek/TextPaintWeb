@@ -12,8 +12,10 @@ let ScreenCellFontX = [];
 let ScreenCellFontY = [];
 
 var ScreenDiv = document.getElementById("screendiv");
+var ScreenVP = document.getElementById("screenvp");
 var ScreenObj = document.getElementById("Screen");
 var ScreenCtx = ScreenObj.getContext("2d", { willReadFrequently: true });
+
 
 var ScreenDataC = [];
 var ScreenDataB = [];
@@ -32,6 +34,7 @@ var ScreenDataChr1;
 let ScreenCursorData;
 
 let ScreenLineOffsetVal = [];
+let ScreenLineOffsetValArray = [];
 let ScreenLineOffsetBlank = [];
 let ScreenLineOffsetBack = [];
 let ScreenLineOffsetFore = [];
@@ -475,7 +478,6 @@ function ScreenCharGlyph(Buf, ScrIdx, Blank)
 }
 
 
-
 function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
 {
     if (X < 0) { return; }
@@ -485,16 +487,16 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
 
     ScreenCalcColor(Back, Fore, Attr);
     
-    let ScrIdx = Y * ScreenW + X;
-    let CharIdx = (Chr < 65536) ? ((Chr << 16) + (ScreenCalcColor_Back << 12) + (ScreenCalcColor_Fore << 8) + (Attr)) : 0;
-    let CharIdx_ = (FontW << 8) + (FontH);
-    if ((CharIdx != 0) && (ScreenData_0[ScrIdx] == CharIdx) && (ScreenData_1[ScrIdx] == CharIdx_))
+    const ScrIdx = Y * ScreenW + X;
+    const CharIdx0 = ((Chr & 32767) << 16) + (ScreenCalcColor_Back << 12) + (ScreenCalcColor_Fore << 8) + (Attr);
+    const CharIdx1 = ((Chr >> 15) << 16) + (FontW << 8) + (FontH);
+    if ((ScreenData_0[ScrIdx] == CharIdx0) && (ScreenData_1[ScrIdx] == CharIdx1))
     {
         return;
     }
     
-    ScreenData_0[ScrIdx] = CharIdx;
-    ScreenData_1[ScrIdx] = CharIdx_;
+    ScreenData_0[ScrIdx] = CharIdx0;
+    ScreenData_1[ScrIdx] = CharIdx1;
     ScreenDataC[ScrIdx] = Chr;
     ScreenDataB[ScrIdx] = Back;
     ScreenDataF[ScrIdx] = Fore;
@@ -534,158 +536,80 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
         }
     }
 
-    let PtrI = 0;
-    let PtrO = 0;
-    
+    const XX = X * ScreenCellW;
+    const YY = Y * ScreenCellH;
     switch (OffsetMode)
     {
         default:
-            PtrI = 0;
-            for (let Y_ = 0; Y_ < ScreenCellH; Y_++)
             {
-                for (let X_ = 0; X_ < ScreenCellW; X_++)
-                {
-                    ScreenDataChr0.data[PtrI + 0] = CharData0.data[PtrI + 0];
-                    ScreenDataChr0.data[PtrI + 1] = CharData0.data[PtrI + 1];
-                    ScreenDataChr0.data[PtrI + 2] = CharData0.data[PtrI + 2];
-                    ScreenDataChr1.data[PtrI + 0] = CharData1.data[PtrI + 0];
-                    ScreenDataChr1.data[PtrI + 1] = CharData1.data[PtrI + 1];
-                    ScreenDataChr1.data[PtrI + 2] = CharData1.data[PtrI + 2];
-                    PtrI += 4;
-                }
+                ScreenCtx.putImageData(CharData0, XX, YY);
+                ScreenCtx.putImageData(CharData1, XX, YY + ScreenHH);
             }
             break;
         case 1:
-
-            PtrO = 0;
-
-            // Current line
-            PtrI = OffsetPtr;
-            for (let Y_ = 0; Y_ < ScreenCellH - OffsetVal; Y_++)
             {
-                for (let X_ = 0; X_ < ScreenCellW; X_++)
+                const T1 = OffsetVal;
+                const T2 = ScreenCellH - OffsetVal;
+
+                ScreenCtx.putImageData(CharData0, XX, YY - T1, 0, T1, ScreenCellW, T2);
+                ScreenCtx.putImageData(CharData1, XX, YY - T1, 0, T1, ScreenCellW, T2 + ScreenHH);
+                
+                if (OffsetOtherHalf)
                 {
-                    ScreenDataChr0.data[PtrO + 0] = CharData0.data[PtrI + 0];
-                    ScreenDataChr0.data[PtrO + 1] = CharData0.data[PtrI + 1];
-                    ScreenDataChr0.data[PtrO + 2] = CharData0.data[PtrI + 2];
-                    ScreenDataChr1.data[PtrO + 0] = CharData1.data[PtrI + 0];
-                    ScreenDataChr1.data[PtrO + 1] = CharData1.data[PtrI + 1];
-                    ScreenDataChr1.data[PtrO + 2] = CharData1.data[PtrI + 2];
-                    PtrI += 4;
-                    PtrO += 4;
+                    CharData0_ = ScreenCharGlyph(0, ScrIdx + ScreenW, false);
+                    CharData1_ = ScreenCharGlyph(1, ScrIdx + ScreenW, false);
                 }
-            }
-
-            // Blank or lower line
-            if (OffsetOtherHalf)
-            {
-                CharData0_ = ScreenCharGlyph(0, ScrIdx + ScreenW, false);
-                CharData1_ = ScreenCharGlyph(1, ScrIdx + ScreenW, false);
-            }
-            else
-            {
-                CharData0_ = ScreenCharGlyph(0, ScrIdx, true);
-                CharData1_ = ScreenCharGlyph(1, ScrIdx, true);
-            }
-            PtrI = 0;
-            for (let Y_ = ScreenCellH - OffsetVal; Y_ < ScreenCellH; Y_++)
-            {
-                for (let X_ = 0; X_ < ScreenCellW; X_++)
+                else
                 {
-                    ScreenDataChr0.data[PtrO + 0] = CharData0_.data[PtrI + 0];
-                    ScreenDataChr0.data[PtrO + 1] = CharData0_.data[PtrI + 1];
-                    ScreenDataChr0.data[PtrO + 2] = CharData0_.data[PtrI + 2];
-                    ScreenDataChr1.data[PtrO + 0] = CharData1_.data[PtrI + 0];
-                    ScreenDataChr1.data[PtrO + 1] = CharData1_.data[PtrI + 1];
-                    ScreenDataChr1.data[PtrO + 2] = CharData1_.data[PtrI + 2];
-                    PtrI += 4;
-                    PtrO += 4;
+                    CharData0_ = ScreenCharGlyph(0, ScrIdx, true);
+                    CharData1_ = ScreenCharGlyph(1, ScrIdx, true);
                 }
-            }
+                if (ScreenBlinkState)
+                {
+                    CharDataScr_ = CharData1_;
+                }
+                else
+                {
+                    CharDataScr_ = CharData0_;
+                }                
 
+                ScreenCtx.putImageData(CharData0_, XX, YY + T2, 0, 0, ScreenCellW, T1);
+                ScreenCtx.putImageData(CharData1_, XX, YY + T2, 0, 0, ScreenCellW, T1 + ScreenHH);
+            }
             break;
         case 2:
+            {
+                const T1 = OffsetVal;
+                const T2 = ScreenCellH - OffsetVal;
 
-            PtrO = 0;
+                ScreenCtx.putImageData(CharData0, XX, YY + T1, 0, 0, ScreenCellW, T2);
+                ScreenCtx.putImageData(CharData1, XX, YY + T1, 0, 0, ScreenCellW, T2 + ScreenHH);
 
-            // Blank or upper line
-            if (OffsetOtherHalf)
-            {
-                CharData0_ = ScreenCharGlyph(0, ScrIdx - ScreenW, false);
-                CharData1_ = ScreenCharGlyph(1, ScrIdx - ScreenW, false);
-            }
-            else
-            {
-                CharData0_ = ScreenCharGlyph(0, ScrIdx, true);
-                CharData1_ = ScreenCharGlyph(1, ScrIdx, true);
-            }
-            PtrI = OffsetPtr;
-            for (let Y_ = ScreenCellH - OffsetVal; Y_ < ScreenCellH; Y_++)
-            {
-                for (let X_ = 0; X_ < ScreenCellW; X_++)
+                if (OffsetOtherHalf)
                 {
-                    ScreenDataChr0.data[PtrO + 0] = CharData0_.data[PtrI + 0];
-                    ScreenDataChr0.data[PtrO + 1] = CharData0_.data[PtrI + 1];
-                    ScreenDataChr0.data[PtrO + 2] = CharData0_.data[PtrI + 2];
-                    ScreenDataChr1.data[PtrO + 0] = CharData1_.data[PtrI + 0];
-                    ScreenDataChr1.data[PtrO + 1] = CharData1_.data[PtrI + 1];
-                    ScreenDataChr1.data[PtrO + 2] = CharData1_.data[PtrI + 2];
-                    PtrI += 4;
-                    PtrO += 4;
+                    CharData0_ = ScreenCharGlyph(0, ScrIdx - ScreenW, false);
+                    CharData1_ = ScreenCharGlyph(1, ScrIdx - ScreenW, false);
+                }
+                else
+                {
+                    CharData0_ = ScreenCharGlyph(0, ScrIdx, true);
+                    CharData1_ = ScreenCharGlyph(1, ScrIdx, true);
+                }
+                if (ScreenBlinkState)
+                {
+                    CharDataScr_ = CharData1_;
+                }
+                else
+                {
+                    CharDataScr_ = CharData0_;
                 }
 
+                ScreenCtx.putImageData(CharData0_, XX, YY - T2, 0, T2, ScreenCellW, T1);
+                ScreenCtx.putImageData(CharData1_, XX, YY - T2, 0, T2, ScreenCellW, T1 + ScreenHH);
             }
-
-            // Current line
-            PtrI = 0;
-            for (let Y_ = 0; Y_ < ScreenCellH - OffsetVal; Y_++)
-            {
-                for (let X_ = 0; X_ < ScreenCellW; X_++)
-                {
-                    ScreenDataChr0.data[PtrO + 0] = CharData0.data[PtrI + 0];
-                    ScreenDataChr0.data[PtrO + 1] = CharData0.data[PtrI + 1];
-                    ScreenDataChr0.data[PtrO + 2] = CharData0.data[PtrI + 2];
-                    ScreenDataChr1.data[PtrO + 0] = CharData1.data[PtrI + 0];
-                    ScreenDataChr1.data[PtrO + 1] = CharData1.data[PtrI + 1];
-                    ScreenDataChr1.data[PtrO + 2] = CharData1.data[PtrI + 2];
-                    PtrI += 4;
-                    PtrO += 4;
-                }
-            }
-
             break;
     }
 
-
-    // Drawing character on the screen memory
-    PtrI = 0;
-    PtrO = (((Y * ScreenCellH) * ScreenWW) + (X * ScreenCellW)) << 2;
-    for (let Y_ = 0; Y_ < ScreenCellH; Y_++)
-    {
-        for (let X_ = 0; X_ < ScreenCellW; X_++)
-        {
-            ScreenData0.data[PtrO + 0] = ScreenDataChr0.data[PtrI + 0];
-            ScreenData0.data[PtrO + 1] = ScreenDataChr0.data[PtrI + 1];
-            ScreenData0.data[PtrO + 2] = ScreenDataChr0.data[PtrI + 2];
-            ScreenData1.data[PtrO + 0] = ScreenDataChr1.data[PtrI + 0];
-            ScreenData1.data[PtrO + 1] = ScreenDataChr1.data[PtrI + 1];
-            ScreenData1.data[PtrO + 2] = ScreenDataChr1.data[PtrI + 2];
-
-            PtrI += 4;
-            PtrO += 4;
-        }
-        PtrO = PtrO - (ScreenCellW << 2) + ((ScreenWW) << 2);
-    }
-
-    // Drawing character on the screen directly
-    if (ScreenBlinkState)
-    {
-        ScreenCtx.putImageData(ScreenDataChr1, X * ScreenCellW, Y * ScreenCellH);
-    }
-    else
-    {
-        ScreenCtx.putImageData(ScreenDataChr0, X * ScreenCellW, Y * ScreenCellH);
-    }
     if ((X == ScreenCursorX) && (Y == ScreenCursorY))
     {
         ScreenDrawCursorWork();
@@ -792,7 +716,7 @@ function ScreenResize(NewW, NewH)
     ScreenWW = ScreenW * ScreenCellW;
     ScreenHH = ScreenH * ScreenCellH;
     ScreenObj.width = ScreenWW;
-    ScreenObj.height = ScreenHH;
+    ScreenObj.height = ScreenHH << 1;
 
     ScreenCtx = ScreenObj.getContext("2d", { willReadFrequently: true });
     ScreenData0 = ScreenCtx.getImageData(0, 0, ScreenWW, ScreenHH);
@@ -820,6 +744,7 @@ function ScreenResize(NewW, NewH)
     }
 
     ScreenCursorData = ScreenCtx.getImageData(0, 0, ScreenCellW, ScreenCursorSize);
+    ScreenDrawCursorColor = -1;
     N = ScreenCellW * ScreenCursorSize;
     for (let I = 0; I < N; I++)
     {
@@ -856,6 +781,7 @@ function ScreenClear(ColorBack, ColorFore)
 {
     for (let Y = 0; Y < ScreenH; Y++)
     {
+        ScreenLineOffsetVal[Y] = -1;
         ScreenLineOffset(Y, 0, 0, ColorBack, ColorFore, 0);
         for (let X = 0; X < ScreenW; X++)
         {
@@ -901,7 +827,7 @@ function ScreenTextMove(X1, Y1, X2, Y2, W, H)
         XAdv = -1;
         XDelta = X1 - X2;
     }
-
+    
     for (let Y = YStart; Y != YStop; Y += YAdv)
     {
         for (let X = XStart; X != XStop; X += XAdv)
@@ -925,29 +851,12 @@ function ScreenLineOffset(Y, Offset, Blank, ColorBack, ColorFore, ColorAttr)
     if (Y < 0) { return; }
     if (Y >= ScreenH) { return; }
     let OldOffset = ScreenLineOffsetVal[Y]
-    switch (ScreenCellH)
-    {
-        case 8:
-            ScreenLineOffsetVal[Y] = Offset;
-            break;
-        case 16:
-            ScreenLineOffsetVal[Y] = Offset << 1;
-            break;
-        case 24:
-            ScreenLineOffsetVal[Y] = Offset + Offset + Offset;
-            break;
-        case 32:
-            ScreenLineOffsetVal[Y] = Offset << 2;
-            break;
-        default:
-            ScreenLineOffsetVal[Y] = Math.floor((Offset * ScreenCellH) / 8);
-            break;
-    }
+    ScreenLineOffsetVal[Y] = ScreenLineOffsetValArray[Offset];
     ScreenLineOffsetBlank[Y] = Blank;
     ScreenLineOffsetBack[Y] = ColorBack;
     ScreenLineOffsetFore[Y] = ColorFore;
     ScreenLineOffsetAttr[Y] = ColorAttr;
-    if (OldOffset != ScreenLineOffset[Y])
+    if (OldOffset != ScreenLineOffsetVal[Y])
     {
         for (let X = 0; X < ScreenW; X++)
         {
@@ -956,49 +865,36 @@ function ScreenLineOffset(Y, Offset, Blank, ColorBack, ColorFore, ColorAttr)
     }
 }
 
-function ScreenDrawBlink(State)
-{
-    ScreenBlinkState = State;
-    if (ScreenBlinkState)
-    {
-        ScreenCtx.putImageData(ScreenData1, 0, 0);
-    }
-    else
-    {
-        ScreenCtx.putImageData(ScreenData0, 0, 0);
-    }
-}
-
 let CursorState = false;
+let ScreenDrawCursorColor = -1;
 
 function ScreenDrawCursorWork()
 {
     if (CursorState)
     {
-        let CursorX_ = ScreenCursorX * ScreenCellW;
-        let CursorY_ = ScreenCursorY * ScreenCellH + (ScreenCellH - ScreenCursorSize);
-        let Ptr1 = 0;
-        let Ptr2 = (CursorY_ * (ScreenWW)) + CursorX_ << 2;
-        let PtrX = ScreenCursorY * ScreenW + ScreenCursorX;
-        for (let I = 0; I < ScreenCursorSize; I++)
+        const CursorX_ = ScreenCursorX * ScreenCellW;
+        const CursorY_ = ScreenCursorY * ScreenCellH + (ScreenCellH - ScreenCursorSize);
+        const ScreenDrawCursorColor_ = ScreenDataF_[ScreenCursorY * ScreenW + ScreenCursorX];
+        if (ScreenDrawCursorColor != ScreenDrawCursorColor_)
         {
-            for (let II = 0; II < ScreenCellW; II++)
+            ScreenDrawCursorColor = ScreenDrawCursorColor_;
+            let Ptr1 = 0;
+            let Ptr2 = (CursorY_ * (ScreenWW)) + CursorX_ << 2;
+            for (let I = 0; I < ScreenCursorSize; I++)
             {
-                ScreenCursorData.data[Ptr1 + 0] = ScreenPaletteR[ScreenDataF_[PtrX]];
-                ScreenCursorData.data[Ptr1 + 1] = ScreenPaletteG[ScreenDataF_[PtrX]];
-                ScreenCursorData.data[Ptr1 + 2] = ScreenPaletteB[ScreenDataF_[PtrX]];
-                ScreenData0.data[Ptr2 + 0] = ScreenPaletteR[ScreenDataF_[PtrX]];
-                ScreenData0.data[Ptr2 + 1] = ScreenPaletteR[ScreenDataF_[PtrX]];
-                ScreenData0.data[Ptr2 + 2] = ScreenPaletteR[ScreenDataF_[PtrX]];
-                ScreenData1.data[Ptr2 + 0] = ScreenPaletteG[ScreenDataF_[PtrX]];
-                ScreenData1.data[Ptr2 + 1] = ScreenPaletteG[ScreenDataF_[PtrX]];
-                ScreenData1.data[Ptr2 + 2] = ScreenPaletteG[ScreenDataF_[PtrX]];
-                Ptr1 += 4;
-                Ptr2 += 4;
+                for (let II = 0; II < ScreenCellW; II++)
+                {
+                    ScreenCursorData.data[Ptr1 + 0] = ScreenPaletteR[ScreenDrawCursorColor];
+                    ScreenCursorData.data[Ptr1 + 1] = ScreenPaletteG[ScreenDrawCursorColor];
+                    ScreenCursorData.data[Ptr1 + 2] = ScreenPaletteB[ScreenDrawCursorColor];
+                    Ptr1 += 4;
+                    Ptr2 += 4;
+                }
+                Ptr2 = Ptr2 - (ScreenCellW << 2) + ((ScreenWW) << 2);
             }
-            Ptr2 = Ptr2 - (ScreenCellW << 2) + ((ScreenWW) << 2);
         }
         ScreenCtx.putImageData(ScreenCursorData, CursorX_, CursorY_);
+        ScreenCtx.putImageData(ScreenCursorData, CursorX_, CursorY_ + ScreenHH);
     }
 }
 
@@ -1076,6 +972,28 @@ function ScreenInit2()
     ScreenCellH2 = ScreenCellH / 2;
     ScreenCursorSize = Math.floor(ScreenFont.CellH / 8);
 
+    for (let I = 0; I <= 8; I++)
+    {
+        switch (ScreenCellH)
+        {
+            case 8:
+                ScreenLineOffsetValArray[I] = I;
+                break;
+            case 16:
+                ScreenLineOffsetValArray[I] = I << 1;
+                break;
+            case 24:
+                ScreenLineOffsetValArray[Y] = I + I + I;
+                break;
+            case 32:
+                ScreenLineOffsetValArray[Y] = I << 2;
+                break;
+            default:
+                ScreenLineOffsetValArray[Y] = Math.floor((I * ScreenCellH) / 8);
+                break;
+        }
+    }
+
     ScreenCellFontX = [];
     ScreenCellFontY = [];
     for (let FontSize = 1; FontSize <= 32; FontSize++)
@@ -1138,37 +1056,67 @@ function ScreenInit2()
     ProgInitAfterConf();
 }
 
-function ScreenDisplayResize()
+
+let ScreenDrawBlinkOffset = "0px";
+
+function ScreenDrawBlink(State)
 {
-    if (ScreenDisplayInterpolate < 2)
+    ScreenBlinkState = State;
+    if (ScreenBlinkState)
     {
-        ScreenObj.style.width = ScreenDiv.style.width;
-        ScreenObj.style.height = ScreenDiv.style.height;
-        ScreenObj.style.left = "0px";
-        ScreenObj.style.top = "0px";
+        ScreenObj.style.top = ScreenDrawBlinkOffset;
     }
     else
     {
-        let ScrW = parseFloat(ScreenDiv.style.width.substr(0, ScreenDiv.style.width.length - 2)) * BrowserF();
-        let ScrH = parseFloat(ScreenDiv.style.height.substr(0, ScreenDiv.style.height.length - 2)) * BrowserF();
-        let CanW = (ScrW > ScreenWW) ? Math.floor(ScrW / ScreenWW) * ScreenWW : ScreenWW;
-        let CanH = (ScrH > ScreenHH) ? Math.floor(ScrH / ScreenHH) * ScreenHH : ScreenHH;
-        while ((ScrW < CanW) && (CanW > 1))
+        ScreenObj.style.top = "0px";
+    }
+}
+
+
+function ScreenDisplayResize()
+{
+    const ScrW = parseInt(ScreenDiv.style.width.substr(0, ScreenDiv.style.width.length - 2));
+    const ScrH = parseInt(ScreenDiv.style.height.substr(0, ScreenDiv.style.height.length - 2));
+    if (ScreenDisplayInterpolate < 2)
+    {
+        ScreenVP.style.width = ScrW + "px";
+        ScreenVP.style.height = ScrH + "px";
+        ScreenVP.style.left = "0px";
+        ScreenVP.style.top = "0px";
+        
+        ScreenDrawBlinkOffset = "-" + ScrH + "px";
+        ScreenObj.style.width = ScrW + "px";
+        ScreenObj.style.height = (ScrH << 1) + "px";
+    }
+    else
+    {
+        let ScrW_ = parseFloat(ScrW) * BrowserF();
+        let ScrH_ = parseFloat(ScrH) * BrowserF();
+        let CanW = (ScrW_ > ScreenWW) ? Math.floor(ScrW_ / ScreenWW) * ScreenWW : ScreenWW;
+        let CanH = (ScrH_ > ScreenHH) ? Math.floor(ScrH_ / ScreenHH) * ScreenHH : ScreenHH;
+        while ((ScrW_ < CanW) && (CanW > 1))
         {
             CanW = CanW >> 1;
         }
-        while ((ScrH < CanH) && (CanH > 1))
+        while ((ScrH_ < CanH) && (CanH > 1))
         {
             CanH = CanH >> 1;
         }
-        ScrW = ScrW / BrowserF();
-        ScrH = ScrH / BrowserF();
+        ScrW_ = ScrW_ / BrowserF();
+        ScrH_ = ScrH_ / BrowserF();
         CanW = CanW / BrowserF();
         CanH = CanH / BrowserF();
-        ScreenObj.style.width = Math.floor(CanW) + "px";
-        ScreenObj.style.height = Math.floor(CanH) + "px";
-        ScreenObj.style.left = Math.floor((ScrW - CanW) / 2) + "px";
-        ScreenObj.style.top = Math.floor((ScrH - CanH) / 2) + "px";
+
+        ScreenVP.style.width = Math.round(CanW) + "px";
+        ScreenVP.style.height = Math.round(CanH) + "px";
+        ScreenVP.style.left = Math.round((ScrW_ - CanW) / 2) + "px";
+        ScreenVP.style.top = Math.round((ScrH_ - CanH) / 2) + "px";
+
+        ScreenDrawBlinkOffset = "-" + CanH + "px";
+        ScreenObj.style.width = CanW + "px";
+        ScreenObj.style.height = (CanH << 1) + "px";
     }
+
+    ScreenDrawBlink(ScreenBlinkState);
 }
 

@@ -1,5 +1,5 @@
 let ExistsSharedArrayBuffer = false;
-let DebugMode = true;
+let DebugMode = false;
 let KeybBlockShortcuts = true;
 let GuiSettingsShown = false;
 
