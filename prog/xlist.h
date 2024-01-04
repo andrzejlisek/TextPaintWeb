@@ -142,7 +142,14 @@ public:
 
     void RemoveRange(int Pos)
     {
-        RemoveRange(Pos, Count - Pos);
+        if (Pos == 0)
+        {
+            Clear();
+        }
+        else
+        {
+            RemoveRange(Pos, Count - Pos);
+        }
     }
 
     void RemoveRange(int Pos, int Count_)
@@ -266,6 +273,45 @@ public:
     int IndexOfBin(T Val)
     {
         return IndexOfBin(Val, 0, Count - 1);
+    }
+
+    int IndexOfBinRange(T Val, int StartPos, int EndPos)
+    {
+        if (Count == 0)
+        {
+            return -1;
+        }
+        if (Val < Data[0])
+        {
+            return 0;
+        }
+        int MidPos = 0;
+        while (StartPos <= EndPos)
+        {
+            MidPos = (StartPos + EndPos) >> 1;
+            if (Data[MidPos] == Val)
+            {
+                return MidPos;
+            }
+            if (Data[MidPos] > Val)
+            {
+                EndPos = MidPos - 1;
+            }
+            else
+            {
+                StartPos = MidPos + 1;
+            }
+        }
+        if (StartPos >= Count)
+        {
+            return -1;
+        }
+        return StartPos;
+    }
+
+    int IndexOfBinRange(T Val)
+    {
+        return IndexOfBinRange(Val, 0, Count - 1);
     }
 
 

@@ -31,8 +31,6 @@ public:
     virtual void EventTick();
     virtual void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     virtual void EventOther(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
-    int CharDoubleInv(int C);
-    int CharDouble(int C);
     bool AppExit = false;
     std::shared_ptr<BinaryFile> BinaryFile_;
     FileManager FileManager_;
@@ -56,10 +54,6 @@ protected:
     void Screen_BackText();
     void Screen_Clear();
     void Screen_Refresh();
-
-private:
-    int BlankDoubleChar = (0x10FFFF + 1);
-    int BlankDoubleCharVis = 32;
 };
 
 #endif // CORECOMMON_H

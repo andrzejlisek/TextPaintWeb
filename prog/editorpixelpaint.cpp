@@ -1598,3 +1598,37 @@ void EditorPixelPaint::ClipboardPaste()
         }
     }
 }
+
+void EditorPixelPaint::UndoRedoBegin()
+{
+    if (UndoRedoItemOld.Count >= UndoRedoItemIndex)
+    {
+        UndoRedoItemOld.RemoveRange(UndoRedoItemIndex);
+        UndoRedoItemNew.RemoveRange(UndoRedoItemIndex);
+    }
+    UndoRedoItemOld.Add(PPS.GetState());
+}
+
+void EditorPixelPaint::UndoRedoEnd()
+{
+    UndoRedoItemNew.Add(PPS.GetState());
+    UndoRedoItemIndex++;
+}
+
+void EditorPixelPaint::UndoRedoUndo()
+{
+    if (UndoRedoItemIndex > 0)
+    {
+        UndoRedoItemIndex--;
+        PPS.SetState(UndoRedoItemOld[UndoRedoItemIndex]);
+    }
+}
+
+void EditorPixelPaint::UndoRedoRedo()
+{
+    if (UndoRedoItemIndex < UndoRedoItemNew.Count)
+    {
+        PPS.SetState(UndoRedoItemNew[UndoRedoItemIndex]);
+        UndoRedoItemIndex++;
+    }
+}

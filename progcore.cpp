@@ -305,8 +305,7 @@ extern "C"
                 RespondClear();
 
                 // Create double font table
-                Screen::AddDoubleRange(-1, -1);
-                Screen::StaticInit();
+                Screen::StaticInit(CF.get()->ParamGetS("_WinBitmapFontDouble1"), CF.get()->ParamGetS("_WinBitmapFontDouble2"));
 
                 // Execute program
                 Init0();

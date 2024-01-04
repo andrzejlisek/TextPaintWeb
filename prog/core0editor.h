@@ -62,8 +62,6 @@ private:
     enum DisplayStateDef { Editor, Info, Charmap, FileMan, DispConfig };
     int DisplayState = Editor;
     int CursorType = 0;
-    int CursorFontW = 1;
-    int CursorFontH = 1;
     bool CursorDisplay = true;
 
     int TextInsDelMode = 0;
@@ -71,8 +69,6 @@ private:
 
     enum WorkStateDef { WriteText, WriteChar, DrawChar, DrawPixel };
     WorkStateDef WorkState = WorkStateDef::WriteText;
-    int CursorXSize = 0;
-    int CursorYSize = 0;
     int DisplayX = 0;
     int DisplayY = 0;
     int WinTxtW = 0;
@@ -100,7 +96,7 @@ private:
     int StatusCursorColoF = -1;
     int StatusCursorColoA = 0;
 
-    void CharmapPaintCursor(int X, int Y, int Chr, bool Sel);
+    void CharmapPaintCursor(int X, int Y, int Chr, bool Sel, bool ChrPrev);
     void CharmapPaint(int Depth);
 
     void FileLoad();

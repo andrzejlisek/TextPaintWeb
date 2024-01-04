@@ -66,6 +66,11 @@ public:
 
     void ClipboardCopy();
     void ClipboardPaste();
+
+    void UndoRedoBegin();
+    void UndoRedoEnd();
+    void UndoRedoUndo();
+    void UndoRedoRedo();
 private:
     XList<PaintMode> PaintMode_;
     int CharGet(int X, int Y, bool Space);
@@ -86,6 +91,10 @@ private:
     void PixBufClear();
 
     void PaintEllipseWork(int X0, int Y0, int RX, int RY, int PX, int PY, bool M1, bool M2);
+
+    XList<EditorPixelPaintState> UndoRedoItemOld;
+    XList<EditorPixelPaintState> UndoRedoItemNew;
+    int UndoRedoItemIndex = 0;
 };
 
 #endif // EDITORPIXELPAINT_H

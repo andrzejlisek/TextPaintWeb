@@ -26,39 +26,37 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
 
         if (AnsiScrollPosition.Count == 0)
         {
-            int ScrollTime = (AnsiState_.AnsiScrollCounter - 1);
-
             switch (ANSIScrollSmooth)
             {
                 case 1:
-                    AnsiScrollPosition.Add(ScrollTime / 2);
+                    AnsiScrollPosition.Add(ANSIScrollChars / 2);
                     AnsiScrollOffset.Add(8);
                     break;
                 case 2:
-                    AnsiScrollPosition.Add(ScrollTime - (ScrollTime / 4));
-                    AnsiScrollPosition.Add((ScrollTime / 4));
+                    AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 4));
+                    AnsiScrollPosition.Add((ANSIScrollChars / 4));
                     AnsiScrollOffset.Add(4);
                     AnsiScrollOffset.Add(8);
                     break;
                 case 3:
-                    AnsiScrollPosition.Add(ScrollTime - (ScrollTime / 8));
-                    AnsiScrollPosition.Add(ScrollTime - ((3 * ScrollTime) / 8));
-                    AnsiScrollPosition.Add(((3 * ScrollTime) / 8));
-                    AnsiScrollPosition.Add((ScrollTime / 8));
+                    AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 8));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((3 * ANSIScrollChars) / 8));
+                    AnsiScrollPosition.Add(((3 * ANSIScrollChars) / 8));
+                    AnsiScrollPosition.Add((ANSIScrollChars / 8));
                     AnsiScrollOffset.Add(2);
                     AnsiScrollOffset.Add(4);
                     AnsiScrollOffset.Add(6);
                     AnsiScrollOffset.Add(8);
                     break;
                 case 4:
-                    AnsiScrollPosition.Add(ScrollTime - (ScrollTime / 16));
-                    AnsiScrollPosition.Add(ScrollTime - ((3 * ScrollTime) / 16));
-                    AnsiScrollPosition.Add(ScrollTime - ((5 * ScrollTime) / 16));
-                    AnsiScrollPosition.Add(ScrollTime - ((7 * ScrollTime) / 16));
-                    AnsiScrollPosition.Add(((7 * ScrollTime) / 16));
-                    AnsiScrollPosition.Add(((5 * ScrollTime) / 16));
-                    AnsiScrollPosition.Add(((3 * ScrollTime) / 16));
-                    AnsiScrollPosition.Add((ScrollTime / 16));
+                    AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 16));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((3 * ANSIScrollChars) / 16));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((5 * ANSIScrollChars) / 16));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((7 * ANSIScrollChars) / 16));
+                    AnsiScrollPosition.Add(((7 * ANSIScrollChars) / 16));
+                    AnsiScrollPosition.Add(((5 * ANSIScrollChars) / 16));
+                    AnsiScrollPosition.Add(((3 * ANSIScrollChars) / 16));
+                    AnsiScrollPosition.Add((ANSIScrollChars / 16));
                     AnsiScrollOffset.Add(1);
                     AnsiScrollOffset.Add(2);
                     AnsiScrollOffset.Add(3);

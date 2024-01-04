@@ -23,7 +23,7 @@ Str AnsiFile::Process(AnsiLineOccupyEx TextBuffer, int TextBufferI, int AnsiMaxX
         // Get color of current character
         TextBuffer.Get(TextBufferI, ii);
 
-        if (Screen::CharDoubleInv(TextBuffer.Item_Char) == 0)
+        if (TextBuffer.Item_Char < Screen::UnicodeCount)
         {
             // Font size change
             if ((LastFontW != TextBuffer.Item_FontW) || (LastFontH != TextBuffer.Item_FontH))

@@ -170,7 +170,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
     switch (InsDelMode)
     {
         case 0:
-        case 10:
+        case 20:
             for (int i = Y; i < (Y + H_); i++)
             {
                 if (TextBuffer.CountLines() > i)
@@ -198,7 +198,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 1:
-        case 11:
+        case 21:
             if (Y < TextBuffer.CountLines())
             {
                 for (int i = Y; i < TextBuffer.CountLines(); i++)
@@ -256,7 +256,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 2:
-        case 12:
+        case 22:
             for (int i = 0; i < TextBuffer.CountLines(); i++)
             {
                 if (TextBuffer.CountItemsTrim(i) > X)
@@ -281,7 +281,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 3:
-        case 13:
+        case 23:
             if (Y < TextBuffer.CountLines())
             {
                 for (int i = 0; i < H_; i++)
@@ -317,7 +317,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 4:
-        case 14:
+        case 24:
             for (int i = Y; i < (Y + H_); i++)
             {
                 if (TextBuffer.CountLines() > i)
@@ -351,7 +351,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 5:
-        case 15:
+        case 25:
             if (Y < TextBuffer.CountLines())
             {
                 TextBuffer.BlankChar();
@@ -418,7 +418,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
     }
-    if (InsDelMode < 10)
+    if (InsDelMode < 20)
     {
         EditorUndo_.get()->BufferAdd(X, Y, InsDelMode, W, H);
         //!!!!TextDisplay(0);
@@ -459,7 +459,7 @@ void EditorData::TextInsert(int X, int Y, int W, int H, int InsDelMode)
                                 TextBuffer.Item_ColorA = DrawColoAI;
                             }
                             TextBuffer.Set(i_Y + i_YY, i_X + i_XX);
-                            if (InsDelMode < 10)
+                            if (InsDelMode < 20)
                             {
                                 TextBuffer.Get(i_Y + i_YY, i_X + i_XX);
                                 EditorUndo_.get()->BufferAdd(i_X + i_XX, i_Y + i_YY, AnsiLineOccupyItem(), TextBuffer.CopyItemObj());
@@ -503,7 +503,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
     switch (InsDelMode)
     {
         case 0:
-        case 10:
+        case 20:
             for (int i = Y; i < (Y + H_); i++)
             {
                 if (TextBuffer.CountLines() > i)
@@ -515,7 +515,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
                         {
                             RemCount = TextBuffer.CountItems(i) - X;
                         }
-                        if (InsDelMode < 10)
+                        if (InsDelMode < 20)
                         {
                             for (int ii = 0; ii < RemCount; ii++)
                             {
@@ -542,7 +542,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 1:
-        case 11:
+        case 21:
             if (Y < TextBuffer.CountLines())
             {
                 for (int i = Y; i < TextBuffer.CountLines(); i++)
@@ -552,7 +552,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
                     ColoBuffer.BlankChar();
                     ColoBuffer.PadRight(i, X + W_ + 1);
                 }
-                if (InsDelMode < 10)
+                if (InsDelMode < 20)
                 {
                     for (int i = Y; i < (Y + H_); i++)
                     {
@@ -616,7 +616,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 2:
-        case 12:
+        case 22:
             for (int i = 0; i < TextBuffer.CountLines(); i++)
             {
                 if (TextBuffer.CountItemsTrim(i) > X)
@@ -626,7 +626,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
                     {
                         RemCount = TextBuffer.CountItems(i) - X;
                     }
-                    if (InsDelMode < 10)
+                    if (InsDelMode < 20)
                     {
                         for (int ii = 0; ii < RemCount; ii++)
                         {
@@ -652,14 +652,14 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 3:
-        case 13:
+        case 23:
             if (Y < TextBuffer.CountLines())
             {
                 for (int i = 0; i < H_; i++)
                 {
                     if (TextBuffer.CountLines() > Y)
                     {
-                        if (InsDelMode < 10)
+                        if (InsDelMode < 20)
                         {
                             for (int ii = 0; ii < TextBuffer.CountItems(Y); ii++)
                             {
@@ -693,7 +693,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 4:
-        case 14:
+        case 24:
             for (int i = Y; i < (Y + H_); i++)
             {
                 TextBuffer.BlankChar();
@@ -728,7 +728,7 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
         case 5:
-        case 15:
+        case 25:
             if (Y < TextBuffer.CountLines())
             {
                 TextBuffer.BlankChar();
@@ -795,9 +795,9 @@ void EditorData::TextDelete(int X, int Y, int W, int H, int InsDelMode)
             }
             break;
     }
-    if (InsDelMode < 10)
+    if (InsDelMode < 20)
     {
-        EditorUndo_.get()->BufferAdd(X, Y, InsDelMode + 4, W, H);
+        EditorUndo_.get()->BufferAdd(X, Y, InsDelMode + 10, W, H);
         TextBuffer.TrimLines();
         //!!!!!!!!!TextDisplay(0);
     }
@@ -988,5 +988,101 @@ void EditorData::CharPutDbl(int X, int Y, int Offset, int Ch)
         Item_.Item_FontW = -1;
         Item_.Item_FontH = -1;
         CharPut(X + Offset, Y, Item_, false);
+    }
+}
+
+void EditorData::UndoRedoBegin()
+{
+    EditorUndo_.get()->ItemBegin(CursorX, CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, ToggleDrawText, ToggleDrawColo);
+}
+
+void EditorData::UndoRedoEnd()
+{
+    EditorUndo_.get()->ItemEnd(CursorX, CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH);
+    TextBuffer.TrimLines();
+}
+
+void EditorData::UndoRedoAction(EditorUndoItem::EntryParams Params, XList<AnsiLineOccupyItemUndoRedo> Items, bool Rev)
+{
+    int I_Begin = 0;
+    int I_End = Items.Count;
+    int I_Step = 1;
+    if (Rev)
+    {
+        I_Begin = Items.Count - 1;
+        I_End = -1;
+        I_Step = -1;
+    }
+
+    for (int i = I_Begin; i != I_End; i += I_Step)
+    {
+        if (Items[i].ActionType < 0)
+        {
+            CharPut(Items[i].X, Items[i].Y, Items[i].CopyItemObj(), true);
+        }
+        else
+        {
+            if (Rev)
+            {
+                if (Items[i].ActionType < 10)
+                {
+                    TextDelete(Items[i].X, Items[i].Y, Items[i].W, Items[i].H, Items[i].ActionType + 20);
+                }
+                else
+                {
+                    TextInsert(Items[i].X, Items[i].Y, Items[i].W, Items[i].H, Items[i].ActionType + 10);
+                }
+            }
+            else
+            {
+                if (Items[i].ActionType < 10)
+                {
+                    TextInsert(Items[i].X, Items[i].Y, Items[i].W, Items[i].H, Items[i].ActionType + 20);
+                }
+                else
+                {
+                    TextDelete(Items[i].X, Items[i].Y, Items[i].W, Items[i].H, Items[i].ActionType + 10);
+                }
+            }
+        }
+    }
+
+    CursorX = Params.CursorX;
+    CursorY = Params.CursorY;
+    CursorXSize = Params.CursorW;
+    CursorYSize = Params.CursorH;
+    CursorFontW = Params.FontW;
+    CursorFontH = Params.FontH;
+}
+
+void EditorData::UndoRedoUndo()
+{
+    EditorUndoItem Item = EditorUndo_.get()->ItemUndo();
+    if (Item.Valid)
+    {
+        bool ToggleDrawText_ = ToggleDrawText;
+        bool ToggleDrawColo_ = ToggleDrawColo;
+        ToggleDrawText = Item.ToggleDrawText;
+        ToggleDrawColo = Item.ToggleDrawColo;
+        UndoRedoAction(Item.EntryParamsOld, Item.ItemsOld, true);
+        ToggleDrawText = ToggleDrawText_;
+        ToggleDrawColo = ToggleDrawColo_;
+        TextBuffer.TrimLines();
+    }
+}
+
+void EditorData::UndoRedoRedo()
+{
+    EditorUndoItem Item = EditorUndo_.get()->ItemRedo();
+    if (Item.Valid)
+    {
+        bool ToggleDrawText_ = ToggleDrawText;
+        bool ToggleDrawColo_ = ToggleDrawColo;
+        ToggleDrawText = Item.ToggleDrawText;
+        ToggleDrawColo = Item.ToggleDrawColo;
+        UndoRedoAction(Item.EntryParamsNew, Item.ItemsNew, false);
+        ToggleDrawText = ToggleDrawText_;
+        ToggleDrawColo = ToggleDrawColo_;
+        TextBuffer.TrimLines();
     }
 }

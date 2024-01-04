@@ -41,6 +41,8 @@ public:
 
     int CursorX = 0;
     int CursorY = 0;
+    int CursorXSize = 0;
+    int CursorYSize = 0;
     int CursorXBase();
     int CursorYBase();
 
@@ -51,6 +53,11 @@ public:
     void CharPut(int X, int Y, int Ch);
     void CharPutDbl(int X, int Y, int Offset, int Ch);
 
+    void UndoRedoBegin();
+    void UndoRedoEnd();
+    void UndoRedoAction(EditorUndoItem::EntryParams Params, XList<AnsiLineOccupyItemUndoRedo> Items, bool Rev);
+    void UndoRedoUndo();
+    void UndoRedoRedo();
 private:
     int ElementGet(AnsiLineOccupyEx Data, int KindType, int X, int Y, int Default);
 };

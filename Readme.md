@@ -51,12 +51,9 @@ If you click the screen, there will be show the GUI interface usable both on tou
 This version is not completed yet and now there are need to do following:
 
 
-* Duospace font support\.
-* Editor \- Undo/Redo buffer\.
 * XTERM mouse support\.
 * Clean\-up config file\.
 * Integration with file system and telnet using WebSocket and separated \.NET/Java application\.
-* And much more\.\.\.
 
 
 

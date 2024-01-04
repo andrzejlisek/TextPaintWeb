@@ -23,14 +23,81 @@ WinTouchScreen=0
 
 
 
-### Font file
+### Duospace font mode
+# 0 - Monospace without double-width characters
+# 1 - Duospace font
+# 2 - Monospace with double-width characters and stretched single-width characters
+# If the FontChars parameter is not provided or blank, the parameter does not matter
 
-FontName1=files/fonts/dos08x16.png
+FontMode=1
 
-#FontName1=files/fonts/unscii08x16.png
-#FontName2=files/fonts/unscii08x16_double.png
-#FontMode=0
-#FontChars=files/fonts/unscii08x16_double.txt
+### Monospace fonts
+
+# DOS fonts
+#ontName1=files/fonts/Dos/Dos08x08.png
+#ontName1=files/fonts/Dos/Dos08x14.png
+FontName1=files/fonts/Dos/Dos08x16.png
+#ontName1=files/fonts/Dos/Dos09x08.png
+#ontName1=files/fonts/Dos/Dos09x14.png
+#ontName1=files/fonts/Dos/Dos09x16.png
+
+# Amiga fonts
+#ontName1=files/fonts/Amiga/Amiga08x08-MicroKnight.png
+#ontName1=files/fonts/Amiga/Amiga08x08-mOsOul.png
+#ontName1=files/fonts/Amiga/Amiga08x08-P0T-NOoDLE.png
+#ontName1=files/fonts/Amiga/Amiga08x08-Topaz1.png
+#ontName1=files/fonts/Amiga/Amiga08x08-Topaz2.png
+#ontName1=files/fonts/Amiga/Amiga08x16-MicroKnight.png
+#ontName1=files/fonts/Amiga/Amiga08x16-Topaz1.png
+#ontName1=files/fonts/Amiga/Amiga08x16-Topaz2.png
+
+# Small font
+#ontName1=files/fonts/Small/Small04x04.png ??????
+
+# VTxxx terminal font
+#ontName1=files/fonts/VT/VT08x10.png
+
+# Unscii - several small fonts
+#ontName1=files/fonts/Unscii/Unscii08x08.png
+#ontName1=files/fonts/Unscii/Unscii08x08-alt.png
+#ontName1=files/fonts/Unscii/Unscii08x08-fantasy.png
+#ontName1=files/fonts/Unscii/Unscii08x08-mcr.png
+#ontName1=files/fonts/Unscii/Unscii08x08-thin.png
+
+### Duospace fonts
+
+# Unscii - single large font
+#ontName1=files/fonts/Unscii/Unscii08x16.png
+#ontName2=files/fonts/Unscii/Unscii08x16_double.png
+#ontChars=files/fonts/Unscii/Unscii08x16_double.txt
+
+# Unifont - two versions of double-width character set with the same number ranges
+#ontName1=files/fonts/Unifont/Unifont08x16.png
+#ontName2=files/fonts/Unifont/Unifont08x16_double.png
+#ontName2=files/fonts/Unifont/Unifont08x16_double_jp.png
+#ontChars=files/fonts/Unifont/Unifont08x16_double.txt
+
+# Xterm - original duospace fonts captured from XTERM application
+#ontName1=files/fonts/Xterm/Xterm01x02_IMG.png
+#ontChars=files/fonts/Xterm/Xterm01x02_IMG_double.txt
+#ontName1=files/fonts/Xterm/Xterm05x08_IMG.png
+#ontChars=files/fonts/Xterm/Xterm05x08_IMG_double.txt
+#ontName1=files/fonts/Xterm/Xterm06x13_IMG.png
+#ontName2=files/fonts/Xterm/Xterm06x13_IMG_double.png
+#ontChars=files/fonts/Xterm/Xterm06x13_IMG_double.txt
+#ontName1=files/fonts/Xterm/Xterm07x14_IMG.png
+#ontChars=files/fonts/Xterm/Xterm07x14_IMG_double.txt
+#ontName1=files/fonts/Xterm/Xterm08x13_IMG.png
+#ontName2=files/fonts/Xterm/Xterm08x13_IMG_double.png
+#ontChars=files/fonts/Xterm/Xterm08x13_IMG_double.txt
+#ontName1=files/fonts/Xterm/Xterm09x18_IMG.png
+#ontName2=files/fonts/Xterm/Xterm09x18_IMG_double.png
+#ontChars=files/fonts/Xterm/Xterm09x18_IMG_double.txt
+#ontName1=files/fonts/Xterm/Xterm10x20_IMG.png
+#ontName2=files/fonts/Xterm/Xterm10x20_IMG_double.png
+#ontChars=files/fonts/Xterm/Xterm10x20_IMG_double.txt
+
+
 
 
 ANSIRead=0
@@ -50,7 +117,7 @@ ANSIPrintTab=0
 ANSIWrite=0
 ANSIColorScheme=0
 
-ANSIScrollChars=1000
+ANSIScrollChars=800
 ANSIScrollSmooth=4
 
 
@@ -81,7 +148,7 @@ TerminalAnswerBack=TextPaint
 
 ### Display options
 
-DisplayInterpolate=0
+DisplayInterpolate=2
 DisplayBlink=1
 DisplayAttrib=14
 
@@ -191,9 +258,8 @@ Pixel_5_14=28E0,28E1,28E8,28E9,28E2,28E3,28EA,28EB,28F0,28F1,28F8,28F9,28F2,28F3
 Pixel_5_15=28E4,28E5,28EC,28ED,28E6,28E7,28EE,28EF,28F4,28F5,28FC,28FD,28F6,28F7,28FE,28FF
 
 ColorNormal=07
-ColorBeyondLine=88
-ColorBeyondEnd=77
-ColorCursor=F0
+ColorBeyondLine=87
+ColorBeyondEnd=78
 ColorStatus=F0
 ColorPopup=0F
 ColorKeyboard=8F

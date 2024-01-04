@@ -11,10 +11,16 @@ EditorChar::EditorChar()
 void EditorChar::Init(std::shared_ptr<ConfigFile> CF_)
 {
     CF = CF_;
-    int N = CF.get()->ParamGetI("_WinBitmapFontPageN");
-    for (int I = 0; I < N; I++)
+
+    std::string PagesS = CF.get()->ParamGetS("_WinBitmapFontPageList");
+    XList<std::string> PagesArr;
+    TextWork::StringSplit(PagesS, '|', PagesArr);
+    for (int I = 0; I < PagesArr.Count; I++)
     {
-        WinBitmapPage.Add(CF.get()->ParamGetI("_WinBitmapFontPage" + std::to_string(I)));
+        if (PagesArr[I].size() > 0)
+        {
+            WinBitmapPage.Add(std::stoi(PagesArr[I]));
+        }
     }
 
     for (int I = 0; I < 256; I++)

@@ -183,7 +183,7 @@ void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int Evt
                 {
                     EditorClipboard_.get()->SysClpTextPaste = EditorClipboard_.get()->SysClpTextCopy;
                 }
-                EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, true, EditorSemi_.get()->DiamondType);
+                EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, true, EditorSemi_.get()->DiamondType);
                 EditorScreenRefresh();
                 ScreenRefresh(true);
                 TickRepaint = TickRepaintX;
@@ -308,10 +308,10 @@ void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShif
     {
         switch (_(KeyName.c_str()))
         {
-            case _("Z"):
+            case _("KeyZ"):
                 UndoBufferUndo();
                 break;
-            case _("X"):
+            case _("KeyX"):
                 UndoBufferRedo();
                 break;
         }
@@ -437,7 +437,7 @@ void Core0Editor::EventKey_Editor_1(std::string KeyName, int KeyChar, bool ModSh
                 }
                 if (CharToPut >= 0)
                 {
-                    CharToPutDbl = CharDouble(CharToPut);
+                    CharToPutDbl = Screen::CharDouble(CharToPut);
                     if (CharToPutDbl != 0)
                     {
                         switch (TextMoveDir)
@@ -503,17 +503,17 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
                 {
                     case 0:
                         {
-                            EditorSemi_.get()->FrameCharPut(0, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(0, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 3:
                         {
-                            EditorSemi_.get()->FrameCharPut(6, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(6, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 1:
                         {
-                            EditorSemi_.get()->FrameCharPut(4, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(4, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                 }
@@ -533,17 +533,17 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
                 {
                     case 0:
                         {
-                            EditorSemi_.get()->FrameCharPut(1, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(1, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 2:
                         {
-                            EditorSemi_.get()->FrameCharPut(5, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(5, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 4:
                         {
-                            EditorSemi_.get()->FrameCharPut(7, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(7, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                 }
@@ -563,17 +563,17 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
                 {
                     case 0:
                         {
-                            EditorSemi_.get()->FrameCharPut(2, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(2, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 2:
                         {
-                            EditorSemi_.get()->FrameCharPut(5, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(5, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 3:
                         {
-                            EditorSemi_.get()->FrameCharPut(6, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(6, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                 }
@@ -597,17 +597,17 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
                 {
                     case 0:
                         {
-                            EditorSemi_.get()->FrameCharPut(3, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(3, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 1:
                         {
-                            EditorSemi_.get()->FrameCharPut(4, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(4, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                     case 4:
                         {
-                            EditorSemi_.get()->FrameCharPut(7, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                            EditorSemi_.get()->FrameCharPut(7, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
                         }
                         break;
                 }
@@ -627,7 +627,7 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             if (EditorSemi_.get()->FramePencil > 0)
             {
                 UndoBufferStart();
-                EditorSemi_.get()->FrameCharPut(4, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                EditorSemi_.get()->FrameCharPut(4, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
             }
             MoveCursor(4);
             if (EditorSemi_.get()->FramePencil > 0)
@@ -644,7 +644,7 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             if (EditorSemi_.get()->FramePencil > 0)
             {
                 UndoBufferStart();
-                EditorSemi_.get()->FrameCharPut(5, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                EditorSemi_.get()->FrameCharPut(5, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
             }
             MoveCursor(5);
             if (EditorSemi_.get()->FramePencil > 0)
@@ -661,7 +661,7 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             if (EditorSemi_.get()->FramePencil > 0)
             {
                 UndoBufferStart();
-                EditorSemi_.get()->FrameCharPut(6, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                EditorSemi_.get()->FrameCharPut(6, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
             }
             MoveCursor(6);
             if (EditorSemi_.get()->FramePencil > 0)
@@ -678,7 +678,7 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             if (EditorSemi_.get()->FramePencil > 0)
             {
                 UndoBufferStart();
-                EditorSemi_.get()->FrameCharPut(7, CursorFontW, CursorFontH, EditorSemi_.get()->FramePencil == 2);
+                EditorSemi_.get()->FrameCharPut(7, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, EditorSemi_.get()->FramePencil == 2);
             }
             MoveCursor(7);
             if (EditorSemi_.get()->FramePencil > 0)
@@ -693,16 +693,16 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             break;
 
         case _("KeyW"):
-            CursorYSize--;
+            EditorData_.get()->CursorYSize--;
             break;
         case _("KeyS"):
-            CursorYSize++;
+            EditorData_.get()->CursorYSize++;
             break;
         case _("KeyA"):
-            CursorXSize--;
+            EditorData_.get()->CursorXSize--;
             break;
         case _("KeyD"):
-            CursorXSize++;
+            EditorData_.get()->CursorXSize++;
             break;
 
         case _("KeyQ"):
@@ -734,11 +734,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorSemi_.get()->RectangleDraw(0, 0, CursorXSize, CursorYSize, 1, CursorFontW, CursorFontH);
+                EditorSemi_.get()->RectangleDraw(0, 0, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, 1, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH);
             }
             else
             {
-                EditorSemi_.get()->DiamondDraw(0, 0, CursorXSize, CursorYSize, 1, -1, CursorFontW, CursorFontH);
+                EditorSemi_.get()->DiamondDraw(0, 0, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, 1, -1, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH);
             }
             UndoBufferStop();
             break;
@@ -746,11 +746,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorSemi_.get()->RectangleDraw(0, 0, CursorXSize, CursorYSize, 2, CursorFontW, CursorFontH);
+                EditorSemi_.get()->RectangleDraw(0, 0, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, 2, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH);
             }
             else
             {
-                EditorSemi_.get()->DiamondDraw(0, 0, CursorXSize, CursorYSize, 2, -1, CursorFontW, CursorFontH);
+                EditorSemi_.get()->DiamondDraw(0, 0, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, 2, -1, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH);
             }
             UndoBufferStop();
             break;
@@ -778,11 +778,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[2]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[2]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[13]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[13]);
             }
             UndoBufferStop();
             break;
@@ -791,11 +791,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[3]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[3]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[14]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[14]);
             }
             UndoBufferStop();
             break;
@@ -804,11 +804,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[4]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[4]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[15]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[15]);
             }
             UndoBufferStop();
             break;
@@ -817,11 +817,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[5]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[5]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[16]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[16]);
             }
             UndoBufferStop();
             break;
@@ -830,11 +830,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[6]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[6]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[17]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[17]);
             }
             UndoBufferStop();
             break;
@@ -843,11 +843,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[7]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[7]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[18]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[18]);
             }
             UndoBufferStop();
             break;
@@ -856,11 +856,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[8]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[8]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[19]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[19]);
             }
             UndoBufferStop();
             break;
@@ -869,11 +869,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[9]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[9]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[20]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[20]);
             }
             UndoBufferStop();
             break;
@@ -882,11 +882,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[10]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[10]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[21]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[21]);
             }
             UndoBufferStop();
             break;
@@ -896,11 +896,11 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[1]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[1]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[12]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[12]);
             }
             UndoBufferStop();
             break;
@@ -909,18 +909,18 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             UndoBufferStart();
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[0]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[0]);
             }
             else
             {
-                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorSemi_.get()->FrameChar[11]);
+                EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorSemi_.get()->FrameChar[11]);
             }
             UndoBufferStop();
             break;
         case _("Space"):
         case _("Numpad0"):
             UndoBufferStart();
-            EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorFontW, EditorData_.get()->DrawCharI);
+            EditorData_.get()->CharPutDbl(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorFontW, EditorData_.get()->DrawCharI);
             UndoBufferStop();
             break;
 
@@ -936,7 +936,7 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             if (EditorSemi_.get()->DiamondType == 0)
             {
                 UndoBufferStart();
-                TextInsert(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, TextInsDelMode);
+                TextInsert(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, TextInsDelMode);
                 UndoBufferStop();
             }
             break;
@@ -944,13 +944,13 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
             if (EditorSemi_.get()->DiamondType == 0)
             {
                 UndoBufferStart();
-                TextDelete(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, TextInsDelMode);
+                TextDelete(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, TextInsDelMode);
                 UndoBufferStop();
             }
             break;
 
         case _("KeyC"):
-            EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, CursorXSize, CursorYSize, CursorFontW, CursorFontH, false, EditorSemi_.get()->DiamondType);
+            EditorClipboard_.get()->TextClipboardWork(EditorData_.get()->CursorX, EditorData_.get()->CursorY, EditorData_.get()->CursorXSize, EditorData_.get()->CursorYSize, EditorData_.get()->CursorFontW, EditorData_.get()->CursorFontH, false, EditorSemi_.get()->DiamondType);
             Screen::FileExport(0, "", "", EditorClipboard_.get()->SysClpTextCopy);
             break;
         case _("KeyV"):
@@ -959,30 +959,26 @@ void Core0Editor::EventKey_Editor_3(std::string KeyName, int KeyChar, bool ModSh
 
 
         case _("Digit6"):
-            if (CursorFontW > 1)
+            if (EditorData_.get()->CursorFontW > 1)
             {
-                CursorFontW--;
                 EditorData_.get()->CursorFontW--;
             }
             break;
         case _("Digit7"):
-            if (CursorFontW < FontMaxSize)
+            if (EditorData_.get()->CursorFontW < FontMaxSize)
             {
-                CursorFontW++;
                 EditorData_.get()->CursorFontW++;
             }
             break;
         case _("Digit8"):
-            if (CursorFontH > 1)
+            if (EditorData_.get()->CursorFontH > 1)
             {
-                CursorFontH--;
                 EditorData_.get()->CursorFontH--;
             }
             break;
         case _("Digit9"):
-            if (CursorFontH < FontMaxSize)
+            if (EditorData_.get()->CursorFontH < FontMaxSize)
             {
-                CursorFontH++;
                 EditorData_.get()->CursorFontH++;
             }
             break;
@@ -1310,56 +1306,56 @@ void Core0Editor::CursorEquivPos(int Dir)
 {
     if (WorkState == WorkStateDef::DrawChar)
     {
-        int CursorXSize_X = CursorXSize * CursorFontW;
-        int CursorYSize_Y = CursorYSize * CursorFontH;
-        int CursorXSize_Y = CursorXSize * CursorFontH;
-        int CursorYSize_X = CursorYSize * CursorFontW;
+        int CursorXSize_X = EditorData_.get()->CursorXSize * EditorData_.get()->CursorFontW;
+        int CursorYSize_Y = EditorData_.get()->CursorYSize * EditorData_.get()->CursorFontH;
+        int CursorXSize_Y = EditorData_.get()->CursorXSize * EditorData_.get()->CursorFontH;
+        int CursorYSize_X = EditorData_.get()->CursorYSize * EditorData_.get()->CursorFontW;
         if (EditorSemi_.get()->DiamondType == 0)
         {
-            if (((CursorXSize < 0) & (CursorYSize < 0)) || ((CursorXSize > 0) & (CursorYSize > 0)))
+            if (((EditorData_.get()->CursorXSize < 0) & (EditorData_.get()->CursorYSize < 0)) || ((EditorData_.get()->CursorXSize > 0) & (EditorData_.get()->CursorYSize > 0)))
             {
-                if (Dir > 0) { EditorData_.get()->CursorX += CursorXSize_X; CursorXSize = 0 - CursorXSize; }
-                if (Dir < 0) { EditorData_.get()->CursorY += CursorYSize_Y; CursorYSize = 0 - CursorYSize; }
+                if (Dir > 0) { EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorXSize = 0 - EditorData_.get()->CursorXSize; }
+                if (Dir < 0) { EditorData_.get()->CursorY += CursorYSize_Y; EditorData_.get()->CursorYSize = 0 - EditorData_.get()->CursorYSize; }
                 CursorLimit();
                 return;
             }
-            if (((CursorXSize > 0) & (CursorYSize < 0)) || ((CursorXSize < 0) & (CursorYSize > 0)))
+            if (((EditorData_.get()->CursorXSize > 0) & (EditorData_.get()->CursorYSize < 0)) || ((EditorData_.get()->CursorXSize < 0) & (EditorData_.get()->CursorYSize > 0)))
             {
-                if (Dir > 0) { EditorData_.get()->CursorY += CursorYSize_Y; CursorYSize = 0 - CursorYSize; }
-                if (Dir < 0) { EditorData_.get()->CursorX += CursorXSize_X; CursorXSize = 0 - CursorXSize; }
+                if (Dir > 0) { EditorData_.get()->CursorY += CursorYSize_Y; EditorData_.get()->CursorYSize = 0 - EditorData_.get()->CursorYSize; }
+                if (Dir < 0) { EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorXSize = 0 - EditorData_.get()->CursorXSize; }
                 CursorLimit();
                 return;
             }
-            if ((CursorXSize == 0) || (CursorYSize == 0))
+            if ((EditorData_.get()->CursorXSize == 0) || (EditorData_.get()->CursorYSize == 0))
             {
-                EditorData_.get()->CursorX += CursorXSize_X; CursorXSize = 0 - CursorXSize;
-                EditorData_.get()->CursorY += CursorYSize_Y; CursorYSize = 0 - CursorYSize;
+                EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorXSize = 0 - EditorData_.get()->CursorXSize;
+                EditorData_.get()->CursorY += CursorYSize_Y; EditorData_.get()->CursorYSize = 0 - EditorData_.get()->CursorYSize;
                 CursorLimit();
                 return;
             }
         }
         else
         {
-            if (((CursorXSize < 0) & (CursorYSize < 0)) || ((CursorXSize > 0) & (CursorYSize > 0)))
+            if (((EditorData_.get()->CursorXSize < 0) & (EditorData_.get()->CursorYSize < 0)) || ((EditorData_.get()->CursorXSize > 0) & (EditorData_.get()->CursorYSize > 0)))
             {
-                if (Dir > 0) { EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorY += CursorXSize_Y; CursorXSize = 0 - CursorXSize; }
-                if (Dir < 0) { EditorData_.get()->CursorX -= CursorYSize_X; EditorData_.get()->CursorY += CursorYSize_Y; CursorYSize = 0 - CursorYSize; }
+                if (Dir > 0) { EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorY += CursorXSize_Y; EditorData_.get()->CursorXSize = 0 - EditorData_.get()->CursorXSize; }
+                if (Dir < 0) { EditorData_.get()->CursorX -= CursorYSize_X; EditorData_.get()->CursorY += CursorYSize_Y; EditorData_.get()->CursorYSize = 0 - EditorData_.get()->CursorYSize; }
                 CursorLimit();
                 return;
             }
-            if (((CursorXSize > 0) & (CursorYSize < 0)) || ((CursorXSize < 0) & (CursorYSize > 0)))
+            if (((EditorData_.get()->CursorXSize > 0) & (EditorData_.get()->CursorYSize < 0)) || ((EditorData_.get()->CursorXSize < 0) & (EditorData_.get()->CursorYSize > 0)))
             {
-                if (Dir > 0) { EditorData_.get()->CursorX -= CursorYSize_X; EditorData_.get()->CursorY += CursorYSize_Y; CursorYSize = 0 - CursorYSize; }
-                if (Dir < 0) { EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorY += CursorXSize_Y; CursorXSize = 0 - CursorXSize; }
+                if (Dir > 0) { EditorData_.get()->CursorX -= CursorYSize_X; EditorData_.get()->CursorY += CursorYSize_Y; EditorData_.get()->CursorYSize = 0 - EditorData_.get()->CursorYSize; }
+                if (Dir < 0) { EditorData_.get()->CursorX += CursorXSize_X; EditorData_.get()->CursorY += CursorXSize_Y; EditorData_.get()->CursorXSize = 0 - EditorData_.get()->CursorXSize; }
                 CursorLimit();
                 return;
             }
-            if (((CursorXSize == 0) & (CursorYSize != 0)) || ((CursorXSize != 0) & (CursorYSize == 0)))
+            if (((EditorData_.get()->CursorXSize == 0) & (EditorData_.get()->CursorYSize != 0)) || ((EditorData_.get()->CursorXSize != 0) & (EditorData_.get()->CursorYSize == 0)))
             {
                 EditorData_.get()->CursorX += (CursorXSize_X - CursorYSize_X);
                 EditorData_.get()->CursorY += (CursorXSize_Y + CursorYSize_Y);
-                CursorXSize = 0 - CursorXSize;
-                CursorYSize = 0 - CursorYSize;
+                EditorData_.get()->CursorXSize = 0 - EditorData_.get()->CursorXSize;
+                EditorData_.get()->CursorYSize = 0 - EditorData_.get()->CursorYSize;
                 CursorLimit();
                 return;
             }
@@ -1372,25 +1368,25 @@ void Core0Editor::MoveCursor(int Direction)
     switch (Direction)
     {
         case 0:
-            if (EditorData_.get()->CursorY >= CursorFontH)
+            if (EditorData_.get()->CursorY >= EditorData_.get()->CursorFontH)
             {
-                EditorData_.get()->CursorY -= CursorFontH;
+                EditorData_.get()->CursorY -= EditorData_.get()->CursorFontH;
             }
             break;
         case 1:
             {
-                EditorData_.get()->CursorY += CursorFontH;
+                EditorData_.get()->CursorY += EditorData_.get()->CursorFontH;
             }
             break;
         case 2:
-            if (EditorData_.get()->CursorX >= CursorFontW)
+            if (EditorData_.get()->CursorX >= EditorData_.get()->CursorFontW)
             {
-                EditorData_.get()->CursorX -= CursorFontW;
+                EditorData_.get()->CursorX -= EditorData_.get()->CursorFontW;
             }
             break;
         case 3:
             {
-                EditorData_.get()->CursorX += CursorFontW;
+                EditorData_.get()->CursorX += EditorData_.get()->CursorFontW;
             }
             break;
         case 4:
@@ -1438,27 +1434,27 @@ void Core0Editor::MoveCursor(int Direction)
 
 int Core0Editor::CursorX0()
 {
-    int T = (EditorData_.get()->CursorX - DisplayX) % CursorFontW;
+    int T = (EditorData_.get()->CursorX - DisplayX) % EditorData_.get()->CursorFontW;
     if (T == 0)
     {
         return 0;
     }
     else
     {
-        return 0 - (CursorFontW - T);
+        return 0 - (EditorData_.get()->CursorFontW - T);
     }
 }
 
 int Core0Editor::CursorY0()
 {
-    int T = (EditorData_.get()->CursorY - DisplayY) % CursorFontH;
+    int T = (EditorData_.get()->CursorY - DisplayY) % EditorData_.get()->CursorFontH;
     if (T == 0)
     {
         return 0;
     }
     else
     {
-        return 0 - (CursorFontH - T);
+        return 0 - (EditorData_.get()->CursorFontH - T);
     }
 }
 
@@ -1477,33 +1473,15 @@ void Core0Editor::CursorChar0(int X, int Y, bool Show)
         return;
     }
     int XMin = std::max(0, X);
-    int XMax = std::min(X + CursorFontW, WinTxtW);
+    int XMax = std::min(X + EditorData_.get()->CursorFontW, WinTxtW);
     int YMin = std::max(0, Y);
-    int YMax = std::min(Y + CursorFontH, WinTxtH);
+    int YMax = std::min(Y + EditorData_.get()->CursorFontH, WinTxtH);
     for (int YY = YMin; YY < YMax; YY++)
     {
         for (int XX = XMin; XX < XMax; XX++)
         {
             CursorSetX.Add(XX);
             CursorSetY.Add(YY);
-
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            /*EditorData_.get()->ScrChar_.Get(YY, XX);
-            if (Show)
-            {
-                if (EditorData_.get()->ScrChar_.Item_Type < 3)
-                {
-                    EditorData_.get()->ScrChar_.Item_Type += 3;
-                }
-            }
-            else
-            {
-                if (EditorData_.get()->ScrChar_.Item_Type > 2)
-                {
-                    EditorData_.get()->ScrChar_.Item_Type -= 3;
-                }
-            }
-            EditorData_.get()->ScrChar_.Set(YY, XX);*/
         }
     }
 }
@@ -1515,9 +1493,9 @@ void Core0Editor::CursorCharX(int X, int Y, bool Show)
         return;
     }
     int XMin = std::max(0, X);
-    int XMax = std::min(X + CursorFontW, WinTxtW);
+    int XMax = std::min(X + EditorData_.get()->CursorFontW, WinTxtW);
     int YMin = std::max(0, Y);
-    int YMax = std::min(Y + CursorFontH, WinTxtH);
+    int YMax = std::min(Y + EditorData_.get()->CursorFontH, WinTxtH);
     for (int YY = YMin; YY < YMax; YY++)
     {
         for (int XX = XMin; XX < XMax; XX++)
@@ -1526,24 +1504,6 @@ void Core0Editor::CursorCharX(int X, int Y, bool Show)
             {
                 CursorSetX.Add(XX);
                 CursorSetY.Add(YY);
-
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                /*EditorData_.get()->ScrChar_.Get(YY, XX);
-                if (Show)
-                {
-                    if (EditorData_.get()->ScrChar_.Item_Type < 3)
-                    {
-                        EditorData_.get()->ScrChar_.Item_Type += 3;
-                    }
-                }
-                else
-                {
-                    if (EditorData_.get()->ScrChar_.Item_Type > 2)
-                    {
-                        EditorData_.get()->ScrChar_.Item_Type -= 3;
-                    }
-                }
-                EditorData_.get()->ScrChar_.Set(YY, XX);*/
             }
         }
     }
@@ -1563,19 +1523,19 @@ void Core0Editor::CursorLine(bool Show)
         {
             if (EditorSemi_.get()->DiamondType == 0)
             {
-                int X1 = std::min(XX, XX + (CursorXSize * CursorFontW));
-                int X2 = std::max(XX, XX + (CursorXSize * CursorFontW));
-                int Y1 = std::min(YY, YY + (CursorYSize * CursorFontH));
-                int Y2 = std::max(YY, YY + (CursorYSize * CursorFontH));
+                int X1 = std::min(XX, XX + (EditorData_.get()->CursorXSize * EditorData_.get()->CursorFontW));
+                int X2 = std::max(XX, XX + (EditorData_.get()->CursorXSize * EditorData_.get()->CursorFontW));
+                int Y1 = std::min(YY, YY + (EditorData_.get()->CursorYSize * EditorData_.get()->CursorFontH));
+                int Y2 = std::max(YY, YY + (EditorData_.get()->CursorYSize * EditorData_.get()->CursorFontH));
 
                 X1 = std::max(std::min(X1, WinTxtW - 1), XX0);
                 X2 = std::max(std::min(X2, WinTxtW - 1), XX0);
                 Y1 = std::max(std::min(Y1, WinTxtH - 1), YY0);
                 Y2 = std::max(std::min(Y2, WinTxtH - 1), YY0);
 
-                for (int Y = Y1; Y <= Y2; Y += CursorFontH)
+                for (int Y = Y1; Y <= Y2; Y += EditorData_.get()->CursorFontH)
                 {
-                    for (int X = X1; X <= X2; X += CursorFontW)
+                    for (int X = X1; X <= X2; X += EditorData_.get()->CursorFontW)
                     {
                         if ((X != XX) || (Y != YY))
                         {
@@ -1586,17 +1546,17 @@ void Core0Editor::CursorLine(bool Show)
             }
             else
             {
-                int X1 = std::min(0, CursorXSize);
-                int X2 = std::max(0, CursorXSize);
-                int Y1 = std::min(0, CursorYSize);
-                int Y2 = std::max(0, CursorYSize);
+                int X1 = std::min(0, EditorData_.get()->CursorXSize);
+                int X2 = std::max(0, EditorData_.get()->CursorXSize);
+                int Y1 = std::min(0, EditorData_.get()->CursorYSize);
+                int Y2 = std::max(0, EditorData_.get()->CursorYSize);
 
                 for (int X_ = X1; X_ <= X2; X_++)
                 {
                     for (int Y_ = Y1; Y_ <= Y2; Y_++)
                     {
-                        int X__ = XX + ((X_ - Y_) * CursorFontW);
-                        int Y__ = YY + ((X_ + Y_) * CursorFontH);
+                        int X__ = XX + ((X_ - Y_) * EditorData_.get()->CursorFontW);
+                        int Y__ = YY + ((X_ + Y_) * EditorData_.get()->CursorFontH);
 
                         CursorChar_(XX, YY, X__, Y__, Show);
 
@@ -1605,40 +1565,40 @@ void Core0Editor::CursorLine(bool Show)
                             case 1:
                                 if ((X_ < X2) && (Y_ > Y1))
                                 {
-                                    CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
+                                    CursorChar_(XX, YY, X__ + EditorData_.get()->CursorFontW, Y__, Show);
                                 }
                                 break;
                             case 2:
-                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__ + EditorData_.get()->CursorFontW, Y__, Show);
                                 break;
                             case 3:
-                                CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
+                                CursorChar_(XX, YY, X__, Y__ + EditorData_.get()->CursorFontH, Show);
                                 break;
                             case 4:
-                                CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__ - EditorData_.get()->CursorFontW, Y__, Show);
                                 break;
                             case 5:
-                                CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
+                                CursorChar_(XX, YY, X__, Y__ - EditorData_.get()->CursorFontH, Show);
                                 break;
                             case 6:
-                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
-                                CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
-                                CursorChar_(XX, YY, X__ + CursorFontW, Y__ - CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ + EditorData_.get()->CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ - EditorData_.get()->CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ + EditorData_.get()->CursorFontW, Y__ - EditorData_.get()->CursorFontH, Show);
                                 break;
                             case 7:
-                                CursorChar_(XX, YY, X__ + CursorFontW, Y__, Show);
-                                CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
-                                CursorChar_(XX, YY, X__ + CursorFontW, Y__ + CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ + EditorData_.get()->CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ + EditorData_.get()->CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ + EditorData_.get()->CursorFontW, Y__ + EditorData_.get()->CursorFontH, Show);
                                 break;
                             case 8:
-                                CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
-                                CursorChar_(XX, YY, X__, Y__ + CursorFontH, Show);
-                                CursorChar_(XX, YY, X__ - CursorFontW, Y__ + CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ - EditorData_.get()->CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ + EditorData_.get()->CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ - EditorData_.get()->CursorFontW, Y__ + EditorData_.get()->CursorFontH, Show);
                                 break;
                             case 9:
-                                CursorChar_(XX, YY, X__ - CursorFontW, Y__, Show);
-                                CursorChar_(XX, YY, X__, Y__ - CursorFontH, Show);
-                                CursorChar_(XX, YY, X__ - CursorFontW, Y__ - CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ - EditorData_.get()->CursorFontW, Y__, Show);
+                                CursorChar_(XX, YY, X__, Y__ - EditorData_.get()->CursorFontH, Show);
+                                CursorChar_(XX, YY, X__ - EditorData_.get()->CursorFontW, Y__ - EditorData_.get()->CursorFontH, Show);
                                 break;
                         }
                     }
@@ -1656,13 +1616,13 @@ void Core0Editor::CursorLine(bool Show)
                 CursorChar_(XX, YY, XX3, YY3, Show);
                 if ((XX2 < 0) || (XX2 >= WinTxtW))
                 {
-                    CursorChar_(XX, YY, XX3, YY3 - CursorFontH, Show);
-                    CursorChar_(XX, YY, XX3, YY3 + CursorFontH, Show);
+                    CursorChar_(XX, YY, XX3, YY3 - EditorData_.get()->CursorFontH, Show);
+                    CursorChar_(XX, YY, XX3, YY3 + EditorData_.get()->CursorFontH, Show);
                 }
                 if ((YY2 < 0) || (YY2 >= WinTxtH))
                 {
-                    CursorChar_(XX, YY, XX3 - CursorFontW, YY3, Show);
-                    CursorChar_(XX, YY, XX3 + CursorFontW, YY3, Show);
+                    CursorChar_(XX, YY, XX3 - EditorData_.get()->CursorFontW, YY3, Show);
+                    CursorChar_(XX, YY, XX3 + EditorData_.get()->CursorFontW, YY3, Show);
                 }
             }
         }
@@ -1677,19 +1637,19 @@ void Core0Editor::CursorLine(bool Show)
         }
         if ((CursorType == 1) || (CursorType == 3))
         {
-            for (int X = XX - CursorFontW; X > (0 - CursorFontW); X -= CursorFontW)
+            for (int X = XX - EditorData_.get()->CursorFontW; X > (0 - EditorData_.get()->CursorFontW); X -= EditorData_.get()->CursorFontW)
             {
                 CursorChar0(X, YY, Show);
             }
-            for (int X = XX + CursorFontW; X < WinTxtW; X += CursorFontW)
+            for (int X = XX + EditorData_.get()->CursorFontW; X < WinTxtW; X += EditorData_.get()->CursorFontW)
             {
                 CursorChar0(X, YY, Show);
             }
-            for (int Y = YY - CursorFontH; Y > (0 - CursorFontH); Y -= CursorFontH)
+            for (int Y = YY - EditorData_.get()->CursorFontH; Y > (0 - EditorData_.get()->CursorFontH); Y -= EditorData_.get()->CursorFontH)
             {
                 CursorChar0(XX, Y, Show);
             }
-            for (int Y = YY + CursorFontH; Y < WinTxtH; Y += CursorFontH)
+            for (int Y = YY + EditorData_.get()->CursorFontH; Y < WinTxtH; Y += EditorData_.get()->CursorFontH)
             {
                 CursorChar0(XX, Y, Show);
             }
@@ -1697,37 +1657,37 @@ void Core0Editor::CursorLine(bool Show)
         if ((CursorType == 2) || (CursorType == 3))
         {
             int XX_, YY_;
-            XX_ = XX - CursorFontW;
-            YY_ = YY - CursorFontH;
-            while ((XX_ > (0 - CursorFontW)) && (YY_ > (0 - CursorFontH)))
+            XX_ = XX - EditorData_.get()->CursorFontW;
+            YY_ = YY - EditorData_.get()->CursorFontH;
+            while ((XX_ > (0 - EditorData_.get()->CursorFontW)) && (YY_ > (0 - EditorData_.get()->CursorFontH)))
             {
                 CursorChar0(XX_, YY_, Show);
-                XX_ -= CursorFontW;
-                YY_ -= CursorFontH;
+                XX_ -= EditorData_.get()->CursorFontW;
+                YY_ -= EditorData_.get()->CursorFontH;
             }
-            XX_ = XX + CursorFontW;
-            YY_ = YY + CursorFontH;
+            XX_ = XX + EditorData_.get()->CursorFontW;
+            YY_ = YY + EditorData_.get()->CursorFontH;
             while ((XX_ < WinTxtW) && (YY_ < WinTxtH))
             {
                 CursorChar0(XX_, YY_, Show);
-                XX_ += CursorFontW;
-                YY_ += CursorFontH;
+                XX_ += EditorData_.get()->CursorFontW;
+                YY_ += EditorData_.get()->CursorFontH;
             }
-            XX_ = XX - CursorFontW;
-            YY_ = YY + CursorFontH;
-            while ((XX_ > (0 - CursorFontW)) && (YY_ < WinTxtH))
+            XX_ = XX - EditorData_.get()->CursorFontW;
+            YY_ = YY + EditorData_.get()->CursorFontH;
+            while ((XX_ > (0 - EditorData_.get()->CursorFontW)) && (YY_ < WinTxtH))
             {
                 CursorChar0(XX_, YY_, Show);
-                XX_ -= CursorFontW;
-                YY_ += CursorFontH;
+                XX_ -= EditorData_.get()->CursorFontW;
+                YY_ += EditorData_.get()->CursorFontH;
             }
-            XX_ = XX + CursorFontW;
-            YY_ = YY - CursorFontH;
-            while ((XX_ < WinTxtW) && (YY_ > (0 - CursorFontH)))
+            XX_ = XX + EditorData_.get()->CursorFontW;
+            YY_ = YY - EditorData_.get()->CursorFontH;
+            while ((XX_ < WinTxtW) && (YY_ > (0 - EditorData_.get()->CursorFontH)))
             {
                 CursorChar0(XX_, YY_, Show);
-                XX_ += CursorFontW;
-                YY_ -= CursorFontH;
+                XX_ += EditorData_.get()->CursorFontW;
+                YY_ -= EditorData_.get()->CursorFontH;
             }
         }
     }
@@ -1735,24 +1695,29 @@ void Core0Editor::CursorLine(bool Show)
 
 void Core0Editor::UndoBufferStart()
 {
-    EditorUndo_.get()->BufferStart();
+    EditorData_.get()->UndoRedoBegin();
+    EditorPixelPaint_.get()->UndoRedoBegin();
 }
 
 void Core0Editor::UndoBufferStop()
 {
-    EditorUndo_.get()->BufferStop();
-    EditorData_.get()->TextBuffer.TrimLines();
+    EditorData_.get()->UndoRedoEnd();
+    EditorPixelPaint_.get()->UndoRedoEnd();
     CursorLimit();
 }
 
 void Core0Editor::UndoBufferUndo()
 {
-
+    EditorData_.get()->UndoRedoUndo();
+    EditorPixelPaint_.get()->UndoRedoUndo();
+    CursorLimit();
 }
 
 void Core0Editor::UndoBufferRedo()
 {
-
+    EditorData_.get()->UndoRedoRedo();
+    EditorPixelPaint_.get()->UndoRedoRedo();
+    CursorLimit();
 }
 
 void Core0Editor::TextInsert(int X, int Y, int W, int H, int InsDelMode)
@@ -1795,9 +1760,9 @@ void Core0Editor::ScreenRefresh(bool Force)
             {
                 Str StatusText;
                 EditorData_.get()->CursorChar = EditorData_.get()->ElementGetVal(EditorData_.get()->CursorX, EditorData_.get()->CursorY, true, false, 0);
-                if (CharDoubleInv(EditorData_.get()->CursorChar) >= 32)
+                if (Screen::CharDoubleInv(EditorData_.get()->CursorChar) >= 0)
                 {
-                    EditorData_.get()->CursorChar = CharDoubleInv(EditorData_.get()->CursorChar);
+                    EditorData_.get()->CursorChar = Screen::CharDoubleInv(EditorData_.get()->CursorChar);
                 }
                 EditorData_.get()->CursorColoB = EditorData_.get()->ElementGetVal(EditorData_.get()->CursorX, EditorData_.get()->CursorY, true, false, 1);
                 EditorData_.get()->CursorColoF = EditorData_.get()->ElementGetVal(EditorData_.get()->CursorX, EditorData_.get()->CursorY, true, false, 2);
@@ -1817,9 +1782,9 @@ void Core0Editor::ScreenRefresh(bool Force)
                 }
                 else
                 {
-                    StatusText.AddString(CursorFontW);
+                    StatusText.AddString(EditorData_.get()->CursorFontW);
                     StatusText.AddString("x");
-                    StatusText.AddString(CursorFontH);
+                    StatusText.AddString(EditorData_.get()->CursorFontH);
                     StatusText.AddString(" ");
 
                     StatusText.AddString(EditorData_.get()->CursorX);
@@ -1828,7 +1793,7 @@ void Core0Editor::ScreenRefresh(bool Force)
                     if (DisplayState != DisplayStateDef::Info)
                     {
                         StatusCursorChar = EditorData_.get()->CursorChar;
-                        StatusCursorCharDbl = CharDouble(StatusCursorChar);
+                        StatusCursorCharDbl = Screen::CharDouble(StatusCursorChar);
                         StatusCursorColoB = EditorData_.get()->CursorColoB;
                         StatusCursorColoF = EditorData_.get()->CursorColoF;
                         StatusCursorColoA = EditorData_.get()->CursorColoA;
@@ -1839,7 +1804,7 @@ void Core0Editor::ScreenRefresh(bool Force)
                     StatusText.Add(StatusCursorChar);
                     if (StatusCursorCharDbl != 0)
                     {
-                        StatusText.AddString(" ");
+                        StatusText.Add(StatusCursorCharDbl);
                     }
                     StatusText.AddString(" ");
                     if ((StatusCursorColoB >= 0) && (StatusCursorColoB <= 15))
@@ -1888,13 +1853,13 @@ void Core0Editor::ScreenRefresh(bool Force)
                     case WorkStateDef::DrawChar:
                         if (EditorSemi_.get()->DiamondType == 0)
                         {
-                            StatusText.AddString("Rect " + std::to_string(abs(CursorXSize) + 1) + "x" + std::to_string(abs(CursorYSize) + 1) + "  " + EditorSemi_.get()->GetFrameName(1));
+                            StatusText.AddString("Rect " + std::to_string(abs(EditorData_.get()->CursorXSize) + 1) + "x" + std::to_string(abs(EditorData_.get()->CursorYSize) + 1) + "  " + EditorSemi_.get()->GetFrameName(1));
                         }
                         else
                         {
-                            StatusText.AddString("Dia " + std::to_string(abs(CursorXSize) + 1) + "x" + std::to_string(abs(CursorYSize) + 1) + "  " + EditorSemi_.get()->GetFrameName(2));
+                            StatusText.AddString("Dia " + std::to_string(abs(EditorData_.get()->CursorXSize) + 1) + "x" + std::to_string(abs(EditorData_.get()->CursorYSize) + 1) + "  " + EditorSemi_.get()->GetFrameName(2));
                         }
-                        if (CharDouble(EditorData_.get()->DrawCharI) != 0)
+                        if (Screen::CharDouble(EditorData_.get()->DrawCharI) != 0)
                         {
                             StatusText.AddString(" ");
                         }
@@ -2017,11 +1982,11 @@ void Core0Editor::TextRepaint(bool Force)
 
 std::string Core0Editor::BeyondIndicator()
 {
-    if ((EditorData_.get()->CursorY + CursorFontH - 1) < EditorData_.get()->TextBuffer.CountLines())
+    if ((EditorData_.get()->CursorY + EditorData_.get()->CursorFontH - 1) < EditorData_.get()->TextBuffer.CountLines())
     {
-        for (int i = 0; i < CursorFontH; i++)
+        for (int i = 0; i < EditorData_.get()->CursorFontH; i++)
         {
-            if ((EditorData_.get()->CursorX + CursorFontW - 1) >= EditorData_.get()->TextBuffer.CountItems(EditorData_.get()->CursorY + i))
+            if ((EditorData_.get()->CursorX + EditorData_.get()->CursorFontW - 1) >= EditorData_.get()->TextBuffer.CountItems(EditorData_.get()->CursorY + i))
             {
                 return ";";
             }
@@ -2048,33 +2013,66 @@ void Core0Editor::SetInfo(bool Enable, int N)
     }
 }
 
-void Core0Editor::CharmapPaintCursor(int X, int Y, int Chr, bool Sel)
+void Core0Editor::CharmapPaintCursor(int X, int Y, int Chr, bool Sel, bool ChrPrev)
 {
+    int Chr1 = 32;
     if (EditorChar_.get()->FavPage)
     {
+        if (ChrPrev && (Chr > 0))
+        {
+            Chr1 = Screen::CharDouble(EditorChar_.get()->FavChar[Chr - 1]);
+            if (Chr1 == 0)
+            {
+                Chr1 = 32;
+            }
+        }
         Chr = EditorChar_.get()->FavChar[Chr];
     }
     else
     {
         Chr = Chr + (EditorChar_.get()->SelectCharPart(1) << 8);
+        if (ChrPrev && (Chr > 0))
+        {
+            Chr1 = Screen::CharDouble(Chr - 1);
+            if (Chr1 == 0)
+            {
+                Chr1 = 32;
+            }
+        }
     }
+
+    int ChrDbl = Screen::CharDouble(Chr);
 
     if (Sel)
     {
-        ScreenChar0(X - 1, Y, '[', PopupBack, PopupFore);
+        if (ChrDbl != 0)
+        {
+            ScreenChar0(X - 1, Y, '>', PopupBack, PopupFore);
+        }
+        else
+        {
+            ScreenChar0(X - 1, Y, '[', PopupBack, PopupFore);
+        }
     }
     else
     {
-        ScreenChar0(X - 1, Y, ' ', PopupBack, PopupFore);
+        ScreenChar0(X - 1, Y, Chr1, PopupBack, PopupFore);
     }
     ScreenChar0(X + 0, Y, Chr, PopupBack, PopupFore);
-    if (Sel)
+    if (ChrDbl != 0)
     {
-        ScreenChar0(X + 1, Y, ']', PopupBack, PopupFore);
+        ScreenChar0(X + 1, Y, ChrDbl, PopupBack, PopupFore);
     }
     else
     {
-        ScreenChar0(X + 1, Y, ' ', PopupBack, PopupFore);
+        if (Sel)
+        {
+            ScreenChar0(X + 1, Y, ']', PopupBack, PopupFore);
+        }
+        else
+        {
+            ScreenChar0(X + 1, Y, ' ', PopupBack, PopupFore);
+        }
     }
 }
 
@@ -2171,6 +2169,11 @@ void Core0Editor::CharmapPaint(int Depth)
                     for (int XX = 0; XX < 16; XX++)
                     {
                         ScreenChar0(CharPosX + XX * 2 + 2, CharPosY + YY + 2, EditorChar_.get()->FavChar[Ptr], PopupBack, PopupFore);
+                        int T = Screen::CharDouble(EditorChar_.get()->FavChar[Ptr]);
+                        if (T != 0)
+                        {
+                            ScreenChar0(CharPosX + XX * 2 + 3, CharPosY + YY + 2, T, PopupBack, PopupFore);
+                        }
                         Ptr++;
                     }
                 }
@@ -2183,6 +2186,11 @@ void Core0Editor::CharmapPaint(int Depth)
                     for (int XX = 0; XX < 16; XX++)
                     {
                         ScreenChar0(CharPosX + XX * 2 + 2, CharPosY + YY + 2, Ptr, PopupBack, PopupFore);
+                        int T = Screen::CharDouble(Ptr);
+                        if (T != 0)
+                        {
+                            ScreenChar0(CharPosX + XX * 2 + 3, CharPosY + YY + 2, T, PopupBack, PopupFore);
+                        }
                         Ptr++;
                     }
                 }
@@ -2219,30 +2227,30 @@ void Core0Editor::CharmapPaint(int Depth)
             {
                 if (ScrY > 0)
                 {
-                    CharmapPaintCursor(SelX, SelY - 1, Chr - 16, false);
+                    CharmapPaintCursor(SelX, SelY - 1, Chr - 16, false, ScrX > 0);
                 }
                 if (ScrX > 0)
                 {
-                    CharmapPaintCursor(SelX - 2, SelY, Chr - 1, false);
+                    CharmapPaintCursor(SelX - 2, SelY, Chr - 1, false, ScrX > 1);
                 }
                 if ((ScrX == 0) && (ScrY > 0))
                 {
-                    CharmapPaintCursor(SelX + 30, SelY - 1, Chr - 1, false);
+                    CharmapPaintCursor(SelX + 30, SelY - 1, Chr - 1, false, true);
                 }
                 if (ScrX < 15)
                 {
-                    CharmapPaintCursor(SelX + 2, SelY, Chr + 1, false);
+                    CharmapPaintCursor(SelX + 2, SelY, Chr + 1, false, true);
                 }
                 if ((ScrX == 15) && (ScrY < 15))
                 {
-                    CharmapPaintCursor(SelX - 30, SelY + 1, Chr + 1, false);
+                    CharmapPaintCursor(SelX - 30, SelY + 1, Chr + 1, false, false);
                 }
                 if (ScrY < 15)
                 {
-                    CharmapPaintCursor(SelX, SelY + 1, Chr + 16, false);
+                    CharmapPaintCursor(SelX, SelY + 1, Chr + 16, false, ScrX > 0);
                 }
             }
-            CharmapPaintCursor(SelX, SelY, Chr, true);
+            CharmapPaintCursor(SelX, SelY, Chr, true, ScrX > 0);
 
             std::string DispCode = TextWork::CharCode(EditorChar_.get()->SelectCharCode(), 2);
 
@@ -2258,6 +2266,11 @@ void Core0Editor::CharmapPaint(int Depth)
             ScreenChar0(CharPosX + 9, CharPosY + 1, 32, PopupBack, PopupFore);
 
             ScreenChar0(CharPosX + 7, CharPosY + 1, EditorChar_.get()->SelectCharCode(), PopupBack, PopupFore);
+            int SelectCharCodeDbl = Screen::CharDouble(EditorChar_.get()->SelectCharCode());
+            if (SelectCharCodeDbl != 0)
+            {
+                ScreenChar0(CharPosX + 8, CharPosY + 1, SelectCharCodeDbl, PopupBack, PopupFore);
+            }
 
             if (EditorChar_.get()->FavPage)
             {
@@ -2518,6 +2531,7 @@ void Core0Editor::FileLoad2()
 
     if (BinaryFile_.get()->ItemGet(-1).Ansi)
     {
+        CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
         CoreAnsi_.get()->AnsiProcessReset(true, false, 0);
         CoreAnsi_.get()->AnsiRingBell = false;
         CoreAnsi_.get()->AnsiProcessSupply(FileTxt);

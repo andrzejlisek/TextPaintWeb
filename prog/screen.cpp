@@ -5,52 +5,71 @@ Screen::Screen()
 
 }
 
-void Screen::AddDoubleRange(int X1, int X2)
+void Screen::StaticInit(std::string Double1, std::string Double2)
 {
-    if (X1 < 0)
-    {
-        Range1.Clear();
-        Range2.Clear();
-    }
-}
+    Range1.Clear();
+    Range2.Clear();
+    XList<std::string> DoubleRange1;
+    XList<std::string> DoubleRange2;
+    TextWork::StringSplit(Double1, '|', DoubleRange1);
+    TextWork::StringSplit(Double2, '|', DoubleRange2);
 
-void Screen::StaticInit()
-{
-    for (int i = 0; i < CharDoubleTableLength; i++)
+    if (DoubleRange1.Count == DoubleRange2.Count)
     {
-        CharDoubleTable[i] = 0;
-        CharDoubleTableInv[i] = 0;
-    }
-
-    // !!!!!!!! Dopisac tworzenie podwojnych znakow
-
-    // !!!!!! Sprawdzic !!!
-    /*CharDoubleTableInv[BlankDoubleChar] = BlankDoubleChar;
-    for (int i = 0; i < CharDoubleTableLength; i++)
-    {
-        if ((CharDoubleTable[i] >= 0) && (CharDoubleTable[i] != BlankDoubleChar))
+        for (int I = 0; I < DoubleRange1.Count; I++)
         {
-            CharDoubleTableInv[CharDoubleTable[i]] = i;
+            if ((DoubleRange1[I].size() > 0) && (DoubleRange2[I].size() > 0))
+            {
+                Range1.Add(std::stoi(DoubleRange1[I]));
+                Range2.Add(std::stoi(DoubleRange2[I]));
+            }
         }
-    }*/
 
+        for (int I = 0; I < Range1.Count; I++)
+        {
+            for (int J = 0; J < Range1.Count; J++)
+            {
+                if (Range1[I] < Range1[J])
+                {
+                    int T1 = Range1[I];
+                    int T2 = Range2[I];
+                    Range1[I] = Range1[J];
+                    Range2[I] = Range2[J];
+                    Range1[J] = T1;
+                    Range2[J] = T2;
+                }
+            }
+        }
+    }
 }
 
 int Screen::CharDouble(int C)
 {
-    return CharDoubleTable[C];
+    int T = Range2.IndexOfBinRange(C);
+    if (T >= 0)
+    {
+        if (Range1[T] <= C)
+        {
+            return C + UnicodeCount;
+        }
+    }
+    return 0;
 }
 
 int Screen::CharDoubleInv(int C)
 {
-    if (C != BlankDoubleChar)
+    if (C >= UnicodeCount)
     {
-        return CharDoubleTableInv[C];
+        int T = Range2.IndexOfBinRange(C - UnicodeCount);
+        if (T >= 0)
+        {
+            if (Range1[T] <= (C - UnicodeCount))
+            {
+                return C - UnicodeCount;
+            }
+        }
     }
-    else
-    {
-        return BlankDoubleCharVis;
-    }
+    return -1;
 }
 
 void Screen::ScreenClear(int Back, int Fore)

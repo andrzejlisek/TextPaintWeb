@@ -161,6 +161,10 @@ int CoreStatic::SetAttribBit(int Attrib, int Bit, bool Val)
 
 int CoreStatic::ColorNegative(int C)
 {
+    if (C >= 16)
+    {
+        return ColorNegative(C - 16) + 16;
+    }
     if (C < 8)
     {
         return 7 - C;

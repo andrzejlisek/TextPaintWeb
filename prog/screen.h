@@ -5,16 +5,14 @@
 #include "str.h"
 #include <string>
 #include <iostream>
+#include "textwork.h"
 
 class Screen
 {
 public:
     Screen();
-    static inline int CharDoubleTable[18 * 65536];
-    static inline int CharDoubleTableInv[18 * 65536];
     static inline bool WinAuto = true;
-    static void AddDoubleRange(int X1, int X2);
-    static void StaticInit();
+    static void StaticInit(std::string Double1, std::string Double2);
     static int CharDouble(int C);
     static int CharDoubleInv(int C);
     static inline int TextNormalBack = 0;
@@ -67,12 +65,11 @@ public:
 
     static int DefaultW(int ScrW, int ANSIDOS);
     static int DefaultH(int ScrH, int ANSIDOS);
+
+    static inline constexpr int UnicodeCount = 0x110000;
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;
-    static inline const int CharDoubleTableLength = 18 * 65536;
-    static inline const int BlankDoubleChar = (0x10FFFF + 1);
-    static inline const int BlankDoubleCharVis = 32;
 };
 
 #endif // SCREEN_H

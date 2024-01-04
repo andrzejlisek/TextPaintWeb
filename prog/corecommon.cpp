@@ -94,25 +94,6 @@ void CoreCommon::InitCommon()
     Str::SpaceChar0 = Str::SpaceChars[0];
 }
 
-int CoreCommon::CharDoubleInv(int C)
-{
-    if (C != BlankDoubleChar)
-    {
-        return 0;
-        //return CharDoubleTableInv[C];
-    }
-    else
-    {
-        return BlankDoubleCharVis;
-    }
-}
-
-int CoreCommon::CharDouble(int C)
-{
-    return 0;
-    //return CharDoubleTable[C];
-}
-
 void CoreCommon::ScreenChar0(int X, int Y, int Chr, int Back, int Fore)
 {
     ScreenChar0(X, Y, Chr, Back, Fore, 0, 0, 0);

@@ -77,16 +77,6 @@ std::string TextWork::NumPlusMinus(long Num)
     return " " + std::to_string(Num);
 }
 
-/*int TextWork::CodeChar(std::string C)
-{
-    //!!!!C = C.trim();
-    if (C == "")
-    {
-        return -1;
-    }
-    return Hex::HexToInt(C);
-}*/
-
 std::string TextWork::CharPrint(int C)
 {
     if ((C >= 32) && (C <= 126))
