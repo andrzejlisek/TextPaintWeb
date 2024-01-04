@@ -95,6 +95,10 @@ function _ProgCallback(D)
                 ScreenLineOffset(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6]);
                 CallbackQueueI += 7;
                 break;
+            case 107:
+                ScreenBell();
+                CallbackQueueI += 1;
+                break;
             case 111:
                 FileImport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4]);
                 CallbackQueueI += 5;

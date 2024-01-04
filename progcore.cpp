@@ -109,6 +109,12 @@ void ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore
     RespondPartial();
 }
 
+void Bell()
+{
+    BufNum(107);
+    RespondPartial();
+}
+
 void ScreenSetConfig()
 {
     FileConfig("DisplayBlink");
@@ -130,6 +136,10 @@ void ScreenSetConfig()
 
     FileConfig("ColorBlending");
     FileConfig("ColorBlendingGamma");
+
+    FileConfig("BellVolume");
+    FileConfig("BellFrequency");
+    FileConfig("BellDuration");
 }
 
 void WorkerSend(int T, std::string X)
@@ -230,11 +240,12 @@ extern "C"
                 Screen::ScreenResize_ = ScreenResize;
                 Screen::ScreenCursorMove_ = ScreenCursorMove;
                 Screen::ScreenTextMove_ = ScreenTextMove;
-                Screen::ScreenLineOffset = ScreenLineOffset;
+                Screen::ScreenLineOffset_ = ScreenLineOffset;
                 Screen::ScreenSetConfig = ScreenSetConfig;
                 Screen::WorkerSend = WorkerSend;
                 Screen::FileImport_ = FileImport;
                 Screen::FileExport_ = FileExport;
+                Screen::Bell = Bell;
 
                 BufInit();
                 RespondClear();

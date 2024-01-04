@@ -26,14 +26,16 @@ public:
     static inline void (*ScreenResize_)( int, int );
     static inline void (*ScreenCursorMove_)( int, int );
     static inline void (*ScreenTextMove_)( int, int, int, int, int, int );
-    static inline void (*ScreenLineOffset)( int, int, int, int, int, int );
+    static inline void (*ScreenLineOffset_)( int, int, int, int, int, int );
     static inline void (*WorkerSend)( int, std::string );
+    static inline void (*Bell)( );
     static void ScreenClear(int Back, int Fore);
     static void ScreenChar(int X, int Y, int C, int ColorBack, int ColorFore, int ColorAttr, int FontW, int FontH);
     static void ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H);
     static void ScreenResize(int NewW, int NewH);
     static void ScreenCursorMove(int X, int Y);
     static void ScreenRefresh();
+    static void ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore, int ColorAttr);
 
     static inline XList<int> ScreenMemo1;
     static inline XList<int> ScreenMemo2;
@@ -70,6 +72,18 @@ public:
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;
+
+    struct ScreenLineOffsetDef
+    {
+        bool NeedSet = false;
+        int Offset = 0;
+        int Blank;
+        int ColorBack;
+        int ColorFore;
+        int ColorAttr;
+    };
+
+    static inline XList<ScreenLineOffsetDef> ScreenLineOffsetArray;
 };
 
 #endif // SCREEN_H

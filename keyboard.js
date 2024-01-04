@@ -491,6 +491,7 @@ function KeybMouseUp(X, Y)
 
 function KeybMouseDown_(Evt)
 {
+    ScreenBellInit();
     if (KeybTouch == 0)
     {
         var _ = KeybSvg.getBoundingClientRect();
@@ -524,6 +525,7 @@ function KeybMouseUp_(Evt)
 
 function KeybMouseDown_0(Evt)
 {
+    ScreenBellInit();
     if ((KeybTouch == 1) && (Evt.touches.length > 0))
     {
         document.getElementsByTagName("BODY")[0].className = "lock-screen";

@@ -23,6 +23,7 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
 
     ANSIScrollChars = CF.get()->ParamGetI("ANSIScrollChars");
     ANSIScrollSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
+    AnsiScrollBuffer = CF.get()->ParamGetI("ANSIScrollBuffer");
 
     ColorThresholdBlackWhite = CF.get()->ParamGetI("ANSIColorThresholdBlackWhite");
     ColorThresholdGray = CF.get()->ParamGetI("ANSIColorThresholdGray");

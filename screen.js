@@ -11,6 +11,10 @@ let ScreenBlinkState = false;
 let ScreenCellFontX = [];
 let ScreenCellFontY = [];
 
+let ScreenBellVolume = 25;
+let ScreenBellFreq = 800;
+let ScreenBellTime = 100;
+
 var ScreenDiv = document.getElementById("screendiv");
 var ScreenVP = document.getElementById("screenvp");
 var ScreenObj = document.getElementById("Screen");
@@ -121,6 +125,10 @@ function ScreenSetDisplayConfig(Repaint)
     if (ScreenAttrS != ((ConfigFileI("DisplayAttrib") & 8) > 0)) IsChanged = true;
 
     if (ScreenSET_Blink != ConfigFileI("DisplayBlink")) IsChanged = true;
+
+    ScreenBellVolume = ConfigFileI("BellVolume");
+    ScreenBellFreq = ConfigFileI("BellFrequency");
+    ScreenBellTime = ConfigFileI("BellDuration");
 
 
     ScreenColorBlendingGamma = ConfigFileI("ColorBlendingGamma");
@@ -1121,5 +1129,35 @@ function ScreenDisplayResize()
     }
 
     ScreenDrawBlink(ScreenBlinkState);
+}
+
+let ScreenBellUnInitialized = true;
+let ScreenBellContext;
+
+
+function ScreenBellInit()
+{
+    if (ScreenBellUnInitialized)
+    {
+        ScreenBellContext = new (window.AudioContext || window.webkitAudioContext)();
+        ScreenBellUnInitialized = false;
+    }
+}
+
+function ScreenBell()
+{
+    if (ScreenBellUnInitialized || (ScreenBellVolume == 0) || (ScreenBellFreq == 0) || (ScreenBellTime == 0))
+    {
+        return;
+    }
+    let ScreenBellGain = ScreenBellContext.createGain();
+    let ScreenBellOsci = ScreenBellContext.createOscillator();
+    ScreenBellGain.gain.value = parseFloat(ScreenBellVolume) / 100.0;
+    ScreenBellOsci.connect(ScreenBellGain);
+    ScreenBellGain.connect(ScreenBellContext.destination);
+    ScreenBellOsci.type = "square";
+    ScreenBellOsci.frequency.value = ScreenBellFreq;
+    ScreenBellOsci.start();
+    ScreenBellOsci.stop(ScreenBellContext.currentTime + (parseFloat(ScreenBellTime) / 1000));
 }
 

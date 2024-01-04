@@ -2847,7 +2847,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         AnsiState_.AnsiRingBellCount++;
                         if (AnsiRingBell)
                         {
-                            //!!!!ScreenBell();
+                            Screen::Bell();
                         }
                     }
                     break;

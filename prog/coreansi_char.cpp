@@ -243,7 +243,10 @@ void CoreAnsi::AnsiScreenNegative(bool IsNega)
                 AnsiState_.__AnsiLineOccupy__.Item_ColorA = AnsiState_.__AnsiLineOccupy__.Item_ColorA & 0x7F;
             }
             AnsiState_.__AnsiLineOccupy__.Set(Y, X);
-            Screen::ScreenChar(X, Y + ScreenOffset, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_ColorA, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH);
+            if (AnsiScreenWork)
+            {
+                Screen::ScreenChar(X, Y + ScreenOffset, AnsiState_.__AnsiLineOccupy__.Item_Char, AnsiState_.__AnsiLineOccupy__.Item_ColorB, AnsiState_.__AnsiLineOccupy__.Item_ColorF, AnsiState_.__AnsiLineOccupy__.Item_ColorA, AnsiState_.__AnsiLineOccupy__.Item_FontW, AnsiState_.__AnsiLineOccupy__.Item_FontH);
+            }
         }
     }
 }

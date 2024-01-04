@@ -613,7 +613,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             {
                 DisplayStatus -= 12;
             }
-            Repaint(true);
+            Repaint(false);
             return;
         case _("1_Minus"):
             return;
@@ -743,7 +743,10 @@ void Core1Player::Repaint(bool Force)
 
     if (DisplayStatusMod != 0)
     {
-        CoreAnsi_.get()->AnsiRepaint(false);
+        if (Force)
+        {
+            CoreAnsi_.get()->AnsiRepaint(false);
+        }
 
         Str CharMsg;
         switch (DisplayStatusDiv)

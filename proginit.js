@@ -37,6 +37,8 @@ window.addEventListener("resize", WindowResize, false);
 
 function KeyPress(e)
 {
+    ScreenBellInit();
+
     if (!ProgStarted)
     {
         return;

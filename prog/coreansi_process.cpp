@@ -157,7 +157,7 @@ bool CoreAnsi::AnsiSeek(int StepCount)
     {
         if (RingBellCount != AnsiState_.AnsiRingBellCount)
         {
-            //!!!!ScreenBell();
+            Screen::Bell();
         }
     }
 
@@ -345,7 +345,11 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                 }
                 else
                 {
-                    int AnsiBufChr = AnsiBuffer[AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars];
+                    if (AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars > AnsiScrollBuffer)
+                    {
+                        BufStop = true;
+                    }
+                    /*int AnsiBufChr = AnsiBuffer[AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars];
                     if ((AnsiBufChr < 32) || (ANSI8bit && (AnsiBufChr >= 0x80) && (AnsiBufChr <= 0x9F)))
                     {
                         BufStop = true;
@@ -359,7 +363,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                                 BufStop = true;
                             }
                         }
-                    }
+                    }*/
                 }
                 if (BufStop)
                 {

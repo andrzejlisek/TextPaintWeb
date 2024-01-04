@@ -74,6 +74,7 @@ int Screen::CharDoubleInv(int C)
 
 void Screen::ScreenClear(int Back, int Fore)
 {
+    ScreenLineOffsetArray.Clear();
     int Area = ScreenMemo1.Count;
     for (int I = 0; I < Area; I++)
     {
@@ -169,7 +170,34 @@ void Screen::ScreenCursorMove(int X, int Y)
 
 void Screen::ScreenRefresh()
 {
+    for (int I = 0; I < ScreenLineOffsetArray.Count; I++)
+    {
+        if (ScreenLineOffsetArray[I].NeedSet)
+        {
+            ScreenLineOffsetDef _ = ScreenLineOffsetArray[I];
+            ScreenLineOffset_(I, _.Offset, _.Blank, _.ColorBack, _.ColorFore, _.ColorAttr);
+            ScreenLineOffsetArray[I].NeedSet = false;
+        }
+    }
     ScreenCursorMove_(CurrentX, CurrentY);
+}
+
+void Screen::ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore, int ColorAttr)
+{
+    ScreenLineOffsetDef _;
+    while (ScreenLineOffsetArray.Count <= Y)
+    {
+        _.NeedSet = false;
+        _.Offset = 0;
+        ScreenLineOffsetArray.Add(_);
+    }
+    _.NeedSet = true;
+    _.Offset = Offset;
+    _.Blank = Blank;
+    _.ColorBack = ColorBack;
+    _.ColorFore = ColorFore;
+    _.ColorAttr = ColorAttr;
+    ScreenLineOffsetArray[Y] = _;
 }
 
 void Screen::ScreenWriteChar(int Chr)

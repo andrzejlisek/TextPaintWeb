@@ -95,6 +95,7 @@ private:
 
     int ANSIScrollChars = 0;
     int ANSIScrollSmooth = 0;
+    int AnsiScrollBuffer = 0;
 
     int ColorThresholdBlackWhite = 48;
     int ColorThresholdGray = 20;
