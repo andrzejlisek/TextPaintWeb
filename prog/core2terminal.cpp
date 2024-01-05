@@ -148,10 +148,12 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             EscapeKey_ = EscapeKeyId(KeyName, KeyChar);
             WorkStateC = WorkStateCDef::Session;
             ConnOpen();
+            TerminalMouse_.MouseOn();
             break;
         case WorkStateCDef::Session:
             if (EscapeKey_ == EscapeKeyId(KeyName, KeyChar))
             {
+                TerminalMouse_.MouseOff();
                 WorkStateC = WorkStateCDef::Toolbox;
             }
             else
@@ -193,6 +195,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                     case _("Escape"):
                         {
                             WorkStateC = WorkStateCDef::Session;
+                            TerminalMouse_.MouseOn();
                         }
                         break;
                     case _("KeyA"):
@@ -223,6 +226,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                     case _("KeyZ"):
                         SendHex(TerminalKeyboard_.KeyCode(KeyName, KeyChar, false, true, false));
                         WorkStateC = WorkStateCDef::Session;
+                        TerminalMouse_.MouseOn();
                         break;
                     case _("Digit1"):
                     case _("Digit2"):
@@ -235,10 +239,12 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                     case _("Digit9"):
                         SendHex(TerminalKeyboard_.KeyCode("F" + KeyName.substr(5), 0, ModShift, ModCtrl, ModAlt));
                         WorkStateC = WorkStateCDef::Session;
+                        TerminalMouse_.MouseOn();
                         break;
                     case _("Digit0"):
                         SendHex(TerminalKeyboard_.KeyCode("F10", 0, ModShift, ModCtrl, ModAlt));
                         WorkStateC = WorkStateCDef::Session;
+                        TerminalMouse_.MouseOn();
                         break;
 
                     default:
@@ -260,12 +266,14 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                         WorkStateC = WorkStateCDef::Session;
                                         Clipboard_.SetText(CoreAnsi_.get()->AnsiState_.GetScreen(0, 0, ScreenW - 1, ScreenH - 1));
                                         Screen::FileExport(0, "", "", Clipboard_.SystemText);
+                                        TerminalMouse_.MouseOn();
                                     }
                                     break;
                                 case '.':
                                     {
                                         WorkStateC = WorkStateCDef::Session;
                                         Screen::FileImport(0, "", "");
+                                        TerminalMouse_.MouseOn();
                                     }
                                     break;
                                 default:
@@ -277,43 +285,52 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                             case '@':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("00");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '[':
                                             case '{':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("1B");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '\\':
                                             case '|':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("1C");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case ']':
                                             case '}':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("1D");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '~':
                                             case '^':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("1E");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '/':
                                             case '_':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("1F");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '?':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex("7F");
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '<':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex(TerminalKeyboard_.KeyCode("F11", 0, false, ModCtrl, ModAlt));
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '>':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex(TerminalKeyboard_.KeyCode("F12", 0, false, ModCtrl, ModAlt));
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                         }
                                     }
@@ -356,10 +373,12 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                             case '<':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex(TerminalKeyboard_.KeyCode("F11", 0, false, ModCtrl, ModAlt));
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '>':
                                                 WorkStateC = WorkStateCDef::Session;
                                                 SendHex(TerminalKeyboard_.KeyCode("F12", 0, false, ModCtrl, ModAlt));
+                                                TerminalMouse_.MouseOn();
                                                 break;
                                             case '/':
                                                 if (Conn.get()->IsConnected() == 0)
@@ -378,6 +397,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                                 {
                                                     WorkStateC = WorkStateCDef::Session;
                                                     //!!!!!TelnetSendWindowSize();
+                                                    TerminalMouse_.MouseOn();
                                                 }
                                                 break;
                                             case '\\':
@@ -484,6 +504,25 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
                 ProcessReceived(Data);
             }
             break;
+        case _("Mouse"):
+            {
+                EventMouse(EvtParam0, EvtParam1, EvtParam2, EvtParam3);
+            }
+            return;
+    }
+}
+
+void Core2Terminal::EventMouse(std::string Name, int X, int Y, int Btn)
+{
+    if ((WorkStateC == WorkStateCDef::Session) || (WorkStateC == WorkStateCDef::Toolbox))
+    {
+        if ((X >= 0) && (Y >= 0))
+        {
+            if ((WorkStateC == WorkStateCDef::Session) && TerminalMouse_.MouseScreen)
+            {
+                SendHex(TerminalMouse_.MouseEvent(Name, X, Y, Btn, false, false, false));
+            }
+        }
     }
 }
 
@@ -515,6 +554,7 @@ void Core2Terminal::SendHex(std::string STR)
 
 void Core2Terminal::ConnOpen()
 {
+    TerminalMouse_.Reset();
     Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
     DisplayStatusRepaint();
     Screen::ScreenCursorMove(0, 0);
@@ -625,23 +665,23 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                     switch (_(ParamStr[1].c_str()))
                     {
                         case _("0"):
-                            //!!!Screen_.MouseSet(TextWork::StrToInt(ParamStr[2], 0), false);
+                            TerminalMouse_.MouseSet(TextWork::StrToInt(ParamStr[2], 0), false);
                             break;
                         case _("1"):
-                            //!!!Screen_.MouseSet(TextWork::StrToInt(ParamStr[2], 0), true);
+                            TerminalMouse_.MouseSet(TextWork::StrToInt(ParamStr[2], 0), true);
                             break;
                         case _("2"):
                             if (TextWork::StrToInt(ParamStr[2], 0) > 0)
                             {
-                                //MouseHighlight = true;
-                                //MouseHighlightX = int.Parse(ParamStr[3]);
-                                //MouseHighlightY = int.Parse(ParamStr[4]);
-                                //MouseHighlightFirst = int.Parse(ParamStr[5]);
-                                //MouseHighlightLast = int.Parse(ParamStr[6]);
+                                TerminalMouse_.Highlight = true;
+                                TerminalMouse_.HighlightX = TextWork::StrToInt(ParamStr[3], 0);
+                                TerminalMouse_.HighlightY = TextWork::StrToInt(ParamStr[4], 0);
+                                TerminalMouse_.HighlightFirst = TextWork::StrToInt(ParamStr[5], 0);
+                                TerminalMouse_.HighlightLast = TextWork::StrToInt(ParamStr[6], 0);
                             }
                             else
                             {
-                                //!!!!MouseHighlight = false;
+                                TerminalMouse_.Highlight = false;
                             }
                             break;
                     }

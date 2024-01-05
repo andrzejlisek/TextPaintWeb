@@ -19,6 +19,8 @@ public:
     static inline int TextNormalFore = 7;
     static inline int TerminalCellW = 8;
     static inline int TerminalCellH = 16;
+    static inline int TerminalCellW2 = 4;
+    static inline int TerminalCellH2 = 8;
 
     static inline void (*ScreenSetConfig)( );
     static inline void (*ScreenClear_)( int, int );
@@ -28,7 +30,7 @@ public:
     static inline void (*ScreenTextMove_)( int, int, int, int, int, int );
     static inline void (*ScreenLineOffset_)( int, int, int, int, int, int );
     static inline void (*WorkerSend)( int, std::string );
-    static inline void (*Bell)( );
+    static inline void (*ScreenOther)( int );
     static void ScreenClear(int Back, int Fore);
     static void ScreenChar(int X, int Y, int C, int ColorBack, int ColorFore, int ColorAttr, int FontW, int FontH);
     static void ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H);
@@ -69,6 +71,8 @@ public:
     static int DefaultH(int ScrH, int ANSIDOS);
 
     static inline constexpr int UnicodeCount = 0x110000;
+
+    static void Bell();
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;

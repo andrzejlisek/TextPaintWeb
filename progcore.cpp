@@ -109,9 +109,10 @@ void ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore
     RespondPartial();
 }
 
-void Bell()
+void ScreenOther(int Param)
 {
     BufNum(107);
+    BufNum(Param);
     RespondPartial();
 }
 
@@ -245,7 +246,7 @@ extern "C"
                 Screen::WorkerSend = WorkerSend;
                 Screen::FileImport_ = FileImport;
                 Screen::FileExport_ = FileExport;
-                Screen::Bell = Bell;
+                Screen::ScreenOther = ScreenOther;
 
                 BufInit();
                 RespondClear();

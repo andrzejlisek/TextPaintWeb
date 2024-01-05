@@ -278,7 +278,14 @@ void Screen::ScreenWriteLine(int Back, int Fore)
 
 void Screen::MouseActive(bool X)
 {
-
+    if (X)
+    {
+        ScreenOther(1);
+    }
+    else
+    {
+        ScreenOther(2);
+    }
 }
 
 int Screen::FileImport(int Kind, std::string Name, std::string Attrib)
@@ -324,4 +331,9 @@ int Screen::DefaultH(int ScrH, int ANSIDOS)
     {
         return ScrH;
     }
+}
+
+void Screen::Bell()
+{
+    ScreenOther(0);
 }

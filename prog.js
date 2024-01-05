@@ -35,6 +35,22 @@ function ProgEventKey(KeyName, KeyChr, KeyS, KeyC, KeyA)
     }
 }
 
+function ProgScreenOther(Param)
+{
+    switch (Param)
+    {
+        case 0:
+            ScreenBell();
+            break;
+        case 1:
+            ScreenMouseTurn1();
+            break;
+        case 2:
+            ScreenMouseTurn0();
+            break;
+    }
+}
+
 let CallbackQueue = [];
 let CallbackQueueI = 0;
 
@@ -96,8 +112,8 @@ function _ProgCallback(D)
                 CallbackQueueI += 7;
                 break;
             case 107:
-                ScreenBell();
-                CallbackQueueI += 1;
+                ProgScreenOther(D[CallbackQueueI+1]);
+                CallbackQueueI += 2;
                 break;
             case 111:
                 FileImport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4]);

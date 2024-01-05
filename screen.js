@@ -15,6 +15,9 @@ let ScreenBellVolume = 25;
 let ScreenBellFreq = 800;
 let ScreenBellTime = 100;
 
+let ScreenMouseX = 0;
+let ScreenMouseY = 0;
+
 var ScreenDiv = document.getElementById("screendiv");
 var ScreenVP = document.getElementById("screenvp");
 var ScreenObj = document.getElementById("Screen");
@@ -176,6 +179,18 @@ function ScreenSetDisplayConfig(Repaint)
     if (Repaint && IsChanged)
     {
         ScreenRepaint();
+    }
+}
+
+function ScreenCalcColorNega(ScreenColor)
+{
+    if (ScreenColor < 8)
+    {
+        return 7 - ScreenColor;
+    }
+    else
+    {
+        return 23 - ScreenColor;
     }
 }
 
@@ -494,6 +509,15 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
 
     ScreenCalcColor(Back, Fore, Attr);
     
+    if (ScreenMouseActive)
+    {
+        if ((X == ScreenMouseProgMoveX) && (Y == ScreenMouseProgMoveY))
+        {
+            ScreenCalcColor_Back = ScreenCalcColorNega(ScreenCalcColor_Back);
+            ScreenCalcColor_Fore = ScreenCalcColorNega(ScreenCalcColor_Fore);
+        }
+    }
+    
     const ScrIdx = Y * ScreenW + X;
     const CharIdx0 = ((Chr & 32767) << 16) + (ScreenCalcColor_Back << 12) + (ScreenCalcColor_Fore << 8) + (Attr);
     const CharIdx1 = ((Chr >> 15) << 16) + (FontW << 8) + (FontH);
@@ -604,6 +628,16 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
     if ((X == ScreenCursorX) && (Y == ScreenCursorY))
     {
         ScreenDrawCursorWork();
+    }
+}
+
+function ScreenRepaintChar_(X, Y)
+{
+    if ((X >= 0) && (Y >= 0))
+    {
+        let Ptr = Y * ScreenW + X;
+        ScreenData_0[Ptr] = -1;
+        ScreenChar(X, Y, ScreenDataC[Ptr], ScreenDataB[Ptr], ScreenDataF[Ptr], ScreenDataA[Ptr], ScreenDataW[Ptr], ScreenDataH[Ptr]);
     }
 }
 
@@ -1129,35 +1163,5 @@ function ScreenDisplayResize()
     }
 
     ScreenDrawBlink(ScreenBlinkState);
-}
-
-let ScreenBellUnInitialized = true;
-let ScreenBellContext;
-
-
-function ScreenBellInit()
-{
-    if (ScreenBellUnInitialized)
-    {
-        ScreenBellContext = new (window.AudioContext || window.webkitAudioContext)();
-        ScreenBellUnInitialized = false;
-    }
-}
-
-function ScreenBell()
-{
-    if (ScreenBellUnInitialized || (ScreenBellVolume == 0) || (ScreenBellFreq == 0) || (ScreenBellTime == 0))
-    {
-        return;
-    }
-    let ScreenBellGain = ScreenBellContext.createGain();
-    let ScreenBellOsci = ScreenBellContext.createOscillator();
-    ScreenBellGain.gain.value = parseFloat(ScreenBellVolume) / 100.0;
-    ScreenBellOsci.connect(ScreenBellGain);
-    ScreenBellGain.connect(ScreenBellContext.destination);
-    ScreenBellOsci.type = "square";
-    ScreenBellOsci.frequency.value = ScreenBellFreq;
-    ScreenBellOsci.start();
-    ScreenBellOsci.stop(ScreenBellContext.currentTime + (parseFloat(ScreenBellTime) / 1000));
 }
 

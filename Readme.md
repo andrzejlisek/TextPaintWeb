@@ -19,7 +19,7 @@ Direct link: [https://andrzejlisek\.github\.io/TextPaintWeb/index\.html](https:/
 
 This version of TextPaint has the internal file manager, which now allows to browse the system files \(**\!\!config\.txt** ans **\!\!system\.txt**\) and the files defined in **\!\!system\.txt** configuration file\. If you modify any file, the file will be stored at local storage and replaces the original default file\.
 
-The file manager is available in editor \(press **F11** key\) and in the animation player \(press **dot/period** key\)\. In the file manager, there are posiible the following keys:
+The file manager is available in editor \(press **F10** key\) and in the animation player \(press **dot/period** key\)\. In the file manager, there are posiible the following keys:
 
 
 * **Tab** \- Move the popup\.
@@ -51,8 +51,8 @@ If you click the screen, there will be show the GUI interface usable both on tou
 This version is not completed yet and now there are need to do following:
 
 
-* XTERM mouse support\.
 * Clean\-up config file\.
+* Readme and documentation\.
 * Integration with file system and telnet using WebSocket and separated \.NET/Java application\.
 
 

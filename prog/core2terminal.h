@@ -8,6 +8,7 @@
 #include "terminalconntest.h"
 #include "terminalconnworker.h"
 #include "textcodec.h"
+#include "terminalmouse.h"
 
 class Core2Terminal : public CoreCommon
 {
@@ -17,6 +18,7 @@ public:
     void EventTick();
     void EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void EventOther(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
+    void EventMouse(std::string Name, int X, int Y, int Btn);
     void ConnOpen();
     void ConnClose(bool StopApp);
 private:
@@ -55,6 +57,7 @@ private:
     std::shared_ptr<TextCodec> TerminalCodecR;
 
     TerminalKeyboard TerminalKeyboard_;
+    TerminalMouse TerminalMouse_;
 
     int TerminalStep;
     Clipboard Clipboard_;

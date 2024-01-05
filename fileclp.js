@@ -92,10 +92,7 @@ function FileClpPaste(Id, Data)
                                 if (DequeueTextState == 0)
                                 {
                                     let CharCode = Temp[5] + Temp[4] + Temp[3] + Temp[2] + Temp[1] + Temp[0];
-                                    if (CharCode <= 65535)
-                                    {
-                                        Data_ = Data_ + String.fromCharCode(CharCode);
-                                    }
+                                    Data_ = Data_ + String_fromCharCode(CharCode);
 
                                     Temp[0] = 0;
                                     Temp[1] = 0;

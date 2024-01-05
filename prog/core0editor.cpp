@@ -220,10 +220,6 @@ void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShif
     CursorLine(false);
     switch (_(KeyName.c_str()))
     {
-        case _("MouseMove"):
-            return;
-        case _("MouseBtn"):
-            return;
         case _("FileDrop1"):
             return;
         case _("FileDrop2"):

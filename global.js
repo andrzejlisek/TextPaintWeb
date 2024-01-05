@@ -29,6 +29,9 @@ let ScreenTimerTickEvent = 1;
 let WaitTimeout = 500;
 
 let ScreenCursorSteady = false;
+let ScreenMouseActive = false;
+let ScreenMouseProgMoveX = -1;
+let ScreenMouseProgMoveY = -1;
 
 let KeybReady = false;
 
@@ -176,5 +179,20 @@ function BrowserH()
 function BrowserF()
 {
     return window.devicePixelRatio;
+}
+
+function String_fromCharCode(T)
+{
+    if ((T <= 0xD7FF) || ((T >= 0xE000) && (T <= 0xFFFF)))
+    {
+        return String.fromCharCode(T);
+    }
+    else
+    {
+        T = T - 65536;
+        var V1 = T >> 10;
+        var V2 = T & 1023;
+        return String.fromCharCode(V1 + 0xD800, V2 + 0xDC00);
+    }
 }
 

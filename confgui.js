@@ -195,6 +195,17 @@ function ConfRepaint()
 
 function ConfShow()
 {
+    if (ScreenMouseActive)
+    {
+        return;
+    }
+    if ((typeof ScreenMouseShowConfig) == "function")
+    {
+        if (!ScreenMouseShowConfig())
+        {
+            return;
+        }
+    }
     GuiSettingsShown = true;
     document.getElementById("ConfGui").style["display"] = "block";
     ConfRepaint();

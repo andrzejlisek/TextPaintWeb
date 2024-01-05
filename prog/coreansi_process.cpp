@@ -32,7 +32,6 @@ void CoreAnsi::AnsiTerminalReset()
     __AnsiResponse.Clear();
     if (AnsiScreenWork)
     {
-        Screen::MouseActive(false);
         AnsiRepaint(false);
     }
 }
