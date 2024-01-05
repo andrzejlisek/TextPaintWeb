@@ -1005,26 +1005,9 @@ function ScreenInit2()
     ScreenCursorSize = Math.floor(ScreenFont.CellH / 8);
     if (ScreenCursorSize == 0) ScreenCursorSize = 1;
 
-    for (let I = 0; I <= 8; I++)
+    for (let I = 0; I <= 16; I++)
     {
-        switch (ScreenCellH)
-        {
-            case 8:
-                ScreenLineOffsetValArray[I] = I;
-                break;
-            case 16:
-                ScreenLineOffsetValArray[I] = I << 1;
-                break;
-            case 24:
-                ScreenLineOffsetValArray[I] = I + I + I;
-                break;
-            case 32:
-                ScreenLineOffsetValArray[I] = I << 2;
-                break;
-            default:
-                ScreenLineOffsetValArray[I] = Math.floor((I * ScreenCellH) / 8);
-                break;
-        }
+        ScreenLineOffsetValArray[I] = Math.floor((I * ScreenCellH) / 16);
     }
 
     ScreenCellFontX = [];

@@ -491,15 +491,15 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Tab"):
             {
-                int DisplayStatus_ = DisplayStatus;
+                int DisplayStatus_ = (DisplayStatus % 3);
                 DisplayStatus++;
                 if ((DisplayStatus % 3) == 0)
                 {
                     DisplayStatus -= 3;
                 }
-                if ((DisplayStatus_ == 0) && (DisplayStatus > 0)) ScreenH++;
-                if ((DisplayStatus_ > 0) && (DisplayStatus == 0)) ScreenH--;
-                ScreenStatusBarSet(DisplayStatus);
+                if ((DisplayStatus_ == 0) && ((DisplayStatus % 3) > 0)) ScreenH++;
+                if ((DisplayStatus_ > 0) && ((DisplayStatus % 3) == 0)) ScreenH--;
+                ScreenStatusBarSet(DisplayStatus % 3);
                 Repaint(true);
             }
             return;

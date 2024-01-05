@@ -144,6 +144,7 @@ void Screen::ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H)
 
 void Screen::ScreenResize(int NewW, int NewH)
 {
+    ScreenLineOffsetArray.Clear();
     ScreenMemo1.Clear();
     ScreenMemo2.Clear();
     int Area = NewW * NewH;

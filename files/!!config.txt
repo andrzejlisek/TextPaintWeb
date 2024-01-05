@@ -155,9 +155,10 @@ DisplayAttrib=14
 
 SteadyCursor=0
 
+### Color blending options
+
 ColorBlending=1
 ColorBlendingGamma=2200
-
 ColorBlending_1=2591,2588,3,1,0
 ColorBlending_2=2592,2588,1,1,0
 ColorBlending_3=2593,2588,1,3,0
@@ -175,11 +176,15 @@ ColorBlending_14=1FB92,2584,1,1,1
 ColorBlending_15=1FB93,258C,1,1,1
 ColorBlending_16=1FB94,2590,1,1,1
 
+### Color palette
+# The left half is normal display, the right half is the VT blink display
+
 PaletteR=00AA00AA00AA00AA55FF55FF55FF55FF007100710071007139AA39AA39AA39AA
 PaletteG=0000AAAA0000AAAA5555FFFF5555FFFF00007171000071713939AAAA3939AAAA
 PaletteB=00000000AAAAAAAA55555555FFFFFFFF000000007171717139393939AAAAAAAA
 
 ### Bell options
+# Volume is 0-100, frequency is in Hz, duration is in milliseconds
 
 BellVolume=25
 BellFrequency=800

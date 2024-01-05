@@ -30,23 +30,23 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
             {
                 case 1:
                     AnsiScrollPosition.Add(ANSIScrollChars / 2);
-                    AnsiScrollOffset.Add(8);
+                    AnsiScrollOffset.Add(16);
                     break;
                 case 2:
                     AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 4));
                     AnsiScrollPosition.Add((ANSIScrollChars / 4));
-                    AnsiScrollOffset.Add(4);
                     AnsiScrollOffset.Add(8);
+                    AnsiScrollOffset.Add(16);
                     break;
                 case 3:
                     AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 8));
                     AnsiScrollPosition.Add(ANSIScrollChars - ((3 * ANSIScrollChars) / 8));
                     AnsiScrollPosition.Add(((3 * ANSIScrollChars) / 8));
                     AnsiScrollPosition.Add((ANSIScrollChars / 8));
-                    AnsiScrollOffset.Add(2);
                     AnsiScrollOffset.Add(4);
-                    AnsiScrollOffset.Add(6);
                     AnsiScrollOffset.Add(8);
+                    AnsiScrollOffset.Add(12);
+                    AnsiScrollOffset.Add(16);
                     break;
                 case 4:
                     AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 16));
@@ -57,6 +57,32 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
                     AnsiScrollPosition.Add(((5 * ANSIScrollChars) / 16));
                     AnsiScrollPosition.Add(((3 * ANSIScrollChars) / 16));
                     AnsiScrollPosition.Add((ANSIScrollChars / 16));
+                    AnsiScrollOffset.Add(2);
+                    AnsiScrollOffset.Add(4);
+                    AnsiScrollOffset.Add(6);
+                    AnsiScrollOffset.Add(8);
+                    AnsiScrollOffset.Add(10);
+                    AnsiScrollOffset.Add(12);
+                    AnsiScrollOffset.Add(14);
+                    AnsiScrollOffset.Add(16);
+                    break;
+                case 5:
+                    AnsiScrollPosition.Add(ANSIScrollChars - (ANSIScrollChars / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((3 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((5 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((7 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((9 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((11 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((13 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(ANSIScrollChars - ((15 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((15 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((13 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((11 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((9 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((7 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((5 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add(((3 * ANSIScrollChars) / 32));
+                    AnsiScrollPosition.Add((ANSIScrollChars / 32));
                     AnsiScrollOffset.Add(1);
                     AnsiScrollOffset.Add(2);
                     AnsiScrollOffset.Add(3);
@@ -65,6 +91,14 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
                     AnsiScrollOffset.Add(6);
                     AnsiScrollOffset.Add(7);
                     AnsiScrollOffset.Add(8);
+                    AnsiScrollOffset.Add(9);
+                    AnsiScrollOffset.Add(10);
+                    AnsiScrollOffset.Add(11);
+                    AnsiScrollOffset.Add(12);
+                    AnsiScrollOffset.Add(13);
+                    AnsiScrollOffset.Add(14);
+                    AnsiScrollOffset.Add(15);
+                    AnsiScrollOffset.Add(16);
                     break;
             }
         }
@@ -125,7 +159,7 @@ bool CoreAnsi::AnsiScrollProcess()
     {
         if (AnsiState_.AnsiScrollCounter == AnsiScrollPosition[i])
         {
-            if (AnsiScrollOffset[i] == 8)
+            if (AnsiScrollOffset[i] == 16)
             {
                 ScrollMove = true;
                 AnsiScrollSetOffset(0);

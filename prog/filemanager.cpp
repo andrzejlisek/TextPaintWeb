@@ -408,6 +408,7 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
             RepaintDepth = 0;
             break;
         case _("Escape"):
+        case _("Backspace"):
             BinaryFile_.get()->ManagerInfoPop();
             RequestRepaint = true;
             RequestCloseOld = true;
@@ -533,6 +534,7 @@ void FileManager::EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift
             Repaint();
             break;
         case _("Escape"):
+        case _("Backspace"):
         case _("Enter"):
         case _("NumpadEnter"):
         case _("Space"):
@@ -570,8 +572,11 @@ void FileManager::EventKeyInsert(std::string KeyName, int KeyChar, bool ModShift
             break;
         case _("Enter"):
         case _("NumpadEnter"):
-            BinaryFile_.get()->ItemAdd(InsertFileName);
-            BinaryFile_.get()->SetDir(Str("."));
+            if (InsertFileName.Count > 0)
+            {
+                BinaryFile_.get()->ItemAdd(InsertFileName);
+                BinaryFile_.get()->SetDir(Str("."));
+            }
             ManagerState = ManagerStateDef::Files;
             RepaintDepth = 2;
             Repaint();
