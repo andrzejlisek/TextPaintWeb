@@ -34,13 +34,8 @@ href="https://andrzejlisek.github.io/TextPaintWeb/index.html">https://andrzejlis
     </tr>
     <tr>
         <td>Reads and writes file directly</td>
-        <td>Uses internal file storage and files from server</td>
-    </tr>
-    <tr>
-        <td>Editor: Tho states of character selector by pressing
-        F3</td>
-        <td>Three states, the third state is the file list and
-        you can select the file and press Enter.</td>
+        <td>Uses internal file storage and files from server.
+        Upload and download files is possible.</td>
     </tr>
     <tr>
         <td>Terminal: Supports Telnet, SSH, Serial connections</td>
@@ -56,10 +51,9 @@ href="https://andrzejlisek.github.io/TextPaintWeb/index.html">https://andrzejlis
 <h1>File manager</h1>
 
 <p>This version of TextPaint has the internal file manager, which
-now allows to browse the system files (<strong>!!config.txt</strong>
-ans <strong>!!system.txt</strong>) and the files defined in <strong>!!system.txt</strong>
-configuration file. If you modify any file, the file will be
-stored at local storage and replaces the original default file.</p>
+now allows to browse the <strong>!!config.txt</strong> sconfiguration
+file. If you modify any file, the file will be stored at local
+storage and replaces the original default file.</p>
 
 <p>The file manager is available in editor (press <strong>F10</strong>
 key) and in the animation player (press <strong>dot/period</strong>
@@ -71,20 +65,29 @@ key). In the file manager, there are posiible the following keys:</p>
         - select item.</li>
     <li><strong>Enter</strong> - Exit from the file manager when
         selected file or enter into directory or upper directory.</li>
+    <li><strong>Escape</strong> or <strong>Backspace</strong> -
+        Exit from the file manager without changing selected
+        file.</li>
+    <li><strong>Insert</strong> - Add new blank file. If you want
+        to add new direcotry, use shach charecter in name, for
+        example <strong>directoryname/file</strong>. The empty
+        directory is not allowed.</li>
+    <li><strong>Delete</strong> - Remove file or directory.</li>
+    <li><strong>Home</strong> - Upload files. The ZIP files will
+        be extracted.</li>
+    <li><strong>End</strong> - Download file or directory. The
+        directory will be downloaded as single ZIP file.</li>
+    <li><strong>Space</strong> - Set file attributes (type and
+        codec) od default attributes applied for new and uploaded
+        files.</li>
 </ul>
 
-<p>In editor: You have to press the F8 again to load selected
-file or press the F7 key to save the current text into the
-selected file.</p>
+<p>In editor: You have to press the F8 to load selected file or
+press the F7 key to save the current text into the selected file.</p>
 
 <p>In player. The file manager is needed for change the current
 directory. After closing the file manager, the selected animation
 will be loaded.</p>
-
-<p><strong>Note:</strong> Currently, the file manager has a
-certain bug: Sometimes, the other files than the two system siles
-is not visible. If the problem occurs, just restart the
-application (refresh page in browser).</p>
 
 <h1>GUI interface</h1>
 
@@ -115,6 +118,8 @@ following rows:</p>
     <li><strong>Colors</strong>, <strong>Font</strong>- Set the
         color and font display options. The result will be shown
         immediately and the affect the screen display only.</li>
+    <li><strong>Screen width</strong>, <strong>Screen height</strong>
+        - Chenge the screen size.</li>
 </ul>
 
 <h1>To do</h1>
@@ -123,10 +128,12 @@ following rows:</p>
 following:</p>
 
 <ul>
+    <li>New smooth-scroll algorithm.</li>
     <li>Clean-up config file.</li>
     <li>Readme and documentation.</li>
     <li>Integration with file system and telnet using WebSocket
         and separated .NET/Java application.</li>
+    <li>Render text-graphics to file.</li>
 </ul>
 
 <p><script language="JavaScript"
