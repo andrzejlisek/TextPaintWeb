@@ -211,6 +211,10 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                 {
                     Processed++;
                 }
+                else
+                {
+                    ProcessCount = 0;
+                }
             }
         }
         if (StdProc)

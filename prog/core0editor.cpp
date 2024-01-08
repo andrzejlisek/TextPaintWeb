@@ -2525,7 +2525,7 @@ void Core0Editor::FileLoad2()
     BinaryFile_.get()->Load(FileTxt);
 
 
-    if (BinaryFile_.get()->ItemGet(-1).Ansi)
+    if (BinaryFile_.get()->ItemGet(-1).Attrib_Ansi)
     {
         CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
         CoreAnsi_.get()->AnsiProcessReset(true, false, 0);
@@ -2618,7 +2618,7 @@ void Core0Editor::FileSave()
     Str FileTxt;
     for (int i = 0; i < EditorData_.get()->TextBuffer.CountLines(); i++)
     {
-        if (BinaryFile_.get()->ItemGet(-1).Ansi)
+        if (BinaryFile_.get()->ItemGet(-1).Attrib_Ansi)
         {
             FileTxt.AddRange(AnsiFile_.Process(EditorData_.get()->TextBuffer, i, CoreAnsi_.get()->AnsiMaxX));
         }

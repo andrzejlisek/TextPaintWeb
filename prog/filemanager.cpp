@@ -152,16 +152,16 @@ void FileManager::RepaintFiles(int PosX, int PosY)
     if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
     {
         Info1.AddString("Ansi: ");
-        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Ansi ? "Y" : "N");
+        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Ansi ? "Y" : "N");
         Info1.AddString("  Codec: ");
-        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->FullName());
+        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).GetCodecName());
     }
     else
     {
         Info1.AddString("Ansi: ");
-        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Ansi ? "Y" : "N");
+        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Attrib_Ansi ? "Y" : "N");
         Info1.AddString("  Codec: ");
-        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->FullName());
+        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->GetCodecName());
     }
     Info2.AddString("Ins - New file  Home - Upload");
     Info3.AddString("Del - Remove    End - Download");
@@ -449,13 +449,13 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
             int ItemIdx = BinaryFile_.get()->ItemIndex;
             if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
             {
-                AttribVal[0] = BinaryFile_.get()->ItemGet(ItemIdx).Ansi;
-                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->ItemGet(ItemIdx).Codec.get()->EncodingNumber);
+                AttribVal[0] = BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Ansi;
+                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Codec);
             }
             else
             {
-                AttribVal[0] = BinaryFile_.get()->DefaultAttrib.get()->Ansi;
-                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->DefaultAttrib.get()->Codec.get()->EncodingNumber);
+                AttribVal[0] = BinaryFile_.get()->DefaultAttrib.get()->Attrib_Ansi;
+                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->DefaultAttrib.get()->Attrib_Codec);
             }
             AttribValMax[0] = 2;
             AttribValMax[1] = TextCodec::CodecListNumber.Count;
@@ -541,14 +541,16 @@ void FileManager::EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift
             int ItemIdx = BinaryFile_.get()->ItemIndex;
             if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
             {
-                BinaryFile_.get()->ItemGet(ItemIdx).Ansi = AttribVal[0];
-                BinaryFile_.get()->ItemGet(ItemIdx).Codec = std::make_shared<TextCodec>(TextCodec::CodecListNumber[AttribVal[1]]);
+                BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Ansi = AttribVal[0];
+                BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Codec = TextCodec::CodecListNumber[AttribVal[1]];
+                BinaryFile_.get()->ItemGet(ItemIdx).AttribGet();
                 BinaryFile_.get()->FileExportAttr(ItemIdx, false);
             }
             else
             {
-                BinaryFile_.get()->DefaultAttrib.get()->Ansi = AttribVal[0];
-                BinaryFile_.get()->DefaultAttrib.get()->Codec = std::make_shared<TextCodec>(TextCodec::CodecListNumber[AttribVal[1]]);
+                BinaryFile_.get()->DefaultAttrib.get()->Attrib_Ansi = AttribVal[0];
+                BinaryFile_.get()->DefaultAttrib.get()->Attrib_Codec = TextCodec::CodecListNumber[AttribVal[1]];
+                BinaryFile_.get()->DefaultAttrib.get()->AttribGet();
             }
             ManagerState = ManagerStateDef::Files;
             RepaintDepth = 2;

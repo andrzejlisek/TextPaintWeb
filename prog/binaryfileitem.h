@@ -11,14 +11,16 @@ class BinaryFileItem
 public:
     int EventId;
     int Type;
-    bool Ansi;
     Str Name;
-    std::shared_ptr<TextCodec> Codec;
-    BinaryFileItem(Str Name_, int Type_, int EventId_, int Codec_, bool Ansi_);
     BinaryFileItem(Str Name_, int Type_, int EventId_, std::string Attrib_);
 
+    bool Uninitialized = true;
+    std::string Attrib;
+    int Attrib_Codec;
+    bool Attrib_Ansi;
+
     std::string AttribGet();
-    void AttribSet(std::string Attrib);
+    void AttribSet();
 
     bool operator!= (BinaryFileItem &_) { return Name != _.Name; }
     bool operator>  (BinaryFileItem &_) { return Name >  _.Name; }
@@ -27,6 +29,7 @@ public:
     bool operator<= (BinaryFileItem &_) { return Name <= _.Name; }
     bool operator<  (BinaryFileItem &_) { return Name <  _.Name; }
 
+    std::string GetCodecName();
     void Save(Str &Text, Raw &Data);
     void Load(Raw &Data, Str &Text);
     void Browser(int Set);
