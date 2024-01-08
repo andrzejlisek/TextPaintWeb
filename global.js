@@ -32,6 +32,11 @@ let ScreenCursorSteady = false;
 let ScreenMouseActive = false;
 let ScreenMouseProgMoveX = -1;
 let ScreenMouseProgMoveY = -1;
+let ScreenMouseHighlight = false;
+let ScreenMouseHighlightX = 0;
+let ScreenMouseHighlightY = 0;
+let ScreenMouseHighlightF = 0;
+let ScreenMouseHighlightL = 0;
 
 let KeybReady = false;
 

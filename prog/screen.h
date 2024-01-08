@@ -31,6 +31,7 @@ public:
     static inline void (*ScreenLineOffset_)( int, int, int, int, int, int );
     static inline void (*WorkerSend)( int, std::string );
     static inline void (*ScreenOther)( int );
+    static inline void (*MouseHighlight)( int, int, int, int, int );
     static void ScreenClear(int Back, int Fore);
     static void ScreenChar(int X, int Y, int C, int ColorBack, int ColorFore, int ColorAttr, int FontW, int FontH);
     static void ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H);

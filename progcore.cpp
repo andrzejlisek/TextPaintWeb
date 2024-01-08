@@ -116,6 +116,17 @@ void ScreenOther(int Param)
     RespondPartial();
 }
 
+void MouseHighlight(int Work, int X, int Y, int F, int L)
+{
+    BufNum(203);
+    BufNum(Work);
+    BufNum(X);
+    BufNum(Y);
+    BufNum(F);
+    BufNum(L);
+    RespondPartial();
+}
+
 void ScreenSetConfig()
 {
     FileConfig("DisplayBlink");
@@ -247,6 +258,7 @@ extern "C"
                 Screen::FileImport_ = FileImport;
                 Screen::FileExport_ = FileExport;
                 Screen::ScreenOther = ScreenOther;
+                Screen::MouseHighlight = MouseHighlight;
 
                 BufInit();
                 RespondClear();

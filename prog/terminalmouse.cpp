@@ -124,6 +124,7 @@ std::string TerminalMouse::MouseEvent(std::string Name, int X, int Y, int Btn, b
 
                         Highlight = false;
                         bool Std = true;
+                        Screen::MouseHighlight(0, HighlightX, HighlightY, HighlightFirst, HighlightLast);
 
                         // SGR-Pixel
                         if (Mouse1016)

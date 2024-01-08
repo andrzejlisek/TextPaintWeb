@@ -29,14 +29,128 @@ function ScreenBell()
 }
 
 
+let ScreenMouseHighlightListX = [];
+let ScreenMouseHighlightListY = [];
 
+function ScreenMouseHighlightRepaintClear()
+{
+    if (ScreenMouseActive)
+    {
+        ScreenMouseActive = false;
+        for (let I = 0; I < ScreenMouseHighlightListX.length; I++)
+        {
+            ScreenRepaintChar_(ScreenMouseHighlightListX[I], ScreenMouseHighlightListY[I]);
+        }
+        ScreenMouseActive = true;
+    }
+    ScreenMouseHighlightListX = [];
+    ScreenMouseHighlightListY = [];
+}
 
+function ScreenMouseHighlightRepaintDraw()
+{
+    let X1 = ScreenMouseHighlightX;
+    let Y1 = ScreenMouseHighlightY;
+    let X2 = ScreenMouseProgMoveX;
+    let Y2 = ScreenMouseProgMoveY;
+    if (Y1 > Y2)
+    {
+        let _ = X1;
+        X1 = X2;
+        X2 = _;
+        _ = Y1;
+        Y1 = Y2;
+        Y2 = _;
+    }
+    Y1 = Math.min(Math.max(Y1, ScreenMouseHighlightF), ScreenMouseHighlightL);
+    Y2 = Math.min(Math.max(Y2, ScreenMouseHighlightF), ScreenMouseHighlightL);
+    if (Y1 == Y2)
+    {
+        X1 = Math.min(ScreenMouseProgMoveX, ScreenMouseHighlightX);
+        X2 = Math.max(ScreenMouseProgMoveX, ScreenMouseHighlightX);
+        for (let XX = X1; XX <= X2; XX++)
+        {
+            ScreenMouseHighlightListX.push(XX);
+            ScreenMouseHighlightListY.push(Y1);
+            ScreenRepaintChar_(XX, Y1);
+        }
+    }
+    else
+    {
+        for (let XX = X1; XX < ScreenW; XX++)
+        {
+            ScreenMouseHighlightListX.push(XX);
+            ScreenMouseHighlightListY.push(Y1);
+            ScreenRepaintChar_(XX, Y1);
+        }
+        for (let YY = (Y1 + 1); YY < Y2; YY++)
+        {
+            for (let XX = 0; XX < ScreenW; XX++)
+            {
+                ScreenMouseHighlightListX.push(XX);
+                ScreenMouseHighlightListY.push(YY);
+                ScreenRepaintChar_(XX, YY);
+            }
+        }
+        for (let XX = 0; XX <= X2; XX++)
+        {
+            ScreenMouseHighlightListX.push(XX);
+            ScreenMouseHighlightListY.push(Y2);
+            ScreenRepaintChar_(XX, Y2);
+        }
+    }
+}
+
+function ScreenMouseHighlightRepaint()
+{
+    if (ScreenMouseActive && ScreenMouseHighlight)
+    {
+        ScreenMouseHighlightRepaintClear();
+        ScreenMouseHighlightRepaintDraw();
+    }
+}
+
+function ScreenMouseSetHighlight(Work, X, Y, F, L)
+{
+    ScreenMouseHighlight = Work > 0 ? true : false;
+    ScreenMouseHighlightX = X - 1;
+    ScreenMouseHighlightY = Y - 1;
+    ScreenMouseHighlightF = F - 1;
+    ScreenMouseHighlightL = L - 2;
+    ScreenMouseHighlightRepaintClear();
+}
+
+function ScreenMousePaint(X, Y)
+{
+    if (ScreenMouseActive)
+    {
+        if ((X == ScreenMouseProgMoveX) && (Y == ScreenMouseProgMoveY))
+        {
+            return true;
+        }
+        if (ScreenMouseHighlight)
+        {
+            for (let I = 0; I < ScreenMouseHighlightListX.length; I++)
+            {
+                if ((X == ScreenMouseHighlightListX[I]) && (Y == ScreenMouseHighlightListY[I]))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 function ScreenMouseTurn1()
 {
     ScreenObj.style.cursor = "none";
     ScreenMouseActive = true;
     ScreenRepaintChar_(ScreenMouseProgMoveX, ScreenMouseProgMoveY);
+    for (let I = 0; I < ScreenMouseHighlightListX.length; I++)
+    {
+        ScreenRepaintChar_(ScreenMouseHighlightListX[I], ScreenMouseHighlightListY[I]);
+    }
 }
 
 function ScreenMouseTurn0()
@@ -44,6 +158,10 @@ function ScreenMouseTurn0()
     ScreenObj.style.cursor = "";
     ScreenMouseActive = false;
     ScreenRepaintChar_(ScreenMouseProgMoveX, ScreenMouseProgMoveY);
+    for (let I = 0; I < ScreenMouseHighlightListX.length; I++)
+    {
+        ScreenRepaintChar_(ScreenMouseHighlightListX[I], ScreenMouseHighlightListY[I]);
+    }
 }
 
 
@@ -184,6 +302,10 @@ function ScreenMouseMove(X_, Y_, Btn)
     ScreenMouseProgMoveX = X;
     ScreenMouseProgMoveY = Y;
     ScreenRepaintChar_(X, Y);
+    if (Btn != 0)
+    {
+        ScreenMouseHighlightRepaint();
+    }
     if (ScreenMouseBtn1)
     {
         if (ScreenMouseActive) ProgEventOther("Mouse", "Move", X, Y, 1, 0);
@@ -212,6 +334,7 @@ function ScreenMouseUp(X_, Y_, Btn)
 {
     const X = ScreenMouseCalcX(X_);
     const Y = ScreenMouseCalcY(Y_);
+    //ScreenMouseHighlightRepaint();
     ScreenMouseAreaX2 = X;
     ScreenMouseAreaY2 = Y;
     if (((Btn & 1) == 0) && (ScreenMouseBtn1))

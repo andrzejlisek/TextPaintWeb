@@ -680,10 +680,12 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                                 TerminalMouse_.HighlightY = TextWork::StrToInt(ParamStr[4], 0);
                                 TerminalMouse_.HighlightFirst = TextWork::StrToInt(ParamStr[5], 0);
                                 TerminalMouse_.HighlightLast = TextWork::StrToInt(ParamStr[6], 0);
+                                Screen::MouseHighlight(1, TerminalMouse_.HighlightX, TerminalMouse_.HighlightY, TerminalMouse_.HighlightFirst, TerminalMouse_.HighlightLast);
                             }
                             else
                             {
                                 TerminalMouse_.Highlight = false;
+                                Screen::MouseHighlight(0, TerminalMouse_.HighlightX, TerminalMouse_.HighlightY, TerminalMouse_.HighlightFirst, TerminalMouse_.HighlightLast);
                             }
                             break;
                     }

@@ -149,6 +149,10 @@ function _ProgCallback(D)
                 VTTEST_.VTStop();
                 CallbackQueueI += 2;
                 break;
+            case 203:
+                ScreenMouseSetHighlight(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5]);
+                CallbackQueueI += 6;
+                break;
         }
     }
 }

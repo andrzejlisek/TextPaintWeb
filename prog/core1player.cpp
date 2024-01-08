@@ -641,6 +641,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case _("1_Slash"):
             FileDelayStepFactor = 0;
             CalcFileDelayStep();
+            Repaint(false);
             return;
         case _("1_Comma"):
             Clipboard_.SetText(CoreAnsi_.get()->AnsiState_.GetScreen(0, 0, ScreenW - 1, ScreenH - 1));

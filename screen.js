@@ -502,13 +502,10 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
 {
     ScreenCalcColor(Back, Fore, Attr);
     
-    if (ScreenMouseActive)
+    if (ScreenMousePaint(X, Y))
     {
-        if ((X == ScreenMouseProgMoveX) && (Y == ScreenMouseProgMoveY))
-        {
-            ScreenCalcColor_Back = ScreenCalcColorNega(ScreenCalcColor_Back);
-            ScreenCalcColor_Fore = ScreenCalcColorNega(ScreenCalcColor_Fore);
-        }
+        ScreenCalcColor_Back = ScreenCalcColorNega(ScreenCalcColor_Back);
+        ScreenCalcColor_Fore = ScreenCalcColorNega(ScreenCalcColor_Fore);
     }
     
     let ScrIdx = Y * ScreenW + X;
