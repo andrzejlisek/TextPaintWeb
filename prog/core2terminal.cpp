@@ -102,6 +102,7 @@ void Core2Terminal::EventTick()
     if (Processed > 0)
     {
         TelnetDisplayInfoRepaint = true;
+        Screen::CursorHide(CoreAnsi_.get()->AnsiState_.CursorHide);
         CoreAnsi_.get()->AnsiRepaintCursor();
         bool NeedStatusRepaint = false;
         if (ScreenW != Screen::CurrentW)
@@ -555,6 +556,7 @@ void Core2Terminal::SendHex(std::string STR)
 void Core2Terminal::ConnOpen()
 {
     TerminalMouse_.Reset();
+    Screen::CursorHide(false);
     Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
     DisplayStatusRepaint();
     Screen::ScreenCursorMove(0, 0);

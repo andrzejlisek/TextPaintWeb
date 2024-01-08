@@ -73,13 +73,14 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::InfoScreen: // Information screen before file opening
             {
+                Screen::CursorHide(false);
                 Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
                 Screen::ScreenCursorMove(0, 0);
                 Screen_Clear();
                 NewFileName.Clear();
                 Screen_WriteText("During displaying:");
                 Screen_WriteLine();
-                Screen_WriteText("Esc - Return to this screen");
+                Screen_WriteText("Esc or = - Return to this screen");
                 Screen_WriteLine();
                 Screen_WriteText("Tab - Show/hide status");
                 Screen_WriteLine();
@@ -125,6 +126,7 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::FileOpenFile0: // Waiting for file contents
             {
+                Screen::CursorHide(false);
                 Screen_Clear();
                 Screen_Refresh();
                 WorkStateS = WorkStateSDef::FileOpenFile;
@@ -135,6 +137,7 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::FileOpen: // Opening file
             {
+                Screen::CursorHide(false);
                 WorkSeekOneChar = false;
                 Screen_Clear();
                 Screen_Refresh();
@@ -187,6 +190,7 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::FileOpenPrepare:
             {
+                Screen::CursorHide(false);
                 Screen_Clear();
                 Screen_Refresh();
 
@@ -559,6 +563,8 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Escape"):
         case _("3_Escape"):
+        case _("1_Equal"):
+        case _("3_Equal"):
             {
                 WorkStateS = WorkStateSDef::InfoScreen;
                 EventTickX();
@@ -614,10 +620,6 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 DisplayStatus -= 12;
             }
             Repaint(false);
-            return;
-        case _("1_Minus"):
-            return;
-        case _("1_Equal"):
             return;
         case _("1_BracketLeft"):
             if (FileDelayStep__ > 1)
@@ -858,6 +860,7 @@ void Core1Player::Repaint(bool Force)
             CoreAnsi_.get()->AnsiRepaint(false);
         }
     }
+    Screen::CursorHide(CoreAnsi_.get()->AnsiState_.CursorHide);
     CoreAnsi_.get()->AnsiRepaintCursor();
 }
 

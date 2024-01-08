@@ -338,3 +338,19 @@ void Screen::Bell()
 {
     ScreenOther(0);
 }
+
+void Screen::CursorHide(bool Hide)
+{
+    if (CursorHideState != Hide)
+    {
+        if (Hide)
+        {
+            ScreenOther(3);
+        }
+        else
+        {
+            ScreenOther(4);
+        }
+        CursorHideState = Hide;
+    }
+}

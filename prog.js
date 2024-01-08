@@ -48,6 +48,12 @@ function ProgScreenOther(Param)
         case 2:
             ScreenMouseTurn0();
             break;
+        case 3:
+            ScreenCursorHide = true;
+            break;
+        case 4:
+            ScreenCursorHide = false;
+            break;
     }
 }
 

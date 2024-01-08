@@ -297,7 +297,24 @@ function ScreenMouseDown_0(Evt)
         var _ = ScreenVP.getBoundingClientRect();
         ScreenMouseLastX = Evt.touches[0].clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.touches[0].clientY + window.scrollX - _.top;
-        ScreenMouseDown(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 1);
+        switch (KeybMouseBtnNr)
+        {
+            case 1:
+                ScreenMouseDown(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 1);
+                break;
+            case 2:
+                ScreenMouseDown(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 4);
+                break;
+            case 3:
+                ScreenMouseDown(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 2);
+                break;
+            case 4:
+                ScreenMouseDown(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 256);
+                break;
+            case 5:
+                ScreenMouseDown(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 512);
+                break;
+        }
     }
 }
 
@@ -308,7 +325,18 @@ function ScreenMouseMove_0(Evt)
         var _ = ScreenVP.getBoundingClientRect();
         ScreenMouseLastX = Evt.touches[0].clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.touches[0].clientY + window.scrollX - _.top;
-        ScreenMouseMove(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 1);
+        switch (KeybMouseBtnNr)
+        {
+            case 1:
+                ScreenMouseMove(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 1);
+                break;
+            case 2:
+                ScreenMouseMove(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 4);
+                break;
+            case 3:
+                ScreenMouseMove(Evt.touches[0].clientX + window.scrollX - _.left, Evt.touches[0].clientY + window.scrollX - _.top, 2);
+                break;
+        }
     }
 }
 

@@ -73,9 +73,11 @@ public:
     static inline constexpr int UnicodeCount = 0x110000;
 
     static void Bell();
+    static void CursorHide(bool Hide);
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;
+    static inline bool CursorHideState = false;
 
     struct ScreenLineOffsetDef
     {

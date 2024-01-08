@@ -55,7 +55,6 @@ If you click the screen, there will be show the GUI interface usable both on tou
 This version is not completed yet and now there are need to do following:
 
 
-* New smooth\-scroll algorithm\.
 * Clean\-up config file\.
 * Readme and documentation\.
 * Integration with file system and telnet using WebSocket and separated \.NET/Java application\.

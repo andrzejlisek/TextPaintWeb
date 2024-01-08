@@ -95,7 +95,6 @@ private:
 
     int ANSIScrollChars = 0;
     int ANSIScrollSmooth = 0;
-    int AnsiScrollBuffer = 0;
 
     int ColorThresholdBlackWhite = 48;
     int ColorThresholdGray = 20;
@@ -149,11 +148,14 @@ private:
 
     XList<int> AnsiScrollPosition;
     XList<int> AnsiScrollOffset;
+    void AnsiScrollPrepare();
     void AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command);
     void AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command, int Param1, int Param2, int Param3, int Param4);
-    bool AnsiScrollFinish(bool ScrollDisp);
-    bool AnsiScrollProcess();
-    void AnsiScrollSetOffset(int Offset);
+    void AnsiScrollFinish(AnsiState::AnsiScrollCommandDef Command, int Param1, int Param2, int Param3, int Param4);
+    void AnsiScrollClear();
+    int AnsiScrollProcess();
+    bool AnsiScrollFinished = true;
+    void AnsiScrollSetOffset(int First, int Last, int Offset);
     void AnsiScrollColumns(int Columns);
     void AnsiScrollLines(int Lines);
     void AnsiDoTab(int TabTimes);

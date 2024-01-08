@@ -336,6 +336,7 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
     TerminalH = AnsiMaxY;
 
     StatusBar = false;
+    CursorHide = false;
 
     PrintCharCounter = 0;
     PrintCharCounterOver = 0;
@@ -435,17 +436,22 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
     __AnsiFore0 = -1;
     __AnsiAttr0 = 0;
 
-    __AnsiAdditionalChars = 0;
+    AnsiScrollProcessBlock = false;
+    AnsiScrollZeroOffset = true;
 
-    AnsiScrollRev = false;
-    AnsiScrollCounter = 0;
-    AnsiScrollCommand = AnsiScrollCommandDef::None;
-    AnsiScrollParam1 = 0;
-    AnsiScrollParam2 = 0;
-    AnsiScrollParam3 = 0;
-    AnsiScrollLinesI = 0;
+    AnsiScrollQueue_Counter.Clear();
+    AnsiScrollQueue_Lines.Clear();
+    AnsiScrollQueue_Command.Clear();
+    AnsiScrollQueue_Param1.Clear();
+    AnsiScrollQueue_Param2.Clear();
+    AnsiScrollQueue_Param3.Clear();
+    AnsiScrollQueue_Param4.Clear();
+    AnsiScrollQueue_First.Clear();
+    AnsiScrollQueue_Last.Clear();
 
     ScrollLastOffset = 0;
+    ScrollLastOffsetFirst = 2;
+    ScrollLastOffsetLast = 1;
 
     CharMapNRCS = false;
 
@@ -1069,6 +1075,7 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     Dst.__AnsiDCS_ = Src.__AnsiDCS_;
 
     Dst.StatusBar = Src.StatusBar;
+    Dst.CursorHide = Src.CursorHide;
 
     for (int i = 32; i < 128; i++)
     {
@@ -1133,15 +1140,19 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     Dst.__AnsiAttr0 = Src.__AnsiAttr0;
 
     Dst.__AnsiCounter = Src.__AnsiCounter;
-    Dst.__AnsiAdditionalChars = Src.__AnsiAdditionalChars;
 
-    Dst.AnsiScrollRev = Src.AnsiScrollRev;
-    Dst.AnsiScrollCounter = Src.AnsiScrollCounter;
-    Dst.AnsiScrollCommand = Src.AnsiScrollCommand;
-    Dst.AnsiScrollParam1 = Src.AnsiScrollParam1;
-    Dst.AnsiScrollParam2 = Src.AnsiScrollParam2;
-    Dst.AnsiScrollParam3 = Src.AnsiScrollParam3;
-    Dst.AnsiScrollLinesI = Src.AnsiScrollLinesI;
+    Dst.AnsiScrollProcessBlock = Src.AnsiScrollProcessBlock;
+    Dst.AnsiScrollZeroOffset = Src.AnsiScrollZeroOffset;
+
+    Dst.AnsiScrollQueue_Counter = Src.AnsiScrollQueue_Counter.Copy();
+    Dst.AnsiScrollQueue_Lines = Src.AnsiScrollQueue_Lines.Copy();
+    Dst.AnsiScrollQueue_Command = Src.AnsiScrollQueue_Command.Copy();
+    Dst.AnsiScrollQueue_Param1 = Src.AnsiScrollQueue_Param1.Copy();
+    Dst.AnsiScrollQueue_Param2 = Src.AnsiScrollQueue_Param2.Copy();
+    Dst.AnsiScrollQueue_Param3 = Src.AnsiScrollQueue_Param3.Copy();
+    Dst.AnsiScrollQueue_Param4 = Src.AnsiScrollQueue_Param4.Copy();
+    Dst.AnsiScrollQueue_First = Src.AnsiScrollQueue_First.Copy();
+    Dst.AnsiScrollQueue_Last = Src.AnsiScrollQueue_Last.Copy();
 
     Dst.__AnsiProcessStep = Src.__AnsiProcessStep;
     Dst.__AnsiProcessDelay = Src.__AnsiProcessDelay;
@@ -1151,6 +1162,8 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     Dst.AnsiBufferI = Src.AnsiBufferI;
 
     Dst.ScrollLastOffset = Src.ScrollLastOffset;
+    Dst.ScrollLastOffsetFirst = Src.ScrollLastOffsetFirst;
+    Dst.ScrollLastOffsetLast = Src.ScrollLastOffsetLast;
     Dst.AnsiRingBellCount = Src.AnsiRingBellCount;
 }
 

@@ -100,7 +100,6 @@ FontName1=files/fonts/Dos/Dos08x16.png
 
 
 
-ANSIRead=0
 ANSIReadCR=0
 ANSIReadLF=0
 ANSIWidth=0
@@ -114,13 +113,9 @@ ANSIColorBold=1
 ANSIIgnoreConcealed=0
 ANSIPrintBackspace=0
 ANSIPrintTab=0
-ANSIWrite=0
-ANSIColorScheme=0
 
 ANSIScrollChars=800
 ANSIScrollSmooth=4
-ANSIScrollBuffer=100
-
 
 ### Player configuration
 

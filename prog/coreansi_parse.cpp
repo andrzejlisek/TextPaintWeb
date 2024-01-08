@@ -676,6 +676,13 @@ void CoreAnsi::AnsiProcess_CSI_Question(std::string AnsiCmd_)
                         case _("3"): // DECSET / DECCOLM
                             {
                                 AnsiState_.__AnsiWrapFlag = false;
+                                for (int i_ = 0; i_ < AnsiMaxY; i_++)
+                                {
+                                    for (int ii_ = AnsiMaxX; ii_ < 132; ii_++)
+                                    {
+                                        AnsiChar(ii_, i_, 32);
+                                    }
+                                }
                                 AnsiResize(132, -1);
                                 AnsiClearFontSize(-1);
                                 if (!AnsiState_.DECCOLMPreserve)
@@ -717,6 +724,9 @@ void CoreAnsi::AnsiProcess_CSI_Question(std::string AnsiCmd_)
                             break;
                         case _("9"):
                             __AnsiResponse.Add("Mouse;1;" + AnsiParams[i]);
+                            break;
+                        case _("25"): // DECSET / DECTCEM
+                            AnsiState_.CursorHide = false;
                             break;
                         case _("42"): // DECSET / DECNRCM
                             AnsiState_.CharMapNRCS = true;
@@ -791,6 +801,13 @@ void CoreAnsi::AnsiProcess_CSI_Question(std::string AnsiCmd_)
                         case _("3"): // DECRST / DECCOLM
                             {
                                 AnsiState_.__AnsiWrapFlag = false;
+                                for (int i_ = 0; i_ < AnsiMaxY; i_++)
+                                {
+                                    for (int ii_ = AnsiMaxX; ii_ < 80; ii_++)
+                                    {
+                                        AnsiChar(ii_, i_, 32);
+                                    }
+                                }
                                 AnsiResize(80, -1);
                                 AnsiClearFontSize(-1);
                                 if (!AnsiState_.DECCOLMPreserve)
@@ -833,7 +850,10 @@ void CoreAnsi::AnsiProcess_CSI_Question(std::string AnsiCmd_)
                         case _("9"):
                             __AnsiResponse.Add("Mouse;0;" + AnsiParams[i]);
                             break;
-                        case _("42"): // DECSET / DECNRCM
+                        case _("25"): // DECRST / DECTCEM
+                            AnsiState_.CursorHide = true;
+                            break;
+                        case _("42"): // DECRST / DECNRCM
                             AnsiState_.CharMapNRCS = false;
                             AnsiState_.RefreshCharMaps();
                             break;
@@ -1999,7 +2019,7 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                         case 23:
                             __AnsiResponse.Add(AnsiCmd_);
                             break;
-                        default:
+                        default: // DECSLPP
                             {
                                 int S = AnsiProcess_Int0(AnsiParams[0], AnsiCmd_);
                                 if (S >= 24)
@@ -2309,6 +2329,14 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                 if ((AnsiCmd_.size() > 2) && (TextWork::StringEndsWith(AnsiCmd_, "*|")))
                 {
                     AnsiResize(-1, AnsiProcess_Int1(AnsiParams[0].substr(0, AnsiParams[0].size() - 1), AnsiCmd_));
+                }
+
+                // DECSCPP
+                if ((AnsiCmd_.size() > 2) && (TextWork::StringEndsWith(AnsiCmd_, "$|")))
+                {
+                    int Dim = AnsiProcess_Int0(AnsiParams[0].substr(0, AnsiParams[0].size() - 1), AnsiCmd_);
+                    if (Dim == 0) Dim = 80;
+                    AnsiResize(Dim, -1);
                 }
             }
             break;

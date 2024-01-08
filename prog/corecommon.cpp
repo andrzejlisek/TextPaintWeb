@@ -37,6 +37,7 @@ void CoreCommon::ReadColor(std::string SettingValue, int &ColorB, int &ColorF)
 
 void CoreCommon::InitCommon()
 {
+    Screen::CursorHide(false);
     if (BinaryFile_.get()->PreInit)
     {
         TextCodec::CodecListCreate();

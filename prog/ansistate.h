@@ -43,6 +43,7 @@ public:
     bool __AnsiWrapFlag0 = false;
 
     bool StatusBar = false;
+    bool CursorHide = false;
 
     int __AnsiBack_ = -1;
     int __AnsiFore_ = -1;
@@ -86,8 +87,6 @@ public:
 
     int __AnsiCounter = 0;
 
-    long __AnsiAdditionalChars = 0;
-
     bool __AnsiCommand = false;
     bool __AnsiSmoothScroll = false;
 
@@ -101,19 +100,26 @@ public:
     AnsiLineOccupy __AnsiLineOccupy1__0;
     AnsiLineOccupy __AnsiLineOccupy2__0;
 
-    bool AnsiScrollRev = false;
-    int AnsiScrollLinesI = 0;
-    int AnsiScrollCounter = 0;
     enum AnsiScrollCommandDef { None, Char, FirstLast, Tab };
-    AnsiScrollCommandDef AnsiScrollCommand = AnsiScrollCommandDef::None;
-    int AnsiScrollParam1 = 0;
-    int AnsiScrollParam2 = 0;
-    int AnsiScrollParam3 = 0;
-    int AnsiScrollParam4 = 0;
+    int AnsiScrollProcessBlock = 0;
+    bool AnsiScrollZeroOffset = true;
+
+    XList<int> AnsiScrollQueue_Counter;
+    XList<int> AnsiScrollQueue_Lines;
+    XList<AnsiScrollCommandDef> AnsiScrollQueue_Command;
+    XList<int> AnsiScrollQueue_Param1;
+    XList<int> AnsiScrollQueue_Param2;
+    XList<int> AnsiScrollQueue_Param3;
+    XList<int> AnsiScrollQueue_Param4;
+    XList<int> AnsiScrollQueue_First;
+    XList<int> AnsiScrollQueue_Last;
+
 
     int AnsiBufferI = 0;
 
     int ScrollLastOffset = 0;
+    int ScrollLastOffsetFirst = 2;
+    int ScrollLastOffsetLast = 1;
     int AnsiRingBellCount = 0;
 
     int PrintCharCounter = 0;

@@ -28,6 +28,7 @@ void CoreAnsi::AnsiProcessSupply(Str TextFileLine)
 void CoreAnsi::AnsiTerminalReset()
 {
     AnsiState_.Reset(AnsiMaxX, AnsiMaxY, -1, -1, ANSIDOS);
+    AnsiScrollClear();
 
     __AnsiResponse.Clear();
     if (AnsiScreenWork)
@@ -171,23 +172,12 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
     {
         ProcessCount = 2147483647;
     }
-    if ((ProcessCount == 0) || (AnsiState_.__AnsiBeyondEOF))
-    {
-        return 0;
-    }
     bool StdProc = true;
-    bool ProcAdditionalChars = false;
-    bool SeekStateSaveInstant = false;
     while (ProcessCount > 0)
     {
         AnsiState_.__AnsiProcessStep++;
 
-        if (AnsiState_.__AnsiBeyondEOF)
-        {
-            break;
-        }
         StdProc = true;
-        ProcAdditionalChars = false;
         if (AnsiCharPrintRepeater > 0)
         {
             Processed++;
@@ -198,30 +188,33 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
             {
                 AnsiCharPrintLast = -1;
             }
-            ProcAdditionalChars = true;
         }
         if (AnsiState_.__AnsiProcessStep <= AnsiState_.__AnsiProcessDelay)
         {
             Processed++;
             StdProc = false;
         }
-        if (AnsiState_.AnsiScrollCounter > 0)
-        {
-            Processed++;
-            StdProc = false;
-            if (AnsiScrollProcess())
-            {
-            }
-            ProcAdditionalChars = true;
-        }
-        SeekStateSaveInstant = StdProc;
         if (StdProc)
         {
-            if (AnsiState_.AnsiBufferI >= AnsiBuffer.Count)
+            if (AnsiScrollProcess() != 0)
             {
-                AnsiState_.__AnsiAdditionalChars = 0;
-                return Processed;
+                Processed++;
+                StdProc = false;
             }
+        }
+        if ((AnsiState_.AnsiBufferI >= AnsiBuffer.Count) || (AnsiState_.__AnsiBeyondEOF))
+        {
+            if (StdProc)
+            {
+                StdProc = false;
+                if (!AnsiScrollFinished)
+                {
+                    Processed++;
+                }
+            }
+        }
+        if (StdProc)
+        {
             Processed++;
 
             int CharToPrint = AnsiBuffer[AnsiState_.AnsiBufferI];
@@ -319,61 +312,10 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                     }
                 }
             }
-            if (AnsiState_.__AnsiAdditionalChars == 0)
-            {
-                ProcessCount--;
-                AnsiState_.__AnsiCounter++;
-            }
-            else
-            {
-                AnsiState_.__AnsiAdditionalChars--;
-                Processed--;
-                AnsiState_.__AnsiProcessStep--;
-                SeekStateSaveInstant = false;
-            }
         }
-        else
-        {
-            if (ProcAdditionalChars && (AnsiState_.ProcessBackgroundChars))
-            {
-                AnsiState_.__AnsiAdditionalChars++;
-                bool BufStop = false;
-                if ((AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars) >= AnsiBuffer.Count)
-                {
-                    BufStop = true;
-                }
-                else
-                {
-                    if (AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars > AnsiScrollBuffer)
-                    {
-                        BufStop = true;
-                    }
-                    /*int AnsiBufChr = AnsiBuffer[AnsiState_.AnsiBufferI + AnsiState_.__AnsiAdditionalChars];
-                    if ((AnsiBufChr < 32) || (ANSI8bit && (AnsiBufChr >= 0x80) && (AnsiBufChr <= 0x9F)))
-                    {
-                        BufStop = true;
-                    }
-                    else
-                    {
-                        if ((AnsiState_.__AnsiX + AnsiState_.__AnsiAdditionalChars) >= AnsiProcessGetXMax(false))
-                        {
-                            if (!AnsiState_.__AnsiNoWrap)
-                            {
-                                BufStop = true;
-                            }
-                        }
-                    }*/
-                }
-                if (BufStop)
-                {
-                    AnsiState_.__AnsiAdditionalChars--;
-                    AnsiState_.ProcessBackgroundChars = false;
-                }
-            }
-            ProcessCount--;
-            AnsiState_.__AnsiCounter++;
-        }
-        SeekStateSave(SeekStateSaveInstant);
+        ProcessCount--;
+        AnsiState_.__AnsiCounter++;
+        SeekStateSave(StdProc && AnsiState_.AnsiScrollZeroOffset);
     }
     if (Processed == 0)
     {

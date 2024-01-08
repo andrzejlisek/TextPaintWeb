@@ -23,7 +23,6 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
 
     ANSIScrollChars = CF.get()->ParamGetI("ANSIScrollChars");
     ANSIScrollSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
-    AnsiScrollBuffer = CF.get()->ParamGetI("ANSIScrollBuffer");
 
     ColorThresholdBlackWhite = CF.get()->ParamGetI("ANSIColorThresholdBlackWhite");
     ColorThresholdGray = CF.get()->ParamGetI("ANSIColorThresholdGray");
@@ -91,11 +90,11 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
     {
         ANSIScrollSmooth = 0;
     }
-    if (ANSIScrollSmooth > 4)
+    if (ANSIScrollSmooth > 5)
     {
         ANSIScrollSmooth = 0;
     }
-
+    AnsiScrollPrepare();
 
 
 
@@ -188,11 +187,11 @@ void CoreAnsi::AnsiRepaint(bool AdditionalBuffers)
         }
         if (BufI == 1)
         {
-            AnsiState_.__AnsiScrollFirst += Bufoffset;
-            AnsiState_.__AnsiScrollLast += Bufoffset;
-            AnsiScrollSetOffset(AnsiState_.ScrollLastOffset);
-            AnsiState_.__AnsiScrollFirst -= Bufoffset;
-            AnsiState_.__AnsiScrollLast -= Bufoffset;
+            int T1 = AnsiState_.ScrollLastOffsetFirst;
+            int T2 = AnsiState_.ScrollLastOffsetLast;
+            AnsiScrollSetOffset(AnsiState_.ScrollLastOffsetFirst + Bufoffset, AnsiState_.ScrollLastOffsetLast + Bufoffset, AnsiState_.ScrollLastOffset);
+            AnsiState_.ScrollLastOffsetFirst = T1;
+            AnsiState_.ScrollLastOffsetLast = T2;
         }
         Bufoffset = Bufoffset + __AnsiLineOccupyX.CountLines();
     }
@@ -246,6 +245,7 @@ void CoreAnsi::AnsiResize(int NewW, int NewH)
             {
                 NewH++;
             }
+            AnsiScrollClear();
             if (AnsiScreenWork)
             {
                 Screen::ScreenResize(NewW, NewH);

@@ -1,4 +1,5 @@
 let KeybTouch = 0;
+let KeybMouseBtnNr = 1;
 let KeybLineWidth = 1;
 let KeybTextSize = 12;
 let KeybBack = 'rgb(128, 128, 128)';
@@ -37,6 +38,13 @@ function KeybEvent(Evt)
             break;
         case "_Switch2":
             KeybCurrent = 2;
+            break;
+        case "_Mouse":
+            KeybMouseBtnNr++;
+            if (KeybMouseBtnNr == 6)
+            {
+                KeybMouseBtnNr = 1;
+            }
             break;
         default:
             RegularKey = true;
@@ -204,7 +212,8 @@ KeybLayout[0].push([26, 11,  3,  2, "_Ctrl",        "Ctrl", ""]);
 
 // Right part
 KeybLayout[1].push([ 0,  0, 15, 13, "",             "", ""]);
-KeybLayout[1].push([ 7,  0,  6,  2, "",             "", ""]);
+KeybLayout[1].push([ 9,  0,  4,  2, "",             "", ""]);
+KeybLayout[1].push([ 7,  0,  2,  2, "_Mouse",       "Mouse", "", 8]);
 KeybLayout[1].push([13,  0,  2,  2, "Backspace",    "Back", "", 8]);
 
 KeybLayout[1].push([ 0,  0,  2,  2, "_Shift",       "Shift", ""]);
@@ -311,6 +320,9 @@ function KeybRepaint()
         
         let KeybBack_ = KeybBack;
         let KeybFore_ = KeybFore;
+        let Txt1 = K[5];
+        let Txt2 = K[6];
+
         switch (K[4])
         {
             case "_Shift":
@@ -341,6 +353,18 @@ function KeybRepaint()
                     KeybFore_ = KeybBack;
                 }
                 break;
+            case "_Mouse":
+                {
+                    switch (KeybMouseBtnNr)
+                    {
+                        case 1: Txt1 = "Button"; Txt2 = "Left"; break;
+                        case 2: Txt1 = "Button"; Txt2 = "Middle"; break;
+                        case 3: Txt1 = "Button"; Txt2 = "Right"; break;
+                        case 4: Txt1 = "Wheel"; Txt2 = "Up"; break;
+                        case 5: Txt1 = "Wheel"; Txt2 = "Down"; break;
+                    }
+                }
+                break;
         }
 
         Temp = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
@@ -353,9 +377,6 @@ function KeybRepaint()
         Temp.setAttribute("stroke-width", KeybLineWidth);
         Temp.setAttribute("fill", KeybBack_);
         KeybSvg.appendChild(Temp);
-
-        let Txt1 = K[5];
-        let Txt2 = K[6];
 
         if (Txt2 == "")
         {
