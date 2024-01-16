@@ -52,7 +52,7 @@ void TerminalMouse::Reset()
 void TerminalMouse::MouseUpdate()
 {
     bool Scr = false;
-    if (Mouse0009 || Mouse1000 || Mouse1001 || Mouse1002 || Mouse1003)
+    if (Mouse0009 || Mouse1000 || Mouse1001 || Mouse1002 || Mouse1003 || LocatorChr || LocatorPxl)
     {
         if (MouseWorks)
         {
@@ -68,6 +68,8 @@ void TerminalMouse::MouseUpdate()
 
 std::string TerminalMouse::MouseEvent(std::string Name, int X, int Y, int Btn, bool ModShift, bool ModCtrl, bool ModAlt)
 {
+    MouseX = X;
+    MouseY = Y;
     int KeyMods = 0;
     if (ModCtrl) { KeyMods += 100; }
     if (ModAlt) { KeyMods += 200; }
@@ -84,6 +86,9 @@ std::string TerminalMouse::MouseEvent(std::string Name, int X, int Y, int Btn, b
             break;
         case _("Down"):
             {
+                if (Btn == 1) MouseBtn1 = true;
+                if (Btn == 2) MouseBtn2 = true;
+                if (Btn == 3) MouseBtn3 = true;
                 bool SendBtn = false;
                 if (Mouse0009 && (Btn <= 3)) { SendBtn = true; KeyMods = 0; }
                 if (Mouse1000 || Mouse1001 || Mouse1002 || Mouse1003) { SendBtn = true; }
@@ -91,9 +96,30 @@ std::string TerminalMouse::MouseEvent(std::string Name, int X, int Y, int Btn, b
                 {
                     return MouseEventCode(X, Y, Btn + KeyMods);
                 }
+                if (LocatorEvt && LocatorBtn1)
+                {
+                    if (LocatorOneShot)
+                    {
+                        LocatorEvt = false;
+                    }
+                    switch (Btn)
+                    {
+                        default:
+                            return "";
+                        case 1:
+                            return MouseEventCodeLocator(MouseX, MouseY, 2);
+                        case 2:
+                            return MouseEventCodeLocator(MouseX, MouseY, 4);
+                        case 3:
+                            return MouseEventCodeLocator(MouseX, MouseY, 6);
+                    }
+                }
             }
         case _("Up"):
             {
+                if (Btn == 1) MouseBtn1 = false;
+                if (Btn == 2) MouseBtn2 = false;
+                if (Btn == 3) MouseBtn3 = false;
                 bool SendBtn = false;
                 if (Mouse1000 || Mouse1001 || Mouse1002 || Mouse1003) { SendBtn = true; }
                 if (SendBtn)
@@ -205,6 +231,24 @@ std::string TerminalMouse::MouseEvent(std::string Name, int X, int Y, int Btn, b
                     else
                     {
                         return MouseEventCode(X, Y, Btn + 10 + KeyMods);
+                    }
+                }
+                if (LocatorEvt && LocatorBtn0)
+                {
+                    if (LocatorOneShot)
+                    {
+                        LocatorEvt = false;
+                    }
+                    switch (Btn)
+                    {
+                        default:
+                            return "";
+                        case 1:
+                            return MouseEventCodeLocator(MouseX, MouseY, 3);
+                        case 2:
+                            return MouseEventCodeLocator(MouseX, MouseY, 5);
+                        case 3:
+                            return MouseEventCodeLocator(MouseX, MouseY, 7);
                     }
                 }
             }
@@ -335,6 +379,150 @@ std::string TerminalMouse::MouseEventCode(int X, int Y, int Evt)
             }
         }
 
+    }
+    return "";
+}
+
+std::string TerminalMouse::MouseEventCodeLocator(int X, int Y, int Evt)
+{
+    int BtnState = 0;
+    if (MouseBtn1) BtnState += 4;
+    if (MouseBtn2) BtnState += 2;
+    if (MouseBtn3) BtnState += 1;
+    X++;
+    Y++;
+    if ((LocatorFilterX1 > 0) && (LocatorFilterY1 > 0))
+    {
+        if (X < LocatorFilterX1)
+        {
+            LocatorEvt = false;
+            Evt = 10;
+        }
+        if (X > LocatorFilterX2)
+        {
+            LocatorEvt = false;
+            Evt = 10;
+        }
+        if (Y < LocatorFilterY1)
+        {
+            LocatorEvt = false;
+            Evt = 10;
+        }
+        if (Y > LocatorFilterY2)
+        {
+            LocatorEvt = false;
+            Evt = 10;
+        }
+    }
+    if (LocatorPxl)
+    {
+        X = (X - 1) * Screen::TerminalCellW + Screen::TerminalCellW2;
+        Y = (Y - 1) * Screen::TerminalCellH + Screen::TerminalCellH2;
+    }
+    std::string LocatorResponse = "##_[" + TelnetReportNumToStr(Evt) + "_;" + TelnetReportNumToStr(BtnState) + "_;" + TelnetReportNumToStr(Y) + "_;" + TelnetReportNumToStr(X) + "_;_0_&_w";
+    return LocatorResponse;
+}
+
+std::string TerminalMouse::Command(std::string ReportRequest)
+{
+    XList<std::string> ParamStr;
+    TextWork::StringSplit(ReportRequest, ';', ParamStr);
+
+    switch (_(ParamStr[1].c_str()))
+    {
+        case _("0"):
+            MouseSet(TextWork::StrToInt(ParamStr[2], 0), false);
+            break;
+        case _("1"):
+            MouseSet(TextWork::StrToInt(ParamStr[2], 0), true);
+            break;
+        case _("2"):
+            if (TextWork::StrToInt(ParamStr[2], 0) > 0)
+            {
+                Highlight = true;
+                HighlightX = TextWork::StrToInt(ParamStr[3], 0);
+                HighlightY = TextWork::StrToInt(ParamStr[4], 0);
+                HighlightFirst = TextWork::StrToInt(ParamStr[5], 0);
+                HighlightLast = TextWork::StrToInt(ParamStr[6], 0);
+                Screen::MouseHighlight(1, HighlightX, HighlightY, HighlightFirst, HighlightLast);
+            }
+            else
+            {
+                Highlight = false;
+                Screen::MouseHighlight(0, HighlightX, HighlightY, HighlightFirst, HighlightLast);
+            }
+            break;
+        case _("10"):
+            LocatorFilterX1 = 0;
+            LocatorFilterY1 = 0;
+            LocatorFilterX2 = 0;
+            LocatorFilterY2 = 0;
+            if (TextWork::StrToInt(ParamStr[2], 0) == 0)
+            {
+                LocatorChr = false;
+                LocatorPxl = false;
+                LocatorEvt = false;
+            }
+            else
+            {
+                LocatorEvt = true;
+                if (TextWork::StrToInt(ParamStr[2], 0) == 2)
+                {
+                    LocatorOneShot = true;
+                }
+                else
+                {
+                    LocatorOneShot = false;
+                }
+                if (TextWork::StrToInt(ParamStr[3], 0) == 1)
+                {
+                    LocatorPxl = true;
+                }
+                else
+                {
+                    LocatorChr = true;
+                }
+            }
+            MouseUpdate();
+            break;
+        case _("11"):
+            switch (TextWork::StrToInt(ParamStr[2], 0))
+            {
+                case 0:
+                    LocatorFilterX1 = 0;
+                    LocatorFilterY1 = 0;
+                    LocatorFilterX2 = 0;
+                    LocatorFilterY2 = 0;
+                    break;
+                case 1:
+                    LocatorBtn1 = true;
+                    break;
+                case 2:
+                    LocatorBtn1 = false;
+                    break;
+                case 3:
+                    LocatorBtn0 = true;
+                    break;
+                case 4:
+                    LocatorBtn0 = false;
+                    break;
+            }
+            break;
+        case _("12"):
+            return MouseEventCodeLocator(MouseX, MouseY, 1);
+        case _("13"):
+            LocatorFilterX1 = 0;
+            LocatorFilterY1 = 0;
+            LocatorFilterX2 = 0;
+            LocatorFilterY2 = 0;
+            if (ParamStr.Count >= 6)
+            {
+                LocatorFilterY1 = TextWork::StrToInt(ParamStr[2], 0);
+                LocatorFilterX1 = TextWork::StrToInt(ParamStr[3], 0);
+                LocatorFilterY2 = TextWork::StrToInt(ParamStr[4], 0);
+                LocatorFilterX2 = TextWork::StrToInt(ParamStr[5], 0);
+            }
+            break;
     }
     return "";
 }

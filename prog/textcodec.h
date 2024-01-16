@@ -52,6 +52,8 @@ public:
     std::map<int, unsigned char> MapTextToByte;
     static void Transcode(Str &S, int CodecSrc, int CodecDst);
     static void Transcode(Raw &S, int CodecSrc, int CodecDst);
+    static Raw Code(Str &S, int Codec);
+    static Str Code(Raw &S, int Codec);
     bool Unicode = false;
 
     static inline XList<int> CodecListNumber;

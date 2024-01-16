@@ -79,31 +79,9 @@ function _ProgCallback(D)
                 CallbackQueue.shift();
                 CallbackQueueI = 0;
                 break;
-            case 98:
-                _ProgInit("2");
-                CallbackQueueI += 1;
-                break;
-            case 99:
-                ProgInitialized = true;
-                ProgInitScreen();
-                ScreenInit1();
-                CallbackQueueI += 1;
-                break;
-            case 100:
-                ProgStart();
-                CallbackQueueI += 1;
-                break;
             case 101:
                 ScreenChar(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6],D[CallbackQueueI+7],D[CallbackQueueI+8]);
                 CallbackQueueI += 9;
-                break;
-            case 102:
-                ScreenClear(D[CallbackQueueI+1],D[CallbackQueueI+2]);
-                CallbackQueueI += 3;
-                break;
-            case 103:
-                ScreenResize(D[CallbackQueueI+1],D[CallbackQueueI+2]);
-                CallbackQueueI += 3;
                 break;
             case 104:
                 ScreenCursorMove(D[CallbackQueueI+1],D[CallbackQueueI+2]);
@@ -117,41 +95,71 @@ function _ProgCallback(D)
                 ScreenLineOffset(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6]);
                 CallbackQueueI += 7;
                 break;
-            case 107:
-                ProgScreenOther(D[CallbackQueueI+1]);
-                CallbackQueueI += 2;
-                break;
-            case 111:
-                FileImport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4]);
-                CallbackQueueI += 5;
-                break;
-            case 112:
-                FileExport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4],D[CallbackQueueI+5]);
-                CallbackQueueI += 6;
-                break;
-            case 113:
-                ConfigFileGet(StringBufDecode(D[CallbackQueueI+1]),StringBufDecode(D[CallbackQueueI+2]));
-                if (ProgStarted)
+            default:
                 {
-                    ScreenSetDisplayConfig(true);
+                    switch (Proc)
+                    {
+                        case 98:
+                            _ProgInit("2");
+                            CallbackQueueI += 1;
+                            break;
+                        case 99:
+                            ProgInitialized = true;
+                            ProgInitScreen();
+                            FileSystemInit();
+                            ScreenInit1();
+                            CallbackQueueI += 1;
+                            break;
+                        case 100:
+                            ProgStart();
+                            CallbackQueueI += 1;
+                            break;
+                        case 102:
+                            ScreenClear(D[CallbackQueueI+1],D[CallbackQueueI+2]);
+                            CallbackQueueI += 3;
+                            break;
+                        case 103:
+                            ScreenResize(D[CallbackQueueI+1],D[CallbackQueueI+2]);
+                            CallbackQueueI += 3;
+                            break;
+                        case 107:
+                            ProgScreenOther(D[CallbackQueueI+1]);
+                            CallbackQueueI += 2;
+                            break;
+                        case 111:
+                            FileImport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4]);
+                            CallbackQueueI += 5;
+                            break;
+                        case 112:
+                            FileExport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4],D[CallbackQueueI+5]);
+                            CallbackQueueI += 6;
+                            break;
+                        case 113:
+                            ConfigFileGet(StringBufDecode(D[CallbackQueueI+1]),StringBufDecode(D[CallbackQueueI+2]));
+                            if (ProgStarted)
+                            {
+                                ScreenSetDisplayConfig(true);
+                            }
+                            CallbackQueueI += 3;
+                            break;
+                        case 200:
+                            VTTEST_.VTData(D[CallbackQueueI+1]);
+                            CallbackQueueI += 2;
+                            break;
+                        case 201:
+                            VTTEST_.VTStart();
+                            CallbackQueueI += 2;
+                            break;
+                        case 202:
+                            VTTEST_.VTStop();
+                            CallbackQueueI += 2;
+                            break;
+                        case 203:
+                            ScreenMouseSetHighlight(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5]);
+                            CallbackQueueI += 6;
+                            break;
+                    }
                 }
-                CallbackQueueI += 3;
-                break;
-            case 200:
-                VTTEST_.VTData(D[CallbackQueueI+1]);
-                CallbackQueueI += 2;
-                break;
-            case 201:
-                VTTEST_.VTStart();
-                CallbackQueueI += 2;
-                break;
-            case 202:
-                VTTEST_.VTStop();
-                CallbackQueueI += 2;
-                break;
-            case 203:
-                ScreenMouseSetHighlight(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5]);
-                CallbackQueueI += 6;
                 break;
         }
     }

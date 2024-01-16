@@ -41,26 +41,6 @@ void CoreCommon::InitCommon()
     if (BinaryFile_.get()->PreInit)
     {
         TextCodec::CodecListCreate();
-
-        int I = 1;
-        std::string XCodec = "0";
-        std::string XAnsi = "0";
-
-        while (CF.get()->ParamExists("File" + std::to_string(I) + "Name"))
-        {
-            std::string XFile = CF.get()->ParamGetS("File" + std::to_string(I) + "Name");
-            if (CF.get()->ParamExists("File" + std::to_string(I) + "Codec"))
-            {
-                XCodec = CF.get()->ParamGetS("File" + std::to_string(I) + "Codec");
-            }
-            if (CF.get()->ParamExists("File" + std::to_string(I) + "Ansi"))
-            {
-                XAnsi = CF.get()->ParamGetS("File" + std::to_string(I) + "Ansi");
-            }
-            BinaryFile_.get()->ItemAdd(BinaryFileItem(XFile, 5, 0, XCodec + "|" + XAnsi + "|"), false);
-            I++;
-        }
-
         BinaryFile_.get()->SetDir(Str("/"));
     }
     BinaryFile_.get()->PreInit = false;
@@ -149,7 +129,7 @@ void CoreCommon::Screen_Refresh()
 
 void CoreCommon::SaveConfig()
 {
-    BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+    BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
     BinaryFile_.get()->SysSaveConfig();
 }
 

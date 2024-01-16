@@ -21,6 +21,9 @@ public:
     Str TrimEnC();
     Str TrimEnd();
     Str Substring(int Pos, int Count_);
+    Str Substring(int Pos);
+    Str CaseLower();
+    Str CaseUpper();
 
     void AddString(int T);
     void AddString(std::string T);

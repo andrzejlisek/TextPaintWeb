@@ -8,7 +8,7 @@ emcc -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp pr
  prog/clipboard.cpp prog/stopwatch.cpp \
  prog/coreansi.cpp prog/coreansi_char.cpp prog/coreansi_fontsize.cpp prog/coreansi_parse.cpp prog/coreansi_process.cpp prog/coreansi_scroll.cpp \
  prog/ansilineoccupyex.cpp prog/ansilineoccupy.cpp prog/ansilineoccupyitem.cpp prog/ansilineoccupyitemundoredo.cpp prog/ansisauce.cpp prog/ansistate.cpp \
- prog/configfile.cpp prog/corestatic.cpp prog/binaryfileitem.cpp prog/binaryfile.cpp prog/filemanager.cpp prog/displayconfig.cpp prog/corecommon.cpp \
+ prog/configfile.cpp prog/corestatic.cpp prog/binaryfile.cpp prog/filemanager.cpp prog/displayconfig.cpp prog/corecommon.cpp \
  prog/editordata.cpp prog/editorinfo.cpp prog/editorchar.cpp prog/editorundoitem.cpp prog/editorundo.cpp prog/editorsemi.cpp \
  prog/editorpixelpaint.cpp prog/editorpixelpaintstate.cpp prog/editorclipboard.cpp prog/core0editor.cpp \
  prog/core1player.cpp \

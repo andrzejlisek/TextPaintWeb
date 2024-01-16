@@ -28,7 +28,6 @@ private:
     int FilePos = 0;
 
     Stopwatch FileTimeMeasure;
-    Stopwatch Stopwatch_;
 
     int Time0;
 
@@ -70,8 +69,6 @@ private:
 
     AnsiSauce AnsiSauce_;
 
-    Str DispBuffer___;
-
     int InfoPosH = 0;
     int InfoPosV = 0;
 
@@ -88,9 +85,6 @@ private:
     bool DisplayConfig_RequestReapint = false;
     bool DisplayConfig_RequestMenu = false;
     bool DisplayConfig_RequestClose = false;
-
-    Str DispBuffer;
-    int DispBufferLen = 1000;
 
     void DisplayInfoText(bool Forced);
 };

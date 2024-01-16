@@ -281,31 +281,6 @@ function FileFetchTruncateBase64(blob)
     return blob.substr(Idx + 1);
 }
 
-function FileFetch(Id, Kind, Name, Attrib)
-{
-    let file = "files/" + Name;
-    fetch(file)
-    .then(_1 => _1.blob())
-    .then(_2 => FileFetchBlobBase64(_2))
-    .then(_3 => FileImportFinish(Id, Kind, Name, Attrib, FileFetchTruncateBase64(_3), 0));
-}
-
-
-
-function FileFetchSave(Id, Kind, Name, Attrib)
-{
-    if ((Kind != 4) && (Kind != 5))
-    {
-        return;
-    }
-    
-    let file = "files/" + Name;
-    fetch(file)
-    .then(_1 => _1.blob())
-    .then(_2 => FileFetchBlobBase64(_2))
-    .then(_3 => FileExport(Id, Kind + 300, Name, Attrib, FileFetchTruncateBase64(_3)));
-}
-
 function FileImport(Id, Kind, Name, Attrib)
 {
     switch (Kind)
@@ -313,251 +288,40 @@ function FileImport(Id, Kind, Name, Attrib)
         case 0: // System clipboard
             FileClpCopy(Id);
             break;
-        case 1: // Local storage
-        case 4: // Local storage - if not exists, then fetch
-            if (Name in FileIndexLS)
-            {
-                FileIdx = FileIndexLS[Name];
-                let Data = DataGet(FileIndexTempl + FileIdx);
-                FileImportFinish(Id, Kind, Name, Attrib, Data, 0);
-            }
-            else
-            {
-                if (Kind == 1)
-                {
-                    FileImportFinish(Id, Kind, Name, Attrib, "", 1);
-                }
-                if (Kind == 4)
-                {
-                    FileFetch(Id, Kind, Name, Attrib);
-                }
-            }
+        case 1: // File system
+            FileSystemGet(Name, Attrib);
             break;
-        case 2: // Database
-        case 5: // Database - if not exists, then fetch
-            if (Name in FileIndexDB)
+        case 2: // Directory
+            if (Attrib == "~RECUR")
             {
-                FileIdx = FileIndexDB[Name];
-                FileDbGet(FileIdx, Id, Kind, Name, Attrib);
+                FileSystemDir(Name, true);
             }
             else
             {
-                if (Kind == 2)
-                {
-                    FileImportFinish(Id, Kind, Name, Attrib, "", 1);
-                }
-                if (Kind == 5)
-                {
-                    FileFetch(Id, Kind, Name, Attrib);
-                }
+                FileSystemDir(Name, false);
             }
             break;
         case 6: // File upload
             FileBrwUpload(Name, Attrib);
-            break;
-        case 3: // Fetch - read only
-            {
-                FileFetch(Id, Kind, Name, Attrib);
-            }
             break;
     }
 }
 
 function FileExport(Id, Kind, Name, Attrib, Data)
 {
-    let FireEvent = true;
-    if (Kind >= 100)
-    {
-        if ((Kind >= 100) && (Kind < 200))
-        {
-            FileDelete(Id, Kind - 100, Name, Attrib);
-            return;
-        }
-        if ((Kind >= 200) && (Kind < 300))
-        {
-            FileAttr(Id, Kind - 200, Name, Attrib);
-            return;
-        }
-        if ((Kind >= 300) && (Kind < 400))
-        {
-            Kind -= 300;
-            FireEvent = false;
-        }
-    }
-    
     switch (Kind)
     {
         case 0: // System clipboard
             FileClpPaste(Id, Data);
             break;
-        case 1: // Local storage
-        case 4: // Local storage - if not exists, then fetch
-            {
-                let FileIdx = 0;
-                if (Name in FileIndexLS)
-                {
-                    FileIdx = FileIndexLS[Name];
-                    if (FileIndexLSAttr[Name] != Attrib)
-                    {
-                        FileIndexLSAttr[Name] = Attrib;
-                        IndexExportLS();
-                    }
-                }
-                else
-                {
-                    FileIdx = FileIndexLSNum;
-                    FileIndexLS[Name] = FileIdx;
-                    FileIndexLSAttr[Name] = Attrib;
-                    FileIndexLSNum++;
-                    IndexExportLS();
-                }
-                if ((FileFreeSpaceLS == 0) || ((Data.length + FileFreeSpaceSafe) > FileFreeSpaceLS))
-                {
-                    DataSet(FileIndexTempl + FileIdx, Data);
-                    IndexMeasureSpaceLS();
-                    if (FireEvent)
-                    {
-                        FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
-                    }
-                }
-                else
-                {
-                    if (FireEvent)
-                    {
-                        FileExportFinish(Id, Kind, Name, Attrib, Data, 1)
-                    }
-                }
-            }
+        case 1: // File system
+            FileSystemSet(Name, Attrib, Data)
             break;
-        case 2: // Database
-        case 5: // Database - if not exists, then fetch
-            {
-                let FileIdx = 0;
-                if (Name in FileIndexDB)
-                {
-                    FileIdx = FileIndexDB[Name];
-                    if (FileIndexDBAttr[Name] != Attrib)
-                    {
-                        FileIndexDBAttr[Name] = Attrib;
-                        IndexExportDB();
-                    }
-                }
-                else
-                {
-                    FileIdx = FileIndexDBNum;
-                    FileIndexDB[Name] = FileIdx;
-                    FileIndexDBAttr[Name] = Attrib;
-                    FileIndexDBNum++;
-                    IndexExportDB();
-                }
-                FileDbSet(FileIdx, Id, Kind, Name, Attrib, Data);                
-            }
+        case 3: // Delete file or directory
+            FileSystemDelete(Name, Attrib);
             break;
         case 6: // File download
             FileBrwDownload(Name, Attrib, Data);
-            if (Name != "/")
-            {
-                if (FireEvent)
-                {
-                    //FileExportFinish(Id, Kind, Name, Attrib, Data, 0);
-                }
-            }
-            break;
-        case 3: // Fetch - not possible
-            if (FireEvent)
-            {
-                FileExportFinish(Id, Kind, Name, Attrib, Data, 1);
-            }
-            break;
-    }
-}
-
-function FileDelete(Id, Kind, Name, Attrib)
-{
-    switch (Kind)
-    {
-        case 0: // System clipboard - not possible
-            break;
-        case 1: // Local storage
-        case 4: // Local storage - if not exists, then fetch
-            {
-                if (Name in FileIndexLS)
-                {
-                    const FileIdx = FileIndexLS[Name];
-                    DataDelete(FileIndexTempl + FileIdx);
-                    delete FileIndexLS[Name];
-                    delete FileIndexLSAttr[Name];
-                    IndexExportLS();
-                }
-                IndexMeasureSpaceLS();
-                FileExportFinish(Id, Kind, Name, Attrib, "", 0);
-            }
-            break;
-        case 2: // Database
-        case 5: // Database - if not exists, then fetch
-            {
-                if (Name in FileIndexDB)
-                {
-                    const FileIdx = FileIndexDB[Name];
-                    FileDbDelete(FileIdx, Id, Kind, Name);
-                    delete FileIndexDB[Name];
-                    delete FileIndexDBAttr[Name];
-                    IndexExportDB();
-                }
-            }
-            break;
-        case 3: // Fetch - not possible
-        case 6: // File upload/download - not possible
-            FileExportFinish(Id, Kind, Name, Attrib, "", 1);
-            break;
-    }
-}
-
-function FileAttr(Id, Kind, Name, Attrib)
-{
-    switch (Kind)
-    {
-        case 0: // System clipboard - not possible
-            break;
-        case 1: // Local storage
-        case 4: // Local storage - if not exists, then fetch
-            {
-                if (Name in FileIndexLS)
-                {
-                    const FileIdx = FileIndexLS[Name];
-                    if (FileIndexLSAttr[Name] != Attrib)
-                    {
-                        FileIndexLSAttr[Name] = Attrib;
-                        IndexExportLS();
-                    }
-                }
-                else
-                {
-                    FileFetchSave(Id, Kind, Name, Attrib);
-                }
-                IndexMeasureSpaceLS();
-            }
-            break;
-        case 2: // Database
-        case 5: // Database - if not exists, then fetch
-            {
-                if (Name in FileIndexDB)
-                {
-                    const FileIdx = FileIndexDB[Name];
-                    if (FileIndexDBAttr[Name] != Attrib)
-                    {
-                        FileIndexDBAttr[Name] = Attrib;
-                        IndexExportDB();
-                    }
-                }
-                else
-                {
-                    FileFetchSave(Id, Kind, Name, Attrib);
-                }
-            }
-            break;
-        case 3: // Fetch - not possible
-        case 6: // File upload/download - not possible
             break;
     }
 }

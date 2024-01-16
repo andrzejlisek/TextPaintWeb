@@ -157,6 +157,42 @@ Str Str::Substring(int Pos, int Count_)
     return X;
 }
 
+Str Str::Substring(int Pos)
+{
+    Str X;
+    for (int I = Pos; I < Count; I++)
+    {
+        X.Add(Data[I]);
+    }
+    return X;
+}
+
+Str Str::CaseLower()
+{
+    Str X = Copy();
+    for (int I = 0; I < X.Count; I++)
+    {
+        if ((X[I] >= 65) && (X[I] <= 90))
+        {
+            X[I] = X[I] + 32;
+        }
+    }
+    return X;
+}
+
+Str Str::CaseUpper()
+{
+    Str X = Copy();
+    for (int I = 0; I < X.Count; I++)
+    {
+        if ((X[I] >= 97) && (X[I] <= 122))
+        {
+            X[I] = X[I] - 32;
+        }
+    }
+    return X;
+}
+
 void Str::AddString(int T)
 {
     AddString(std::to_string(T));

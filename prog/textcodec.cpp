@@ -1342,6 +1342,24 @@ void TextCodec::Transcode(Raw &S, int CodecSrc, int CodecDst)
     Codec1.DequeueRaw(S);
 }
 
+Str TextCodec::Code(Raw &S, int Codec)
+{
+    TextCodec Codec0(Codec);
+    Codec0.EnqueueRaw(S);
+    Str Temp;
+    Codec0.DequeueStr(Temp);
+    return Temp;
+}
+
+Raw TextCodec::Code(Str &S, int Codec)
+{
+    TextCodec Codec0(Codec);
+    Codec0.EnqueueStr(S);
+    Raw Temp;
+    Codec0.DequeueRaw(Temp);
+    return Temp;
+}
+
 void TextCodec::CodecListCreateItem(int Num)
 {
     TextCodec E(Num);

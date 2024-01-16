@@ -570,7 +570,7 @@ void Core2Terminal::ConnOpen()
     Conn = std::make_unique<TerminalConnWorker>();
     ConnInternal = true;
 
-    CoreAnsi_.get()->AnsiProcessReset(false, true, 0);
+    CoreAnsi_.get()->AnsiProcessReset(false, true, 0, true);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(1, 4);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(2, 2);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(3, 2);
@@ -661,35 +661,7 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
             {
                 if (TextWork::StringStartsWith(ReportRequest, "Mouse;"))
                 {
-                    XList<std::string> ParamStr;
-                    TextWork::StringSplit(ReportRequest, ';', ParamStr);
-
-                    switch (_(ParamStr[1].c_str()))
-                    {
-                        case _("0"):
-                            TerminalMouse_.MouseSet(TextWork::StrToInt(ParamStr[2], 0), false);
-                            break;
-                        case _("1"):
-                            TerminalMouse_.MouseSet(TextWork::StrToInt(ParamStr[2], 0), true);
-                            break;
-                        case _("2"):
-                            if (TextWork::StrToInt(ParamStr[2], 0) > 0)
-                            {
-                                TerminalMouse_.Highlight = true;
-                                TerminalMouse_.HighlightX = TextWork::StrToInt(ParamStr[3], 0);
-                                TerminalMouse_.HighlightY = TextWork::StrToInt(ParamStr[4], 0);
-                                TerminalMouse_.HighlightFirst = TextWork::StrToInt(ParamStr[5], 0);
-                                TerminalMouse_.HighlightLast = TextWork::StrToInt(ParamStr[6], 0);
-                                Screen::MouseHighlight(1, TerminalMouse_.HighlightX, TerminalMouse_.HighlightY, TerminalMouse_.HighlightFirst, TerminalMouse_.HighlightLast);
-                            }
-                            else
-                            {
-                                TerminalMouse_.Highlight = false;
-                                Screen::MouseHighlight(0, TerminalMouse_.HighlightX, TerminalMouse_.HighlightY, TerminalMouse_.HighlightFirst, TerminalMouse_.HighlightLast);
-                            }
-                            break;
-                    }
-
+                    SendHex(TerminalMouse_.Command(ReportRequest));
                 }
                 if (TextWork::StringStartsWith(ReportRequest, "WindowTitle"))
                 {

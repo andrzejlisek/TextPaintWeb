@@ -2185,6 +2185,13 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                 }
             }
             break;
+        case 'w':
+            // DECEFR
+            if (TextWork::StringEndsWith(AnsiCmd_, "\'w"))
+            {
+                __AnsiResponse.Add("Mouse;13;" + AnsiCmd_.substr(1, AnsiCmd_.size() - 3));
+            }
+            break;
         case 'x':
             // DECFRA
             if (TextWork::StringEndsWith(AnsiCmd_, "$x"))
@@ -2280,6 +2287,12 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     AnsiAttributesLoad();
                 }
             }
+
+            // DECELR
+            if (TextWork::StringEndsWith(AnsiCmd_, "\'z"))
+            {
+                __AnsiResponse.Add("Mouse;10;" + AnsiCmd_.substr(1, AnsiCmd_.size() - 3));
+            }
             break;
         case '{':
             // DECSERA
@@ -2322,6 +2335,12 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     AnsiAttributesLoad();
                 }
             }
+
+            // DECSLE
+            if (TextWork::StringEndsWith(AnsiCmd_, "\'{"))
+            {
+                __AnsiResponse.Add("Mouse;11;" + AnsiCmd_.substr(1, AnsiCmd_.size() - 3));
+            }
             break;
         case '|':
             {
@@ -2338,6 +2357,12 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     if (Dim == 0) Dim = 80;
                     AnsiResize(Dim, -1);
                 }
+            }
+
+            // DECRQLP
+            if (TextWork::StringEndsWith(AnsiCmd_, "\'|"))
+            {
+                __AnsiResponse.Add("Mouse;12;" + AnsiCmd_.substr(1, AnsiCmd_.size() - 3));
             }
             break;
         case '}':
@@ -2714,45 +2739,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
     }
 
     int TextFileLine_i_GetChar = TextFileLine_i;
-    if (!ANSIDOS_)
-    {
-        if (!AnsiState_.__AnsiVT52)
-        {
-            TextFileLine_i_GetChar = AnsiState_.GetChar(TextFileLine_i);
-        }
-
-        if ((!ANSIDOS_) && (TextFileLine_i_GetChar == 127))
-        {
-            return;
-        }
-    }
-
-    if ((!AnsiState_.__AnsiMusic) && (TextFileLine_i < 32) && (ANSIDOS_))
-    {
-        switch (TextFileLine_i)
-        {
-            case 13:
-            case 10:
-            case 26:
-                break;
-            case 8:
-                if (ANSIPrintBackspace)
-                {
-                    TextFileLine_i = DosControl[TextFileLine_i];
-                }
-                break;
-            case 9:
-                if (ANSIPrintTab)
-                {
-                    TextFileLine_i = DosControl[TextFileLine_i];
-                }
-                break;
-            default:
-                TextFileLine_i = DosControl[TextFileLine_i];
-                break;
-        }
-    }
-    if ((TextFileLine_i >= 32))
+    if ((!ANSIDOS_) && (UseAnsiCommands))
     {
         if (AnsiState_.__AnsiVT52)
         {
@@ -2760,15 +2747,54 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
             {
                 if ((TextFileLine_i >= 95) && (TextFileLine_i <= 126))
                 {
-                    TextFileLine_i = VT52_SemigraphChars[TextFileLine_i - 95];
+                    TextFileLine_i_GetChar = VT52_SemigraphChars[TextFileLine_i - 95];
                 }
             }
         }
         else
         {
-            TextFileLine_i = TextFileLine_i_GetChar;
+            TextFileLine_i_GetChar = AnsiState_.GetChar(TextFileLine_i);
         }
 
+        if (TextFileLine_i_GetChar == 127)
+        {
+            return;
+        }
+    }
+
+    if ((ANSIDOS_) && (!AnsiState_.__AnsiMusic) && (TextFileLine_i < 32))
+    {
+        switch (TextFileLine_i)
+        {
+            case 13: // CR
+            case 10: // LF
+                break;
+            case 26: // ESC
+                if ((!AnsiState_.__AnsiUseEOF) || (!UseAnsiCommands))
+                {
+                    TextFileLine_i_GetChar = DosControl[TextFileLine_i];
+                }
+                break;
+            case 8: // BS
+                if (ANSIPrintBackspace)
+                {
+                    TextFileLine_i_GetChar = DosControl[TextFileLine_i];
+                }
+                break;
+            case 9: // HT
+                if (ANSIPrintTab)
+                {
+                    TextFileLine_i_GetChar = DosControl[TextFileLine_i];
+                }
+                break;
+            default:
+                TextFileLine_i_GetChar = DosControl[TextFileLine_i];
+                break;
+        }
+    }
+    if ((TextFileLine_i_GetChar >= 32))
+    {
+        TextFileLine_i = TextFileLine_i_GetChar;
         if (!AnsiState_.__AnsiMusic)
         {
             int TextFileLine_i_dbl = Screen::CharDouble(TextFileLine_i);
@@ -2849,7 +2875,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
         {
             switch (TextFileLine_i)
             {
-                case 14:
+                case 14: // SO - Exit from ANSI music
                     {
                         if (AnsiState_.__AnsiMusic)
                         {
@@ -2863,13 +2889,13 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
         {
             switch (TextFileLine_i)
             {
-                case 5:
+                case 5: // ENQ
                     if (!ANSIDOS_)
                     {
                         __AnsiResponse.Add("AnswerBack");
                     }
                     break;
-                case 7:
+                case 7: // BEL
                     if (!AnsiState_.__AnsiCommand)
                     {
                         AnsiState_.AnsiRingBellCount++;
@@ -2879,7 +2905,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         }
                     }
                     break;
-                case 8:
+                case 8: // BS
                     {
                         if (!ANSIPrintBackspace)
                         {
@@ -2895,7 +2921,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         }
                     }
                     break;
-                case 9:
+                case 9: // TAB
                     {
                         if (!ANSIPrintTab)
                         {
@@ -2903,7 +2929,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         }
                     }
                     break;
-                case 13:
+                case 13: // CR
                     {
                         switch (ANSI_CR)
                         {
@@ -2926,7 +2952,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         }
                     }
                     break;
-                case 12:
+                case 12: // FF - same as LF
                     if (!ANSIDOS_)
                     {
                         switch (ANSI_LF)
@@ -2957,7 +2983,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         }
                     }
                     break;
-                case 10:
+                case 10: // LF
                     {
                         switch (ANSI_LF)
                         {
@@ -2987,7 +3013,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         }
                     }
                     break;
-                case 11:
+                case 11: // VT - same as LF
                     if (!ANSIDOS_)
                     {
                         AnsiState_.__AnsiWrapFlag = false;
@@ -3014,8 +3040,8 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         AnsiState_.CharMapNumGL = 0;
                     }
                     break;
-                case 26:
-                    if (AnsiState_.__AnsiUseEOF)
+                case 26: // SUB - End of file
+                    if (AnsiState_.__AnsiUseEOF && UseAnsiCommands)
                     {
                         AnsiState_.__AnsiBeyondEOF = true;
                     }

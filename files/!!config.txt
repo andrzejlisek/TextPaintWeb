@@ -8,10 +8,10 @@
 
 
 ### Application timer options
-TimerPeriod=100
-TimerLoop=10
-TimerCursor=1
-TimerBlink=5
+TimerPeriod=50
+TimerLoop=20
+TimerCursor=2
+TimerBlink=10
 TimerTick=1
 
 ### Window and screen option
@@ -114,13 +114,13 @@ ANSIIgnoreConcealed=0
 ANSIPrintBackspace=0
 ANSIPrintTab=0
 
-ANSIScrollChars=800
+ANSIScrollChars=400
 ANSIScrollSmooth=4
 
 ### Player configuration
 
 PlayerEnd=0
-PlayerStep=200
+PlayerStep=100
 PlayerDelayFrame=200
 
 
@@ -131,7 +131,7 @@ TerminalName=xterm-256color
 TerminalType=5
 TerminalVTFuncKeys=0
 TerminalVTArrowKeys=0
-TerminalStep=200
+TerminalStep=100
 TerminalKeys=1101000
 TerminalAnswerBack=TextPaint
 
@@ -286,6 +286,128 @@ ANSIColorThresholdBlackWhite=48
 ANSIColorThresholdGray=20
 
 
+### File extensions for type detect
+
+FileExtText=txt,bbs,lst,nfo,asc,doc,dox,diz,bat,htm,html
+FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo
+FileExtBin=bin
+FileExtXbin=xb,xbin
+
+### There are files, which can be loaded as default.
+
+File1=xmas/xmas0.ans
+File2=xmas/xmas1.ans
+File3=xmas/xmas2.ans
+File4=xmas/xmas3.ans
+File5=xmas/xmas4.ans
+File6=xmas/xmas5.ans
+File7=xmas/xmas6.ans
+File8=xmas/xmas7.ans
+File9=xmas/xmas8.ans
+File10=xmas/xmas9.ans
+
+File11=vt100/bambi.godzila.vt
+File12=vt100/bambi.vt
+File13=vt100/barney.vt
+File14=vt100/beer.vt
+File15=vt100/bevis.butthead.vt
+File16=vt100/blinkeyes.vt
+File17=vt100/bomb.vt
+File18=vt100/bugsbunny.vt
+File19=vt100/cartwhee.vt
+File20=vt100/castle.vt
+File21=vt100/cert18.vt
+File22=vt100/cowboom.vt
+File23=vt100/cow.vt
+File24=vt100/crash.vt
+File25=vt100/cursor.vt
+File26=vt100/delay.vt
+File27=vt100/demo.vt
+File28=vt100/dirty.vt
+File29=vt100/dogs.vt
+File30=vt100/dontworry.vt
+File31=vt100/dont-wor.vt
+File32=vt100/duckpaint.vt
+File33=vt100/fireworks.vt
+File34=vt100/firework.vt
+File35=vt100/fishy2.vt
+File36=vt100/fishy-fishy.vt
+File37=vt100/fishy.vt
+File38=vt100/flatmap.vt
+File39=vt100/frogs.vt
+File40=vt100/glass.vt
+File41=vt100/globe.vt
+File42=vt100/hallow.vt
+File43=vt100/hello.vt
+File44=vt100/juanspla.vt
+File45=vt100/july.4.vt
+File46=vt100/jumble.vt
+File47=vt100/maingate.vt
+File48=vt100/mark.twain.vt
+File49=vt100/monkey.vt
+File50=vt100/monorail.vt
+File51=vt100/moon.animation.vt
+File52=vt100/movglobe.vt
+File53=vt100/mr.pumpkin.vt
+File54=vt100/nasa.vt
+File55=vt100/newbeer.vt
+File56=vt100/new.year.vt
+File57=vt100/nifty.vt
+File58=vt100/outerlimits.vt
+File59=vt100/pac3d.vt
+File60=vt100/paradise.vt
+File61=vt100/peace.vt
+File62=vt100/prey.col.vt
+File63=vt100/prey.vt
+File64=vt100/safesex.vt
+File65=vt100/shuttle.vt
+File66=vt100/skyway.vt
+File67=vt100/snowing1.vt
+File68=vt100/snowing2.vt
+File69=vt100/spinweb.vt
+File70=vt100/sship.vt
+File71=vt100/startrek.vt
+File72=vt100/strike.vt
+File73=vt100/sun.vt
+File74=vt100/surf.vt
+File75=vt100/tetris.vt
+File76=vt100/tomorrw.vt
+File77=vt100/torturet.vt
+File78=vt100/treadmill.vt
+File79=vt100/trekvid.vt
+File80=vt100/trek.vt
+File81=vt100/turkey.vt
+File82=vt100/tv.vt
+File83=vt100/twilight.vt
+File84=vt100/twilightzone.vt
+File85=vt100/valentine.vt
+File86=vt100/valentin.vt
+File87=vt100/van.halen.vt
+File88=vt100/wineglas.vt
+File89=vt100/xmas-00.vt
+File90=vt100/xmas-01.vt
+File91=vt100/xmas-02.vt
+File92=vt100/xmas-03.vt
+File93=vt100/xmas-04.vt
+File94=vt100/xmas-05.vt
+File95=vt100/xmas-06.vt
+File96=vt100/xmas-07.vt
+File97=vt100/xmas-08.vt
+File98=vt100/xmas-09.vt
+File99=vt100/xmas2.vt
+File100=vt100/xmas.large.vt
+File101=vt100/xmasshort.vt
+File102=vt100/xmas.vt
+File103=vt100/zorro.vt
+
+File104=test/charmap.ans
+File105=test/colors16.ans
+File106=test/colors256.ans
+File107=test/format.ans
+File108=test/test.ans
+File109=test/font.ans
+File110=test/blend.ans
+File111=test/onebyte.txt
 
 ### Favorite character table, you can store up to 256 characters
 
@@ -545,131 +667,4 @@ FavChar252=32
 FavChar253=32
 FavChar254=32
 FavChar255=32
-
-
-### There are files, which can be loaded as default.
-### One item consists of three parameters:
-### - File?Name - File name in the "files" subdirectory
-### - File?Codec - Text codec used for read and save file
-### - File?Ansi - 0 meand text file, 1 means ANSI file
-### If the File?Codec or File?Ansi is not provided,
-### there will be used values from prevoius item.
-
-File1Name=xmas/xmas0.txt
-File1Codec=0
-File1Ansi=1
-
-File2Name=xmas/xmas1.txt
-File3Name=xmas/xmas2.txt
-File4Name=xmas/xmas3.txt
-File5Name=xmas/xmas4.txt
-File6Name=xmas/xmas5.txt
-File7Name=xmas/xmas6.txt
-File8Name=xmas/xmas7.txt
-File9Name=xmas/xmas8.txt
-File10Name=xmas/xmas9.txt
-
-File11Name=vt100/bambi.godzila.vt
-File12Name=vt100/bambi.vt
-File13Name=vt100/barney.vt
-File14Name=vt100/beer.vt
-File15Name=vt100/bevis.butthead.vt
-File16Name=vt100/blinkeyes.vt
-File17Name=vt100/bomb.vt
-File18Name=vt100/bugsbunny.vt
-File19Name=vt100/cartwhee.vt
-File20Name=vt100/castle.vt
-File21Name=vt100/cert18.vt
-File22Name=vt100/cowboom.vt
-File23Name=vt100/cow.vt
-File24Name=vt100/crash.vt
-File25Name=vt100/cursor.vt
-File26Name=vt100/delay.vt
-File27Name=vt100/demo.vt
-File28Name=vt100/dirty.vt
-File29Name=vt100/dogs.vt
-File30Name=vt100/dontworry.vt
-File31Name=vt100/dont-wor.vt
-File32Name=vt100/duckpaint.vt
-File33Name=vt100/fireworks.vt
-File34Name=vt100/firework.vt
-File35Name=vt100/fishy2.vt
-File36Name=vt100/fishy-fishy.vt
-File37Name=vt100/fishy.vt
-File38Name=vt100/flatmap.vt
-File39Name=vt100/frogs.vt
-File40Name=vt100/glass.vt
-File41Name=vt100/globe.vt
-File42Name=vt100/hallow.vt
-File43Name=vt100/hello.vt
-File44Name=vt100/juanspla.vt
-File45Name=vt100/july.4.vt
-File46Name=vt100/jumble.vt
-File47Name=vt100/maingate.vt
-File48Name=vt100/mark.twain.vt
-File49Name=vt100/monkey.vt
-File50Name=vt100/monorail.vt
-File51Name=vt100/moon.animation.vt
-File52Name=vt100/movglobe.vt
-File53Name=vt100/mr.pumpkin.vt
-File54Name=vt100/nasa.vt
-File55Name=vt100/newbeer.vt
-File56Name=vt100/new.year.vt
-File57Name=vt100/nifty.vt
-File58Name=vt100/outerlimits.vt
-File59Name=vt100/pac3d.vt
-File60Name=vt100/paradise.vt
-File61Name=vt100/peace.vt
-File62Name=vt100/prey.col.vt
-File63Name=vt100/prey.vt
-File64Name=vt100/safesex.vt
-File65Name=vt100/shuttle.vt
-File66Name=vt100/skyway.vt
-File67Name=vt100/snowing1.vt
-File68Name=vt100/snowing2.vt
-File69Name=vt100/spinweb.vt
-File70Name=vt100/sship.vt
-File71Name=vt100/startrek.vt
-File72Name=vt100/strike.vt
-File73Name=vt100/sun.vt
-File74Name=vt100/surf.vt
-File75Name=vt100/tetris.vt
-File76Name=vt100/tomorrw.vt
-File77Name=vt100/torturet.vt
-File78Name=vt100/treadmill.vt
-File79Name=vt100/trekvid.vt
-File80Name=vt100/trek.vt
-File81Name=vt100/turkey.vt
-File82Name=vt100/tv.vt
-File83Name=vt100/twilight.vt
-File84Name=vt100/twilightzone.vt
-File85Name=vt100/valentine.vt
-File86Name=vt100/valentin.vt
-File87Name=vt100/van.halen.vt
-File88Name=vt100/wineglas.vt
-File89Name=vt100/xmas-00.vt
-File90Name=vt100/xmas-01.vt
-File91Name=vt100/xmas-02.vt
-File92Name=vt100/xmas-03.vt
-File93Name=vt100/xmas-04.vt
-File94Name=vt100/xmas-05.vt
-File95Name=vt100/xmas-06.vt
-File96Name=vt100/xmas-07.vt
-File97Name=vt100/xmas-08.vt
-File98Name=vt100/xmas-09.vt
-File99Name=vt100/xmas2.vt
-File100Name=vt100/xmas.large.vt
-File101Name=vt100/xmasshort.vt
-File102Name=vt100/xmas.vt
-File103Name=vt100/zorro.vt
-
-File104Name=test/charmap.ans
-File105Name=test/colors16.ans
-File106Name=test/colors256.ans
-File107Name=test/format.ans
-File108Name=test/test.ans
-
-File109Name=test/font.ans
-File109Codec=65001
-File110Name=test/blend.ans
 

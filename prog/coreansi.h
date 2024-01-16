@@ -64,7 +64,7 @@ public:
     void AnsiChar(int X, int Y, int Ch, int ColB, int ColF, int FontW, int FontH, int ColA);
     void AnsiScreenNegative(bool IsNega);
 
-    void AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_);
+    void AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, bool UseAnsiCommands_);
     void AnsiProcessSupply(Str TextFileLine);
     void AnsiTerminalReset();
     bool AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_);
@@ -76,6 +76,7 @@ public:
     void AnsiRepaintCursor();
 private:
 
+    bool UseAnsiCommands = true;
     int ScreenStatusBar = 0;
     int ScreenOffset = 0;
 

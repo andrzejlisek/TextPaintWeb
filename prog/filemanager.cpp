@@ -69,15 +69,15 @@ void FileManager::RepaintFiles(int PosX, int PosY)
 {
     int DispLen = SizeH - MarginHead - MarginFoot;
 
-    if (BinaryFile_.get()->ListDispOffset < (BinaryFile_.get()->ItemIndex - DispLen + 1))
+    if (BinaryFile_.get()->DirItemOff < (BinaryFile_.get()->DirItemIdx - DispLen + 1))
     {
-        BinaryFile_.get()->ListDispOffset = (BinaryFile_.get()->ItemIndex - DispLen + 1);
+        BinaryFile_.get()->DirItemOff = (BinaryFile_.get()->DirItemIdx - DispLen + 1);
         RepaintDepth = 2;
     }
 
-    if (BinaryFile_.get()->ListDispOffset > (BinaryFile_.get()->ItemIndex))
+    if (BinaryFile_.get()->DirItemOff > (BinaryFile_.get()->DirItemIdx))
     {
-        BinaryFile_.get()->ListDispOffset = (BinaryFile_.get()->ItemIndex);
+        BinaryFile_.get()->DirItemOff = (BinaryFile_.get()->DirItemIdx);
         RepaintDepth = 2;
     }
 
@@ -96,21 +96,31 @@ void FileManager::RepaintFiles(int PosX, int PosY)
             Screen::ScreenChar(PosX + I + 1, PosY + 1, ' ', PopupBack, PopupFore, 0, 0, 0);
         }
 
-        for (int Idx = BinaryFile_.get()->ListDispOffset; Idx < std::min(BinaryFile_.get()->ItemCount(), DispLen + BinaryFile_.get()->ListDispOffset); Idx++)
+        for (int Idx = BinaryFile_.get()->DirItemOff; Idx < std::min(BinaryFile_.get()->DirItemName.Count, DispLen + BinaryFile_.get()->DirItemOff); Idx++)
         {
-            int ItemL = std::min(BinaryFile_.get()->ItemName(Idx).Count, SizeW - 1);
-            int ItemO = BinaryFile_.get()->ItemName(Idx).Count - ItemL;
+            Str DirItemName = BinaryFile_.get()->DirItemName[Idx];
+            if (DirItemName[DirItemName.Count - 1] == '/')
+            {
+                DirItemName.PopLast();
+            }
+            int DirItemNameSlash = DirItemName.IndexOf('/', 0 - (DirItemName.Count + 10));
+            if (DirItemNameSlash >= 0)
+            {
+                DirItemName.RemoveRange(0, DirItemNameSlash + 1);
+            }
+            int ItemL = std::min(DirItemName.Count, SizeW - 1);
+            int ItemO = DirItemName.Count - ItemL;
             int PopupBack_ = PopupBack;
             int PopupFore_ = PopupFore;
-            if (BinaryFile_.get()->ItemType(Idx) < 0)
+            if (BinaryFile_.get()->GetFileType(Idx) < 0)
             {
                 PopupBack_ = PopupFore;
                 PopupFore_ = PopupBack;
             }
-            int ItemY = PosY + 1 + Idx + 1 - BinaryFile_.get()->ListDispOffset;
+            int ItemY = PosY + 1 + Idx + 1 - BinaryFile_.get()->DirItemOff;
             for (int I = 0; I < ItemL; I++)
             {
-                Screen::ScreenChar(PosX + I + 2, ItemY, BinaryFile_.get()->ItemName(Idx)[I + ItemO], PopupBack_, PopupFore_, 0, 0, 0);
+                Screen::ScreenChar(PosX + I + 2, ItemY, DirItemName[I + ItemO], PopupBack_, PopupFore_, 0, 0, 0);
             }
             for (int I = ItemL; I < (SizeW - 1); I++)
             {
@@ -129,16 +139,19 @@ void FileManager::RepaintFiles(int PosX, int PosY)
     int Sel = 0;
     if (RepaintDepth <= 3)
     {
-        for (int Idx = 0; Idx < DispLen; Idx++)
+        if (BinaryFile_.get()->DirItemName.Count > 0)
         {
-            if ((Idx + BinaryFile_.get()->ListDispOffset) == (BinaryFile_.get()->ItemIndex))
+            for (int Idx = 0; Idx < DispLen; Idx++)
             {
-                Sel = Idx;
-                Screen::ScreenChar(PosX + 0 + 1, PosY + 1 + Idx + 1, '>', PopupBack, PopupFore, 0, 0, 0);
-            }
-            else
-            {
-                Screen::ScreenChar(PosX + 0 + 1, PosY + 1 + Idx + 1, ' ', PopupBack, PopupFore, 0, 0, 0);
+                if ((Idx + BinaryFile_.get()->DirItemOff) == (BinaryFile_.get()->DirItemIdx))
+                {
+                    Sel = Idx;
+                    Screen::ScreenChar(PosX + 0 + 1, PosY + 1 + Idx + 1, '>', PopupBack, PopupFore, 0, 0, 0);
+                }
+                else
+                {
+                    Screen::ScreenChar(PosX + 0 + 1, PosY + 1 + Idx + 1, ' ', PopupBack, PopupFore, 0, 0, 0);
+                }
             }
         }
     }
@@ -148,30 +161,28 @@ void FileManager::RepaintFiles(int PosX, int PosY)
     Str Info2;
     Str Info3;
     Str Info4;
-    int ItemIdx = BinaryFile_.get()->ItemIndex;
-    if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+    Info1.AddString("Ins - New file  Home - Upload");
+    Info2.AddString("Del - Remove    End - Download");
+    Info3.AddString("Space - Read and write options");
     {
-        Info1.AddString("Ansi: ");
-        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Ansi ? "Y" : "N");
-        Info1.AddString("  Codec: ");
-        Info1.AddString(BinaryFile_.get()->ItemGet(ItemIdx).GetCodecName());
-    }
-    else
-    {
-        Info1.AddString("Ansi: ");
-        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->Attrib_Ansi ? "Y" : "N");
-        Info1.AddString("  Codec: ");
-        Info1.AddString(BinaryFile_.get()->DefaultAttrib.get()->GetCodecName());
-    }
-    Info2.AddString("Ins - New file  Home - Upload");
-    Info3.AddString("Del - Remove    End - Download");
-    if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
-    {
-        Info4.AddString("Space - File attributes");
-    }
-    else
-    {
-        Info4.AddString("Space - Default attributes");
+        switch (BinaryFile_.get()->CurrentFileAttrGet(1))
+        {
+            case 0: Info4.AddString("Auto/T"); break;
+            case 1: Info4.AddString("Auto/A"); break;
+            case 2: Info4.AddString("Text"); break;
+            case 3: Info4.AddString("Ansi"); break;
+            case 4: Info4.AddString("Bin"); break;
+            case 5: Info4.AddString("XBin"); break;
+        }
+        int CodecN = BinaryFile_.get()->CurrentFileAttrGet(0);
+        Info4.AddString("   ");
+        Info4.AddString(CodecN);
+        int CodecNN = TextCodec::CodecListNumber.IndexOfBin(CodecN);
+        if (CodecNN >= 0)
+        {
+            Info4.AddString("/");
+            Info4.AddString(TextCodec::CodecListName[CodecNN]);
+        }
     }
     Info1.AddPad(SizeW, 32);
     Info2.AddPad(SizeW, 32);
@@ -196,48 +207,55 @@ void FileManager::RepaintAttrib(int PosX, int PosY)
     {
         case 0:
             Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
-            Screen::ScreenWriteText(Str(" Type "), PopupFore, PopupBack);
-            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
-            Screen::ScreenWriteText(Str(" Codec "), PopupBack, PopupFore);
-
-            Screen::ScreenCursorMove(PosX + 1, PosY + 2);
-            Screen::ScreenWriteText(Str(" Text"), PopupBack, PopupFore);
-            Screen::ScreenCursorMove(PosX + 1, PosY + 3);
-            Screen::ScreenWriteText(Str(" Ansi"), PopupBack, PopupFore);
-
-            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[0]);
-            Screen::ScreenWriteText(Str(">"), PopupBack, PopupFore);
-            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[0]);
-
-            break;
-        case 1:
+            Screen::ScreenWriteText(Str(" Codec "), PopupFore, PopupBack);
             Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
             Screen::ScreenWriteText(Str(" Type "), PopupBack, PopupFore);
-            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
-            Screen::ScreenWriteText(Str(" Codec "), PopupFore, PopupBack);
 
-            if (AttribValOffset[1] >= AttribVal[1])
+            if (AttribValOffset[0] >= AttribVal[0])
             {
-                AttribValOffset[1] =  AttribVal[1];
+                AttribValOffset[0] =  AttribVal[0];
             }
 
-            if (AttribValOffset[1] <= (AttribVal[1] - SizeH + 2))
+            if (AttribValOffset[0] <= (AttribVal[0] - SizeH + 2))
             {
-                AttribValOffset[1] =  (AttribVal[1] - SizeH + 2);
+                AttribValOffset[0] =  (AttribVal[0] - SizeH + 2);
             }
 
             for (int I = 0; I < (SizeH - 1); I++)
             {
                 Screen::ScreenCursorMove(PosX + 1, PosY + 2 + I);
-                if (((I + AttribValOffset[1]) >= 0) && ((I + (AttribValOffset[1])) < TextCodec::CodecListNumber.Count))
+                if (((I + AttribValOffset[0]) >= 0) && ((I + (AttribValOffset[0])) < TextCodec::CodecListNumber.Count))
                 {
-                    Screen::ScreenWriteText(Str(" " + std::to_string(TextCodec::CodecListNumber[I + AttribValOffset[1]]) + "/" + TextCodec::CodecListName[I + AttribValOffset[1]]), PopupBack, PopupFore);
+                    Screen::ScreenWriteText(Str(" " + std::to_string(TextCodec::CodecListNumber[I + AttribValOffset[0]]) + "/" + TextCodec::CodecListName[I + AttribValOffset[0]]), PopupBack, PopupFore);
                 }
             }
 
-            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[1] - AttribValOffset[1]);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[0] - AttribValOffset[0]);
             Screen::ScreenWriteText(Str(">"), PopupBack, PopupFore);
-            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[1] - AttribValOffset[1]);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[0] - AttribValOffset[0]);
+            break;
+        case 1:
+            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str(" Codec "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str("  "), PopupBack, PopupFore);
+            Screen::ScreenWriteText(Str(" Type "), PopupFore, PopupBack);
+
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2);
+            Screen::ScreenWriteText(Str(" Auto - Text"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 3);
+            Screen::ScreenWriteText(Str(" Auto - Ansi"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 4);
+            Screen::ScreenWriteText(Str(" Text"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 5);
+            Screen::ScreenWriteText(Str(" Ansi"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 6);
+            Screen::ScreenWriteText(Str(" Bin"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 7);
+            Screen::ScreenWriteText(Str(" XBin"), PopupBack, PopupFore);
+
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[1]);
+            Screen::ScreenWriteText(Str(">"), PopupBack, PopupFore);
+            Screen::ScreenCursorMove(PosX + 1, PosY + 2 + AttribVal[1]);
             break;
     }
 
@@ -285,8 +303,8 @@ void FileManager::RepaintDelete(int PosX, int PosY)
 {
     Screen::ScreenCursorMove(PosX + 2, PosY + 2);
 
-    int ItemIdx = BinaryFile_.get()->ItemIndex;
-    if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
+    int ItemIdx = BinaryFile_.get()->DirItemIdx;
+    if (BinaryFile_.get()->GetFileType(ItemIdx) >= 0)
     {
         Screen::ScreenWriteText(Str("Press ENTER to delete file."), PopupBack, PopupFore);
     }
@@ -363,40 +381,52 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
     switch (_(KeyName.c_str()))
     {
         case _("ArrowUp"):
-            BinaryFile_.get()->ItemIndex--;
-            if (BinaryFile_.get()->ItemIndex < 0)
+            if (BinaryFile_.get()->DirItemName.Count > 0)
             {
-                BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
+                BinaryFile_.get()->DirItemIdx--;
+                if (BinaryFile_.get()->DirItemIdx < 0)
+                {
+                    BinaryFile_.get()->DirItemIdx = (BinaryFile_.get()->DirItemName.Count - 1);
+                }
+                RepaintDepth = 3;
+                Repaint();
             }
-            RepaintDepth = 3;
-            Repaint();
             break;
         case _("ArrowDown"):
-            BinaryFile_.get()->ItemIndex++;
-            if (BinaryFile_.get()->ItemIndex > (BinaryFile_.get()->ItemCount() - 1))
+            if (BinaryFile_.get()->DirItemName.Count > 0)
             {
-                BinaryFile_.get()->ItemIndex = 0;
+                BinaryFile_.get()->DirItemIdx++;
+                if (BinaryFile_.get()->DirItemIdx > (BinaryFile_.get()->DirItemName.Count - 1))
+                {
+                    BinaryFile_.get()->DirItemIdx = 0;
+                }
+                RepaintDepth = 3;
+                Repaint();
             }
-            RepaintDepth = 3;
-            Repaint();
             break;
         case _("PageUp"):
-            BinaryFile_.get()->ItemIndex -= 10;
-            if (BinaryFile_.get()->ItemIndex < 0)
+            if (BinaryFile_.get()->DirItemName.Count > 0)
             {
-                BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
+                BinaryFile_.get()->DirItemIdx -= 10;
+                if (BinaryFile_.get()->DirItemIdx < 0)
+                {
+                    BinaryFile_.get()->DirItemIdx = (BinaryFile_.get()->DirItemName.Count - 1);
+                }
+                RepaintDepth = 3;
+                Repaint();
             }
-            RepaintDepth = 3;
-            Repaint();
             break;
         case _("PageDown"):
-            BinaryFile_.get()->ItemIndex += 10;
-            if (BinaryFile_.get()->ItemIndex > (BinaryFile_.get()->ItemCount() - 1))
+            if (BinaryFile_.get()->DirItemName.Count > 0)
             {
-                BinaryFile_.get()->ItemIndex = 0;
+                BinaryFile_.get()->DirItemIdx += 10;
+                if (BinaryFile_.get()->DirItemIdx > (BinaryFile_.get()->DirItemName.Count - 1))
+                {
+                    BinaryFile_.get()->DirItemIdx = 0;
+                }
+                RepaintDepth = 3;
+                Repaint();
             }
-            RepaintDepth = 3;
-            Repaint();
             break;
         case _("Tab"):
             Pos++;
@@ -415,14 +445,22 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
             break;
         case _("Enter"):
         case _("NumpadEnter"):
-            if (BinaryFile_.get()->ItemType(BinaryFile_.get()->ItemIndex) >= 0)
+            if (BinaryFile_.get()->GetFileType(BinaryFile_.get()->DirItemIdx) >= 0)
             {
+                BinaryFile_.get()->CurrentFileName = BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx];
                 RequestRepaint = true;
                 RequestCloseNew = true;
             }
             else
             {
-                BinaryFile_.get()->SetDir(BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex));
+                Str DirName = BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx];
+                DirName.PopLast();
+                int Idx_ = DirName.IndexOf('/', 0 - DirName.Count);
+                if (Idx_ > 0)
+                {
+                    DirName.RemoveRange(0, Idx_ + 1);
+                }
+                BinaryFile_.get()->SetDir(DirName);
                 RepaintDepth = 2;
                 Repaint();
             }
@@ -446,19 +484,10 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
             break;
         case _("Space"):
             AttribParam = 0;
-            int ItemIdx = BinaryFile_.get()->ItemIndex;
-            if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
-            {
-                AttribVal[0] = BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Ansi;
-                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Codec);
-            }
-            else
-            {
-                AttribVal[0] = BinaryFile_.get()->DefaultAttrib.get()->Attrib_Ansi;
-                AttribVal[1] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->DefaultAttrib.get()->Attrib_Codec);
-            }
-            AttribValMax[0] = 2;
-            AttribValMax[1] = TextCodec::CodecListNumber.Count;
+            AttribVal[0] = TextCodec::CodecListNumber.IndexOf(BinaryFile_.get()->CurrentFileAttrGet(0));
+            AttribVal[1] = BinaryFile_.get()->CurrentFileAttrGet(1);
+            AttribValMax[0] = TextCodec::CodecListNumber.Count;
+            AttribValMax[1] = 6;
             AttribValOffset[0] = 0;
             AttribValOffset[1] = 0;
             ManagerState = ManagerStateDef::Attrib;
@@ -538,20 +567,8 @@ void FileManager::EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift
         case _("Enter"):
         case _("NumpadEnter"):
         case _("Space"):
-            int ItemIdx = BinaryFile_.get()->ItemIndex;
-            if (BinaryFile_.get()->ItemType(ItemIdx) >= 0)
-            {
-                BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Ansi = AttribVal[0];
-                BinaryFile_.get()->ItemGet(ItemIdx).Attrib_Codec = TextCodec::CodecListNumber[AttribVal[1]];
-                BinaryFile_.get()->ItemGet(ItemIdx).AttribGet();
-                BinaryFile_.get()->FileExportAttr(ItemIdx, false);
-            }
-            else
-            {
-                BinaryFile_.get()->DefaultAttrib.get()->Attrib_Ansi = AttribVal[0];
-                BinaryFile_.get()->DefaultAttrib.get()->Attrib_Codec = TextCodec::CodecListNumber[AttribVal[1]];
-                BinaryFile_.get()->DefaultAttrib.get()->AttribGet();
-            }
+            BinaryFile_.get()->CurrentFileAttrSet(0, TextCodec::CodecListNumber[AttribVal[0]]);
+            BinaryFile_.get()->CurrentFileAttrSet(1, AttribVal[1]);
             ManagerState = ManagerStateDef::Files;
             RepaintDepth = 2;
             Repaint();
@@ -576,7 +593,7 @@ void FileManager::EventKeyInsert(std::string KeyName, int KeyChar, bool ModShift
         case _("NumpadEnter"):
             if (InsertFileName.Count > 0)
             {
-                BinaryFile_.get()->ItemAdd(InsertFileName);
+                BinaryFile_.get()->ItemFileAdd(InsertFileName);
                 BinaryFile_.get()->SetDir(Str("."));
             }
             ManagerState = ManagerStateDef::Files;
@@ -635,7 +652,7 @@ void FileManager::EventKeyDelete(std::string KeyName, int KeyChar, bool ModShift
             break;
         case _("Enter"):
         case _("NumpadEnter"):
-            BinaryFile_.get()->ItemRemove(BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex));
+            BinaryFile_.get()->ItemFileRemove(BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx]);
             BinaryFile_.get()->SetDir(Str("."));
             ManagerState = ManagerStateDef::Files;
             RepaintDepth = 2;

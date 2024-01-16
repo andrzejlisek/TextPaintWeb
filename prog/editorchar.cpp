@@ -51,7 +51,7 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
                     {
                         FavChar[KeyChar] = SelectChar;
                         CF.get()->ParamSet("FavChar" + std::to_string(KeyChar), std::to_string(SelectChar));
-                        BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                        BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
                         BinaryFile_.get()->SysSaveConfig();
 
                         RepaintDepth = 3;
@@ -166,7 +166,7 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
                 {
                     FavChar[SelectCharFavGet()] = SelectToFav;
                     CF.get()->ParamSet("FavChar" + std::to_string(SelectCharFavGet()), std::to_string(SelectToFav));
-                    BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                    BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
                     BinaryFile_.get()->SysSaveConfig();
                     SelectToFav = -1;
                 }

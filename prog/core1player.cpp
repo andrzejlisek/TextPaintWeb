@@ -7,11 +7,6 @@ Core1Player::Core1Player()
 
 void Core1Player::Init()
 {
-    //LoadFileMeasuring = true;
-    //Stopwatch_.MeasureTick();
-
-    Stopwatch_.Reset();
-
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
     DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
     DisplayConfig_.get()->PopupBack = PopupBack;
@@ -130,7 +125,7 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
                 WorkStateS = WorkStateSDef::FileOpenFile;
-                BinaryFile_.get()->FileImport(-1, false);
+                BinaryFile_.get()->FileImport(BinaryFile_.get()->CurrentFileName);
             }
             break;
         case WorkStateSDef::FileOpenFile: // Waiting for file contents
@@ -143,25 +138,44 @@ void Core1Player::EventTick()
                 Screen_Refresh();
                 FileCtX.Clear();
                 FileCtX_.Clear();
-                BinaryFile_.get()->Load(FileCtX);
-                BinaryFile_.get()->LoadRaw(FileCtX_);
-                DispBuffer.Clear();
+                BinaryFile_.get()->LoadRaw(BinaryFile_.get()->CurrentFileName, FileCtX_);
+                int FileType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->CurrentFileName);
+                switch (FileType)
+                {
+                    case 0: // TXT
+                        BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileCtX, 1);
+                        break;
+                    case 1: // ANSI
+                        BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileCtX, 0);
+                        break;
+                    case 2: // BIN
+                        break;
+                    case 3: // XBIN
+                        break;
+                }
                 AnsiSauce_.Info.Clear();
                 AnsiSauce_.LoadRaw(FileCtX_);
                 Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
                 FilePos = 0;
-                CoreAnsi_.get()->AnsiProcessReset(true, false, 1);
+                switch (FileType)
+                {
+                    case 0: // TXT
+                        CoreAnsi_.get()->AnsiProcessReset(true, false, 1, false);
+                        break;
+                    case 1: // ANSI
+                        CoreAnsi_.get()->AnsiProcessReset(true, false, 1, true);
+                        break;
+                    case 2: // BIN
+                        break;
+                    case 3: // XBIN
+                        break;
+                }
                 CoreAnsi_.get()->AnsiTerminalResize(Screen::CurrentW, Screen::CurrentH, ScreenStatusBar);
                 CoreAnsi_.get()->AnsiProcessSupply(FileCtX);
 
 
                 MoviePos = 0;
                 MovieLength = 0;
-                /*if (!LoadFileMeasuring)
-                {
-                    LoadFileMeasuring = true;
-                    Stopwatch_.MeasureTick();
-                }*/
 
                 WorkStateS = WorkStateSDef::FileOpenWait;
                 LoadFileChunk = 10;
@@ -194,8 +208,8 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
 
-                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->ItemIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()));
-                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex).ToString());
+                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count));
+                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->CurrentFileName.ToString());
                 AnsiSauce_.NonSauceInfo("Steps", MovieLength);
                 AnsiSauce_.NonSauceInfo("Characters", CoreAnsi_.get()->AnsiState_.AnsiBufferI);
                 AnsiSauce_.NonSauceInfo("Overwrites/writes", std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter));
@@ -204,7 +218,20 @@ void Core1Player::EventTick()
 
                 AnsiSauce_.CreateInfo();
                 MoviePos = 0;
-                CoreAnsi_.get()->AnsiProcessReset(true, true, 2);
+                int FileType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->CurrentFileName);
+                switch (FileType)
+                {
+                    case 0: // TXT
+                        CoreAnsi_.get()->AnsiProcessReset(true, true, 2, false);
+                        break;
+                    case 1: // ANSI
+                        CoreAnsi_.get()->AnsiProcessReset(true, true, 2, true);
+                        break;
+                    case 2: // BIN
+                        break;
+                    case 3: // XBIN
+                        break;
+                }
                 CoreAnsi_.get()->AnsiProcessSupply(FileCtX);
 
                 /*!!!!if (Server_ != null)
@@ -245,33 +272,7 @@ void Core1Player::EventTick()
                     {
                         Server_.Send(ServerEncoding.GetBytes(TextWork.IntToStr(FileCtX.GetRange(FilePos, CharsToSend))));
                     }*/
-                    if (CharsToSend <= (DispBufferLen + DispBufferLen))
-                    {
-                        while (CharsToSend > 0)
-                        {
-                            DispBuffer.Add(FileCtX[FilePos]);
-                            FilePos++;
-                            CharsToSend--;
-                        }
-                        while (DispBuffer.Count > (DispBufferLen + DispBufferLen))
-                        {
-                            DispBuffer.RemoveRange(0, DispBufferLen);
-                        }
-                    }
-                    else
-                    {
-                        DispBuffer.Clear();
-                        int StartI = CoreAnsi_.get()->AnsiState_.AnsiBufferI - DispBufferLen;
-                        if (StartI < 0)
-                        {
-                            StartI = 0;
-                        }
-                        for (int i = StartI; i < CoreAnsi_.get()->AnsiState_.AnsiBufferI; i++)
-                        {
-                            DispBuffer.Add(FileCtX[i]);
-                        }
-                        FilePos = FilePos + CharsToSend;
-                    }
+                    FilePos = FilePos + CharsToSend;
                     MoviePos += WorkSeekAdvance;
                 }
                 else
@@ -298,44 +299,10 @@ void Core1Player::EventTick()
                 if (WorkSeekAdvance > 0)
                 {
                     int CharsToSend = CoreAnsi_.get()->AnsiState_.AnsiBufferI;
-                    int BufI = CoreAnsi_.get()->AnsiState_.AnsiBufferI;
                     NeedRepaint = CoreAnsi_.get()->AnsiSeek(0 - WorkSeekAdvance);
                     CharsToSend = CharsToSend - CoreAnsi_.get()->AnsiState_.AnsiBufferI;
 
-                    int BufL = WorkSeekAdvance + DispBufferLen;
-                    if (BufL >= BufI)
-                    {
-                        BufL = BufI - 1;
-                    }
-                    BufI = BufI - DispBuffer.Count - 1;
-                    if (CharsToSend <= (DispBufferLen + DispBufferLen))
-                    {
-                        while (DispBuffer.Count <= BufL)
-                        {
-                            DispBuffer.Insert(0, FileCtX[BufI]);
-                            BufI--;
-                        }
-                        while (CharsToSend > 0)
-                        {
-                            DispBuffer.Remove(DispBuffer.Count - 1);
-                            FilePos--;
-                            CharsToSend--;
-                        }
-                    }
-                    else
-                    {
-                        DispBuffer.Clear();
-                        int StartI = CoreAnsi_.get()->AnsiState_.AnsiBufferI - DispBufferLen;
-                        if (StartI < 0)
-                        {
-                            StartI = 0;
-                        }
-                        for (int i = StartI; i < CoreAnsi_.get()->AnsiState_.AnsiBufferI; i++)
-                        {
-                            DispBuffer.Add(FileCtX[i]);
-                        }
-                        FilePos = FilePos - CharsToSend;
-                    }
+                    FilePos = FilePos - CharsToSend;
                     /*if (Server_ != null)
                     {
                         Server_.Send(UniConn.HexToRaw(Server_.TerminalResetCommand));
@@ -576,16 +543,17 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 int FType = -1;
                 while (FType < 0)
                 {
-                    if (BinaryFile_.get()->ItemIndex > 0)
+                    if (BinaryFile_.get()->DirItemIdx > 0)
                     {
-                        BinaryFile_.get()->ItemIndex--;
+                        BinaryFile_.get()->DirItemIdx--;
                     }
                     else
                     {
-                        BinaryFile_.get()->ItemIndex = (BinaryFile_.get()->ItemCount() - 1);
+                        BinaryFile_.get()->DirItemIdx = (BinaryFile_.get()->DirItemName.Count - 1);
                     }
-                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ItemIndex);
+                    FType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->DirItemIdx);
                 }
+                BinaryFile_.get()->CurrentFileName = BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx];
                 WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
             }
@@ -596,16 +564,17 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                 int FType = -1;
                 while (FType < 0)
                 {
-                    if (BinaryFile_.get()->ItemIndex < (BinaryFile_.get()->ItemCount() - 1))
+                    if (BinaryFile_.get()->DirItemIdx < (BinaryFile_.get()->DirItemName.Count - 1))
                     {
-                        BinaryFile_.get()->ItemIndex++;
+                        BinaryFile_.get()->DirItemIdx++;
                     }
                     else
                     {
-                        BinaryFile_.get()->ItemIndex = 0;
+                        BinaryFile_.get()->DirItemIdx = 0;
                     }
-                    FType = BinaryFile_.get()->ItemType(BinaryFile_.get()->ItemIndex);
+                    FType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->DirItemIdx);
                 }
+                BinaryFile_.get()->CurrentFileName = BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx];
                 WorkStateS = WorkStateSDef::FileOpenFile0;
                 EventTickX();
             }
@@ -709,22 +678,29 @@ void Core1Player::EventOther(std::string EvtName, std::string EvtParam0, int Evt
             break;
         case _("FileImport"):
             {
-                bool ImportAllowed = false;
-                if (WorkStateS == WorkStateSDef::FileOpenFile)
+                if ((EvtParam2 == 2) && (WorkStateS == WorkStateSDef::FileMan))
                 {
-                    ImportAllowed = true;
+                    FileManager_.Repaint();
                 }
-                if ((WorkStateS == WorkStateSDef::FileMan) && (FileManager_.RequestCloseOld || FileManager_.RequestCloseNew))
+                if (EvtParam2 == 1)
                 {
-                    ImportAllowed = true;
-                }
-                if (ImportAllowed)
-                {
-                    FileManager_.RequestCloseOld = false;
-                    FileManager_.RequestCloseNew = false;
-                    if (EvtParam2 != 0)
+                    bool ImportAllowed = false;
+                    if (WorkStateS == WorkStateSDef::FileOpenFile)
                     {
-                        WorkStateS = WorkStateSDef::FileOpen;
+                        ImportAllowed = true;
+                    }
+                    if ((WorkStateS == WorkStateSDef::FileMan) && (FileManager_.RequestCloseOld || FileManager_.RequestCloseNew))
+                    {
+                        ImportAllowed = true;
+                    }
+                    if (ImportAllowed)
+                    {
+                        FileManager_.RequestCloseOld = false;
+                        FileManager_.RequestCloseNew = false;
+                        if (EvtParam2 != 0)
+                        {
+                            WorkStateS = WorkStateSDef::FileOpen;
+                        }
                     }
                 }
             }
@@ -752,15 +728,22 @@ void Core1Player::Repaint(bool Force)
         }
 
         Str CharMsg;
+        int MoviePosLead = std::to_string(MovieLength).size() - std::to_string(MoviePos).size();
         switch (DisplayStatusDiv)
         {
             case 0:
                 {
-                    Str CharMsgIdx(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
+                    Str CharMsgIdx;
+                    while (MoviePosLead > 0)
+                    {
+                        CharMsgIdx.Add(' ');
+                        MoviePosLead--;
+                    }
+                    CharMsgIdx.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
                     CharMsgIdx.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
-                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->ItemIndex + 1) + "/" + std::to_string(BinaryFile_.get()->ItemCount()) + (AnsiSauce_.Exists ? "= " : ": "));
+                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count) + (AnsiSauce_.Exists ? "= " : ": "));
 
-                    CharMsg.AddRange(BinaryFile_.get()->ItemName(BinaryFile_.get()->ItemIndex));
+                    CharMsg.AddRange(BinaryFile_.get()->CurrentFileName);
                     int MaxS = (ScreenW - CharMsgIdx.Count);
                     if (CharMsg.Count > MaxS)
                     {
@@ -775,6 +758,11 @@ void Core1Player::Repaint(bool Force)
                 break;
             case 1:
                 {
+                    while (MoviePosLead > 0)
+                    {
+                        CharMsg.Add(' ');
+                        MoviePosLead--;
+                    }
                     CharMsg.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
                     CharMsg.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
                     CharMsg.AddString(" | " + TextWork::NumPlusMinus(FileDelayStepFactor));
@@ -795,43 +783,109 @@ void Core1Player::Repaint(bool Force)
             case 4:
                 {
                     Str CharCounter;
-                    CharCounter.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
-                    CharCounter.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.AnsiBufferI) + "/" + std::to_string(FileCtX.Count) + ": ");
-                    for (int iii = DispBuffer.Count - 1; iii >= 0; iii--)
+                    while (MoviePosLead > 0)
                     {
-                        Str CharMsg_(TextWork::CharCode(DispBuffer[iii], 0) + " ");
-                        switch (DisplayStatusDiv)
+                        CharCounter.Add(' ');
+                        MoviePosLead--;
+                    }
+                    CharCounter.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
+                    int FileCtXI = CoreAnsi_.get()->AnsiState_.AnsiBufferI;
+                    CharCounter.AddString(" | ");
+                    MoviePosLead = std::to_string(FileCtX.Count).size() - std::to_string(FileCtXI).size();
+                    while (MoviePosLead > 0)
+                    {
+                        CharCounter.Add(' ');
+                        MoviePosLead--;
+                    }
+                    CharCounter.AddString(std::to_string(FileCtXI) + "/" + std::to_string(FileCtX.Count) + ": ");
+
+                    int PrevewLength = (ScreenW - CharCounter.Count - 2) / 6;
+
+                    for (int iii = (0 - PrevewLength); iii < PrevewLength; iii++)
+                    {
+                        if (iii == 0)
                         {
-                            case 2:
-                                if (DispBuffer[iii] >= 33)
-                                {
-                                    CharMsg_.Clear();
-                                    CharMsg_.Add(DispBuffer[iii]);
-                                    CharMsg_.Add(' ');
-                                    if (Screen::CharDouble(DispBuffer[iii]))
-                                    {
-                                        CharMsg_.Add(' ');
-                                    }
-                                }
-                                break;
-                            case 3:
-                                if ((DispBuffer[iii] >= 33) && (DispBuffer[iii] <= 126))
-                                {
-                                    CharMsg_.Clear();
-                                    CharMsg_.Add(DispBuffer[iii]);
-                                    CharMsg_.Add(' ');
-                                    if (Screen::CharDouble(DispBuffer[iii]))
-                                    {
-                                        CharMsg_.Add(' ');
-                                    }
-                                }
-                                break;
+                            CharMsg.AddString(" | ");
                         }
-                        if ((CharCounter.Count + CharMsg.Count + CharMsg_.Count - 1) < ScreenW)
+                        else
                         {
-                            CharMsg.InsertRange(CharMsg_);
+                            CharMsg.Add(' ');
+                        }
+                        if (((FileCtXI + iii) >= 0) && ((FileCtXI + iii) < FileCtX.Count))
+                        {
+                            bool DispChar = false;
+                            int DispChrN = FileCtX[FileCtXI + iii];
+                            switch (DisplayStatusDiv)
+                            {
+                                case 2:
+                                    {
+                                        DispChar = (DispChrN >= 33);
+                                    }
+                                    break;
+                                case 3:
+                                    {
+                                        DispChar = ((DispChrN >= 33) && (DispChrN <= 126));
+                                    }
+                                    break;
+                            }
+                            if (DispChar)
+                            {
+                                if (Screen::CharDouble(DispChrN))
+                                {
+                                    CharMsg.Add(DispChrN);
+                                    CharMsg.Add('_');
+                                }
+                                else
+                                {
+                                    CharMsg.Add('_');
+                                    CharMsg.Add(DispChrN);
+                                }
+                            }
+                            else
+                            {
+                                if (DispChrN > 255)
+                                {
+                                    if (iii < (PrevewLength - 1))
+                                    {
+                                        CharMsg.AddString(TextWork::CharCode(DispChrN, 2));
+                                    }
+                                    else
+                                    {
+                                        CharMsg.AddString("  ");
+                                    }
+                                    if (iii < 0)
+                                    {
+                                        CharMsg.PopFirst();
+                                        CharMsg.PopFirst();
+                                        CharMsg.PopFirst();
+                                    }
+                                    else
+                                    {
+                                        PrevewLength--;
+                                    }
+                                }
+                                else
+                                {
+                                    CharMsg.AddString(TextWork::CharCode(DispChrN, 0));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            CharMsg.AddString("  ");
                         }
                     }
+                    if (CharMsg[0] != ' ')
+                    {
+                        CharMsg.PopFirst();
+                        CharMsg.PopFirst();
+                        CharMsg.PopFirst();
+                        CharMsg.Insert(' ');
+                        CharMsg.Insert(' ');
+                        CharMsg.Insert(' ');
+                    }
+
+                    CharMsg.Add(' ');
                     CharMsg.InsertPad(ScreenW - CharCounter.Count, ' ');
                     CharMsg.InsertRange(CharCounter);
                 }

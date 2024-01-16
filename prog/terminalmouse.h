@@ -19,6 +19,7 @@ public:
     int HighlightLast = 0;
     std::string MouseEvent(std::string Name, int X, int Y, int Btn, bool ModShift, bool ModCtrl, bool ModAlt);
     bool MouseScreen = false;
+    std::string Command(std::string ReportRequest);
 private:
     bool MouseWorks = false;
 
@@ -32,10 +33,28 @@ private:
     bool Mouse1006 = false; // Coordinates: SGR
     bool Mouse1015 = false; // Coordinates: URXVT
     bool Mouse1005 = false; // Coordinates: UTF-8
+
+    bool LocatorChr = false;
+    bool LocatorPxl = false;
+    bool LocatorEvt = false;
+    bool LocatorOneShot = false;
+    bool LocatorBtn1 = false;
+    bool LocatorBtn0 = false;
+    int LocatorFilterX1 = 0;
+    int LocatorFilterY1 = 0;
+    int LocatorFilterX2 = 0;
+    int LocatorFilterY2 = 0;
+
     void MouseUpdate();
     std::string TelnetReportNumToStr(int N);
     std::string MouseCoordCalc(int Val, bool UTF8);
     std::string MouseEventCode(int X, int Y, int Evt);
+    std::string MouseEventCodeLocator(int X, int Y, int Evt);
+    int MouseX = 0;
+    int MouseY = 0;
+    bool MouseBtn1 = false;
+    bool MouseBtn2 = false;
+    bool MouseBtn3 = false;
 };
 
 #endif // TERMINALMOUSE_H

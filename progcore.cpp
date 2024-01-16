@@ -47,6 +47,17 @@ void FileConfig(std::string Param)
     RespondPartial();
 }
 
+void FileConfigVal(std::string Param, std::string Value)
+{
+    BufNum(113);
+    BufTxt("\"");
+    BufStr(Param);
+    BufTxt("\",\"");
+    BufStr(Value);
+    BufTxt("\",");
+    RespondPartial();
+}
+
 void ScreenChar(int X, int Y, int Chr, int Back, int Fore, int Attr, int FontW, int FontH)
 {
     BufNum(101);
@@ -263,8 +274,8 @@ extern "C"
                 BufInit();
                 RespondClear();
 
-                BinaryFile_ = std::make_shared<BinaryFile>();
                 CF = std::make_shared<ConfigFile>();
+                BinaryFile_ = std::make_shared<BinaryFile>();
 
                 BinaryFile_.get()->FileImportSys();
                 BufNum(98);
@@ -281,6 +292,7 @@ extern "C"
                 {
                     CF.get()->ParamClear();
                     CF.get()->FileLoad(0, BinaryFile_.get()->LoadToStringConfig());
+                    BinaryFile_.get()->Init(CF);
 
                     int TempWinW = Screen::DefaultW(CF.get()->ParamGetI("WinW"), CF.get()->ParamGetI("ANSIDOS"));
                     int TempWinH = Screen::DefaultH(CF.get()->ParamGetI("WinH"), CF.get()->ParamGetI("ANSIDOS"));
@@ -310,12 +322,22 @@ extern "C"
                             FileConfig("ColorBlending_" + std::to_string(I_));
                             I_++;
                         }
+                        
+
+                        I_ = 1;
+                        std::string XItem = "File1";
+                        while (CF.get()->ParamExists(XItem))
+                        {
+                            FileConfig(XItem);
+                            I_++;
+                            XItem = "File" + std::to_string(I_);
+                        }
+                        FileConfigVal("FileN", std::to_string(I_));
                     }
                     FileConfig("PaletteR");
                     FileConfig("PaletteG");
                     FileConfig("PaletteB");
 
-                    
                     ScreenSetConfig();
                     BufNum(99);
                     RespondFinish();
@@ -420,7 +442,7 @@ extern "C"
             CF.get()->ParamSet(_Param, _Value);
             if (EvtParam2 == 1)
             {
-                BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
                 BinaryFile_.get()->SysSaveConfig();
             }
             Core.get()->CoreAnsi_.get()->UpdateConfig(CF);
@@ -432,7 +454,7 @@ extern "C"
             {
                 CF.get()->ParamSet("WinW", EvtParam1);
                 CF.get()->ParamSet("WinH", EvtParam2);
-                BinaryFile_.get()->SaveFromString(CF.get()->FileSave(0));
+                BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
                 BinaryFile_.get()->SysSaveConfig();
             }
             Fire = true;

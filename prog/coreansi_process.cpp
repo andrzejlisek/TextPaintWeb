@@ -1,12 +1,13 @@
 #include "coreansi.h"
 
-void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_)
+void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, bool UseAnsiCommands_)
 {
     if (SeekMode_ <= 1)
     {
         SeekStateSaveLast = -1;
         SeekState.Clear();
     }
+    UseAnsiCommands = UseAnsiCommands_;
     SeekMode = SeekMode_;
     AnsiRingBell = AnsiScreenWork_;
     AnsiScreenWork = AnsiScreenWork_;
@@ -226,7 +227,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
 
             bool CharNoCommandStarting = true;
 
-            if (CharToPrint == 27)
+            if ((CharToPrint == 27) && UseAnsiCommands)
             {
                 AnsiState_.__AnsiCmd.Clear();
                 AnsiState_.__AnsiCommand = true;
@@ -234,7 +235,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
             }
             else
             {
-                if (ANSI8bit && (CharToPrint >= 0x80) && (CharToPrint <= 0x9F))
+                if (ANSI8bit && (CharToPrint >= 0x80) && (CharToPrint <= 0x9F) && UseAnsiCommands)
                 {
                     AnsiState_.__AnsiCmd.Clear();
                     AnsiState_.__AnsiCmd.Add(CharToPrint - 0x40);

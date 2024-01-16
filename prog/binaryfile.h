@@ -7,42 +7,37 @@
 #include <iostream>
 #include "str.h"
 #include "screen.h"
-#include "binaryfileitem.h"
+#include "configfile.h"
 
 class BinaryFile
 {
 public:
     BinaryFile();
-    int ItemIndex = 0;
-    int ListDispOffset = 0;
+    Str CurrentFileName;
+    Str CurrentFileAttr;
+    Str DirSearchFile;
+    int CurrentFileAttrGet(int AttribN);
+    void CurrentFileAttrSet(int AttribN, int Val);
+
     Str ListDir;
 
-    std::unique_ptr<BinaryFileItem> DefaultAttrib;
-    BinaryFileItem &ItemGet(int idx);
-    void ItemAdd(BinaryFileItem X, bool Replace);
     void ItemAdd(Str FileName);
-    void ItemRemove(Str FileName);
-    Str ItemName(int Idx);
-    int ItemType0(int Idx);
-    int ItemType(int Idx);
-    int ItemCount();
+    void ItemFileAdd(Str FileName);
+    void ItemFileRemove(Str FileName);
 
     void SetDir(Str Dir);
 
-    void Save(Str &Text);
-    void Load(Str &Text);
-    void LoadRaw(Raw &Text);
-    std::string LoadToString();
+    void Save(Str FileName, Str &Text);
+    void Load(Str FileName, Str &Text, int CRLF);
+    void LoadRaw(Str FileName, Raw &Text);
+    std::string LoadToString(Str FileName, int CRLF);
     std::string LoadToStringConfig();
-    void SaveFromString(std::string S);
-    bool IsSystemFile();
+    void SaveFromString(Str FileName, std::string S);
+    void SaveFromStringConfig(std::string S);
 
     void FileImportSys();
-    void FileImport(int Idx, bool Absolute);
-    void FileExport(int Idx, bool Absolute);
-    void FileExportAttr(int Idx, bool Absolute);
-
-    int IdxCurrent;
+    void FileImport(Str FileName);
+    void FileExport(Str FileName);
 
     bool EventFile(std::string EvtName, std::string EvtParam0, int EvtParam1, int EvtParam2, int EvtParam3, int EvtParam4);
 
@@ -60,29 +55,49 @@ public:
 
     Str ProcessInfo;
 
+    std::string SystemFileName = "!!config.txt";
+    std::string SystemFileAttr = "65001|0|";
+
+    XList<Str> DirItemName;
+
+    int GetFileType(int Idx);
+    int GetFileType(Str FileName);
+
+    int DirItemIdx = 0;
+    int DirItemOff = 0;
+
+    int DirItemIdx_ = 0;
+    int DirItemOff_ = 0;
+    void Init(std::shared_ptr<ConfigFile> CF);
 private:
+    XList<Str> FileExtText;
+    XList<Str> FileExtAnsi;
+    XList<Str> FileExtBin;
+    XList<Str> FileExtXbin;
+
+    void ItemListClear();
+
     std::string EventFileName = "";
 
-    XList<Str> Disp;
-    XList<BinaryFileItem> ListItems;
     XList<Str> ListItemsN;
     int PtrSep = 255;
     int PtrSepNum = 8;
 
     Raw TempData;
-    std::string SystemFile0 = "!!config.txt";
     std::unique_ptr<TextCodec> B64;
 
-    int ItemIndex_ = 0;
-    int ListDispOffset_ = 0;
     Str ListDir_;
 
     int BrowserUploadCurrent;
     int BrowserUploadCount;
-    int BrowserDownloadCount;
-    XList<int> BrowserDownload;
-    void BrowserDownloadProc(int Idx);
-    void BrowserDownloadProc2();
+    XList<Str> BrowserDownload;
+    int BrowserDownloadCount = 0;
+    void BrowserDownloadProc0();
+    void BrowserDownloadProc1(Str FileName);
+
+    int AttribValGet(Str AttribS, int AttribN);
+    Str AttribValSet(Str AttribS, int AttribN, int Val);
+    Str FileExt(Str FileName);
 };
 
 #endif // BINARYFILE_H

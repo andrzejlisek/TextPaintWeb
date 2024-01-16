@@ -112,10 +112,21 @@ void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int Evt
 {
     if ((EvtName == "FileImport") && (EvtParam2 != 0))
     {
+        if (DisplayState == DisplayStateDef::FileMan)
+        {
+            if (EvtParam2 == 2)
+            {
+                FileManager_.Repaint();
+                return;
+            }
+        }
         if (DisplayState == DisplayStateDef::Editor)
         {
-            FileLoad2();
-            return;
+            if (EvtParam2 == 1)
+            {
+                FileLoad2();
+                return;
+            }
         }
     }
 
@@ -2504,7 +2515,7 @@ void Core0Editor::CharmapPaint(int Depth)
 
 void Core0Editor::FileLoad()
 {
-    BinaryFile_.get()->FileImport(-1, false);
+    BinaryFile_.get()->FileImport(BinaryFile_.get()->CurrentFileName);
     //FileLoad2();
 }
 
@@ -2522,15 +2533,50 @@ void Core0Editor::FileLoad2()
     EditorData_.get()->ToggleDrawColo = true;
 
     Str FileTxt;
-    BinaryFile_.get()->Load(FileTxt);
 
-
-    if (BinaryFile_.get()->ItemGet(-1).Attrib_Ansi)
+    int FileW = CoreAnsi_.get()->AnsiMaxX;
+    int FileH = CoreAnsi_.get()->AnsiMaxY;
+    int AnsiMaxX_ = CoreAnsi_.get()->AnsiMaxX;
+    int AnsiMaxY_ = CoreAnsi_.get()->AnsiMaxY;
+    switch (BinaryFile_.get()->GetFileType(BinaryFile_.get()->CurrentFileName))
     {
-        CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-        CoreAnsi_.get()->AnsiProcessReset(true, false, 0);
-        CoreAnsi_.get()->AnsiRingBell = false;
-        CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
+        case 0: // TXT
+            BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileTxt, 1);
+            {
+                int LineCounter = 0;
+                int LineCounter0 = 0;
+                for (int I = 0; I < FileTxt.Count; I++)
+                {
+                    LineCounter++;
+                    if (FileTxt[I] == 10)
+                    {
+                        FileW = std::max(FileW, LineCounter + 3);
+                        LineCounter = 0;
+                        LineCounter0++;
+                    }
+                }
+                FileH = std::max(FileH, LineCounter0 + 3);
+            }
+            CoreAnsi_.get()->AnsiTerminalResize(FileW, FileH, 0);
+            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, false);
+            CoreAnsi_.get()->AnsiRingBell = false;
+            CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
+            break;
+        case 1: // ANSI
+            BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileTxt, 0);
+            CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
+            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, true);
+            CoreAnsi_.get()->AnsiRingBell = false;
+            CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
+            break;
+        case 2: // BIN
+            break;
+        case 3: // XBIN
+            break;
+    }
+
+    if (true)
+    {
         if (FileReadSteps > 0)
         {
             CoreAnsi_.get()->AnsiProcess(FileReadSteps);
@@ -2599,6 +2645,10 @@ void Core0Editor::FileLoad2()
             }
         }
     }
+    CoreAnsi_.get()->AnsiTerminalResize(AnsiMaxX_, AnsiMaxY_, 0);
+    CoreAnsi_.get()->AnsiProcessReset(true, false, 0, true);
+
+
     EditorData_.get()->TextBuffer.TrimLines();
 
     EditorScreenRefresh();
@@ -2618,16 +2668,17 @@ void Core0Editor::FileSave()
     Str FileTxt;
     for (int i = 0; i < EditorData_.get()->TextBuffer.CountLines(); i++)
     {
-        if (BinaryFile_.get()->ItemGet(-1).Attrib_Ansi)
+        switch (BinaryFile_.get()->GetFileType(BinaryFile_.get()->CurrentFileName))
         {
-            FileTxt.AddRange(AnsiFile_.Process(EditorData_.get()->TextBuffer, i, CoreAnsi_.get()->AnsiMaxX));
-        }
-        else
-        {
-            FileTxt.AddRange(EditorData_.get()->TextBuffer.GetLineString(i));
-            FileTxt.Add('\n');
+            case 0: // TXT
+                FileTxt.AddRange(EditorData_.get()->TextBuffer.GetLineString(i));
+                FileTxt.Add('\n');
+                break;
+            case 1: // ANSI
+                FileTxt.AddRange(AnsiFile_.Process(EditorData_.get()->TextBuffer, i, CoreAnsi_.get()->AnsiMaxX));
+                break;
         }
     }
-    BinaryFile_.get()->Save(FileTxt);
-    BinaryFile_.get()->FileExport(-1, false);
+    BinaryFile_.get()->Save(BinaryFile_.get()->CurrentFileName, FileTxt);
+    BinaryFile_.get()->FileExport(BinaryFile_.get()->CurrentFileName);
 }
