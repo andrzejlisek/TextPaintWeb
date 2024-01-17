@@ -15,6 +15,7 @@
 #include "filemanager.h"
 #include "displayconfig.h"
 #include "stopwatch.h"
+#include "xbin.h"
 
 class CoreCommon
 {
@@ -36,6 +37,7 @@ public:
     FileManager FileManager_;
     void SaveConfig();
     void ScreenStatusBarSet(int ScreenStatusBar_);
+    XBIN XBIN_;
 protected:
     int ScreenStatusBar = 0;
     void ReadColor(std::string SettingValue, int &ColorB, int &ColorF);

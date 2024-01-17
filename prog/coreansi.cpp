@@ -103,9 +103,9 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
     std::string CharsVT52[50];
     int CharDOS_Length = TextWork::StringSplit(CF.get()->ParamGetS("ANSICharsDOS"), ',', CharDOS);
     int CharsVT52_Length = TextWork::StringSplit(CF.get()->ParamGetS("ANSICharsVT52"), ',', CharsVT52);
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 33; i++)
     {
-        if (CharDOS_Length >= 32)
+        if (CharDOS_Length >= 33)
         {
             int T = TextWork::CodeChar(CharDOS[i]);
             if (T >= 32)
@@ -117,6 +117,9 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
                 DosControl[i] = 32;
             }
         }
+    }
+    for (int i = 0; i < 32; i++)
+    {
         if (CharsVT52_Length >= 32)
         {
             int T = TextWork::CodeChar(CharsVT52[i]);

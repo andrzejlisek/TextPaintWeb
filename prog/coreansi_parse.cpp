@@ -2762,7 +2762,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
         }
     }
 
-    if ((ANSIDOS_) && (!AnsiState_.__AnsiMusic) && (TextFileLine_i < 32))
+    if ((ANSIDOS_) && (!AnsiState_.__AnsiMusic) && ((TextFileLine_i < 32) || (TextFileLine_i == 127)))
     {
         switch (TextFileLine_i)
         {
@@ -2786,6 +2786,9 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                 {
                     TextFileLine_i_GetChar = DosControl[TextFileLine_i];
                 }
+                break;
+            case 127:
+                TextFileLine_i_GetChar = DosControl[32];
                 break;
             default:
                 TextFileLine_i_GetChar = DosControl[TextFileLine_i];

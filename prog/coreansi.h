@@ -64,7 +64,7 @@ public:
     void AnsiChar(int X, int Y, int Ch, int ColB, int ColF, int FontW, int FontH, int ColA);
     void AnsiScreenNegative(bool IsNega);
 
-    void AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, bool UseAnsiCommands_);
+    void AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, int AnsiOptions);
     void AnsiProcessSupply(Str TextFileLine);
     void AnsiTerminalReset();
     bool AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_);
@@ -84,7 +84,7 @@ private:
     Str CommandEndChar;
 
     // Printable character replacement for standard DOS character from 00h to 1Fh
-    int DosControl[32];
+    int DosControl[33];
 
     // Color subsitution from 256-color palette - filled in in constructor
     int Color256[257];

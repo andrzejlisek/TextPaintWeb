@@ -115,11 +115,18 @@ function FileSystemDir(Name, Recursive)
                 }
             }
             
-            if (Recursive)
+            if (Recursive == 2)
+            {
+                for (let I = 0; I < DirList.length; I++)
+                {
+                    FileSystemDelete(DirList[I], "~~");
+                }
+            }
+            if (Recursive == 1)
             {
                 FileImportFinish(0, 3, Name, "~RECURS", btoa(DirListStr), 0);
             }
-            else
+            if (Recursive == 0)
             {
                 FileImportFinish(0, 2, Name, "~DIR", btoa(DirListStr), 0);
             }
@@ -198,11 +205,10 @@ function FileSystemDelete(Name, Attrib)
     }
 
     DbTrans.addEventListener('complete', () => {
-        FileExportFinish(0, 3, Name, Attrib, "", 0);
+        if (Attrib != "~~")
+        {
+            FileExportFinish(0, 3, Name, Attrib, "", 0);
+        }
     });
 }
-
-
-
-
 

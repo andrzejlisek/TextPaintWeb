@@ -225,7 +225,7 @@ function ConfClick(id)
                 if (confirm("Reset configuration?"))
                 {
                     ConfigFileReset();
-                    if (confirm("Clear file index?"))
+                    if (confirm("Clear file storage?"))
                     {
                         IndexClear();
                     }

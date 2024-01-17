@@ -11,7 +11,6 @@ class AnsiSauce
 public:
     AnsiSauce();
 
-    bool Exists = false;
     XList<std::string> Info;
     Raw InfoRaw;
 
@@ -20,7 +19,11 @@ public:
     void CreateInfo();
     void LoadRaw(Raw &Raw__);
 
+    int DataIdx = -1;
+
 private:
+    int SauceIdx = -1;
+    int CommentIdx = -1;
     std::string NameDataType[10] { "None", "Character", "Bitmap", "Vector", "Audio", "BinaryText", "XBin", "Archive", "Executable", "_" };
     std::string NameFileType0[1] { "_" };
     std::string NameFileType1[10] { "ASCII", "ANSi", "ANSiMation", "RIP script", "PCBoard", "Avatar", "HTML", "Source", "TundraDraw", "_" };
@@ -31,9 +34,6 @@ private:
     std::string NameFileType6[1] { "_" };
     std::string NameFileType7[11] { "ZIP", "ARJ", "LZH", "ARC", "TAR", "ZOO", "RAR", "UC2", "PAK", "SQZ", "_" };
     std::string NameFileType8[1] { "_" };
-
-    int SauceIdx = -1;
-    int CommentIdx = -1;
 
     std::string Field01Version = "";
     std::string Field02Title = "";

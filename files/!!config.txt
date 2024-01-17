@@ -30,39 +30,60 @@ WinTouchScreen=0
 # If the FontChars parameter is not provided or blank, the parameter does not matter
 
 FontMode=1
+FontSelect=3
+FontName1=files/fonts/Dos/Dos08x16.png
 
 ### Monospace fonts
 
 # DOS fonts
-#ontName1=files/fonts/Dos/Dos08x08.png
-#ontName1=files/fonts/Dos/Dos08x14.png
-FontName1=files/fonts/Dos/Dos08x16.png
-#ontName1=files/fonts/Dos/Dos09x08.png
-#ontName1=files/fonts/Dos/Dos09x14.png
-#ontName1=files/fonts/Dos/Dos09x16.png
+Font1Name=DOS 8x8
+Font1File1=files/fonts/Dos/Dos08x08.png
+Font2Name=DOS 8x14
+Font2File1=files/fonts/Dos/Dos08x14.png
+Font3Name=DOS 8x16
+Font3File1=files/fonts/Dos/Dos08x16.png
+Font4Name=DOS 9x8
+Font4File1=files/fonts/Dos/Dos09x08.png
+Font5Name=DOS 9x14
+Font5File1=files/fonts/Dos/Dos09x14.png
+Font6Name=DOS 9x16
+Font6File1=files/fonts/Dos/Dos09x16.png
 
 # Amiga fonts
-#ontName1=files/fonts/Amiga/Amiga08x08-MicroKnight.png
-#ontName1=files/fonts/Amiga/Amiga08x08-mOsOul.png
-#ontName1=files/fonts/Amiga/Amiga08x08-P0T-NOoDLE.png
-#ontName1=files/fonts/Amiga/Amiga08x08-Topaz1.png
-#ontName1=files/fonts/Amiga/Amiga08x08-Topaz2.png
-#ontName1=files/fonts/Amiga/Amiga08x16-MicroKnight.png
-#ontName1=files/fonts/Amiga/Amiga08x16-Topaz1.png
-#ontName1=files/fonts/Amiga/Amiga08x16-Topaz2.png
-
-# Small font
-#ontName1=files/fonts/Small/Small04x04.png ??????
-
-# VTxxx terminal font
-#ontName1=files/fonts/VT/VT08x10.png
+Font7Name=Amiga MicroKnight
+Font7File1=files/fonts/Amiga/Amiga08x08-MicroKnight.png
+Font8Name=Amiga mOsOul
+Font8File1=files/fonts/Amiga/Amiga08x08-mOsOul.png
+Font9Name=Amiga P0T-NOoDLE
+Font9File1=files/fonts/Amiga/Amiga08x08-P0T-NOoDLE.png
+Font10Name=Amiga Topaz 1
+Font10File1=files/fonts/Amiga/Amiga08x08-Topaz1.png
+Font11Name=Amiga Topaz 2
+Font11File1=files/fonts/Amiga/Amiga08x08-Topaz2.png
+Font12Name=Amiga MicroKnight 16px
+Font12File1=files/fonts/Amiga/Amiga08x16-MicroKnight.png
+Font13Name=Amiga Topaz 1 16px
+Font13File1=files/fonts/Amiga/Amiga08x16-Topaz1.png
+Font14Name=Amiga Topaz 2 16px
+Font14File1=files/fonts/Amiga/Amiga08x16-Topaz2.png
 
 # Unscii - several small fonts
-#ontName1=files/fonts/Unscii/Unscii08x08.png
-#ontName1=files/fonts/Unscii/Unscii08x08-alt.png
-#ontName1=files/fonts/Unscii/Unscii08x08-fantasy.png
-#ontName1=files/fonts/Unscii/Unscii08x08-mcr.png
-#ontName1=files/fonts/Unscii/Unscii08x08-thin.png
+Font15Name=Unscii 8x8 standard
+Font15File1=files/fonts/Unscii/Unscii08x08.png
+Font16Name=Unscii 8x8 thin
+Font16File1=files/fonts/Unscii/Unscii08x08-thin.png
+Font17Name=Unscii 8x8 alternative
+Font17File1=files/fonts/Unscii/Unscii08x08-alt.png
+Font18Name=Unscii 8x8 MCR
+Font18File1=files/fonts/Unscii/Unscii08x08-mcr.png
+Font19Name=Unscii 8x8 fantasy
+Font19File1=files/fonts/Unscii/Unscii08x08-fantasy.png
+
+# Other single fonts
+Font20Name=Small font
+Font20File1=files/fonts/Small/Small04x04.png
+Font21Name=VT220 font
+Font21File1=files/fonts/VT/VT08x10.png
 
 ### Duospace fonts
 
@@ -174,6 +195,18 @@ ColorBlending_16=1FB94,2590,1,1,1
 ### Color palette
 # The left half is normal display, the right half is the VT blink display
 
+PaletteSelect=1
+
+Palette1Name=DOS
+Palette1Colors=000000AA000000AA00AAAA000000AAAA00AA00AAAAAAAAAA555555FF555555FF55FFFF555555FFFF55FF55FFFFFFFFFF000000710000007100717100000071710071007171717171393939AA393939AA39AAAA393939AAAA39AA39AAAAAAAAAA
+
+Palette2Name=DOS brown
+Palette2Colors=000000AA000000AA00AAAA000000AAAA00AA00AAAAAAAAAA555555FF555555FF55FFFF555555FFFF55FF55FFFFFFFFFF000000710000007100717100000071710071007171717171393939AA393939AA39AAAA393939AAAA39AA39AAAAAAAAAA
+
+Palette3Name=Windows
+Palette3Colors=000000800000008000808000000080800080008080C0C0C0808080FF000000FF00FFFF000000FFFF00FF00FFFFFFFFFF000000400000004000404000000040400040004040606060404040800000008000808000000080800080008080808080
+
+
 PaletteR=00AA00AA00AA00AA55FF55FF55FF55FF007100710071007139AA39AA39AA39AA
 PaletteG=0000AAAA0000AAAA5555FFFF5555FFFF00007171000071713939AAAA3939AAAA
 PaletteB=00000000AAAAAAAA55555555FFFFFFFF000000007171717139393939AAAAAAAA
@@ -279,7 +312,7 @@ BeyondLineMargin=-1
 ANSIBufferAbove=1
 ANSIBufferBelow=1
 
-ANSICharsDOS=0020,263A,263B,2665,2666,2663,2660,2022,25D8,25CB,25D9,2642,2640,266A,266B,263C,25BA,25C4,2195,203C,00B6,00A7,25AC,21A8,2191,2193,2192,2190,221F,2194,25B2,25BC
+ANSICharsDOS=0020,263A,263B,2665,2666,2663,2660,2022,25D8,25CB,25D9,2642,2640,266A,266B,263C,25BA,25C4,2195,203C,00B6,00A7,25AC,21A8,2191,2193,2192,2190,221F,2194,25B2,25BC,2302
 ANSICharsVT52=0020,0020,2588,00B9,00B3,2075,2077,00B0,00B1,2192,2026,00F7,2193,2594,1FB76,1FB77,1FB78,1FB79,1FB7A,1FB7B,2581,2080,2081,2082,2083,2084,2085,2086,2087,2088,2089,00B6
 
 ANSIColorThresholdBlackWhite=48

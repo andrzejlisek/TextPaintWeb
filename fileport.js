@@ -90,19 +90,12 @@ function ConfigFileSet(Param, Value)
 
 function ConfigFileReset()
 {
-    FileDelete(0, 1, FileSystemName);
-    FileDelete(0, 2, FileSystemName);
+    FileSystemDelete(FileSystemName, "~~");
 }
 
 function IndexClear()
 {
-    FileIndexLS = {};
-    FileIndexLSAttr = {};
-    IndexExportLS();
-
-    FileIndexDB = {};
-    FileIndexDBAttr = {};
-    IndexExportDB();
+    FileSystemDir("", 2);
 }
 
 function IndexImport(IndexRaw0, AttribOffset)
@@ -294,11 +287,11 @@ function FileImport(Id, Kind, Name, Attrib)
         case 2: // Directory
             if (Attrib == "~RECUR")
             {
-                FileSystemDir(Name, true);
+                FileSystemDir(Name, 1);
             }
             else
             {
-                FileSystemDir(Name, false);
+                FileSystemDir(Name, 0);
             }
             break;
         case 6: // File upload

@@ -570,7 +570,7 @@ void Core2Terminal::ConnOpen()
     Conn = std::make_unique<TerminalConnWorker>();
     ConnInternal = true;
 
-    CoreAnsi_.get()->AnsiProcessReset(false, true, 0, true);
+    CoreAnsi_.get()->AnsiProcessReset(false, true, 0, 1);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(1, 4);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(2, 2);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(3, 2);

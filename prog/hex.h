@@ -18,6 +18,7 @@ public:
     static std::string ToHex(unsigned char * Raw, unsigned int RawSize);
 
     static int HexToInt(std::string Hex0);
+    static int HexToInt(char Hex0);
 };
 
 #endif // HEX_H

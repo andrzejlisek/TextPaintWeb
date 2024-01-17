@@ -87,6 +87,8 @@ private:
     bool DisplayConfig_RequestClose = false;
 
     void DisplayInfoText(bool Forced);
+
+    bool FileOpenFile0Info = false;
 };
 
 #endif // CORE1PLAYER_H

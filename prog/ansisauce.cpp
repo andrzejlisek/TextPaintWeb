@@ -19,9 +19,9 @@ void AnsiSauce::NonSauceInfo(std::string Label, std::string Value)
 void AnsiSauce::CreateInfo()
 {
     InfoRaw.Clear();
-    Exists = false;
     SauceIdx = -1;
     CommentIdx = -1;
+    DataIdx = -1;
 
     if (SauceIdx < 0)
     {
@@ -59,7 +59,8 @@ void AnsiSauce::CreateInfo()
 
     if (SauceIdx >= 0)
     {
-        Exists = true;
+        DataIdx = SauceIdx;
+
         ReadSAUCE();
         if (Field13Comments > 0)
         {
@@ -67,6 +68,10 @@ void AnsiSauce::CreateInfo()
             while ((CommentIdx + 64) < 0)
             {
                 CommentIdx += 64;
+            }
+            if (DataIdx > CommentIdx)
+            {
+                DataIdx = CommentIdx;
             }
             ReadCOMNT();
         }

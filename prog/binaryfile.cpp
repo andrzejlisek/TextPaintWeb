@@ -163,7 +163,7 @@ int BinaryFile::GetFileType(Str FileName)
 
 Str BinaryFile::FileExt(Str FileName)
 {
-    int ExtI = FileName.IndexOf('.');
+    int ExtI = FileName.IndexOf('.', 0 - FileName.Count);
     if (ExtI >= 0)
     {
         return FileName.Substring(ExtI).CaseLower();

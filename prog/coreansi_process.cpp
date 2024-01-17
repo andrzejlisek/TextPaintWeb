@@ -1,13 +1,13 @@
 #include "coreansi.h"
 
-void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, bool UseAnsiCommands_)
+void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, int AnsiOptions)
 {
     if (SeekMode_ <= 1)
     {
         SeekStateSaveLast = -1;
         SeekState.Clear();
     }
-    UseAnsiCommands = UseAnsiCommands_;
+    UseAnsiCommands = ((AnsiOptions & 1) > 0);
     SeekMode = SeekMode_;
     AnsiRingBell = AnsiScreenWork_;
     AnsiScreenWork = AnsiScreenWork_;

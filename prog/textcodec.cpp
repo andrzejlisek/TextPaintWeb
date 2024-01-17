@@ -2,32 +2,48 @@
 
 TextCodec::TextCodec()
 {
-    EncodingNumber = 0;
-    EncodingOneByte = false;
-    Map0 = "";
-    Map1 = "";
-    Map2 = "";
-    Map3 = "";
-    Unicode = false;
-    BOM__[0] = 0;
-
-    EncodingName = "None";
-    EncodingNumber = NONE;
-    EncodingOneByte = true;
-
-    for (int I = 0; I < 256; I++)
-    {
-        MapByteToText[I] = I;
-        MapTextToByte[I] = I;
-    }
-
-    Reset();
+    TextCodec_(0, 0);
 }
 
 TextCodec::TextCodec(int CodePage)
 {
+    TextCodec_(CodePage, 0);
+}
+
+TextCodec::TextCodec(int CodePage, int CodecType)
+{
+    TextCodec_(CodePage, CodecType);
+    if ((CodecType & 1) > 0)
+    {
+        if (!EncodingOneByte)
+        {
+            TextCodec_(0, CodecType & 254);
+        }
+    }
+}
+
+void TextCodec::TextCodec_(int CodePage, int CodecType)
+{
+    if ((CodecType & 2) > 0)
+    {
+        for (int I = 0; I < 33; I++)
+        {
+            CharDOSWork[I] = CharDOS[I];
+        }
+    }
+    else
+    {
+        for (int I = 0; I < 32; I++)
+        {
+            CharDOSWork[I] = I;
+        }
+        CharDOSWork[32] = 127;
+    }
+
+
     EncodingNumber = CodePage;
     EncodingOneByte = false;
+
     Map0 = "";
     Map1 = "";
     Map2 = "";
@@ -1051,7 +1067,26 @@ void TextCodec::EnqueueStr(Str &Text)
                 }
                 else
                 {
-                    RawData.Add('?');
+                    bool DosNotFound = true;
+                    for (int II = 0; II < 32; II++)
+                    {
+                        if (CharDOS[II] == Text[I])
+                        {
+                            RawData.Add(II);
+                            DosNotFound = false;
+                        }
+                    }
+                    if (DosNotFound)
+                    {
+                        if (CharDOS[32] == Text[I])
+                        {
+                            RawData.Add(127);
+                        }
+                        else
+                        {
+                            RawData.Add('?');
+                        }
+                    }
                 }
             }
             return;
@@ -1084,7 +1119,7 @@ void TextCodec::DequeueStr(Str &Text)
                         }
                         if ((Temp[0] <= 0xD7FF) || (Temp[0] >= 0xE000))
                         {
-                            Text.Add(Temp[0]);
+                            Text.Add(CharDOSCode(Temp[0]));
                             DequeueTextState = 0;
                         }
                         else
@@ -1103,7 +1138,7 @@ void TextCodec::DequeueStr(Str &Text)
                         }
                         if ((Temp[0] >= 0xD800) && (Temp[0] <= 0xDBFF) && (Temp[2] >= 0xDC00) && (Temp[2] <= 0xDFFF))
                         {
-                            Text.Add((((Temp[0] & 1023) + 64) << 10) + (Temp[2] & 1023));
+                            Text.Add(CharDOSCode((((Temp[0] & 1023) + 64) << 10) + (Temp[2] & 1023)));
                         }
                         DequeueTextState = 0;
                         break;
@@ -1136,7 +1171,7 @@ void TextCodec::DequeueStr(Str &Text)
                                 Temp[1] = Temp[1] << 16;
                                 Temp[2] = Temp[2] << 8;
                             }
-                            Text.Add(Temp[0] + Temp[1] + Temp[2] + Temp[3]);
+                            Text.Add(CharDOSCode(Temp[0] + Temp[1] + Temp[2] + Temp[3]));
                             DequeueTextState = 0;
                             break;
                     }
@@ -1153,7 +1188,7 @@ void TextCodec::DequeueStr(Str &Text)
                         case 0:
                             if (RawDataNum < 128)
                             {
-                                Text.Add(RawDataNum);
+                                Text.Add(CharDOSCode(RawDataNum));
                             }
                             else
                             {
@@ -1211,7 +1246,7 @@ void TextCodec::DequeueStr(Str &Text)
                                 Temp[DequeueTextState] = (RawDataNum & 0x3F);
                                 if (DequeueTextState == 0)
                                 {
-                                    Text.Add(Temp[5] + Temp[4] + Temp[3] + Temp[2] + Temp[1] + Temp[0]);
+                                    Text.Add(CharDOSCode(Temp[5] + Temp[4] + Temp[3] + Temp[2] + Temp[1] + Temp[0]));
 
                                     Temp[0] = 0;
                                     Temp[1] = 0;
@@ -1290,7 +1325,7 @@ void TextCodec::DequeueStr(Str &Text)
         default:
             for (int I = 0; I < RawData.Count; I++)
             {
-                Text.Add(MapByteToText[RawData[I]]);
+                Text.Add(CharDOSCode(MapByteToText[RawData[I]]));
             }
             break;
     }
@@ -1370,8 +1405,37 @@ void TextCodec::CodecListCreateItem(int Num)
     }
 }
 
-void TextCodec::CodecListCreate()
+int TextCodec::CharDOSCode(int Chr)
 {
+    if (Chr < 32)
+    {
+        return CharDOSWork[Chr];
+    }
+    if (Chr == 127)
+    {
+        return CharDOSWork[32];
+    }
+    return Chr;
+}
+
+void TextCodec::CodecListCreate(std::string CharDOS_)
+{
+    CharDOS_ = CharDOS_ + ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,";
+
+    int II = 0;
+    for (int I = 0; I < 33; I++)
+    {
+        int Buf = 0;
+        while (CharDOS_[II] != ',')
+        {
+            Buf = Buf * 16;
+            Buf = Buf + Hex::HexToInt(CharDOS_[II]);
+            II++;
+        }
+        CharDOS[I] = Buf;
+        II++;
+    }
+
     CodecListNumber.Clear();
     CodecListName.Clear();
     CodecListCreateItem(0);

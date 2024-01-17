@@ -2533,6 +2533,7 @@ void Core0Editor::FileLoad2()
     EditorData_.get()->ToggleDrawColo = true;
 
     Str FileTxt;
+    Raw FileTxtRaw;
 
     int FileW = CoreAnsi_.get()->AnsiMaxX;
     int FileH = CoreAnsi_.get()->AnsiMaxY;
@@ -2558,20 +2559,34 @@ void Core0Editor::FileLoad2()
                 FileH = std::max(FileH, LineCounter0 + 3);
             }
             CoreAnsi_.get()->AnsiTerminalResize(FileW, FileH, 0);
-            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, false);
+            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 0);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
         case 1: // ANSI
             BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileTxt, 0);
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, true);
+            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 1);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
         case 2: // BIN
+            BinaryFile_.get()->LoadRaw(BinaryFile_.get()->CurrentFileName, FileTxtRaw);
+            XBIN_.SetRaw(FileTxtRaw, -1, false);
+            XBIN_.GetStr(FileTxt, BinaryFile_.get()->CurrentFileAttrGet(0));
+            CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
+            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 3);
+            CoreAnsi_.get()->AnsiRingBell = false;
+            CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
         case 3: // XBIN
+            BinaryFile_.get()->LoadRaw(BinaryFile_.get()->CurrentFileName, FileTxtRaw);
+            XBIN_.SetRaw(FileTxtRaw, -1, true);
+            XBIN_.GetStr(FileTxt, BinaryFile_.get()->CurrentFileAttrGet(0));
+            CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
+            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 3);
+            CoreAnsi_.get()->AnsiRingBell = false;
+            CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
     }
 
@@ -2646,7 +2661,7 @@ void Core0Editor::FileLoad2()
         }
     }
     CoreAnsi_.get()->AnsiTerminalResize(AnsiMaxX_, AnsiMaxY_, 0);
-    CoreAnsi_.get()->AnsiProcessReset(true, false, 0, true);
+    CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 1);
 
 
     EditorData_.get()->TextBuffer.TrimLines();

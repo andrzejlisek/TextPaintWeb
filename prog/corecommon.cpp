@@ -40,7 +40,7 @@ void CoreCommon::InitCommon()
     Screen::CursorHide(false);
     if (BinaryFile_.get()->PreInit)
     {
-        TextCodec::CodecListCreate();
+        TextCodec::CodecListCreate(CF.get()->ParamGetS("ANSICharsDOS"));
         BinaryFile_.get()->SetDir(Str("/"));
     }
     BinaryFile_.get()->PreInit = false;

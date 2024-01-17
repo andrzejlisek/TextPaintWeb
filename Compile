@@ -5,7 +5,7 @@ rm compiled/*
 emcc -std=c++20 progio.cpp -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -o compiled/progio.js
 
 emcc -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp prog/raw.cpp prog/str.cpp prog/textwork.cpp prog/textcodec.cpp \
- prog/clipboard.cpp prog/stopwatch.cpp \
+ prog/clipboard.cpp prog/stopwatch.cpp prog/xbin.cpp \
  prog/coreansi.cpp prog/coreansi_char.cpp prog/coreansi_fontsize.cpp prog/coreansi_parse.cpp prog/coreansi_process.cpp prog/coreansi_scroll.cpp \
  prog/ansilineoccupyex.cpp prog/ansilineoccupy.cpp prog/ansilineoccupyitem.cpp prog/ansilineoccupyitemundoredo.cpp prog/ansisauce.cpp prog/ansistate.cpp \
  prog/configfile.cpp prog/corestatic.cpp prog/binaryfile.cpp prog/filemanager.cpp prog/displayconfig.cpp prog/corecommon.cpp \
