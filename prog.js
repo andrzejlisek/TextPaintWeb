@@ -3,7 +3,6 @@ let _ProgEventKey;
 let _ProgEventTick;
 let ProgEventOther;
 let ProgEventOtherFile;
-let ProgEventTickState = 0;
 
 function ProgStart()
 {
@@ -19,17 +18,13 @@ function ProgEventTick()
 {
     if (ProgStarted)
     {
-        if (ProgEventTickState == 0)
+        if (CallbackQueue.length == 0)
         {
-            ProgEventTickState = 1;
             _ProgEventTick();
         }
         else
         {
-            if (ProgEventTickState > 1)
-            {
-                setTimeout(() => _ProgCallback([0]));
-            }
+            setTimeout(() => _ProgCallback([0]));
         }
     }
 }
@@ -98,7 +93,6 @@ function _ProgCallback(D_)
     {
         CallbackQueue.push(D_);
     }
-    ProgEventTickState++;
     const TimeLimit = performance.now() + ScreenTimerCallback;
     let AtLeastOneAction = true;
     while ((CallbackQueue.length > 0) && ((TimeLimit > performance.now()) || AtLeastOneAction))
@@ -199,10 +193,6 @@ function _ProgCallback(D_)
                 }
                 break;
         }
-    }
-    if (CallbackQueue.length == 0)
-    {
-        ProgEventTickState = 0;
     }
 }
 

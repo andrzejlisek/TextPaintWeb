@@ -2,7 +2,7 @@ function ScreenTimerStart()
 {
     if (ScreenStarted && ProgStarted)
     {
-        ScreenTimerTick();
+        setInterval(ScreenTimerTick, ScreenTimerPeriod);
     }
 }
 
@@ -46,6 +46,4 @@ function ScreenTimerTick()
     }
 
     VTTEST_.VTData("");
-
-    setTimeout(ScreenTimerTick, ScreenTimerPeriod);
 }
