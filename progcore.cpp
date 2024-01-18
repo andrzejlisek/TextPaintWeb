@@ -403,6 +403,7 @@ extern "C"
     {
         RespondClear();
         Core.get()->EventTick();
+        BufNum(999);
         RespondFinish();
     }
 

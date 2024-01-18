@@ -3,6 +3,7 @@ let _ProgEventKey;
 let _ProgEventTick;
 let ProgEventOther;
 let ProgEventOtherFile;
+let ProgEventTickIdle = true;
 
 function ProgStart()
 {
@@ -18,8 +19,9 @@ function ProgEventTick()
 {
     if (ProgStarted)
     {
-        if (CallbackQueue.length == 0)
+        if (ProgEventTickIdle && (CallbackQueue.length == 0))
         {
+            ProgEventTickIdle = false;
             _ProgEventTick();
         }
         else
@@ -121,6 +123,10 @@ function _ProgCallback(D_)
             case 106:
                 ScreenLineOffset(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6]);
                 CallbackQueueI += 7;
+                break;
+            case 999:
+                ProgEventTickIdle = true;
+                CallbackQueueI += 1;
                 break;
             default:
                 {
