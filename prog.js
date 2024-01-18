@@ -3,10 +3,11 @@ let _ProgEventKey;
 let _ProgEventTick;
 let ProgEventOther;
 let ProgEventOtherFile;
+let ProgEventTickState = 0;
 
 function ProgStart()
 {
-    ScreenTimerCallback = ScreenTimerPeriod;
+    ScreenTimerCallback = (ScreenTimerPeriod * 4) / 5;
     ProgStarted = true;
     ProgInitScreen();
     ScreenTimerStart();
@@ -18,7 +19,18 @@ function ProgEventTick()
 {
     if (ProgStarted)
     {
-        _ProgEventTick();
+        if (ProgEventTickState == 0)
+        {
+            ProgEventTickState = 1;
+            _ProgEventTick();
+        }
+        else
+        {
+            if (ProgEventTickState > 1)
+            {
+                setTimeout(() => _ProgCallback([0]));
+            }
+        }
     }
 }
 
@@ -57,15 +69,36 @@ function ProgScreenOther(Param)
     }
 }
 
+function ProgScreenOtherStr(Param, ParamStr)
+{
+    let ParamStr_ = ParamStr.split('|');
+    switch (Param)
+    {
+        case 1:
+            ScreenSetPalette(ParamStr, true);
+            break;
+        case 2:
+            ScreenSetFont(ParamStr_[0], ParamStr_[1], ParamStr_[2], parseInt(ParamStr_[3]), true);
+            break;
+        case 3:
+            ScreenSetFontCustom(parseInt(ParamStr));
+            break;
+        case 4:
+            ScreenFontCreateCustomChar(ParamStr);
+            break;
+    }
+}
+
 let CallbackQueue = [];
 let CallbackQueueI = 0;
 
-function _ProgCallback(D)
+function _ProgCallback(D_)
 {
-    if (D.length > 1)
+    if (D_.length > 1)
     {
-        CallbackQueue.push(D);
+        CallbackQueue.push(D_);
     }
+    ProgEventTickState++;
     const TimeLimit = performance.now() + ScreenTimerCallback;
     let AtLeastOneAction = true;
     while ((CallbackQueue.length > 0) && ((TimeLimit > performance.now()) || AtLeastOneAction))
@@ -119,12 +152,16 @@ function _ProgCallback(D)
                             CallbackQueueI += 3;
                             break;
                         case 103:
-                            ScreenResize(D[CallbackQueueI+1],D[CallbackQueueI+2]);
+                            ScreenResize(D[CallbackQueueI+1],D[CallbackQueueI+2],true);
                             CallbackQueueI += 3;
                             break;
                         case 107:
                             ProgScreenOther(D[CallbackQueueI+1]);
                             CallbackQueueI += 2;
+                            break;
+                        case 108:
+                            ProgScreenOtherStr(D[CallbackQueueI+1],StringBufDecode(D[CallbackQueueI+2]));
+                            CallbackQueueI += 3;
                             break;
                         case 111:
                             FileImport(D[CallbackQueueI+1],D[CallbackQueueI+2],StringBufDecode(D[CallbackQueueI+3]),D[CallbackQueueI+4]);
@@ -162,6 +199,10 @@ function _ProgCallback(D)
                 }
                 break;
         }
+    }
+    if (CallbackQueue.length == 0)
+    {
+        ProgEventTickState = 0;
     }
 }
 

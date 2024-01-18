@@ -4,6 +4,7 @@ let ScreenCellW = 8;
 let ScreenCellH = 16;
 let ScreenWW = 0;
 let ScreenHH = 0;
+let ScreenBlinkOffset = 0;
 let ScreenCursorX = 0;
 let ScreenCursorY = 0;
 let ScreenCursorSize = 0;
@@ -348,7 +349,7 @@ function ScreenCharGlyph(Buf, ScrIdx)
         let Fore2G = ScreenPaletteG[Fore_ + 16];
         let Fore2B = ScreenPaletteB[Fore_ + 16];
 
-        if (ScreenColorBlending)
+        if (ScreenColorBlending && (ScreenFont.Mode < 10))
         {
             if (Chr in ScreenColorBlendingChars)
             {
@@ -564,7 +565,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
         default:
             {
                 ScreenCtx.putImageData(CharData0, XX, YY);
-                ScreenCtx.putImageData(CharData1, XX, YY + ScreenHH);
+                ScreenCtx.putImageData(CharData1, XX, YY + ScreenBlinkOffset);
             }
             break;
         case 1:
@@ -575,7 +576,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                 if (T2 > 0)
                 {
                     ScreenCtx.putImageData(CharData0, XX, YY - T1, 0, T1, ScreenCellW, T2);
-                    ScreenCtx.putImageData(CharData1, XX, YY - T1 + ScreenHH, 0, T1, ScreenCellW, T2);
+                    ScreenCtx.putImageData(CharData1, XX, YY - T1 + ScreenBlinkOffset, 0, T1, ScreenCellW, T2);
                 }
 
                 if (OffsetOtherHalf)
@@ -590,7 +591,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                 CharData1_ = ScreenCharGlyph(1, ScrIdx);
 
                 ScreenCtx.putImageData(CharData0_, XX, YY + T2, 0, 0, ScreenCellW, T1);
-                ScreenCtx.putImageData(CharData1_, XX, YY + T2 + ScreenHH, 0, 0, ScreenCellW, T1);
+                ScreenCtx.putImageData(CharData1_, XX, YY + T2 + ScreenBlinkOffset, 0, 0, ScreenCellW, T1);
             }
             break;
         case 2:
@@ -601,7 +602,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                 if (T2 > 0)
                 {
                     ScreenCtx.putImageData(CharData0, XX, YY + T1, 0, 0, ScreenCellW, T2);
-                    ScreenCtx.putImageData(CharData1, XX, YY + T1 + ScreenHH, 0, 0, ScreenCellW, T2);
+                    ScreenCtx.putImageData(CharData1, XX, YY + T1 + ScreenBlinkOffset, 0, 0, ScreenCellW, T2);
                 }
 
                 if (OffsetOtherHalf)
@@ -616,7 +617,7 @@ function ScreenChar(X, Y, Chr, Back, Fore, Attr, FontW, FontH)
                 CharData1_ = ScreenCharGlyph(1, ScrIdx);
 
                 ScreenCtx.putImageData(CharData0_, XX, YY - T2, 0, T2, ScreenCellW, T1);
-                ScreenCtx.putImageData(CharData1_, XX, YY - T2 + ScreenHH, 0, T2, ScreenCellW, T1);
+                ScreenCtx.putImageData(CharData1_, XX, YY - T2 + ScreenBlinkOffset, 0, T2, ScreenCellW, T1);
             }
             break;
     }
@@ -658,11 +659,13 @@ function ScreenRepaint()
     }
 }
 
-function ScreenResize(NewW, NewH)
+function ScreenResize(NewW, NewH, DataClear)
 {
     let N = (NewW * NewH) + NewW;
     if ((ScreenW != NewW) || (ScreenH != NewH))
     {
+        DataClear = true;
+    
         let ScreenDataC_ = ScreenDataC;
         let ScreenDataB_1 = ScreenDataB;
         let ScreenDataF_1 = ScreenDataF;
@@ -739,7 +742,8 @@ function ScreenResize(NewW, NewH)
     ScreenWW = ScreenW * ScreenCellW;
     ScreenHH = ScreenH * ScreenCellH;
     ScreenObj.width = ScreenWW;
-    ScreenObj.height = ScreenHH << 1;
+    ScreenObj.height = (ScreenHH << 1);
+    ScreenBlinkOffset = ScreenHH;
 
     ScreenCtx = ScreenObj.getContext("2d", { willReadFrequently: true });
     ScreenData0 = ScreenCtx.getImageData(0, 0, ScreenWW, ScreenHH);
@@ -777,8 +781,10 @@ function ScreenResize(NewW, NewH)
     
     
     
-    
-    ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
+    if (DataClear)
+    {
+        ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
+    }
     //ScreenRepaint();
     
     ScreenDisplayResize();
@@ -963,7 +969,7 @@ function ScreenDrawCursorWork()
             }
         }
         ScreenCtx.putImageData(ScreenCursorData, CursorX_, CursorY_);
-        ScreenCtx.putImageData(ScreenCursorData, CursorX_, CursorY_ + ScreenHH);
+        ScreenCtx.putImageData(ScreenCursorData, CursorX_, CursorY_ + ScreenBlinkOffset);
     }
 }
 
@@ -1014,21 +1020,13 @@ function ScreenInit1()
     ScreenPaletteG = [0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255];
     ScreenPaletteB = [0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255, 0, 128, 128, 128, 128, 128, 128, 255];
 
-    const PalR = ConfigFileS("PaletteR");
-    const PalG = ConfigFileS("PaletteG");
-    const PalB = ConfigFileS("PaletteB");
-    
-    if ((PalR.length >= 64) && (PalG.length >= 64) && (PalB.length >= 64))
-    {
-        for (let I = 0; I < 32; I++)
-        {
-            ScreenPaletteR[I] = HexToNum8(PalR.substr(I * 2, 2));
-            ScreenPaletteG[I] = HexToNum8(PalG.substr(I * 2, 2));
-            ScreenPaletteB[I] = HexToNum8(PalB.substr(I * 2, 2));
-        }
-    }
+    ScreenSetPalette(ConfigFileS("Palette" + ConfigFileS("PaletteSelect") + "Colors"), false);
 
-    ScreenFont = new ScreenFontCplx(ConfigFileS("FontName1"), ConfigFileS("FontName2"), ConfigFileS("FontChars"), ConfigFileI("FontMode"), ScreenInit2);
+    const F1 = ConfigFileS("Font" + ConfigFileS("FontSelect") + "File1");
+    const F2 = ConfigFileS("Font" + ConfigFileS("FontSelect") + "File2");
+    const F3 = ConfigFileS("Font" + ConfigFileS("FontSelect") + "File3");
+
+    ScreenSetFont(F1, F2, F3, ConfigFileI("FontMode"), false);
 }
 
 function ScreenInit2()
@@ -1040,16 +1038,79 @@ function ScreenInit2()
     ScreenTimerBlink = ConfigFileI("TimerBlink");
     ScreenTimerTickEvent = ConfigFileI("TimerTick");
 
+    for (let I = 0; I <= 16; I++)
+    {
+        ScreenLineOffsetValArray[I] = Math.floor((I * ScreenCellH) / 16);
+    }
+    
+    ScreenResize(1, 1, true);
+    ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
+    //ScreenTest();
+    ScreenStarted = true;
+    ScreenTimerStart();
+    ProgInitAfterConf();
+}
+
+
+function ScreenSetPalette(Colors, Repaint)
+{
+    if (Repaint)
+    {
+        ScreenGlyphBufClear();
+    }
+
+    if ((Colors.length >= (64 * 3)))
+    {
+        for (let I = 0; I < 32; I++)
+        {
+            ScreenPaletteR[I] = HexToNum8(Colors.substr(I * 6 + 0, 2));
+            ScreenPaletteG[I] = HexToNum8(Colors.substr(I * 6 + 2, 2));
+            ScreenPaletteB[I] = HexToNum8(Colors.substr(I * 6 + 4, 2));
+        }
+    }
+
+    if (Repaint)
+    {
+        ScreenRepaint();
+    }
+}
+
+function ScreenSetFont(File1, File2, File3, CharMode, Repaint)
+{
+    if (Repaint)
+    {
+        ScreenFontCreate(File1, File2, File3, CharMode, ScreenSetFontRepaint1);
+    }
+    else
+    {
+        ScreenFontCreate(File1, File2, File3, CharMode, ScreenSetFontRepaint0);
+    }
+}
+
+function ScreenSetFontCustom(FontSize)
+{
+    if (ScreenCellW > 8)
+    {
+        ScreenFontCreateCustom(9, FontSize, ScreenSetFontRepaint1);
+    }
+    else
+    {
+        ScreenFontCreateCustom(8, FontSize, ScreenSetFontRepaint1);
+    }
+}
+
+function ScreenSetFontAfterCreate()
+{
+    ConfigFileSet("_WinBitmapFontPageList", ScreenFont.ScreenPages);
+    ConfigFileSet("_WinBitmapFontDouble1", ScreenFont.ScreenDbl1);
+    ConfigFileSet("_WinBitmapFontDouble2", ScreenFont.ScreenDbl2);
+    ProgEventOtherFile("ScreenFont", "", 0, 0, 0, 0);
+
     ScreenCellW = ScreenFont.CellW;
     ScreenCellH = ScreenFont.CellH;
     ScreenCellH2 = ScreenCellH / 2;
     ScreenCursorSize = Math.floor(ScreenFont.CellH / 8);
     if (ScreenCursorSize == 0) ScreenCursorSize = 1;
-
-    for (let I = 0; I <= 16; I++)
-    {
-        ScreenLineOffsetValArray[I] = Math.floor((I * ScreenCellH) / 16);
-    }
 
     ScreenCellFontX = [];
     ScreenCellFontY = [];
@@ -1102,17 +1163,32 @@ function ScreenInit2()
             ScreenCellFontY.push(CellFontYItem);
         }
     }
-    
-
-    
-    ScreenResize(1, 1);
-    ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
-    //ScreenTest();
-    ScreenStarted = true;
-    ScreenTimerStart();
-    ProgInitAfterConf();
 }
 
+function ScreenSetFontRepaint0()
+{
+    ScreenFont = ScreenFontTemp[0];
+    ScreenFontTemp.shift();
+    ScreenSetFontAfterCreate();
+    ScreenInit2();
+}
+
+function ScreenSetFontRepaint1()
+{
+    if (ScreenFontTemp.length > 0)
+    {
+        while (ScreenFontTemp.length > 1)
+        {
+            ScreenFontTemp.shift();
+        }
+        ScreenFont = ScreenFontTemp[0];
+        ScreenFontTemp.shift();
+        ScreenSetFontAfterCreate();
+        ScreenGlyphBufClear();
+        ScreenResize(ScreenW, ScreenH, false);
+        ScreenRepaint();
+    }
+}
 
 let ScreenDrawBlinkOffset = "0px";
 

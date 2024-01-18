@@ -7,11 +7,13 @@
 #include <memory>
 #include "binaryfile.h"
 #include <iostream>
+#include "configfile.h"
 
 class FileManager
 {
 public:
     std::shared_ptr<BinaryFile> BinaryFile_;
+    std::shared_ptr<ConfigFile> CF;
     FileManager();
     int PopupFore = 0;
     int PopupBack = 0;
@@ -30,7 +32,7 @@ public:
     void EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void EventKeyInsert(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
     void EventKeyDelete(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt);
-    void Open();
+    void Open(std::shared_ptr<ConfigFile> CF_);
     bool RequestRepaint = false;
     bool RequestCloseNew = false;
     bool RequestCloseOld = false;

@@ -1,3 +1,45 @@
+let ScreenFontTemp = [];
+let ScreenFontBuf = {};
+
+function ScreenFontCreate(ImgUrl1, ImgUrl2, DblUrl, Mode, CallbackFunction_)
+{
+    const BufKey = "|" + ImgUrl1 + "|" + ImgUrl2 + "|" + DblUrl + "|" + Mode + "|";
+    if (BufKey in ScreenFontBuf)
+    {
+        ScreenFontTemp.push(ScreenFontBuf[BufKey]);
+        CallbackFunction_();
+    }
+    else
+    {
+        const TempObj = new ScreenFontCplx(ImgUrl1, ImgUrl2, DblUrl, Mode, CallbackFunction_);
+        ScreenFontBuf[BufKey] = TempObj;
+        ScreenFontTemp.push(TempObj);
+    }
+}
+
+function ScreenFontCreateCustom(FontW, FontH, CallbackFunction_)
+{
+    ScreenFontCreateCustomCallback = CallbackFunction_;
+    const TempObj = new ScreenFontCplx(FontW, FontH, "", 10, CallbackFunction_);
+    ScreenFontTemp.push(TempObj);
+}
+
+function ScreenFontCreateCustomChar(Pattern_)
+{
+    const Pattern = Pattern_.split('|');
+    if (ScreenFontTemp.length > 0)
+    {
+        if (Pattern.length == 1)
+        {
+            ScreenFontTemp[ScreenFontTemp.length - 1].InvokeCallback();
+        }
+        else
+        {
+            ScreenFontTemp[ScreenFontTemp.length - 1].SetCharPattern(Pattern);
+        }
+    }
+}
+
 class ScreenFontBmp
 {
     GetPixelBin(X, Y)
@@ -254,10 +296,46 @@ class ScreenFontCplx
         this.Ready1 = false;
         this.Ready2 = false;
         this.Ready3 = false;
+        this.ScreenPages = "";
+        this.ScreenDbl1 = "";
+        this.ScreenDbl2 = "";
         this.CallbackFunction = CallbackFunction_;
-        this.Font1 = new ScreenFontBmp(ImgUrl1, this.constCallback, this, 1);
-        this.Font2 = new ScreenFontBmp(this.Mode > 0 ? ImgUrl2 : "", this.constCallback, this, 2);
-        this.Dbl = new ScreenFontDbl(DblUrl, this.constCallback, this);
+        if (Mode < 10)
+        {
+            this.Font1 = new ScreenFontBmp(ImgUrl1, this.constCallback, this, 1);
+            this.Font2 = new ScreenFontBmp(this.Mode > 0 ? ImgUrl2 : "", this.constCallback, this, 2);
+            this.Dbl = new ScreenFontDbl(DblUrl, this.constCallback, this);
+        }
+        else
+        {
+            this.CustomGlyph = {};
+            this.CustomGlyphBuf = {};
+            this.CellW = parseInt(ImgUrl1);
+            this.CellH = parseInt(ImgUrl2);
+            this.GetGlyph = this.GetGlyphCustom;
+        }
+    }
+    
+    InvokeCallback()
+    {
+        if (this.Mode == 10)
+        {
+            let Pages = [];
+
+            for (let Chr in this.CustomGlyph)
+            {
+                const ChrPage = Chr >> 8;
+                
+                if (Pages.indexOf(ChrPage) < 0)
+                {
+                    Pages.push(ChrPage);
+                }
+            }
+            Pages.sort(function(a, b){return a - b});
+            this.ScreenPages = Pages.join("|");
+            this.CallbackFunction();
+            this.Mode = 11;
+        }
     }
     
     constCallback(Sender, N)
@@ -286,7 +364,7 @@ class ScreenFontCplx
             
             Pages.sort(function(a, b){return a - b});
 
-            ConfigFileSet("_WinBitmapFontPageList", Pages.join("|"));
+            Sender.ScreenPages = Pages.join("|");
 
             Sender.DblList1 = Sender.Dbl.DblList1;
             Sender.DblList2 = Sender.Dbl.DblList2;
@@ -307,25 +385,89 @@ class ScreenFontCplx
             {
                 case 0:
                     Sender.GetGlyph = Sender.GetGlyph0;
-                    ConfigFileSet("_WinBitmapFontDouble1", "");
-                    ConfigFileSet("_WinBitmapFontDouble2", "");
                     break;
                 case 1:
                     Sender.GetGlyph = Sender.GetGlyph1;
-                    ConfigFileSet("_WinBitmapFontDouble1", Sender.DblList1.join("|"));
-                    ConfigFileSet("_WinBitmapFontDouble2", Sender.DblList2.join("|"));
+                    Sender.ScreenDbl1 = Sender.DblList1.join("|");
+                    Sender.ScreenDbl2 = Sender.DblList2.join("|");
                     break;
                 case 2:
                     Sender.CellW = Sender.Font1.CellW << 1;
                     Sender.GetGlyph = Sender.GetGlyph2;
-                    ConfigFileSet("_WinBitmapFontDouble1", "");
-                    ConfigFileSet("_WinBitmapFontDouble2", "");
                     break;
             }
             Sender.CallbackFunction();
         }
     }
+    
+    SetCharPattern(Pattern)
+    {
+        if (this.Mode != 10)
+        {
+            return;
+        }
+        this.CustomGlyph[Pattern[1]] = Pattern;
+    }
 
+    GetGlyphCustom(Chr)
+    {
+        if (Chr in this.CustomGlyphBuf)
+        {
+            return this.CustomGlyphBuf[Chr];
+        }
+        let GlyphVals = [];
+        
+        if (Chr in this.CustomGlyph)
+        {
+            const BitData = this.CustomGlyph[Chr];
+            if (BitData.length > (this.CellH + 2))
+            {
+                const Chr9 = parseInt(BitData[this.CellH + 2]);
+                
+                for (let Y = 0; Y < this.CellH; Y++)
+                {
+                    let BitVal = parseInt(BitData[Y + 2]);
+                    GlyphVals.push((BitVal & 128) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &  64) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &  32) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &  16) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &   8) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &   4) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &   2) > 0 ? 1 : 0);
+                    GlyphVals.push((BitVal &   1) > 0 ? 1 : 0);
+                    if (this.CellW == 9)
+                    {
+                        if (Chr9)
+                        {
+                            GlyphVals.push((BitVal & 1) > 0 ? 1 : 0);
+                        }
+                        else
+                        {
+                            GlyphVals.push(0);
+                        }
+                    }
+                }
+                this.CustomGlyphBuf[Chr] = GlyphVals;
+                return GlyphVals;
+            }
+        }
+
+        for (let Y = 0; Y < this.CellH; Y++)
+        {
+            for (let X = 0; X < this.CellW; X++)
+            {
+                if (((X + Y) & 1) == 0)
+                {
+                    GlyphVals.push(1);
+                }
+                else
+                {
+                    GlyphVals.push(0);
+                }
+            }
+        }
+        return GlyphVals;
+    }
 
     GetGlyph0(Chr)
     {

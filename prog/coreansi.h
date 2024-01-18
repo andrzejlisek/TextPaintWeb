@@ -73,10 +73,12 @@ public:
     void AnsiResize(int NewW, int NewH);
 
     bool AnsiSeek(int StepCount);
+    void AnsiSeekInterval(int Period);
     void AnsiRepaintCursor();
 private:
 
     bool UseAnsiCommands = true;
+    bool UseCustomPaletteFont = false;
     int ScreenStatusBar = 0;
     int ScreenOffset = 0;
 
@@ -119,16 +121,17 @@ private:
     // 2 - Save state without clear
     int SeekMode = 0;
 
-    int SeekPeriod = 1023;
-    int SeekPeriod0 = 2048;
+    int SeekPeriod = 1000000000;
+    int SeekPeriod0 = 2000000000;
 
     XList<AnsiState> SeekState;
 
     long SeekStateSaveLast = -1;
+    long SeekStateSaveNext = -1;
 
-    bool SeekStateSaveRequest = false;
-
-    void SeekStateSave(bool Instant);
+    void SeekStateSave(bool StdProc);
+    void SeekStateSaveForbid();
+    void SeekStateSaveForce();
 
     void SetProcessDelay(long TimeStamp);
     void AnsiProcess_VT52();
@@ -155,7 +158,6 @@ private:
     void AnsiScrollFinish(AnsiState::AnsiScrollCommandDef Command, int Param1, int Param2, int Param3, int Param4);
     void AnsiScrollClear();
     int AnsiScrollProcess();
-    bool AnsiScrollFinished = true;
     void AnsiScrollSetOffset(int First, int Last, int Offset);
     void AnsiScrollColumns(int Columns);
     void AnsiScrollLines(int Lines);

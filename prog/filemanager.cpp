@@ -567,8 +567,19 @@ void FileManager::EventKeyAttrib(std::string KeyName, int KeyChar, bool ModShift
         case _("Enter"):
         case _("NumpadEnter"):
         case _("Space"):
-            BinaryFile_.get()->CurrentFileAttrSet(0, TextCodec::CodecListNumber[AttribVal[0]]);
-            BinaryFile_.get()->CurrentFileAttrSet(1, AttribVal[1]);
+            {
+                bool X0 = BinaryFile_.get()->CurrentFileAttrSet(0, TextCodec::CodecListNumber[AttribVal[0]]);
+                bool X1 = BinaryFile_.get()->CurrentFileAttrSet(1, AttribVal[1]);
+
+                if (X0 || X1)
+                {
+                    CF.get()->ParamSet("FileCodec", TextCodec::CodecListNumber[AttribVal[0]]);
+                    CF.get()->ParamSet("FileType", AttribVal[1]);
+                    BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
+                    BinaryFile_.get()->SysSaveConfig();
+                }
+            }
+
             ManagerState = ManagerStateDef::Files;
             RepaintDepth = 2;
             Repaint();
@@ -666,8 +677,9 @@ void FileManager::EventKeyDelete(std::string KeyName, int KeyChar, bool ModShift
     }
 }
 
-void FileManager::Open()
+void FileManager::Open(std::shared_ptr<ConfigFile> CF_)
 {
+    CF = CF_;
     ManagerState = ManagerStateDef::Files;
     BinaryFile_.get()->ManagerInfoPush();
     RequestRepaint = false;

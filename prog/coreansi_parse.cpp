@@ -1581,7 +1581,7 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
             if (AnsiParams[2] == "") { AnsiParams[2] = "0"; }
             switch (_(AnsiParams[0].c_str()))
             {
-                case _("0"):
+                case _("0"): // Arbitrary font size and character part
                     AnsiState_.__AnsiFontSizeW = AnsiProcess_Int0(AnsiParams[1], AnsiCmd_);
                     AnsiState_.__AnsiFontSizeH = AnsiProcess_Int0(AnsiParams[2], AnsiCmd_);
                     if (AnsiState_.__AnsiFontSizeW > CoreStatic::FontMaxSizeCode)
@@ -1593,9 +1593,50 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                         AnsiState_.__AnsiFontSizeH = 0;
                     }
                     break;
-                case _("1"):
+                case _("1"): // Screen display delay
                     {
                         SetProcessDelay(AnsiProcess_Int0(AnsiParams[1], AnsiCmd_));
+                    }
+                    break;
+                case _("2"): // XBIN - Custom palette
+                    if (UseCustomPaletteFont)
+                    {
+                        if (AnsiParams.Count > 16 * 3)
+                        {
+                            std::string PalDef = "";
+                            for (int I = 1; I < AnsiParams.Count; I++)
+                            {
+                                PalDef = PalDef + Hex::IntToHex8(AnsiProcess_Int0(AnsiParams[I], AnsiCmd_));
+                            }
+                            Screen::SetPalette(PalDef + PalDef);
+                        }
+                    }
+                    break;
+                case _("3"): // XBIN - Custom font
+                    if (UseCustomPaletteFont)
+                    {
+                        switch (AnsiProcess_Int0(AnsiParams[1], AnsiCmd_))
+                        {
+                            case 1:
+                                SeekStateSaveForbid();
+                                Screen::SetCustomFont(AnsiProcess_Int0(AnsiParams[2], AnsiCmd_));
+                                break;
+                            case 2:
+                                SeekStateSaveForbid();
+                                {
+                                    std::string PalDef = AnsiParams[2];
+                                    for (int I = 3; I < AnsiParams.Count; I++)
+                                    {
+                                        PalDef = PalDef + "|" + AnsiParams[I];
+                                    }
+                                    Screen::SetCustomChar(PalDef);
+                                }
+                                break;
+                            case 3:
+                                SeekStateSaveForce();
+                                Screen::SetCustomChar("");
+                                break;
+                        }
                     }
                     break;
             }

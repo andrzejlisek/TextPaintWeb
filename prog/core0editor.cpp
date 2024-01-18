@@ -303,7 +303,7 @@ void Core0Editor::EventKey_Editor(std::string KeyName, int KeyChar, bool ModShif
 
         case _("F10"):
             DisplayState = DisplayStateDef::FileMan;
-            FileManager_.Open();
+            FileManager_.Open(CF);
             return;
 
         case _("F12"):

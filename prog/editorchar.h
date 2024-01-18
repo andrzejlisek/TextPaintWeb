@@ -31,7 +31,6 @@ public:
 
     int FavChar[256];
 
-    XList<int> WinBitmapPage;
     bool WinBitmapEnabled = true;
     int WinBitmapNearest(int CharCode, bool Backward);
 

@@ -56,13 +56,14 @@ void XBIN::SetRaw(Raw &Raw_, int RawL, bool IsXBIN)
         {
             FontN = 1;
             int FileFontSize = 256 * FontSize;
+            DataFont1.AddRange(Raw_.GetRange(DataPtr, FileFontSize));
+            DataPtr += FileFontSize;
             if (((FileFlag & 16) != 0))
             {
                 FontN = 2;
-                FileFontSize = 512 * FontSize;
+                DataFont2.AddRange(Raw_.GetRange(DataPtr, FileFontSize));
+                DataPtr += FileFontSize;
             }
-
-            DataPtr += FileFontSize;
         }
     }
 
@@ -152,12 +153,78 @@ void XBIN::SetRaw(Raw &Raw_, int RawL, bool IsXBIN)
 void XBIN::GetStr(Str &Str_, int CodecN)
 {
     TextCodec Codec(CodecN, 1 + 2);
+
     Str DataRawS;
+    Str_.Clear();
     Codec.Reset();
     Codec.EnqueueRaw(DataRaw);
     Codec.DequeueStr(DataRawS);
 
-    Str_.Clear();
+
+    if (DataPal.Count > 0)
+    {
+        Str_.Add(27);
+        Str_.AddString("[2");
+        for (int I = 0; I < DataPal.Count; I++)
+        {
+            Str_.Add(';');
+            Str_.AddString(DataPal[I]);
+        }
+        Str_.AddString("V");
+    }
+
+    if (FontN >= 1)
+    {
+        Raw CharsMapR;
+        Str CharsMapS;
+        for (int I = 0; I < 256; I++)
+        {
+            CharsMapR.Add(I);
+        }
+
+        Codec.Reset();
+        Codec.EnqueueRaw(CharsMapR);
+        Codec.DequeueStr(CharsMapS);
+
+
+        Str_.Add(27);
+        Str_.AddString("[3;1;");
+        Str_.AddString(FontSize);
+        Str_.AddString("V");
+
+        if (DataFont1.Count >= (FontSize * 256))
+        {
+            int FontPtr = 0;
+            for (int I = 0; I < 256; I++)
+            {
+                Str_.Add(27);
+                Str_.AddString("[3;2;");
+                Str_.AddString(I);
+                Str_.AddString(";");
+                Str_.AddString(CharsMapS[I]);
+                for (int II = 0; II < FontSize; II++)
+                {
+                    Str_.AddString(";");
+                    Str_.AddString(DataFont1[FontPtr + II]);
+                }
+                if (((I >= 0xC0) && (I <= 0xDF)))
+                {
+                    Str_.AddString(";1V");
+                }
+                else
+                {
+                    Str_.AddString(";0V");
+                }
+                FontPtr += FontSize;
+            }
+        }
+
+        Str_.Add(27);
+        Str_.AddString("[3;3");
+        Str_.AddString("V");
+    }
+
+
     Str_.Add(27);
     Str_.AddString("[0m");
     int LastB = -1;

@@ -103,6 +103,7 @@ public:
     enum AnsiScrollCommandDef { None, Char, FirstLast, Tab };
     int AnsiScrollProcessBlock = 0;
     bool AnsiScrollZeroOffset = true;
+    bool AnsiScrollSeekSave = false;
 
     XList<int> AnsiScrollQueue_Counter;
     XList<int> AnsiScrollQueue_Lines;

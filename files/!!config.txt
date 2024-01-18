@@ -31,7 +31,6 @@ WinTouchScreen=0
 
 FontMode=1
 FontSelect=3
-FontName1=files/fonts/Dos/Dos08x16.png
 
 ### Monospace fonts
 
@@ -49,74 +48,88 @@ Font5File1=files/fonts/Dos/Dos09x14.png
 Font6Name=DOS 9x16
 Font6File1=files/fonts/Dos/Dos09x16.png
 
-# Amiga fonts
-Font7Name=Amiga MicroKnight
-Font7File1=files/fonts/Amiga/Amiga08x08-MicroKnight.png
-Font8Name=Amiga mOsOul
-Font8File1=files/fonts/Amiga/Amiga08x08-mOsOul.png
-Font9Name=Amiga P0T-NOoDLE
-Font9File1=files/fonts/Amiga/Amiga08x08-P0T-NOoDLE.png
-Font10Name=Amiga Topaz 1
-Font10File1=files/fonts/Amiga/Amiga08x08-Topaz1.png
-Font11Name=Amiga Topaz 2
-Font11File1=files/fonts/Amiga/Amiga08x08-Topaz2.png
-Font12Name=Amiga MicroKnight 16px
-Font12File1=files/fonts/Amiga/Amiga08x16-MicroKnight.png
-Font13Name=Amiga Topaz 1 16px
-Font13File1=files/fonts/Amiga/Amiga08x16-Topaz1.png
-Font14Name=Amiga Topaz 2 16px
-Font14File1=files/fonts/Amiga/Amiga08x16-Topaz2.png
-
 # Unscii - several small fonts
-Font15Name=Unscii 8x8 standard
-Font15File1=files/fonts/Unscii/Unscii08x08.png
-Font16Name=Unscii 8x8 thin
-Font16File1=files/fonts/Unscii/Unscii08x08-thin.png
-Font17Name=Unscii 8x8 alternative
-Font17File1=files/fonts/Unscii/Unscii08x08-alt.png
-Font18Name=Unscii 8x8 MCR
-Font18File1=files/fonts/Unscii/Unscii08x08-mcr.png
-Font19Name=Unscii 8x8 fantasy
-Font19File1=files/fonts/Unscii/Unscii08x08-fantasy.png
+Font7Name=Unscii 8x8 standard
+Font7File1=files/fonts/Unscii/Unscii08x08.png
+Font8Name=Unscii 8x8 alternative
+Font8File1=files/fonts/Unscii/Unscii08x08-alt.png
+Font9Name=Unscii 8x8 MCR
+Font9File1=files/fonts/Unscii/Unscii08x08-mcr.png
+Font10Name=Unscii 8x8 fantasy
+Font10File1=files/fonts/Unscii/Unscii08x08-fantasy.png
+Font11Name=Unscii 8x8 thin
+Font11File1=files/fonts/Unscii/Unscii08x08-thin.png
 
 # Other single fonts
-Font20Name=Small font
-Font20File1=files/fonts/Small/Small04x04.png
-Font21Name=VT220 font
-Font21File1=files/fonts/VT/VT08x10.png
+Font12Name=Small 4x4 font
+Font12File1=files/fonts/Small/Small04x04.png
+Font13Name=VT220 8x10 font
+Font13File1=files/fonts/VT/VT08x10.png
 
 ### Duospace fonts
 
 # Unscii - single large font
-#ontName1=files/fonts/Unscii/Unscii08x16.png
-#ontName2=files/fonts/Unscii/Unscii08x16_double.png
-#ontChars=files/fonts/Unscii/Unscii08x16_double.txt
+Font14Name=Unscii DUO 8x16
+Font14File1=files/fonts/Unscii/Unscii08x16.png
+Font14File2=files/fonts/Unscii/Unscii08x16_double.png
+Font14File3=files/fonts/Unscii/Unscii08x16_double.txt
 
 # Unifont - two versions of double-width character set with the same number ranges
-#ontName1=files/fonts/Unifont/Unifont08x16.png
-#ontName2=files/fonts/Unifont/Unifont08x16_double.png
-#ontName2=files/fonts/Unifont/Unifont08x16_double_jp.png
-#ontChars=files/fonts/Unifont/Unifont08x16_double.txt
+Font15Name=Unifont DUO 8x16 STD
+Font15File1=files/fonts/Unifont/Unifont08x16.png
+Font15File2=files/fonts/Unifont/Unifont08x16_double.png
+Font15File3=files/fonts/Unifont/Unifont08x16_double.txt
+Font16Name=Unifont DUO 8x16 JP
+Font16File1=files/fonts/Unifont/Unifont08x16.png
+Font16File2=files/fonts/Unifont/Unifont08x16_double_jp.png
+Font16File3=files/fonts/Unifont/Unifont08x16_double.txt
 
 # Xterm - original duospace fonts captured from XTERM application
-#ontName1=files/fonts/Xterm/Xterm01x02_IMG.png
-#ontChars=files/fonts/Xterm/Xterm01x02_IMG_double.txt
-#ontName1=files/fonts/Xterm/Xterm05x08_IMG.png
-#ontChars=files/fonts/Xterm/Xterm05x08_IMG_double.txt
-#ontName1=files/fonts/Xterm/Xterm06x13_IMG.png
-#ontName2=files/fonts/Xterm/Xterm06x13_IMG_double.png
-#ontChars=files/fonts/Xterm/Xterm06x13_IMG_double.txt
-#ontName1=files/fonts/Xterm/Xterm07x14_IMG.png
-#ontChars=files/fonts/Xterm/Xterm07x14_IMG_double.txt
-#ontName1=files/fonts/Xterm/Xterm08x13_IMG.png
-#ontName2=files/fonts/Xterm/Xterm08x13_IMG_double.png
-#ontChars=files/fonts/Xterm/Xterm08x13_IMG_double.txt
-#ontName1=files/fonts/Xterm/Xterm09x18_IMG.png
-#ontName2=files/fonts/Xterm/Xterm09x18_IMG_double.png
-#ontChars=files/fonts/Xterm/Xterm09x18_IMG_double.txt
-#ontName1=files/fonts/Xterm/Xterm10x20_IMG.png
-#ontName2=files/fonts/Xterm/Xterm10x20_IMG_double.png
-#ontChars=files/fonts/Xterm/Xterm10x20_IMG_double.txt
+Font17Name=XTERM DUO 1x2
+Font17File1=files/fonts/Xterm/Xterm01x02_IMG.png
+Font17File3=files/fonts/Xterm/Xterm01x02_IMG_double.txt
+Font18Name=XTERM DUO 5x8
+Font18File1=files/fonts/Xterm/Xterm05x08_IMG.png
+Font18File3=files/fonts/Xterm/Xterm05x08_IMG_double.txt
+Font19Name=XTERM DUO 6x13
+Font19File1=files/fonts/Xterm/Xterm06x13_IMG.png
+Font19File2=files/fonts/Xterm/Xterm06x13_IMG_double.png
+Font19File3=files/fonts/Xterm/Xterm06x13_IMG_double.txt
+Font20Name=XTERM DUO 7x14
+Font20File1=files/fonts/Xterm/Xterm07x14_IMG.png
+Font20File3=files/fonts/Xterm/Xterm07x14_IMG_double.txt
+Font21Name=XTERM DUO 8x13
+Font21File1=files/fonts/Xterm/Xterm08x13_IMG.png
+Font21File2=files/fonts/Xterm/Xterm08x13_IMG_double.png
+Font21File3=files/fonts/Xterm/Xterm08x13_IMG_double.txt
+Font22Name=XTERM DUO 9x18
+Font22File1=files/fonts/Xterm/Xterm09x18_IMG.png
+Font22File2=files/fonts/Xterm/Xterm09x18_IMG_double.png
+Font22File3=files/fonts/Xterm/Xterm09x18_IMG_double.txt
+Font23Name=XTERM DUO 10x20
+Font23File1=files/fonts/Xterm/Xterm10x20_IMG.png
+Font23File2=files/fonts/Xterm/Xterm10x20_IMG_double.png
+Font23File3=files/fonts/Xterm/Xterm10x20_IMG_double.txt
+
+# No-codec fonts
+Font24Name=Amiga 256 8x8 Topaz 1
+Font24File1=files/fonts/NoCodec/Amiga08x08-Topaz1.png
+Font25Name=Amiga 256 8x8 Topaz 2
+Font25File1=files/fonts/NoCodec/Amiga08x08-Topaz2.png
+Font26Name=Amiga 256 8x8 MicroKnight
+Font26File1=files/fonts/NoCodec/Amiga08x08-MicroKnight.png
+Font27Name=Amiga 256 8x8 mOsOul
+Font27File1=files/fonts/NoCodec/Amiga08x08-mOsOul.png
+Font28Name=Amiga 256 8x8 P0T-NOoDLE
+Font28File1=files/fonts/NoCodec/Amiga08x08-P0T-NOoDLE.png
+Font29Name=Amiga 256 8x16 Topaz 1
+Font29File1=files/fonts/NoCodec/Amiga08x16-Topaz1.png
+Font30Name=Amiga 256 8x16 Topaz 2
+Font30File1=files/fonts/NoCodec/Amiga08x16-Topaz2.png
+Font31Name=Amiga 256 8x16 MicroKnight
+Font31File1=files/fonts/NoCodec/Amiga08x16-MicroKnight.png
+Font32Name=Portfolio 256 6x8
+Font32File1=files/fonts/NoCodec/Portfolio06x08.png
 
 
 
@@ -201,15 +214,10 @@ Palette1Name=DOS
 Palette1Colors=000000AA000000AA00AAAA000000AAAA00AA00AAAAAAAAAA555555FF555555FF55FFFF555555FFFF55FF55FFFFFFFFFF000000710000007100717100000071710071007171717171393939AA393939AA39AAAA393939AAAA39AA39AAAAAAAAAA
 
 Palette2Name=DOS brown
-Palette2Colors=000000AA000000AA00AAAA000000AAAA00AA00AAAAAAAAAA555555FF555555FF55FFFF555555FFFF55FF55FFFFFFFFFF000000710000007100717100000071710071007171717171393939AA393939AA39AAAA393939AAAA39AA39AAAAAAAAAA
+Palette2Colors=000000AA000000AA00AA55000000AAAA00AA00AAAAAAAAAA555555FF555555FF55FFFF555555FFFF55FF55FFFFFFFFFF000000710000007100713900000071710071007171717171393939AA393939AA39AAAA393939AAAA39AA39AAAAAAAAAA
 
 Palette3Name=Windows
 Palette3Colors=000000800000008000808000000080800080008080C0C0C0808080FF000000FF00FFFF000000FFFF00FF00FFFFFFFFFF000000400000004000404000000040400040004040606060404040800000008000808000000080800080008080808080
-
-
-PaletteR=00AA00AA00AA00AA55FF55FF55FF55FF007100710071007139AA39AA39AA39AA
-PaletteG=0000AAAA0000AAAA5555FFFF5555FFFF00007171000071713939AAAA3939AAAA
-PaletteB=00000000AAAAAAAA55555555FFFFFFFF000000007171717139393939AAAAAAAA
 
 ### Bell options
 # Volume is 0-100, frequency is in Hz, duration is in milliseconds
@@ -322,9 +330,14 @@ ANSIColorThresholdGray=20
 ### File extensions for type detect
 
 FileExtText=txt,bbs,lst,nfo,asc,doc,dox,diz,bat,htm,html
-FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo
+FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo,ams,mus
 FileExtBin=bin
 FileExtXbin=xb,xbin
+
+### Codec and type set in file manager
+
+FileCodec=65001
+FileType=0
 
 ### There are files, which can be loaded as default.
 

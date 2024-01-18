@@ -144,6 +144,7 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
         else
         {
             AnsiState_.AnsiScrollQueue_Counter.Add(ANSIScrollChars - 1);
+            AnsiState_.AnsiScrollSeekSave = false;
             AnsiScrollLines(AnsiState_.AnsiScrollQueue_Lines[0]);
             if (Lines > 0)
             {
@@ -208,7 +209,6 @@ void CoreAnsi::AnsiScrollClear()
     AnsiState_.AnsiScrollQueue_First.Clear();
     AnsiState_.AnsiScrollQueue_Last.Clear();
     AnsiState_.AnsiScrollProcessBlock = false;
-    AnsiScrollFinished = true;
 }
 
 int CoreAnsi::AnsiScrollProcess()
@@ -247,14 +247,12 @@ int CoreAnsi::AnsiScrollProcess()
             }
             AnsiScrollSetOffset(AnsiState_.AnsiScrollQueue_First[0], AnsiState_.AnsiScrollQueue_Last[0], 16);
         }
-        AnsiState_.AnsiScrollZeroOffset = false;
     }
     else
     {
         if (AnsiState_.AnsiScrollQueue_Counter[0] == 1)
         {
             AnsiScrollSetOffset(AnsiState_.AnsiScrollQueue_First[0], AnsiState_.AnsiScrollQueue_Last[0], 0);
-            AnsiState_.AnsiScrollZeroOffset = true;
             AnsiState_.AnsiScrollQueue_Counter.PopFirst();
             AnsiState_.AnsiScrollQueue_Lines.PopFirst();
             AnsiState_.AnsiScrollQueue_Command.PopFirst();
@@ -267,12 +265,12 @@ int CoreAnsi::AnsiScrollProcess()
             if (AnsiState_.AnsiScrollQueue_Counter.Count == 0)
             {
                 AnsiState_.AnsiScrollProcessBlock = 2;
-                AnsiScrollFinished = true;
+                AnsiState_.AnsiScrollZeroOffset = true;
                 return 2;
             }
             else
             {
-                AnsiScrollFinished = false;
+                AnsiState_.AnsiScrollZeroOffset = false;
                 return AnsiState_.AnsiScrollProcessBlock;
             }
         }
@@ -296,7 +294,11 @@ int CoreAnsi::AnsiScrollProcess()
     }
 
     AnsiState_.AnsiScrollQueue_Counter[0]--;
-    AnsiScrollFinished = false;
+    if (AnsiState_.AnsiScrollQueue_Counter[0] == 1)
+    {
+        AnsiState_.AnsiScrollSeekSave = true;
+    }
+    AnsiState_.AnsiScrollZeroOffset = false;
     return AnsiState_.AnsiScrollProcessBlock;
 }
 

@@ -127,6 +127,16 @@ void ScreenOther(int Param)
     RespondPartial();
 }
 
+void ScreenOtherString(int Param, std::string ParamStr)
+{
+    BufNum(108);
+    BufNum(Param);
+    BufTxt("\"");
+    BufStr(ParamStr);
+    BufTxt("\",");
+    RespondPartial();
+}
+
 void MouseHighlight(int Work, int X, int Y, int F, int L)
 {
     BufNum(203);
@@ -163,6 +173,9 @@ void ScreenSetConfig()
     FileConfig("BellVolume");
     FileConfig("BellFrequency");
     FileConfig("BellDuration");
+    
+    FileConfig("FontSelect");
+    FileConfig("PaletteSelect");
 }
 
 void WorkerSend(int T, std::string X)
@@ -269,6 +282,7 @@ extern "C"
                 Screen::FileImport_ = FileImport;
                 Screen::FileExport_ = FileExport;
                 Screen::ScreenOther = ScreenOther;
+                Screen::ScreenOtherString = ScreenOtherString;
                 Screen::MouseHighlight = MouseHighlight;
 
                 BufInit();
@@ -333,6 +347,28 @@ extern "C"
                             XItem = "File" + std::to_string(I_);
                         }
                         FileConfigVal("FileN", std::to_string(I_));
+
+                        I_ = 1;
+                        XItem = "Font1";
+                        while (CF.get()->ParamExists(XItem + "Name"))
+                        {
+                            FileConfig(XItem + "File1");
+                            FileConfig(XItem + "File2");
+                            FileConfig(XItem + "File3");
+                            I_++;
+                            XItem = "Font" + std::to_string(I_);
+                        }
+                        FileConfigVal("FontN", std::to_string(I_));
+
+                        I_ = 1;
+                        XItem = "Palette1Colors";
+                        while (CF.get()->ParamExists(XItem))
+                        {
+                            FileConfig(XItem);
+                            I_++;
+                            XItem = "Palette" + std::to_string(I_) + "Colors";
+                        }
+                        FileConfigVal("PaletteN", std::to_string(I_));
                     }
                     FileConfig("PaletteR");
                     FileConfig("PaletteG");
@@ -351,7 +387,7 @@ extern "C"
                 RespondClear();
 
                 // Create double font table
-                Screen::StaticInit(CF.get()->ParamGetS("_WinBitmapFontDouble1"), CF.get()->ParamGetS("_WinBitmapFontDouble2"));
+                Screen::StaticInit(CF);
 
                 // Execute program
                 Init0();
@@ -446,6 +482,11 @@ extern "C"
                 BinaryFile_.get()->SysSaveConfig();
             }
             Core.get()->CoreAnsi_.get()->UpdateConfig(CF);
+            Fire = false;
+        }
+        if (EvtName == "ScreenFont")
+        {
+            Screen::UpdateFontParams(CF);
             Fire = false;
         }
         if (EvtName == "Resize")

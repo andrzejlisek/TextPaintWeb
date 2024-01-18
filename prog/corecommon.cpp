@@ -41,6 +41,12 @@ void CoreCommon::InitCommon()
     if (BinaryFile_.get()->PreInit)
     {
         TextCodec::CodecListCreate(CF.get()->ParamGetS("ANSICharsDOS"));
+        Screen::FontSingleChar.clear();
+        for (int I = 0; I < 32; I++)
+        {
+            Screen::FontSingleChar[TextCodec::CharDOS[I]] = I;
+        }
+        Screen::FontSingleChar[TextCodec::CharDOS[32]] = 127;
         BinaryFile_.get()->SetDir(Str("/"));
     }
     BinaryFile_.get()->PreInit = false;

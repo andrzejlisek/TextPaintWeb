@@ -438,6 +438,7 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
 
     AnsiScrollProcessBlock = false;
     AnsiScrollZeroOffset = true;
+    AnsiScrollSeekSave = false;
 
     AnsiScrollQueue_Counter.Clear();
     AnsiScrollQueue_Lines.Clear();
@@ -1011,10 +1012,7 @@ void AnsiState::CopyListStr(Str &Src, Str &Dst)
 void AnsiState::CopyListInt(XList<int> &Src, XList<int> &Dst)
 {
     Dst.Clear();
-    for (int i = 0; i < Src.Count; i++)
-    {
-        Dst.Add(Src[i]);
-    }
+    Dst.AddRange(Src);
 }
 
 void AnsiState::CopyListList(XList<XList<int>> &Src, XList<XList<int>> &Dst)
@@ -1143,6 +1141,7 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
 
     Dst.AnsiScrollProcessBlock = Src.AnsiScrollProcessBlock;
     Dst.AnsiScrollZeroOffset = Src.AnsiScrollZeroOffset;
+    Dst.AnsiScrollSeekSave = Src.AnsiScrollSeekSave;
 
     Dst.AnsiScrollQueue_Counter = Src.AnsiScrollQueue_Counter.Copy();
     Dst.AnsiScrollQueue_Lines = Src.AnsiScrollQueue_Lines.Copy();

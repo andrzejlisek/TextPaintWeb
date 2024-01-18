@@ -27,6 +27,9 @@ public:
 private:
     int MenuPos = 0;
     void ScreenResize(int DeltaX, int DeltaY);
+    int PopupState = 0;
+    int InfoW = 0;
+    int InfoH = 0;
 };
 
 #endif // DISPLAYCONFIG_H

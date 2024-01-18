@@ -62,6 +62,7 @@ public:
     static inline XList<std::string> CodecListName;
     static void CodecListCreateItem(int Num);
     static void CodecListCreate(std::string CharDOS_);
+    unsigned static inline int CharDOS[33];
 private:
     char Base64Chars[66] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     char HexChars[33] = "0123456789ABCDEF0123456789abcdef";
@@ -74,7 +75,6 @@ private:
     unsigned int Temp[10];
     unsigned int BOM__[10];
     void BOMPrepare(unsigned int N, unsigned int B1, unsigned int B2, unsigned int B3, unsigned int B4);
-    unsigned static inline int CharDOS[33];
     unsigned int CharDOSWork[33];
     inline int CharDOSCode(int Chr);
 };

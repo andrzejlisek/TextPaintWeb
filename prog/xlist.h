@@ -37,10 +37,8 @@ public:
     XList<T> GetRange(int Pos, int Count_)
     {
         XList<T> X;
-        for (int I = Pos; I < (Count_ + Pos); I++)
-        {
-            X.Add(Data[I]);
-        }
+        X.Data.insert(X.Data.end(), Data.begin() + Pos, Data.begin() + Pos + Count_);
+        X.Count = Count_;
         return X;
     }
 
@@ -116,21 +114,9 @@ public:
         return Idx;
     }
 
-    void AddRange(T * Vals, unsigned int ValsC)
-    {
-        for (int I = 0; I < ValsC; I++)
-        {
-            Data.push_back(Vals[I]);
-        }
-        Count += ValsC;
-    }
-
     void AddRange(XList<T> Vals)
     {
-        for (int I = 0; I < Vals.Count; I++)
-        {
-            Data.push_back(Vals.Data[I]);
-        }
+        Data.insert(Data.end(), Vals.Data.begin(), Vals.Data.end());
         Count += Vals.Count;
     }
 
@@ -237,10 +223,17 @@ public:
 
     int IndexOf(T Val)
     {
-        return IndexOf(Val, 0);
+        for (int I = 0; I < Count; I++)
+        {
+            if (Data[I] == Val)
+            {
+                return I;
+            }
+        }
+        return -1;
     }
 
-    int IndexOfBin(T Val, int StartPos, int EndPos)
+    int IndexOfBin(T Val)
     {
         if (Count == 0)
         {
@@ -250,6 +243,8 @@ public:
         {
             return 0 - 1 - Count;
         }
+        int StartPos = 0;
+        int EndPos = Count - 1;
         int MidPos = 0;
         while (StartPos <= EndPos)
         {
@@ -270,12 +265,7 @@ public:
         return 0 - StartPos;
     }
 
-    int IndexOfBin(T Val)
-    {
-        return IndexOfBin(Val, 0, Count - 1);
-    }
-
-    int IndexOfBinRange(T Val, int StartPos, int EndPos)
+    int IndexOfBinRange(T Val)
     {
         if (Count == 0)
         {
@@ -285,6 +275,8 @@ public:
         {
             return 0;
         }
+        int StartPos = 0;
+        int EndPos = Count - 1;
         int MidPos = 0;
         while (StartPos <= EndPos)
         {
@@ -307,11 +299,6 @@ public:
             return -1;
         }
         return StartPos;
-    }
-
-    int IndexOfBinRange(T Val)
-    {
-        return IndexOfBinRange(Val, 0, Count - 1);
     }
 
 
@@ -346,10 +333,7 @@ public:
     XList<T> Copy()
     {
         XList<T> L;
-        for (int I = 0; I < Count; I++)
-        {
-            L.Data.push_back(Data[I]);
-        }
+        L.Data.insert(L.Data.end(), Data.begin(), Data.end());
         L.Count = Count;
         return L;
     }
@@ -378,36 +362,36 @@ public:
     XList<T> LPad(int I, T Val)
     {
         XList<T> L = Copy();
-        while (L.Count < I)
-        {
-            L.Insert(0, Val);
-        }
+        L.InsertPad(I, Val);
         return L;
     }
 
     XList<T> RPad(int I, T Val)
     {
         XList<T> L = Copy();
-        while (L.Count < I)
-        {
-            L.Add(Val);
-        }
+        L.AddPad(I, Val);
         return L;
     }
 
     void InsertPad(int I, T Val)
     {
-        while (Count < I)
+        if (Count < I)
         {
-            Insert(0, Val);
+            std::vector<int> Pad(I - Count);
+            std::fill(Pad.begin(), Pad.end(), Val);
+            Data.insert(Data.begin(), Pad.begin(), Pad.end());
+            Count = I;
         }
     }
 
     void AddPad(int I, T Val)
     {
-        while (Count < I)
+        if (Count < I)
         {
-            Add(Val);
+            std::vector<int> Pad(I - Count);
+            std::fill(Pad.begin(), Pad.end(), Val);
+            Data.insert(Data.end(), Pad.begin(), Pad.end());
+            Count = I;
         }
     }
 

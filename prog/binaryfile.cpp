@@ -14,6 +14,8 @@ void BinaryFile::Init(std::shared_ptr<ConfigFile> CF)
 {
     XList<std::string> Temp;
 
+    CurrentFileAttr = CF.get()->ParamGetS("FileCodec") + "|" + CF.get()->ParamGetS("FileType") + "|";
+
     Temp.Clear();
     TextWork::StringSplit(CF.get()->ParamGetS("FileExtText"), ',', Temp);
     FileExtText.Clear();
@@ -783,7 +785,16 @@ int BinaryFile::CurrentFileAttrGet(int AttribN)
     return AttribValGet(CurrentFileAttr, AttribN);
 }
 
-void BinaryFile::CurrentFileAttrSet(int AttribN, int Val)
+bool BinaryFile::CurrentFileAttrSet(int AttribN, int Val)
 {
+    Str CurrentFileAttr_ = CurrentFileAttr;
     CurrentFileAttr = AttribValSet(CurrentFileAttr, AttribN, Val);
+    if (CurrentFileAttr_ != CurrentFileAttr)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

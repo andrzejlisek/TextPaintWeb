@@ -12,17 +12,6 @@ void EditorChar::Init(std::shared_ptr<ConfigFile> CF_)
 {
     CF = CF_;
 
-    std::string PagesS = CF.get()->ParamGetS("_WinBitmapFontPageList");
-    XList<std::string> PagesArr;
-    TextWork::StringSplit(PagesS, '|', PagesArr);
-    for (int I = 0; I < PagesArr.Count; I++)
-    {
-        if (PagesArr[I].size() > 0)
-        {
-            WinBitmapPage.Add(std::stoi(PagesArr[I]));
-        }
-    }
-
     for (int I = 0; I < 256; I++)
     {
         if (CF.get()->ParamExists("FavChar" + std::to_string(I)))
@@ -265,52 +254,48 @@ int EditorChar::WinBitmapNearest(int CharCode, bool Backward)
     if (WinBitmapEnabled)
     {
         int CharPage = CharCode >> 8;
-        if (WinBitmapPage.Count > 0)
+        if (Screen::BitmapPage.Count > 0)
         {
-            if (CharPage < WinBitmapPage[0])
+            int PageMin = Screen::BitmapPage[0];
+            int PageMax = Screen::BitmapPage[Screen::BitmapPage.Count - 1];
+            if ((CharPage > PageMin) && (CharPage < PageMax))
+            {
+                int PagePos = Screen::BitmapPage.IndexOfBin(CharPage);
+                if (Backward)
+                {
+                    if (PagePos < 0)
+                    {
+                        CharPage = Screen::BitmapPage[(0 - PagePos) - 1];
+                    }
+                }
+                else
+                {
+                    if (PagePos < 0)
+                    {
+                        CharPage = Screen::BitmapPage[(0 - PagePos)];
+                    }
+                }
+            }
+            if (CharPage < PageMin)
             {
                 if (Backward)
                 {
-                    CharPage = WinBitmapPage[WinBitmapPage.Count - 1];
+                    CharPage = PageMax;
                 }
                 else
                 {
-                    CharPage = WinBitmapPage[0];
+                    CharPage = PageMin;
                 }
             }
-            else
+            if (CharPage > PageMax)
             {
-                if (CharPage > WinBitmapPage[WinBitmapPage.Count - 1])
+                if (Backward)
                 {
-                    if (Backward)
-                    {
-                        CharPage = WinBitmapPage[WinBitmapPage.Count - 1];
-                    }
-                    else
-                    {
-                        CharPage = WinBitmapPage[0];
-                    }
+                    CharPage = PageMax;
                 }
                 else
                 {
-                    if (Backward)
-                    {
-                        int I = WinBitmapPage.Count - 1;
-                        while (CharPage < WinBitmapPage[I])
-                        {
-                            I--;
-                        }
-                        CharPage = WinBitmapPage[I];
-                    }
-                    else
-                    {
-                        int I = 0;
-                        while (CharPage > WinBitmapPage[I])
-                        {
-                            I++;
-                        }
-                        CharPage = WinBitmapPage[I];
-                    }
+                    CharPage = PageMin;
                 }
             }
         }

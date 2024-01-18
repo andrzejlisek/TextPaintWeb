@@ -17,7 +17,7 @@ public:
     Str CurrentFileAttr;
     Str DirSearchFile;
     int CurrentFileAttrGet(int AttribN);
-    void CurrentFileAttrSet(int AttribN, int Val);
+    bool CurrentFileAttrSet(int AttribN, int Val);
 
     Str ListDir;
 

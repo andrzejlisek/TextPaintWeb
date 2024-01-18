@@ -5,17 +5,21 @@ void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int Se
     if (SeekMode_ <= 1)
     {
         SeekStateSaveLast = -1;
+        SeekStateSaveNext = -1;
         SeekState.Clear();
     }
     UseAnsiCommands = ((AnsiOptions & 1) > 0);
+    UseCustomPaletteFont = ((AnsiOptions & 2) > 0);
     SeekMode = SeekMode_;
     AnsiRingBell = AnsiScreenWork_;
     AnsiScreenWork = AnsiScreenWork_;
     AnsiBuffer.Clear();
     AnsiState_.Zero(__AnsiUseEOF_);
     AnsiTerminalReset();
-    SeekStateSaveRequest = true;
-    SeekStateSave(true);
+    if (SeekStateSaveLast < 0)
+    {
+        SeekStateSave(true);
+    }
 }
 
 void CoreAnsi::AnsiProcessSupply(Str TextFileLine)
@@ -77,11 +81,6 @@ bool CoreAnsi::AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_)
         Screen::CurrentY = NewH - 1;
     }
 
-    if (SeekState.Count > 1)
-    {
-        //SeekState.RemoveRange(1, SeekState.Count - 1);
-    }
-
     AnsiMaxX = NewW;
     AnsiMaxY = NewH;
     AnsiState_.TerminalW = NewW;
@@ -94,29 +93,29 @@ bool CoreAnsi::AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_)
 }
 
 
-void CoreAnsi::SeekStateSave(bool Instant)
+void CoreAnsi::SeekStateSave(bool StdProc)
 {
-    if ((SeekMode > 0) && ((SeekStateSaveLast < AnsiState_.__AnsiProcessStep)))
+    if ((SeekMode > 0) && (SeekStateSaveNext <= AnsiState_.__AnsiProcessStep))
     {
-        if (Instant)
+        if (((StdProc && AnsiState_.AnsiScrollZeroOffset)) || AnsiState_.AnsiScrollSeekSave)
         {
-            if (SeekStateSaveRequest || ((AnsiState_.__AnsiProcessStep & SeekPeriod) == 0))
-            {
-                {
-                    SeekState.Add(AnsiState_.Clone());
-                    SeekStateSaveLast = AnsiState_.__AnsiProcessStep + SeekPeriod;
-                }
-                SeekStateSaveRequest = false;
-            }
-        }
-        else
-        {
-            if (((AnsiState_.__AnsiProcessStep & SeekPeriod) == 0))
-            {
-                SeekStateSaveRequest = true;
-            }
+            AnsiState_.AnsiScrollSeekSave = false;
+            SeekState.Add(AnsiState_.Clone());
+            SeekStateSaveLast = AnsiState_.__AnsiProcessStep;
+            SeekStateSaveNext = SeekStateSaveLast + SeekPeriod;
         }
     }
+    AnsiState_.AnsiScrollSeekSave = false;
+}
+
+void CoreAnsi::SeekStateSaveForbid()
+{
+    SeekStateSaveNext = SeekStateSaveLast + SeekPeriod;
+}
+
+void CoreAnsi::SeekStateSaveForce()
+{
+    SeekStateSaveNext = SeekStateSaveLast + 1;
 }
 
 bool CoreAnsi::AnsiSeek(int StepCount)
@@ -165,6 +164,11 @@ bool CoreAnsi::AnsiSeek(int StepCount)
     return NeedRepaint;
 }
 
+void CoreAnsi::AnsiSeekInterval(int Period)
+{
+    SeekPeriod = Period;
+    SeekPeriod0 = Period + Period;
+}
 
 int CoreAnsi::AnsiProcess(int ProcessCount)
 {
@@ -208,7 +212,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
             if (StdProc)
             {
                 StdProc = false;
-                if (!AnsiScrollFinished)
+                if (!AnsiState_.AnsiScrollZeroOffset)
                 {
                     Processed++;
                 }
@@ -297,8 +301,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                         }
                         if ((ResoX != AnsiMaxX) || (ResoY != AnsiMaxY))
                         {
-                            SeekStateSaveLast = AnsiState_.__AnsiProcessStep - 1;
-                            SeekStateSaveRequest = true;
+                            SeekStateSaveForce();
                         }
                     }
                 }
@@ -320,7 +323,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
         }
         ProcessCount--;
         AnsiState_.__AnsiCounter++;
-        SeekStateSave(StdProc && AnsiState_.AnsiScrollZeroOffset);
+        SeekStateSave(StdProc);
     }
     if (Processed == 0)
     {

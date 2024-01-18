@@ -5,8 +5,24 @@ Screen::Screen()
 
 }
 
-void Screen::StaticInit(std::string Double1, std::string Double2)
+void Screen::UpdateFontParams(std::shared_ptr<ConfigFile> CF)
 {
+    std::string PagesS = CF.get()->ParamGetS("_WinBitmapFontPageList");
+    std::string Double1 = CF.get()->ParamGetS("_WinBitmapFontDouble1");
+    std::string Double2 = CF.get()->ParamGetS("_WinBitmapFontDouble2");
+
+    XList<std::string> PagesArr;
+    TextWork::StringSplit(PagesS, '|', PagesArr);
+    BitmapPage.Clear();
+    for (int I = 0; I < PagesArr.Count; I++)
+    {
+        if (PagesArr[I].size() > 0)
+        {
+            BitmapPage.AddSort(std::stoi(PagesArr[I]));
+        }
+    }
+    FontSinglePage = (BitmapPage.Count == 1);
+
     Range1.Clear();
     Range2.Clear();
     XList<std::string> DoubleRange1;
@@ -40,6 +56,47 @@ void Screen::StaticInit(std::string Double1, std::string Double2)
                 }
             }
         }
+    }
+}
+
+void Screen::StaticInit(std::shared_ptr<ConfigFile> CF)
+{
+    FontListMode = CF.get()->ParamGetI("FontMode");
+
+    // Font list
+    int ItemN = 1;
+    std::string ItemName = CF.get()->ParamGetS("Font1Name");
+    while (ItemName != "")
+    {
+        FontListName.Add(ItemName);
+        FontListFile1.Add(CF.get()->ParamGetS("Font" + std::to_string(ItemN) + "File1"));
+        FontListFile2.Add(CF.get()->ParamGetS("Font" + std::to_string(ItemN) + "File2"));
+        FontListFile3.Add(CF.get()->ParamGetS("Font" + std::to_string(ItemN) + "File3"));
+
+        ItemN++;
+        ItemName = CF.get()->ParamGetS("Font" + std::to_string(ItemN) + "Name");
+    }
+    FontListSelect = CF.get()->ParamGetI("FontSelect") - 1;
+    if (FontListSelect < 0)
+    {
+        FontListSelect = 0;
+    }
+
+    // Palette list
+    ItemN = 1;
+    ItemName = CF.get()->ParamGetS("Palette1Name");
+    while (ItemName != "")
+    {
+        PaletteListName.Add(ItemName);
+        PaletteListColors.Add(CF.get()->ParamGetS("Palette" + std::to_string(ItemN) + "Colors"));
+
+        ItemN++;
+        ItemName = CF.get()->ParamGetS("Palette" + std::to_string(ItemN) + "Name");
+    }
+    PaletteListSelect = CF.get()->ParamGetI("PaletteSelect") - 1;
+    if (PaletteListSelect < 0)
+    {
+        PaletteListSelect = 0;
     }
 }
 
@@ -91,6 +148,13 @@ void Screen::ScreenChar(int X, int Y, int C, int ColorBack, int ColorFore, int C
     if (X >= CurrentW) return;
     if (Y >= CurrentH) return;
     int Ptr = Y * CurrentW + X;
+    if (FontSinglePage)
+    {
+        if (FontSingleChar.count(C) > 0)
+        {
+            C = FontSingleChar[C];
+        }
+    }
     int Memo1 = (C << 8) + (ColorAttr);
     int Memo2 = ((ColorBack >= 0 ? ColorBack : 32) << 6) + (ColorFore >= 0 ? ColorFore : 32) + (FontW << 12) + (FontH << 21);
     if ((ScreenMemo1[Ptr] != Memo1) || (ScreenMemo2[Ptr] != Memo2))
@@ -353,4 +417,43 @@ void Screen::CursorHide(bool Hide)
         }
         CursorHideState = Hide;
     }
+}
+
+void Screen::SetPalette(std::string PaletteColors)
+{
+    Screen::ScreenOtherString(1, PaletteColors);
+}
+
+void Screen::SetFont(std::string FontFile1, std::string FontFile2, std::string FontFile3, int FontMode)
+{
+    Screen::ScreenOtherString(2, FontFile1 + "|" + FontFile2 + "|" + FontFile3 + "|" + std::to_string(FontMode));
+}
+
+void Screen::SetCustomFont(int Size)
+{
+    Screen::ScreenOtherString(3, std::to_string(Size));
+}
+
+void Screen::SetCustomChar(std::string Data)
+{
+    Screen::ScreenOtherString(4, Data);
+}
+
+void Screen::SetPalette()
+{
+    SetPalette(PaletteListColors[PaletteListSelect]);
+}
+
+void Screen::SetFont()
+{
+    std::string F1 = FontListFile1[FontListSelect];
+    std::string F2 = FontListFile2[FontListSelect];
+    std::string F3 = FontListFile3[FontListSelect];
+    SetFont(F1, F2, F3, FontListMode);
+}
+
+void Screen::ResetCustomPaletteFont()
+{
+    SetPalette();
+    SetFont();
 }

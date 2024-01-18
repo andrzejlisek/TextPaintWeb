@@ -33,6 +33,7 @@ void Core1Player::Init()
     {
         FileDelayStep = 1;
     }
+    CoreAnsi_.get()->AnsiSeekInterval(FileDelayStep * 10);
     CalcFileDelayStep();
 }
 
@@ -68,6 +69,7 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::InfoScreen: // Information screen before file opening
             {
+                Screen::ResetCustomPaletteFont();
                 Screen::CursorHide(false);
                 Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
                 Screen::ScreenCursorMove(0, 0);
@@ -111,7 +113,7 @@ void Core1Player::EventTick()
                 Screen_WriteLine();
                 Screen_WriteLine();
                 Screen_WriteLine();
-                Screen_WriteText("Press Enter to start displaying or Tab to quit application.");
+                Screen_WriteText("Press Enter to select a file or Tab to quit.");
                 Screen_WriteLine();
                 Screen_Refresh();
                 WorkStateS = WorkStateSDef::InfoScreenWaitForKey;
@@ -121,6 +123,7 @@ void Core1Player::EventTick()
             break;
         case WorkStateSDef::FileOpenFile0: // Waiting for file contents
             {
+                Screen::ResetCustomPaletteFont();
                 Screen::CursorHide(false);
                 Screen_Clear();
                 Screen_Refresh();
@@ -245,7 +248,7 @@ void Core1Player::EventTick()
                 {
                     AnsiSauce_.NonSauceInfo("XBIN size", std::to_string(XBIN_.FileW) + "x" + std::to_string(XBIN_.FileH));
                     AnsiSauce_.NonSauceInfo("XBIN palette", (XBIN_.DataPal.Count > 0) ? "Yes" : "No");
-                    if (XBIN_.FontSize > 0)
+                    if ((XBIN_.FontN > 0) && (XBIN_.FontSize > 0))
                     {
                         AnsiSauce_.NonSauceInfo("XBIN fonts", std::to_string(XBIN_.FontN) + ", " + std::to_string(XBIN_.FontSize) + "px");
                     }
@@ -377,6 +380,7 @@ void Core1Player::EventTick()
             }
             break;
         case WorkStateSDef::FileMan: // File manager
+        case WorkStateSDef::FileMan0: // File manager
             FileManager_.EventTick();
             break;
         case WorkStateSDef::DispConf: // Display configuration
@@ -409,6 +413,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             WorkDisp = "3_";
             break;
         case WorkStateSDef::FileMan:
+        case WorkStateSDef::FileMan0:
             FileManager_.EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
             if (FileManager_.RequestRepaint)
             {
@@ -418,7 +423,14 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             if (FileManager_.RequestCloseOld)
             {
                 Repaint(true);
-                WorkStateS = WorkStateSDef::DisplayPause;
+                if ( WorkStateS == WorkStateSDef::FileMan)
+                {
+                    WorkStateS = WorkStateSDef::DisplayPause;
+                }
+                else
+                {
+                    WorkStateS = WorkStateSDef::InfoScreen;
+                }
                 EventTickX();
             }
             if (FileManager_.RequestCloseNew)
@@ -463,8 +475,10 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case _("0_Enter"):
         case _("0_NumpadEnter"):
             {
-                WorkStateS = WorkStateSDef::FileOpenFile0;
-                EventTickX();
+                WorkStateS = WorkStateSDef::FileMan0;
+                FileManager_.Open(CF);
+                //WorkStateS = WorkStateSDef::FileOpenFile0;
+                //EventTickX();
             }
             return;
         case _("0_Tab"):
@@ -675,7 +689,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Period"):
             WorkStateS = WorkStateSDef::FileMan;
-            FileManager_.Open();
+            FileManager_.Open(CF);
             return;
         case _("1_Backslash"):
             WorkStateS = WorkStateSDef::DispConf;
@@ -735,7 +749,7 @@ void Core1Player::EventOther(std::string EvtName, std::string EvtParam0, int Evt
             break;
         case _("FileImport"):
             {
-                if ((EvtParam2 == 2) && (WorkStateS == WorkStateSDef::FileMan))
+                if ((EvtParam2 == 2) && ((WorkStateS == WorkStateSDef::FileMan) || (WorkStateS == WorkStateSDef::FileMan0)))
                 {
                     FileManager_.Repaint();
                 }
@@ -746,7 +760,7 @@ void Core1Player::EventOther(std::string EvtName, std::string EvtParam0, int Evt
                     {
                         ImportAllowed = true;
                     }
-                    if ((WorkStateS == WorkStateSDef::FileMan) && (FileManager_.RequestCloseOld || FileManager_.RequestCloseNew))
+                    if (((WorkStateS == WorkStateSDef::FileMan) || (WorkStateS == WorkStateSDef::FileMan0)) && (FileManager_.RequestCloseOld || FileManager_.RequestCloseNew))
                     {
                         ImportAllowed = true;
                     }
@@ -785,31 +799,39 @@ void Core1Player::Repaint(bool Force)
         }
 
         Str CharMsg;
+        CharMsg.Clear();
         int MoviePosLead = std::to_string(MovieLength).size() - std::to_string(MoviePos).size();
         switch (DisplayStatusDiv)
         {
             case 0:
                 {
-                    Str CharMsgIdx;
                     while (MoviePosLead > 0)
                     {
-                        CharMsgIdx.Add(' ');
+                        CharMsg.Add(' ');
                         MoviePosLead--;
                     }
-                    CharMsgIdx.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
-                    CharMsgIdx.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
-                    CharMsgIdx.AddString(" | " + std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count) + ((AnsiSauce_.DataIdx >= 0) ? "= " : ": "));
+                    CharMsg.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
+                    CharMsg.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
+                    CharMsg.AddString(" | " + std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count) + ((AnsiSauce_.DataIdx >= 0) ? "= " : ": "));
 
-                    CharMsg.AddRange(BinaryFile_.get()->CurrentFileName);
-                    int MaxS = (ScreenW - CharMsgIdx.Count);
-                    if (CharMsg.Count > MaxS)
+                    int MaxS = (ScreenW - CharMsg.Count);
+                    Str CurrentFileName = BinaryFile_.get()->CurrentFileName;
+                    int CurrentFileNameI = CurrentFileName.IndexOf('/', 0 - (CurrentFileName.Count));
+                    if (CurrentFileNameI >= 0)
                     {
-                        CharMsg.RemoveRange(CharMsg.Count - MaxS + 3);
-                        CharMsg.InsertRange(0, '.');
-                        CharMsg.InsertRange(0, '.');
-                        CharMsg.InsertRange(0, '.');
+                        CurrentFileName.RemoveRange(0, CurrentFileNameI + 1);
                     }
-                    CharMsg.InsertRange(0, CharMsgIdx);
+                    if (CurrentFileName.Count <= MaxS)
+                    {
+                        CharMsg.AddRange(CurrentFileName);
+                    }
+                    else
+                    {
+                        CharMsg.AddString("...");
+                        MaxS -= 3;
+                        CurrentFileName.RemoveRange(0, CurrentFileName.Count - MaxS);
+                        CharMsg.AddRange(CurrentFileName);
+                    }
                     CharMsg.Add(' ');
                 }
                 break;
