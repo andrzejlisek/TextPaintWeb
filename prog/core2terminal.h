@@ -7,6 +7,7 @@
 #include "terminalconn.h"
 #include "terminalconntest.h"
 #include "terminalconnworker.h"
+#include "terminalconnworkertelnet.h"
 #include "textcodec.h"
 #include "terminalmouse.h"
 
@@ -22,6 +23,16 @@ public:
     void ConnOpen();
     void ConnClose(bool StopApp);
 private:
+    XList<std::string> ConnListName;
+    XList<std::string> ConnListType;
+    XList<std::string> ConnListAddr;
+    XList<int> ConnListCodec;
+    void ConnListPrint();
+    std::string ConnListKeys = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    std::string ConnSelectedType;
+    std::string ConnSelectedAddr;
+    int ConnResizeCounter = 0;
+    int ConnSelectedCodec;
     std::unique_ptr<TextCodec> B64;
     int ServerPort = 0;
     bool ServerTelnet = false;
@@ -62,7 +73,7 @@ private:
     int TerminalStep;
     Clipboard Clipboard_;
 
-    enum WorkStateCDef { InfoScreen, Session, Toolbox, Toolbox_, EscapeKey, DispConf };
+    enum WorkStateCDef { ConnListSelect, InfoScreen, Session, Toolbox, Toolbox_, EscapeKey, DispConf };
     WorkStateCDef WorkStateC = WorkStateCDef::InfoScreen;
 
     std::unique_ptr<TerminalConn> Conn;

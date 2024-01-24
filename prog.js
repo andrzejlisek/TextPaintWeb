@@ -185,15 +185,29 @@ function _ProgCallback(D_)
                             break;
                         case 201:
                             VTTEST_.VTStart();
+                            ProgEventOther("Received", "", 0, 0, 0, 0);
                             CallbackQueueI += 2;
                             break;
                         case 202:
                             VTTEST_.VTStop();
+                            ProgEventOther("Received", "", 1, 0, 0, 0);
                             CallbackQueueI += 2;
                             break;
                         case 203:
                             ScreenMouseSetHighlight(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5]);
                             CallbackQueueI += 6;
+                            break;
+                        case 210:
+                            WebSocketConnSend(StringBufDecode(D[CallbackQueueI+1]));
+                            CallbackQueueI += 2;
+                            break;
+                        case 211:
+                            WebSocketConnOpen(StringBufDecode(D[CallbackQueueI+1]));
+                            CallbackQueueI += 2;
+                            break;
+                        case 212:
+                            WebSocketConnClose(StringBufDecode(D[CallbackQueueI+1]));
+                            CallbackQueueI += 2;
                             break;
                     }
                 }
@@ -201,7 +215,6 @@ function _ProgCallback(D_)
         }
     }
 }
-
 
       var Module = {
         print: (function() {

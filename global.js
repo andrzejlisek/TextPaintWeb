@@ -40,6 +40,10 @@ let ScreenMouseHighlightL = 0;
 
 let KeybReady = false;
 
+let WebSocketObject = "";
+let WebSocketObjectReady = false;
+let WebSocketObjectConnected = false;
+
 if (typeof SharedArrayBuffer !== 'undefined')
 {
     ExistsSharedArrayBuffer = true;

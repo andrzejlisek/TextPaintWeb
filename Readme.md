@@ -57,7 +57,6 @@ This version is not completed yet and now there are need to do following:
 
 * Clean\-up config file\.
 * Readme and documentation\.
-* Integration with file system and telnet using WebSocket and separated \.NET/Java application\.
 * Render text\-graphics to file\.
 
 

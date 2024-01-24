@@ -558,7 +558,7 @@ std::string TerminalKeyboard::KeyCode(std::string KeyName, int KeyChar, bool Mod
                     if ((KeyChar >= 32) || ((KeyChar >= 1) && (KeyChar <= 26) && (KeyChar != 13)))
                     {
                         EchoChar.Add(KeyChar);
-                        return "_" + TextWork::CharToStr(KeyChar);
+                        return "~~" + Hex::IntToHex32(KeyChar);
                     }
                     if (KeyName == "NumpadEnter")
                     {

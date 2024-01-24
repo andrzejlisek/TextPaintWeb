@@ -470,7 +470,12 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
         CharMapName[2] = "2A";
         CharMapName[3] = "2A";
     }
-
+    for (int ii = 0; ii < 4; ii++)
+    {
+        CharMapName_[ii] = CharMapName[ii];
+        CharMapName0[ii] = CharMapName[ii];
+        CharMapName_0[ii] = CharMapName[ii];
+    }
     RefreshCharMaps();
 }
 
@@ -480,6 +485,64 @@ void AnsiState::RefreshCharMaps()
     SetCharMap(1, CharMapName[1]);
     SetCharMap(2, CharMapName[2]);
     SetCharMap(3, CharMapName[3]);
+    CharMapSwap(1);
+    SetCharMap(0, CharMapName[0]);
+    SetCharMap(1, CharMapName[1]);
+    SetCharMap(2, CharMapName[2]);
+    SetCharMap(3, CharMapName[3]);
+    CharMapSwap(2);
+    SetCharMap(0, CharMapName[0]);
+    SetCharMap(1, CharMapName[1]);
+    SetCharMap(2, CharMapName[2]);
+    SetCharMap(3, CharMapName[3]);
+    CharMapSwap(1);
+    SetCharMap(0, CharMapName[0]);
+    SetCharMap(1, CharMapName[1]);
+    SetCharMap(2, CharMapName[2]);
+    SetCharMap(3, CharMapName[3]);
+    CharMapSwap(2);
+}
+
+void AnsiState::CharMapSwap(int N)
+{
+    std::string _S;
+    int _I;
+    switch (N)
+    {
+        case 1: // Main screen ans alternative screen
+            for (int ii = 0; ii < 4; ii++)
+            {
+                _S = CharMapName[ii];
+                CharMapName[ii] = CharMapName0[ii];
+                CharMapName0[ii] = _S;
+                _S = CharMapName_[ii];
+                CharMapName_[ii] = CharMapName_0[ii];
+                CharMapName_0[ii] = _S;
+                for (int i = 32; i < 128; i++)
+                {
+                    _I = CharMap[ii][i]; CharMap[ii][i] = CharMap0[ii][i]; CharMap0[ii][i] = _I;
+                    _I = CharMap_[ii][i]; CharMap_[ii][i] = CharMap_0[ii][i]; CharMap_0[ii][i] = _I;
+                }
+            }
+            break;
+        case 2: // Save and restore cursor
+            for (int ii = 0; ii < 4; ii++)
+            {
+                _S = CharMapName[ii];
+                CharMapName[ii] = CharMapName_[ii];
+                CharMapName_[ii] = _S;
+                _S = CharMapName0[ii];
+                CharMapName0[ii] = CharMapName_0[ii];
+                CharMapName_0[ii] = _S;
+                for (int i = 32; i < 128; i++)
+                {
+                    _I = CharMap[ii][i]; CharMap[ii][i] = CharMap_[ii][i]; CharMap_[ii][i] = _I;
+                    _I = CharMap0[ii][i]; CharMap0[ii][i] = CharMap_0[ii][i]; CharMap_0[ii][i] = _I;
+                }
+            }
+            break;
+
+    }
 }
 
 void AnsiState::SetCharMap(int Num, std::string MapId)

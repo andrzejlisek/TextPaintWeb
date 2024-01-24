@@ -7,6 +7,7 @@ class Raw : public XList<unsigned char>
 {
 public:
     Raw();
+    Raw Copy();
 };
 
 #endif // RAW_H

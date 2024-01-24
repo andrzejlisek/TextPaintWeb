@@ -165,6 +165,8 @@ public:
     static void Copy(AnsiState &Src, AnsiState &Dst);
     AnsiState Clone();
 private:
+    void CharMapSwap(int N);
+
     static void CopyListStr(Str &Src, Str &Dst);
     static void CopyListInt(XList<int> &Src, XList<int> &Dst);
     static void CopyListList(XList<XList<int>> &Src, XList<XList<int>> &Dst);

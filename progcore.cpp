@@ -315,6 +315,7 @@ extern "C"
                     CF.get()->ParamSet("WinH", TempWinH);
 
                     RespondClear();
+                    FileConfig("WebSocket");
                     FileConfig("WinTouchScreen");
                     FileConfig("ColorKeyboard");
                     FileConfig("FontName1");

@@ -14,8 +14,15 @@ function ProgInit()
 
 function ProgInitAfterConf()
 {
-    ConfRepaint();
-    _ProgInit("3");
+    if (WebSocketObjectReady)
+    {
+        ConfRepaint();
+        _ProgInit("3");
+    }
+    else
+    {
+        setTimeout(ProgInitAfterConf, 100);
+    }
 }
 
 

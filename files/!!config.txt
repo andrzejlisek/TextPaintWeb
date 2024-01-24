@@ -8,13 +8,16 @@
 
 
 ### Application timer options
+
 TimerPeriod=50
 TimerLoop=20
 TimerCursor=2
 TimerBlink=10
 TimerTick=1
 
+
 ### Window and screen option
+
 WinW=80
 WinH=24
 WinScreenSize=70
@@ -22,15 +25,79 @@ WinKeyboardSize=30
 WinTouchScreen=0
 
 
+### WebApiServer WebSocket address
+
+WebSocket=ws://localhost:8888
+
+
+### Common ANSI process settings
+
+ANSIReadCR=0
+ANSIReadLF=0
+ANSIWidth=0
+ANSIHeight=0
+ANSIDOS=0
+ANSI8bit=1
+ANSIColors=1
+ANSIReverseMode=2
+ANSIColorBlink=0
+ANSIColorBold=1
+ANSIIgnoreConcealed=0
+ANSIPrintBackspace=0
+ANSIPrintTab=0
+ANSIScrollChars=400
+ANSIScrollSmooth=4
+
+
+### Player configuration
+
+PlayerEnd=0
+PlayerStep=100
+PlayerDelayFrame=200
+
+
+### Terminal configuration
+
+TerminalEncoding=65001
+TerminalName=xterm-256color
+TerminalType=5
+TerminalVTFuncKeys=0
+TerminalVTArrowKeys=0
+TerminalStep=100
+TerminalKeys=1101000
+TerminalAnswerBack=TextPaint
+
+
+### Terminal connections
+
+Terminal1Name=Telnet local host by network
+Terminal1Addr=localhost:23
+Terminal1Type=TELNET
+Terminal1Codec=65001
+Terminal2Name=Telnet local host by /bin/telnet command
+Terminal2Addr=/bin/telnet localhost 23
+Terminal2Type=CMD
+Terminal2Codec=65001
+
+
+### File extensions for type detect
+
+FileExtText=txt,bbs,lst,nfo,asc,doc,dox,diz,bat,htm,html
+FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo,ams,mus
+FileExtBin=bin
+FileExtXbin=xb,xbin
+
 
 ### Duospace font mode
-# 0 - Monospace without double-width characters
-# 1 - Duospace font
-# 2 - Monospace with double-width characters and stretched single-width characters
-# If the FontChars parameter is not provided or blank, the parameter does not matter
 
+# FontMode=0 - Monospace without double-width characters
+# FontMode=1 - Duospace font
+# FontMode=2 - Monospace with double-width characters and stretched single-width characters
+# If the FontChars parameter is not provided or blank, the parameter does not matter
 FontMode=1
+
 FontSelect=3
+
 
 ### Monospace fonts
 
@@ -111,7 +178,7 @@ Font23File1=files/fonts/Xterm/Xterm10x20_IMG.png
 Font23File2=files/fonts/Xterm/Xterm10x20_IMG_double.png
 Font23File3=files/fonts/Xterm/Xterm10x20_IMG_double.txt
 
-# No-codec fonts
+### No-codec fonts, which used page 0 only, contains 256 characters
 Font24Name=Amiga 256 8x8 Topaz 1
 Font24File1=files/fonts/NoCodec/Amiga08x08-Topaz1.png
 Font25Name=Amiga 256 8x8 Topaz 2
@@ -132,60 +199,13 @@ Font32Name=Portfolio 256 6x8
 Font32File1=files/fonts/NoCodec/Portfolio06x08.png
 
 
-
-
-ANSIReadCR=0
-ANSIReadLF=0
-ANSIWidth=0
-ANSIHeight=0
-ANSIDOS=0
-ANSI8bit=1
-ANSIColors=1
-ANSIReverseMode=2
-ANSIColorBlink=0
-ANSIColorBold=1
-ANSIIgnoreConcealed=0
-ANSIPrintBackspace=0
-ANSIPrintTab=0
-
-ANSIScrollChars=400
-ANSIScrollSmooth=4
-
-### Player configuration
-
-PlayerEnd=0
-PlayerStep=100
-PlayerDelayFrame=200
-
-
-### Terminal configuration
-
-TerminalEncoding=65001
-TerminalName=xterm-256color
-TerminalType=5
-TerminalVTFuncKeys=0
-TerminalVTArrowKeys=0
-TerminalStep=100
-TerminalKeys=1101000
-TerminalAnswerBack=TextPaint
-
-
-
-#ServerPort=0
-#ServerEncoding=65001
-#ServerTelnet=1
-
-
 ### Display options
-
 DisplayInterpolate=2
 DisplayBlink=1
 DisplayAttrib=14
-
 SteadyCursor=0
 
 ### Color blending options
-
 ColorBlending=1
 ColorBlendingGamma=2200
 ColorBlending_1=2591,2588,3,1,0
@@ -229,7 +249,7 @@ BellDuration=100
 
 
 
-### Render options - not used
+### Render options - not implemented yet
 
 RenderType=PNG
 RenderFile=File.png
@@ -245,7 +265,6 @@ RenderLeading=0
 RenderTrailing=0
 RenderBlinkPeriod=10
 RenderBlinkOffset=0
-
 
 
 
@@ -326,13 +345,6 @@ ANSICharsVT52=0020,0020,2588,00B9,00B3,2075,2077,00B0,00B1,2192,2026,00F7,2193,2
 ANSIColorThresholdBlackWhite=48
 ANSIColorThresholdGray=20
 
-
-### File extensions for type detect
-
-FileExtText=txt,bbs,lst,nfo,asc,doc,dox,diz,bat,htm,html
-FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo,ams,mus
-FileExtBin=bin
-FileExtXbin=xb,xbin
 
 ### Codec and type set in file manager
 

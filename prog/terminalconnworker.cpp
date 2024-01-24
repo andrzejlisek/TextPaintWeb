@@ -10,11 +10,38 @@ TerminalConnWorker::~TerminalConnWorker()
     Close();
 }
 
-void TerminalConnWorker::Open(std::string Addr, int Port, std::string TerminalName_, int TerminalW, int TerminalH)
+void TerminalConnWorker::Open(std::string Protocol, std::string AddrPort, int TerminalW, int TerminalH)
 {
+    ConnRecv = false;
     if (!WorkerOpen)
     {
-        Screen::WorkerSend(1, "");
+        std::string WorkerAddr = "";
+        int Idx = Str(Protocol).IndexOf(':');
+        TerminalName = Protocol.substr(Idx + 1);
+        switch (_(Protocol.substr(0, Idx).c_str()))
+        {
+            case _("CMD"):
+                WorkerAddr = "CMD:" + AddrPort;
+                WorkerNumSend = 10;
+                WorkerNumOpen = 11;
+                WorkerNumClose = 12;
+                break;
+            case _("TELNET"):
+                WorkerAddr = "NET:" + AddrPort;
+                WorkerNumSend = 10;
+                WorkerNumOpen = 11;
+                WorkerNumClose = 12;
+                break;
+            case _("RAWNET"):
+                WorkerAddr = "NET:" + AddrPort;
+                WorkerNumSend = 10;
+                WorkerNumOpen = 11;
+                WorkerNumClose = 12;
+                break;
+            default:
+                break;
+        }
+        Screen::WorkerSend(WorkerNumOpen, WorkerAddr);
     }
     WorkerOpen = true;
 }
@@ -23,11 +50,18 @@ int TerminalConnWorker::IsConnected()
 {
     if (WorkerOpen)
     {
-        return 1;
+        if (ConnRecv)
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
     }
     else
     {
-        return 0;
+        return 3;
     }
 }
 
@@ -38,7 +72,7 @@ void TerminalConnWorker::Send(Raw &Data)
         Str S;
         B64.get()->Reset();
         B64.get()->Decode(Data, S);
-        Screen::WorkerSend(0, S.ToString());
+        Screen::WorkerSend(WorkerNumSend, S.ToString());
     }
 }
 
@@ -46,7 +80,7 @@ void TerminalConnWorker::Close()
 {
     if (WorkerOpen)
     {
-        Screen::WorkerSend(2, "");
+        Screen::WorkerSend(WorkerNumClose, "");
     }
     WorkerOpen = false;
 }

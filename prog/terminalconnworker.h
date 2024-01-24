@@ -12,13 +12,17 @@ public:
     TerminalConnWorker();
     ~TerminalConnWorker();
 
-    void Open(std::string Addr, int Port, std::string TerminalName_, int TerminalW, int TerminalH);
+    void Open(std::string Protocol, std::string AddrPort, int TerminalW, int TerminalH);
     int IsConnected();
     void Send(Raw &Data);
     void Close();
-private:
+protected:
+    std::string TerminalName;
     std::unique_ptr<TextCodec> B64;
-    bool WorkerOpen = false;;
+    bool WorkerOpen = false;
+    int WorkerNumSend = 0;
+    int WorkerNumOpen = 1;
+    int WorkerNumClose = 2;
 };
 
 #endif // TERMINALCONNWORKER_H

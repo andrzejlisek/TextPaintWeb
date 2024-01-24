@@ -2,6 +2,8 @@ let FetchFilesN = ["!!config.txt"];
 
 function FileSystemInit()
 {
+    WebSocketObject = new WebSocketInputOutput(ConfigFileS("WebSocket"), 0, WebSocketResult);
+
     FetchFilesN = ["!!config.txt"];
 
     let N = ConfigFileI("FileN");
@@ -89,6 +91,20 @@ function FileSystemDir(Name, Recursive)
     let DirList = [];
     let DirListStr = "";
 
+    if (Name == "")
+    {
+        DirList.push(WebSocketFileRoot + "/");
+        DirListStr = DirListStr + WebSocketFileRoot + "/\n";
+    }
+    else
+    {
+        if (WebSocketPathInsideSystem(Name))
+        {
+            WebSocketFileSystemDir(Name);
+            return;
+        }
+    }
+
     ObjStore.openCursor(IDBKeyRange.bound(Name, Name + FileLastWord, false, true)).addEventListener('success', e => {
 
         const cursor = e.target.result;
@@ -137,6 +153,12 @@ function FileSystemDir(Name, Recursive)
 
 function FileSystemGet(Name, Attrib)
 {
+    if (WebSocketPathInsideSystem(Name))
+    {
+        WebSocketFileSystemGet(Name, Attrib);
+        return;
+    }
+
     const ObjStore = FileDb.transaction(FileDbName).objectStore(FileDbName);
     let NoDataRead = true;
     ObjStore.openCursor(IDBKeyRange.bound(Name, Name)).addEventListener('success', e => {
@@ -171,6 +193,12 @@ function FileSystemGet(Name, Attrib)
 
 function FileSystemSet(Name, Attrib, Data)
 {
+    if (WebSocketPathInsideSystem(Name))
+    {
+        WebSocketFileSystemSet(Name, Attrib, Data);
+        return;
+    }
+
     let Preview = FileCreatePreview(Data);
     
     const Item = { id: Name, name: Name, data: Data, preview: Preview };
@@ -193,6 +221,12 @@ function FileSystemSet(Name, Attrib, Data)
 
 function FileSystemDelete(Name, Attrib)
 {
+    if (WebSocketPathInsideSystem(Name))
+    {
+        WebSocketFileSystemDelete(Name, Attrib);
+        return;
+    }
+
     const DbTrans = FileDb.transaction([FileDbName], 'readwrite');
     const ObjStore = DbTrans.objectStore(FileDbName);
     if (Name.endsWith("/"))

@@ -5,7 +5,12 @@ TerminalConn::TerminalConn()
 
 }
 
-void TerminalConn::Open(std::string Addr, int Port, std::string TerminalName_, int TerminalW, int TerminalH)
+void TerminalConn::Open(std::string Protocol, std::string AddrPort, int TerminalW, int TerminalH)
+{
+    ConnRecv = false;
+}
+
+void TerminalConn::AfterOpen()
 {
 
 }
@@ -18,6 +23,11 @@ int TerminalConn::IsConnected()
 void TerminalConn::Send(Raw &Data)
 {
 
+}
+
+void TerminalConn::Recv(Raw &Data)
+{
+    ConnRecv = true;
 }
 
 void TerminalConn::Close()

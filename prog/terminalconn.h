@@ -9,13 +9,16 @@ class TerminalConn
 {
 public:
     TerminalConn();
-    virtual void Open(std::string Addr, int Port, std::string TerminalName_, int TerminalW, int TerminalH);
+    virtual void Open(std::string Protocol, std::string AddrPort, int TerminalW, int TerminalH);
+    virtual void AfterOpen();
     virtual int IsConnected();
     virtual void Send(Raw &Data);
+    virtual void Recv(Raw &Data);
     virtual void Close();
     virtual void Resize(int NewW, int NewH);
     XList<Raw> Msgs;
 protected:
+    bool ConnRecv = false;
     Raw Loop;
     void LoopSend(Raw &Data);
     void LoopReceive(Raw &Data);

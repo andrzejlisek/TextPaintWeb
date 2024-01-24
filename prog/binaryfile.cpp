@@ -553,7 +553,7 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
                     {
                         if (ListDir.Count > 0)
                         {
-                            DirItemName.Insert(Str::FromString("../"));
+                            DirItemName.Insert(Str());
                         }
 
                         DirItemIdx = DirItemName.IndexOfBin(CurrentFileName);
@@ -574,6 +574,12 @@ bool BinaryFile::EventFile(std::string EvtName, std::string EvtParam0, int EvtPa
                                 }
                             }
                             DirSearchFile.Clear();
+                        }
+
+                        if (ListDir.Count > 0)
+                        {
+                            DirItemName.PopFirst();
+                            DirItemName.Insert(Str::FromString("../"));
                         }
                     }
                 }

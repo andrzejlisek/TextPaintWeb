@@ -44,7 +44,6 @@ void Core2Terminal::Init()
         TerminalKeyboard_.TerminalAnswerBack = TerminalKeyboard_.TerminalAnswerBack + "_" + TextWork::CharToStr(TerminalAnswerBack0[i]);
     }
 
-    //TerminalCodec = std::make_shared<TextCodec>(CF.get()->ParamGetI("TerminalEncoding"));
     TerminalCodecS = std::make_shared<TextCodec>(0);
     TerminalCodecR = std::make_shared<TextCodec>(0);
 
@@ -81,14 +80,70 @@ void Core2Terminal::Init()
 
     Conn = std::make_unique<TerminalConn>();
 
-    WorkStateC = WorkStateCDef::InfoScreen;
+    ConnListName.Clear();
+    ConnListAddr.Clear();
+    ConnListType.Clear();
+    ConnListCodec.Clear();
+
+    ConnListName.Add("VTTEST");
+    ConnListType.Add("VTTEST");
+    ConnListAddr.Add("VTTEST");
+    ConnListCodec.Add(0);
+
+    int ConnN = 1;
+    while (CF.get()->ParamExists("Terminal" + std::to_string(ConnN) + "Name"))
+    {
+        std::string _ConnName = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Name");
+        std::string _ConnType = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Type");
+        std::string _ConnAddr = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Addr");
+        int _ConnCodec = CF.get()->ParamGetI("Terminal" + std::to_string(ConnN) + "Codec");
+        if ((_ConnType.size() > 0) && (_ConnAddr.size() > 0) && (_ConnName.size() > 0))
+        {
+            ConnListName.Add(_ConnName);
+            ConnListType.Add(_ConnType);
+            ConnListAddr.Add(_ConnAddr);
+            ConnListCodec.Add(_ConnCodec);
+        }
+        ConnN++;
+    }
+
+    //ConnListName.Add("Other");
+    //ConnListType.Add("CUSTOM");
+    //ConnListAddr.Add("~");
+    //ConnListCodec.Add(0);
+
+    ConnListPrint();
+    WorkStateC = WorkStateCDef::ConnListSelect;
+}
+
+void Core2Terminal::ConnListPrint()
+{
     Screen_Clear();
-    Screen_WriteText("Press key, which will be used as escape key...");
+    int L = std::min(ConnListName.Count, (int)(ConnListKeys.size()));
+    for (int I = 0; I < L; I++)
+    {
+        Screen_WriteText(ConnListKeys.substr(I, 1));
+        Screen_WriteText(" - ");
+        Screen_WriteText(ConnListName[I]);
+        Screen_WriteLine();
+    }
     Screen_Refresh();
 }
 
 void Core2Terminal::EventTick()
 {
+    if (ConnResizeCounter > 0)
+    {
+        if (Conn.get()->IsConnected() == 1)
+        {
+            ConnResizeCounter--;
+            if (ConnResizeCounter == 0)
+            {
+                Conn.get()->Resize(ScreenW, ScreenH);
+            }
+        }
+    }
+
     if (ConnInternal)
     {
         while (Conn.get()->Msgs.Count > 0)
@@ -145,6 +200,70 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
 {
     switch (WorkStateC)
     {
+        case WorkStateCDef::ConnListSelect:
+            {
+                int ConnSelectedItem = -1;
+                switch (_(KeyName.c_str()))
+                {
+                    case _("Digit0"): ConnSelectedItem = 0; break;
+                    case _("Digit1"): ConnSelectedItem = 1; break;
+                    case _("Digit2"): ConnSelectedItem = 2; break;
+                    case _("Digit3"): ConnSelectedItem = 3; break;
+                    case _("Digit4"): ConnSelectedItem = 4; break;
+                    case _("Digit5"): ConnSelectedItem = 5; break;
+                    case _("Digit6"): ConnSelectedItem = 6; break;
+                    case _("Digit7"): ConnSelectedItem = 7; break;
+                    case _("Digit8"): ConnSelectedItem = 8; break;
+                    case _("Digit9"): ConnSelectedItem = 9; break;
+                    case _("Numpad0"): ConnSelectedItem = 0; break;
+                    case _("Numpad1"): ConnSelectedItem = 1; break;
+                    case _("Numpad2"): ConnSelectedItem = 2; break;
+                    case _("Numpad3"): ConnSelectedItem = 3; break;
+                    case _("Numpad4"): ConnSelectedItem = 4; break;
+                    case _("Numpad5"): ConnSelectedItem = 5; break;
+                    case _("Numpad6"): ConnSelectedItem = 6; break;
+                    case _("Numpad7"): ConnSelectedItem = 7; break;
+                    case _("Numpad8"): ConnSelectedItem = 8; break;
+                    case _("Numpad9"): ConnSelectedItem = 9; break;
+                    case _("KeyA"): ConnSelectedItem = 10; break;
+                    case _("KeyB"): ConnSelectedItem = 11; break;
+                    case _("KeyC"): ConnSelectedItem = 12; break;
+                    case _("KeyD"): ConnSelectedItem = 13; break;
+                    case _("KeyE"): ConnSelectedItem = 14; break;
+                    case _("KeyF"): ConnSelectedItem = 15; break;
+                    case _("KeyG"): ConnSelectedItem = 16; break;
+                    case _("KeyH"): ConnSelectedItem = 17; break;
+                    case _("KeyI"): ConnSelectedItem = 18; break;
+                    case _("KeyJ"): ConnSelectedItem = 19; break;
+                    case _("KeyK"): ConnSelectedItem = 20; break;
+                    case _("KeyL"): ConnSelectedItem = 21; break;
+                    case _("KeyM"): ConnSelectedItem = 22; break;
+                    case _("KeyN"): ConnSelectedItem = 23; break;
+                    case _("KeyO"): ConnSelectedItem = 24; break;
+                    case _("KeyP"): ConnSelectedItem = 25; break;
+                    case _("KeyQ"): ConnSelectedItem = 26; break;
+                    case _("KeyR"): ConnSelectedItem = 27; break;
+                    case _("KeyS"): ConnSelectedItem = 28; break;
+                    case _("KeyT"): ConnSelectedItem = 29; break;
+                    case _("KeyU"): ConnSelectedItem = 30; break;
+                    case _("KeyV"): ConnSelectedItem = 31; break;
+                    case _("KeyW"): ConnSelectedItem = 32; break;
+                    case _("KeyX"): ConnSelectedItem = 33; break;
+                    case _("KeyY"): ConnSelectedItem = 34; break;
+                    case _("KeyZ"): ConnSelectedItem = 35; break;
+                }
+                if (ConnSelectedItem >= 0)
+                {
+                    ConnSelectedAddr = ConnListAddr[ConnSelectedItem];
+                    ConnSelectedType = ConnListType[ConnSelectedItem];
+                    ConnSelectedCodec = ConnListCodec[ConnSelectedItem];
+                    WorkStateC = WorkStateCDef::InfoScreen;
+                    Screen_Clear();
+                    Screen_WriteText("Press key, which will be used as escape key...");
+                    Screen_Refresh();
+                }
+            }
+            break;
         case WorkStateCDef::InfoScreen:
             EscapeKey_ = EscapeKeyId(KeyName, KeyChar);
             WorkStateC = WorkStateCDef::Session;
@@ -253,6 +372,11 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                             switch (KeyChar)
                             {
                                 case '=':
+                                    {
+                                        WorkStateC = WorkStateCDef::Session;
+                                        TerminalMouse_.MouseOn();
+                                    }
+                                    break;
                                 case ';':
                                 case ':':
                                     TerminalKeyboard_.TelnetFuncKeyOther++;
@@ -397,7 +521,10 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                             case '?':
                                                 {
                                                     WorkStateC = WorkStateCDef::Session;
-                                                    //!!!!!TelnetSendWindowSize();
+                                                    if (Conn.get()->IsConnected() == 1)
+                                                    {
+                                                        Conn.get()->Resize(ScreenW, ScreenH);
+                                                    }
                                                     TerminalMouse_.MouseOn();
                                                 }
                                                 break;
@@ -472,6 +599,7 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
             DisplayStatusRepaint();
             switch (WorkStateC)
             {
+                case WorkStateCDef::ConnListSelect:
                 case WorkStateCDef::InfoScreen:
                     Screen_Refresh();
                     break;
@@ -503,6 +631,10 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
                 Raw Data;
                 B64.get()->Encode(Text, Data);
                 ProcessReceived(Data);
+                if (EvtParam1 == 1)
+                {
+                    Conn = std::make_unique<TerminalConn>();
+                }
             }
             break;
         case _("Mouse"):
@@ -534,21 +666,35 @@ std::string Core2Terminal::EscapeKeyId(std::string KeyName, int KeyChar)
 
 void Core2Terminal::SendHex(std::string STR)
 {
-    if (Command_8bit && (!CoreAnsi_.get()->AnsiState_.__AnsiVT52))
+    if (STR.size() == 0)
     {
-        for (int i = 0x40; i < 0x60; i++)
+        return;
+    }
+
+    Str STR0;
+    Raw STR_;
+    if (STR[0] != '~')
+    {
+        if (Command_8bit && (!CoreAnsi_.get()->AnsiState_.__AnsiVT52))
         {
-            STR = TextWork::StringReplace(STR, "##_" + TextWork::CharToStr(i), Hex::IntToHex8(i + 0x40));
-            STR = TextWork::StringReplace(STR, "##" + Hex::IntToHex8(i), Hex::IntToHex8(i + 0x40));
+            for (int i = 0x40; i < 0x60; i++)
+            {
+                STR = TextWork::StringReplace(STR, "##_" + TextWork::CharToStr(i), Hex::IntToHex8(i + 0x40));
+                STR = TextWork::StringReplace(STR, "##" + Hex::IntToHex8(i), Hex::IntToHex8(i + 0x40));
+            }
         }
+        else
+        {
+            STR = TextWork::StringReplace(STR, "##", "1B");
+        }
+        STR0.AddString(STR);
+        TextCodec::Transcode(STR0, TextCodec::HEX, 0);
     }
     else
     {
-        STR = TextWork::StringReplace(STR, "##", "1B");
+        int StrChr = Hex::HexToInt(STR.substr(2));
+        STR0.Add(StrChr);
     }
-    Str STR0 = Str::FromString(STR);
-    Raw STR_;
-    TextCodec::Transcode(STR0, TextCodec::HEX, 0);
     TerminalCodecS.get()->Encode(STR0, STR_);
     Conn.get()->Send(STR_);
 }
@@ -566,8 +712,37 @@ void Core2Terminal::ConnOpen()
     TerminalCodecR.get()->Reset();
     ServerCodec.get()->Reset();
 
-    //Conn = std::make_unique<TerminalConnTest>();
-    Conn = std::make_unique<TerminalConnWorker>();
+    std::string ConnSelectedType_ = "";
+    std::string ConnResizeCounter_ = "";
+    for (int I = 0; I < ConnSelectedType.size(); I++)
+    {
+        if ((ConnSelectedType[I] >= '0') && (ConnSelectedType[I] <= '9'))
+        {
+            ConnResizeCounter_ = ConnResizeCounter_ + TextWork::CharToStr(ConnSelectedType[I]);
+        }
+        else
+        {
+            ConnSelectedType_ = ConnSelectedType_ + TextWork::CharToStr(ConnSelectedType[I]);
+        }
+    }
+    if (ConnResizeCounter_.size() > 0)
+    {
+        ConnResizeCounter = std::stoi(ConnResizeCounter_);
+    }
+    else
+    {
+        ConnResizeCounter = 0;
+    }
+
+    switch (_(ConnSelectedType_.c_str()))
+    {
+        case _("TELNET"):
+            Conn = std::make_unique<TerminalConnWorkerTelnet>();
+            break;
+        default:
+            Conn = std::make_unique<TerminalConnWorker>();
+            break;
+    }
     ConnInternal = true;
 
     CoreAnsi_.get()->AnsiProcessReset(false, true, 0, 1);
@@ -599,21 +774,26 @@ void Core2Terminal::ConnOpen()
     CoreAnsi_.get()->AnsiState_.DecParamSet(1015, 2);
     CoreAnsi_.get()->AnsiState_.DecParamSet(1016, 2);
 
-    Conn.get()->Open("", 0, TerminalName, ScreenW, ScreenH);
+    TerminalCodecS = std::make_shared<TextCodec>(ConnSelectedCodec);
+    TerminalCodecR = std::make_shared<TextCodec>(ConnSelectedCodec);
+
+    Conn.get()->Open(ConnSelectedType_ + ":" + TerminalName, ConnSelectedAddr, ScreenW, ScreenH);
+    Conn.get()->AfterOpen();
 }
 
 void Core2Terminal::ConnClose(bool StopApp)
 {
     Conn.get()->Close();
-    Conn = std::make_unique<TerminalConn>();
     if (StopApp)
     {
+        Conn = std::make_unique<TerminalConn>();
         AppExit = true;
     }
 }
 
 void Core2Terminal::ProcessReceived(Raw &Data)
 {
+    Conn.get()->Recv(Data);
     if (Data.Count > 0)
     {
         Str Data_;
@@ -1171,7 +1351,7 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
         InfoMsg.Add(" Status: " + StatusInfo + " ");
         InfoMsg.Add(" Screen size: " + std::to_string(CoreAnsi_.get()->AnsiMaxX) + "x" + std::to_string(CoreAnsi_.get()->AnsiMaxY) + " ");
         InfoMsg.Add(" Escape key: " + EscapeKey_ + " ");
-        InfoMsg.Add(" Esc - Return to terminal ");
+        InfoMsg.Add(" Esc = - Return to terminal ");
         InfoMsg.Add(" Enter - Change escape key ");
         InfoMsg.Add(" Tab - Move info ");
         InfoMsg.Add(" Backspace - Quit ");
@@ -1190,7 +1370,7 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
                 InfoMsg.Add(" < > - Send AnswerBack              ");
                 break;
         }
-        InfoMsg.Add(" = ; : - Change control code ");
+        InfoMsg.Add(" ; : - Change control code ");
         InfoMsg.Add(" Letter - Send CTRL+letter ");
         std::string TelnetKeyboardConf_ = "";
         switch (_((std::to_string(TerminalKeyboard_.TelnetKeyboardConfI) + TextWork::CharToStr(TerminalKeyboard_.TelnetKeyboardConf[TerminalKeyboard_.TelnetKeyboardConfI])).c_str()))
