@@ -1044,11 +1044,6 @@ function ScreenInit2()
     ScreenTimerBlink = ConfigFileI("TimerBlink");
     ScreenTimerTickEvent = ConfigFileI("TimerTick");
 
-    for (let I = 0; I <= 16; I++)
-    {
-        ScreenLineOffsetValArray[I] = Math.floor((I * ScreenCellH) / 16);
-    }
-    
     ScreenResize(1, 1, true);
     ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
     //ScreenTest();
@@ -1117,6 +1112,11 @@ function ScreenSetFontAfterCreate()
     ScreenCellH2 = ScreenCellH / 2;
     ScreenCursorSize = Math.floor(ScreenFont.CellH / 8);
     if (ScreenCursorSize == 0) ScreenCursorSize = 1;
+
+    for (let I = 0; I <= 16; I++)
+    {
+        ScreenLineOffsetValArray[I] = Math.floor((I * ScreenCellH) / 16);
+    }
 
     ScreenCellFontX = [];
     ScreenCellFontY = [];
