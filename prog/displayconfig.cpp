@@ -161,6 +161,34 @@ void DisplayConfig::Repaint()
         }
     }
 
+    if ((PopupState == 2) && (Screen::FontCustom))
+    {
+        int HalfPos = (InfoH / 2) - 1;
+        for (int YY = 0; YY < (InfoH - 2); YY++)
+        {
+            if (YY != HalfPos)
+            {
+                for (int XX = 0; XX < InfoW; XX++)
+                {
+                    Screen::ScreenChar(OffsetX + XX, OffsetY + YY + 2, ' ', CB_, CF_, 0, 0, 0);
+                }
+            }
+        }
+        int Ptr = 0;
+        for (int YY = 0; YY < 17; YY++)
+        {
+            if (YY == (HalfPos - 1))
+            {
+                YY++;
+            }
+            for (int XX = 0; XX < 16; XX++)
+            {
+                Screen::ScreenChar(OffsetX + (XX * 2), OffsetY + YY + 3, Screen::FontCustomMap[Ptr], CB_, CF_, 0, 0, 0);
+                Ptr++;
+            }
+        }
+    }
+
     for (int i = -1; i < InfoW + 1; i++)
     {
         Screen::ScreenChar(OffsetX + i, OffsetY + InfoH, ' ', CF_, CB_, 0, 0, 0);
@@ -407,18 +435,24 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             switch (_(KeyName.c_str()))
             {
                 case _("ArrowUp"):
-                    if (Screen::PaletteListSelect > 0)
+                    if ((Screen::PaletteListSelect > 0) || Screen::PaletteCustom)
                     {
-                        Screen::PaletteListSelect--;
+                        if (!Screen::PaletteCustom)
+                        {
+                            Screen::PaletteListSelect--;
+                        }
                         CF.get()->ParamSet("PaletteSelect", Screen::PaletteListSelect + 1);
                         Screen::SetPalette();
                         RequestSave = true;
                     }
                     break;
                 case _("ArrowDown"):
-                    if (Screen::PaletteListSelect < (Screen::PaletteListName.Count - 1))
+                    if ((Screen::PaletteListSelect < (Screen::PaletteListName.Count - 1)) || Screen::PaletteCustom)
                     {
-                        Screen::PaletteListSelect++;
+                        if (!Screen::PaletteCustom)
+                        {
+                            Screen::PaletteListSelect++;
+                        }
                         CF.get()->ParamSet("PaletteSelect", Screen::PaletteListSelect + 1);
                         Screen::SetPalette();
                         RequestSave = true;
@@ -430,18 +464,24 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             switch (_(KeyName.c_str()))
             {
                 case _("ArrowUp"):
-                    if (Screen::FontListSelect > 0)
+                    if ((Screen::FontListSelect > 0) || Screen::FontCustom)
                     {
-                        Screen::FontListSelect--;
+                        if (!Screen::FontCustom)
+                        {
+                            Screen::FontListSelect--;
+                        }
                         CF.get()->ParamSet("FontSelect", Screen::FontListSelect + 1);
                         Screen::SetFont();
                         RequestSave = true;
                     }
                     break;
                 case _("ArrowDown"):
-                    if (Screen::FontListSelect < (Screen::FontListName.Count - 1))
+                    if ((Screen::FontListSelect < (Screen::FontListName.Count - 1)) || Screen::FontCustom)
                     {
-                        Screen::FontListSelect++;
+                        if (!Screen::FontCustom)
+                        {
+                            Screen::FontListSelect++;
+                        }
                         CF.get()->ParamSet("FontSelect", Screen::FontListSelect + 1);
                         Screen::SetFont();
                         RequestSave = true;

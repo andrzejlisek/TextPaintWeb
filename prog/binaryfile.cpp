@@ -47,6 +47,14 @@ void BinaryFile::Init(std::shared_ptr<ConfigFile> CF)
     {
         FileExtXbin.Add(Str::FromString("." + Temp[I]).CaseLower());
     }
+
+    Temp.Clear();
+    TextWork::StringSplit(CF.get()->ParamGetS("FileExtOmmit"), ',', Temp);
+    FileExtOmmit.Clear();
+    for (int I = 0; I < Temp.Count; I++)
+    {
+        FileExtOmmit.Add(Str::FromString("." + Temp[I]).CaseLower());
+    }
 }
 
 void BinaryFile::ItemListClear()
@@ -108,6 +116,23 @@ void BinaryFile::ItemFileRemove(Str FileName)
         Screen::FileExport(3, FileName.ToString(), "", "");
         ListItemsN.Remove(Idx);
     }
+}
+
+bool BinaryFile::IsFileOmmit(int Idx)
+{
+    return IsFileOmmit(DirItemName[Idx]);
+}
+
+bool BinaryFile::IsFileOmmit(Str FileName)
+{
+    for (int I = 0; I < FileExtOmmit.Count; I++)
+    {
+        if (FileExt(FileName) == FileExtOmmit[I])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 int BinaryFile::GetFileType(int Idx)
@@ -257,7 +282,7 @@ void BinaryFile::Save(Str FileName, Str &Text)
     int Idx = ListItemsN.IndexOfBin(FileName);
     if (Idx >= 0)
     {
-        std::unique_ptr<TextCodec> Codec = std::make_unique<TextCodec>(AttribValGet(CurrentFileAttr, 0));
+        std::unique_ptr<TextCodec> Codec = std::make_unique<TextCodec>(Screen::FontSinglePage ? 0 : AttribValGet(CurrentFileAttr, 0));
         TempData.Clear();
         Codec.get()->Reset();
         Codec.get()->AddBOM();
@@ -271,9 +296,18 @@ void BinaryFile::Load(Str FileName, Str &Text, int CRLF)
     int Idx = ListItemsN.IndexOfBin(FileName);
     if (Idx >= 0)
     {
-        std::unique_ptr<TextCodec> Codec = std::make_unique<TextCodec>(AttribValGet(CurrentFileAttr, 0));
+        std::unique_ptr<TextCodec> Codec = std::make_unique<TextCodec>(Screen::FontSinglePage ? 0 : AttribValGet(CurrentFileAttr, 0));
+        Raw TempData_ = TempData.Copy();
+        LoadSauce(TempData_);
+        if (TempData_.Count > 0)
+        {
+            if (TempData_[TempData_.Count - 1] == 26)
+            {
+                TempData_.PopLast();
+            }
+        }
         Codec.get()->Reset();
-        Codec.get()->EnqueueRaw(TempData);
+        Codec.get()->EnqueueRaw(TempData_);
         Codec.get()->RemoveBOM();
         if (CRLF == 0)
         {
@@ -348,6 +382,18 @@ void BinaryFile::LoadRaw(Str FileName, Raw &Text)
 {
     Text.Clear();
     Text.AddRange(TempData);
+    LoadSauce(Text);
+}
+
+void BinaryFile::LoadSauce(Raw &Text)
+{
+    AnsiSauce_.Clear();
+    AnsiSauce_.LoadRaw(TempData);
+    AnsiSauce_.CreateInfo();
+    if (AnsiSauce_.DataIdx >= 0)
+    {
+        Text.RemoveRange(AnsiSauce_.DataIdx);
+    }
 }
 
 std::string BinaryFile::LoadToString(Str FileName, int CRLF)

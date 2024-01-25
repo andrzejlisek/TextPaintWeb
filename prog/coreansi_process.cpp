@@ -1,6 +1,6 @@
 #include "coreansi.h"
 
-void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, int AnsiOptions)
+void CoreAnsi::AnsiProcessReset(bool AnsiScreenWork_, int SeekMode_, int AnsiOptions)
 {
     if (SeekMode_ <= 1)
     {
@@ -14,7 +14,7 @@ void CoreAnsi::AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int Se
     AnsiRingBell = AnsiScreenWork_;
     AnsiScreenWork = AnsiScreenWork_;
     AnsiBuffer.Clear();
-    AnsiState_.Zero(__AnsiUseEOF_);
+    AnsiState_.Zero();
     AnsiTerminalReset();
     if (SeekStateSaveLast < 0)
     {
@@ -207,7 +207,7 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
                 StdProc = false;
             }
         }
-        if ((AnsiState_.AnsiBufferI >= AnsiBuffer.Count) || (AnsiState_.__AnsiBeyondEOF))
+        if (AnsiState_.AnsiBufferI >= AnsiBuffer.Count)
         {
             if (StdProc)
             {
@@ -231,20 +231,23 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
 
             bool CharNoCommandStarting = true;
 
-            if ((CharToPrint == 27) && UseAnsiCommands)
+            if (UseAnsiCommands)
             {
-                AnsiState_.__AnsiCmd.Clear();
-                AnsiState_.__AnsiCommand = true;
-                CharNoCommandStarting = false;
-            }
-            else
-            {
-                if (ANSI8bit && (CharToPrint >= 0x80) && (CharToPrint <= 0x9F) && UseAnsiCommands)
+                if (CharToPrint == 27)
                 {
                     AnsiState_.__AnsiCmd.Clear();
-                    AnsiState_.__AnsiCmd.Add(CharToPrint - 0x40);
                     AnsiState_.__AnsiCommand = true;
                     CharNoCommandStarting = false;
+                }
+                else
+                {
+                    if (ANSI8bit && (CharToPrint >= 0x80) && (CharToPrint <= 0x9F))
+                    {
+                        AnsiState_.__AnsiCmd.Clear();
+                        AnsiState_.__AnsiCmd.Add(CharToPrint - 0x40);
+                        AnsiState_.__AnsiCommand = true;
+                        CharNoCommandStarting = false;
+                    }
                 }
             }
 

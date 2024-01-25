@@ -17,7 +17,18 @@ function WebSocketResult(Params)
             }
             break;
         case "Connection":
-            ProgEventOther("Received", Params.Data, 0, 0, 0, 0);
+            {
+                let Data_ = Params.Data;
+                while (Data_.length > FileBufSize)
+                {
+                    let DataPart = Data_.substring(0, FileBufSize);
+
+                    ProgEventOther("Received", DataPart, 0, 0, 0, 0);
+
+                    Data_ = Data_.substring(FileBufSize);
+                }
+                ProgEventOther("Received", Data_, 0, 0, 0, 0);
+            }
             break;
     }
 }

@@ -5,7 +5,6 @@
 #include "map"
 #include "terminalkeyboard.h"
 #include "terminalconn.h"
-#include "terminalconntest.h"
 #include "terminalconnworker.h"
 #include "terminalconnworkertelnet.h"
 #include "textcodec.h"
@@ -77,7 +76,6 @@ private:
     WorkStateCDef WorkStateC = WorkStateCDef::InfoScreen;
 
     std::unique_ptr<TerminalConn> Conn;
-    bool ConnInternal = false;
 
     std::string EscapeKey_;
     std::string EscapeKeyId(std::string KeyName, int KeyChar);

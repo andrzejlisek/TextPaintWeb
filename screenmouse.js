@@ -144,7 +144,10 @@ function ScreenMousePaint(X, Y)
 
 function ScreenMouseTurn1()
 {
-    ScreenObj.style.cursor = "none";
+    Screen0Obj.style.cursor = "none";
+    Screen1Obj.style.cursor = "none";
+    ScreenVP.style.cursor = "none";
+    ScreenVP0.style.cursor = "none";
     ScreenMouseActive = true;
     ScreenRepaintChar_(ScreenMouseProgMoveX, ScreenMouseProgMoveY);
     for (let I = 0; I < ScreenMouseHighlightListX.length; I++)
@@ -155,7 +158,10 @@ function ScreenMouseTurn1()
 
 function ScreenMouseTurn0()
 {
-    ScreenObj.style.cursor = "";
+    Screen0Obj.style.cursor = "";
+    Screen1Obj.style.cursor = "";
+    ScreenVP.style.cursor = "";
+    ScreenVP0.style.cursor = "";
     ScreenMouseActive = false;
     ScreenRepaintChar_(ScreenMouseProgMoveX, ScreenMouseProgMoveY);
     for (let I = 0; I < ScreenMouseHighlightListX.length; I++)
@@ -178,13 +184,13 @@ let ScreenMouseBtn3 = false;
 
 function ScreenMouseCalcX(X)
 {
-    const ScrW = parseInt(ScreenVP.style.width.substr(0, ScreenVP.style.width.length - 2));
+    const ScrW = parseInt(ScreenVP0.style.width.substr(0, ScreenVP0.style.width.length - 2));
     return Math.floor(X * ScreenW / ScrW);
 }
 
 function ScreenMouseCalcY(Y)
 {
-    const ScrH = parseInt(ScreenVP.style.height.substr(0, ScreenVP.style.height.length - 2));
+    const ScrH = parseInt(ScreenVP0.style.height.substr(0, ScreenVP0.style.height.length - 2));
     return Math.floor(Y * ScreenH / ScrH);
 }
 
@@ -368,7 +374,7 @@ function ScreenMouseDown_(Evt)
 {
     if (KeybTouch == 0)
     {
-        var _ = ScreenVP.getBoundingClientRect();
+        var _ = ScreenVP0.getBoundingClientRect();
         ScreenMouseLastX = Evt.clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.clientY + window.scrollX - _.top;
         ScreenMouseDown(ScreenMouseLastX, ScreenMouseLastY, Evt.buttons);
@@ -379,7 +385,7 @@ function ScreenMouseMove_(Evt)
 {
     if (KeybTouch == 0)
     {
-        var _ = ScreenVP.getBoundingClientRect();
+        var _ = ScreenVP0.getBoundingClientRect();
         ScreenMouseLastX = Evt.clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.clientY + window.scrollX - _.top;
         ScreenMouseMove(ScreenMouseLastX, ScreenMouseLastY, Evt.buttons);
@@ -390,7 +396,7 @@ function ScreenMouseUp_(Evt)
 {
     if (KeybTouch == 0)
     {
-        var _ = ScreenVP.getBoundingClientRect();
+        var _ = ScreenVP0.getBoundingClientRect();
         ScreenMouseLastX = Evt.clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.clientY + window.scrollX - _.top;
         ScreenMouseUp(ScreenMouseLastX, ScreenMouseLastY, Evt.buttons);
@@ -417,7 +423,7 @@ function ScreenMouseDown_0(Evt)
     if ((KeybTouch == 1) && (Evt.touches.length > 0))
     {
         document.getElementsByTagName("BODY")[0].className = "lock-screen";
-        var _ = ScreenVP.getBoundingClientRect();
+        var _ = ScreenVP0.getBoundingClientRect();
         ScreenMouseLastX = Evt.touches[0].clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.touches[0].clientY + window.scrollX - _.top;
         switch (KeybMouseBtnNr)
@@ -445,7 +451,7 @@ function ScreenMouseMove_0(Evt)
 {
     if ((KeybTouch == 1) && (Evt.touches.length > 0))
     {
-        var _ = ScreenVP.getBoundingClientRect();
+        var _ = ScreenVP0.getBoundingClientRect();
         ScreenMouseLastX = Evt.touches[0].clientX + window.scrollX - _.left;
         ScreenMouseLastY = Evt.touches[0].clientY + window.scrollX - _.top;
         switch (KeybMouseBtnNr)
@@ -468,7 +474,7 @@ function ScreenMouseUp_0(Evt)
     if ((KeybTouch == 1))
     {
         document.getElementsByTagName("BODY")[0].className = "";
-        var _ = ScreenVP.getBoundingClientRect();
+        var _ = ScreenVP0.getBoundingClientRect();
         ScreenMouseUp(ScreenMouseLastX, ScreenMouseLastY, 0);
     }
 }
@@ -485,14 +491,14 @@ function ScreenMouseReset(Evt)
     }
 }
 
-ScreenObj.addEventListener("mousedown", ScreenMouseDown_);
-ScreenObj.addEventListener("mousemove", ScreenMouseMove_);
-ScreenObj.addEventListener("mouseup", ScreenMouseUp_);
-ScreenObj.addEventListener("mouseout", ScreenMouseReset);
-ScreenObj.addEventListener("touchstart", ScreenMouseDown_0);
-ScreenObj.addEventListener("touchmove", ScreenMouseMove_0);
-ScreenObj.addEventListener("touchend", ScreenMouseUp_0);
-ScreenObj.addEventListener("touchcancel", ScreenMouseReset);
-ScreenObj.addEventListener("wheel", ScreenMouseScroll_);
-ScreenObj.addEventListener("contextmenu", event => event.preventDefault(), false);
+ScreenVP0.addEventListener("mousedown", ScreenMouseDown_);
+ScreenVP0.addEventListener("mousemove", ScreenMouseMove_);
+ScreenVP0.addEventListener("mouseup", ScreenMouseUp_);
+ScreenVP0.addEventListener("mouseout", ScreenMouseReset);
+ScreenVP0.addEventListener("touchstart", ScreenMouseDown_0);
+ScreenVP0.addEventListener("touchmove", ScreenMouseMove_0);
+ScreenVP0.addEventListener("touchend", ScreenMouseUp_0);
+ScreenVP0.addEventListener("touchcancel", ScreenMouseReset);
+ScreenVP0.addEventListener("wheel", ScreenMouseScroll_);
+ScreenVP0.addEventListener("contextmenu", event => event.preventDefault(), false);
 

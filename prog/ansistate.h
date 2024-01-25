@@ -21,8 +21,6 @@ public:
 
 
     bool __AnsiMusic = false;
-    bool __AnsiUseEOF = false;
-    bool __AnsiBeyondEOF = false;
     bool __AnsiNoWrap = false;
 
     int __AnsiBack = -1;
@@ -153,7 +151,7 @@ public:
     int DecParamGet(std::string S);
     void AnsiParamSet(std::string S, int V);
     int AnsiParamGet(std::string S);
-    void Zero(bool __AnsiUseEOF_);
+    void Zero();
     void Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int ANSIDOS);
     void RefreshCharMaps();
     void SetCharMap(int Num, std::string MapId);

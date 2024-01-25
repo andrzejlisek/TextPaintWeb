@@ -64,7 +64,7 @@ public:
     void AnsiChar(int X, int Y, int Ch, int ColB, int ColF, int FontW, int FontH, int ColA);
     void AnsiScreenNegative(bool IsNega);
 
-    void AnsiProcessReset(bool __AnsiUseEOF_, bool AnsiScreenWork_, int SeekMode_, int AnsiOptions);
+    void AnsiProcessReset(bool AnsiScreenWork_, int SeekMode_, int AnsiOptions);
     void AnsiProcessSupply(Str TextFileLine);
     void AnsiTerminalReset();
     bool AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_);

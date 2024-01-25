@@ -34,6 +34,11 @@ public:
         }
     }
 
+    XList<T> GetRange(int Pos)
+    {
+        return GetRange(Pos, Count - Pos);
+    }
+
     XList<T> GetRange(int Pos, int Count_)
     {
         XList<T> X;

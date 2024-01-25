@@ -371,3 +371,30 @@ long long TextWork::StrToLong(std::string S, long long Default)
     if (S[0] == '-') return (0L - N);
     return N;
 }
+
+std::string TextWork::DebugPrint(Str Data)
+{
+    std::stringstream Str_;
+    for (int I = 0; I < Data.Count; I++)
+    {
+        if (I > 0) Str_ << " ";
+        if ((Data[I] >= 33) && (Data[I] <= 126))
+        {
+            Str_ << ((char)Data[I]);
+        }
+        else
+        {
+            Str_ << "<" << Hex::IntToHex16(Data[I]) << ">";
+        }
+    }
+    return Str_.str();
+}
+
+std::string TextWork::DebugPrint(Raw Data)
+{
+    Str Str_;
+    TextCodec C(0);
+    C.EnqueueRaw(Data);
+    C.DequeueStr(Str_);
+    return DebugPrint(Str_);
+}

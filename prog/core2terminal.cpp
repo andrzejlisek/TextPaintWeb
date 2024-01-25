@@ -144,15 +144,6 @@ void Core2Terminal::EventTick()
         }
     }
 
-    if (ConnInternal)
-    {
-        while (Conn.get()->Msgs.Count > 0)
-        {
-            ProcessReceived(Conn.get()->Msgs[0]);
-            Conn.get()->Msgs.Remove(0);
-        }
-    }
-
     int Processed = CoreAnsi_.get()->AnsiProcess(TerminalStep);
     if (Processed > 0)
     {
@@ -506,16 +497,13 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                                                 TerminalMouse_.MouseOn();
                                                 break;
                                             case '/':
-                                                if (Conn.get()->IsConnected() == 0)
+                                                if (Conn.get()->IsConnected() == 1)
                                                 {
-                                                    ConnOpen();
+                                                    ConnClose(false);
                                                 }
                                                 else
                                                 {
-                                                    if (Conn.get()->IsConnected() == 1)
-                                                    {
-                                                        ConnClose(false);
-                                                    }
+                                                    ConnOpen();
                                                 }
                                                 break;
                                             case '?':
@@ -625,6 +613,7 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
                     Conn.get()->Send(Data);
                 }
             }
+            break;
         case _("Received"):
             {
                 Str Text(EvtParam0);
@@ -743,9 +732,8 @@ void Core2Terminal::ConnOpen()
             Conn = std::make_unique<TerminalConnWorker>();
             break;
     }
-    ConnInternal = true;
 
-    CoreAnsi_.get()->AnsiProcessReset(false, true, 0, 1);
+    CoreAnsi_.get()->AnsiProcessReset(true, 0, 1);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(1, 4);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(2, 2);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(3, 2);

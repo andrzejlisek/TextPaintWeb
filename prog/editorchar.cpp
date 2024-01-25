@@ -133,21 +133,17 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
                 SelectorState = 1;
             }
             break;
-        case _("F4"):
-            if (SelectorState == 1)
-            {
-                RepaintDepth = 3;
-                WinBitmapEnabled = !WinBitmapEnabled;
-            }
-            if (SelectorState == 2)
-            {
-                //DisplayConfigOpen();
-            }
-            break;
         case _("Backspace"):
             if ((SelectChar >= 0) || (SelectToFav < 0))
             {
-                SelectToFav = SelectChar;
+                if (SelectToFav < 0)
+                {
+                    SelectToFav = SelectChar;
+                }
+                else
+                {
+                    SelectToFav = -1;
+                }
             }
             else
             {
@@ -251,7 +247,7 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
 
 int EditorChar::WinBitmapNearest(int CharCode, bool Backward)
 {
-    if (WinBitmapEnabled)
+    if (SelectToFav < 0)
     {
         int CharPage = CharCode >> 8;
         if (Screen::BitmapPage.Count > 0)

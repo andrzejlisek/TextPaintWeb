@@ -8,10 +8,12 @@
 #include "str.h"
 #include "screen.h"
 #include "configfile.h"
+#include "ansisauce.h"
 
 class BinaryFile
 {
 public:
+    AnsiSauce AnsiSauce_;
     BinaryFile();
     Str CurrentFileName;
     Str CurrentFileAttr;
@@ -30,6 +32,7 @@ public:
     void Save(Str FileName, Str &Text);
     void Load(Str FileName, Str &Text, int CRLF);
     void LoadRaw(Str FileName, Raw &Text);
+    void LoadSauce(Raw &Text);
     std::string LoadToString(Str FileName, int CRLF);
     std::string LoadToStringConfig();
     void SaveFromString(Str FileName, std::string S);
@@ -60,6 +63,8 @@ public:
 
     XList<Str> DirItemName;
 
+    bool IsFileOmmit(int Idx);
+    bool IsFileOmmit(Str FileName);
     int GetFileType(int Idx);
     int GetFileType(Str FileName);
 
@@ -74,6 +79,7 @@ private:
     XList<Str> FileExtAnsi;
     XList<Str> FileExtBin;
     XList<Str> FileExtXbin;
+    XList<Str> FileExtOmmit;
 
     void ItemListClear();
 

@@ -1629,12 +1629,12 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                                     {
                                         PalDef = PalDef + "|" + AnsiParams[I];
                                     }
-                                    Screen::SetCustomChar(PalDef);
+                                    Screen::SetCustomChar(AnsiProcess_Int0(AnsiParams[2], AnsiCmd_), AnsiProcess_Int0(AnsiParams[3], AnsiCmd_), PalDef);
                                 }
                                 break;
                             case 3:
                                 SeekStateSaveForce();
-                                Screen::SetCustomChar("");
+                                Screen::SetCustomChar(256, 0, "");
                                 break;
                         }
                     }
@@ -2810,8 +2810,8 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
             case 13: // CR
             case 10: // LF
                 break;
-            case 26: // ESC
-                if ((!AnsiState_.__AnsiUseEOF) || (!UseAnsiCommands))
+            case 26: // SUB - End of file
+                if (!UseAnsiCommands)
                 {
                     TextFileLine_i_GetChar = DosControl[TextFileLine_i];
                 }
@@ -3085,10 +3085,6 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                     }
                     break;
                 case 26: // SUB - End of file
-                    if (AnsiState_.__AnsiUseEOF && UseAnsiCommands)
-                    {
-                        AnsiState_.__AnsiBeyondEOF = true;
-                    }
                     break;
             }
         }

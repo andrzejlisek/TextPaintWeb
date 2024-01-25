@@ -120,17 +120,11 @@ void FileManager::RepaintFiles(int PosX, int PosY)
             int ItemY = PosY + 1 + Idx + 1 - BinaryFile_.get()->DirItemOff;
             for (int I = 0; I < ItemL; I++)
             {
-                Screen::ScreenChar(PosX + I + 2, ItemY, DirItemName[I + ItemO], PopupBack_, PopupFore_, 0, 0, 0);
+                Screen::ScreenChar(PosX + I + 2, ItemY, DirItemName[I], PopupBack_, PopupFore_, 0, 0, 0);
             }
             for (int I = ItemL; I < (SizeW - 1); I++)
             {
                 Screen::ScreenChar(PosX + I + 2, ItemY, ' ', PopupBack, PopupFore, 0, 0, 0);
-            }
-            if (ItemO > 0)
-            {
-                Screen::ScreenChar(PosX + 0 + 2, ItemY, '.', PopupBack_, PopupFore_, 0, 0, 0);
-                Screen::ScreenChar(PosX + 1 + 2, ItemY, '.', PopupBack_, PopupFore_, 0, 0, 0);
-                Screen::ScreenChar(PosX + 2 + 2, ItemY, '.', PopupBack_, PopupFore_, 0, 0, 0);
             }
         }
     }
@@ -410,7 +404,7 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
                 BinaryFile_.get()->DirItemIdx -= 10;
                 if (BinaryFile_.get()->DirItemIdx < 0)
                 {
-                    BinaryFile_.get()->DirItemIdx = (BinaryFile_.get()->DirItemName.Count - 1);
+                    BinaryFile_.get()->DirItemIdx = 0;
                 }
                 RepaintDepth = 3;
                 Repaint();
@@ -422,7 +416,7 @@ void FileManager::EventKeyFiles(std::string KeyName, int KeyChar, bool ModShift,
                 BinaryFile_.get()->DirItemIdx += 10;
                 if (BinaryFile_.get()->DirItemIdx > (BinaryFile_.get()->DirItemName.Count - 1))
                 {
-                    BinaryFile_.get()->DirItemIdx = 0;
+                    BinaryFile_.get()->DirItemIdx = (BinaryFile_.get()->DirItemName.Count - 1);
                 }
                 RepaintDepth = 3;
                 Repaint();

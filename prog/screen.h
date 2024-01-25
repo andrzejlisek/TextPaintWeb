@@ -96,16 +96,19 @@ public:
     static void SetPalette(std::string PaletteColors);
     static void SetFont(std::string FontFile1, std::string FontFile2, std::string FontFile3, int FontMode);
     static void SetCustomFont(int Size);
-    static void SetCustomChar(std::string Data);
+    static void SetCustomChar(int CharCode, int CharDisp, std::string Data);
     static void SetPalette();
     static void SetFont();
 
+    static inline bool PaletteCustom = false;
     static inline std::map<int, int> FontSingleChar;
+    static inline bool FontSinglePage = false;
+    static inline bool FontCustom = false;
+    static inline int FontCustomMap[257];
 private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;
     static inline bool CursorHideState = false;
-    static inline bool FontSinglePage = false;
 
     struct ScreenLineOffsetDef
     {

@@ -140,10 +140,7 @@ void Core1Player::EventTick()
                 Screen_Clear();
                 Screen_Refresh();
                 FileCtX.Clear();
-                FileCtX_.Clear();
-                BinaryFile_.get()->LoadRaw(BinaryFile_.get()->CurrentFileName, FileCtX_);
-                AnsiSauce_.Info.Clear();
-                AnsiSauce_.LoadRaw(FileCtX_);
+                Raw FileCtX_;
                 int FileType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->CurrentFileName);
                 switch (FileType)
                 {
@@ -154,13 +151,13 @@ void Core1Player::EventTick()
                         BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileCtX, 0);
                         break;
                     case 2: // BIN
-                        AnsiSauce_.CreateInfo();
-                        XBIN_.SetRaw(FileCtX_, AnsiSauce_.DataIdx, false);
+                        BinaryFile_.get()->LoadRaw(BinaryFile_.get()->CurrentFileName, FileCtX_);
+                        XBIN_.SetRaw(FileCtX_, BinaryFile_.get()->AnsiSauce_.DataIdx, false);
                         XBIN_.GetStr(FileCtX, BinaryFile_.get()->CurrentFileAttrGet(0));
                         break;
                     case 3: // XBIN
-                        AnsiSauce_.CreateInfo();
-                        XBIN_.SetRaw(FileCtX_, AnsiSauce_.DataIdx, true);
+                        BinaryFile_.get()->LoadRaw(BinaryFile_.get()->CurrentFileName, FileCtX_);
+                        XBIN_.SetRaw(FileCtX_, BinaryFile_.get()->AnsiSauce_.DataIdx, true);
                         XBIN_.GetStr(FileCtX, BinaryFile_.get()->CurrentFileAttrGet(0));
                         break;
                 }
@@ -169,14 +166,14 @@ void Core1Player::EventTick()
                 switch (FileType)
                 {
                     case 0: // TXT
-                        CoreAnsi_.get()->AnsiProcessReset(true, false, 1, 0);
+                        CoreAnsi_.get()->AnsiProcessReset(false, 1, 0);
                         break;
                     case 1: // ANSI
-                        CoreAnsi_.get()->AnsiProcessReset(true, false, 1, 1);
+                        CoreAnsi_.get()->AnsiProcessReset(false, 1, 1);
                         break;
                     case 2: // BIN
                     case 3: // XBIN
-                        CoreAnsi_.get()->AnsiProcessReset(true, false, 1, 3);
+                        CoreAnsi_.get()->AnsiProcessReset(false, 1, 3);
                         break;
                 }
                 CoreAnsi_.get()->AnsiTerminalResize(Screen::CurrentW, Screen::CurrentH, ScreenStatusBar);
@@ -193,9 +190,11 @@ void Core1Player::EventTick()
         case WorkStateSDef::FileOpenWait:
             {
                 FileTimeMeasure.Reset();
+                int LoadFileChunk_ = 0;
                 while (FileTimeMeasure.Elapsed() < LoadFileTimeChunk)
                 {
                     int MovieLength0 = CoreAnsi_.get()->AnsiProcess(LoadFileChunk);
+                    LoadFileChunk_ += LoadFileChunk;
                     if (MovieLength0 > 0)
                     {
                         MovieLength = MovieLength + MovieLength0;
@@ -206,6 +205,12 @@ void Core1Player::EventTick()
                         break;
                     }
                 }
+                LoadFileChunk_ = LoadFileChunk_ / 5;
+                if (LoadFileChunk_ < 10)
+                {
+                    LoadFileChunk_ = 10;
+                }
+                LoadFileChunk = LoadFileChunk_;
                 Screen_Clear();
                 Screen_WriteText(std::to_string(CoreAnsi_.get()->AnsiState_.AnsiBufferI) + "/" + std::to_string(FileCtX.Count));
                 Screen_Refresh();
@@ -219,59 +224,63 @@ void Core1Player::EventTick()
                 int FileType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->CurrentFileName);
 
 
-                AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count));
-                AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->CurrentFileName.ToString());
+                BinaryFile_.get()->AnsiSauce_.NonSauceInfo("Index", std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count));
+                BinaryFile_.get()->AnsiSauce_.NonSauceInfo("File name", BinaryFile_.get()->CurrentFileName.ToString());
                 switch (FileType)
                 {
                     case 0: // TXT
-                        AnsiSauce_.NonSauceInfo("File type", "TEXT");
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("File type", "TEXT");
                         break;
                     case 1: // ANSI
-                        AnsiSauce_.NonSauceInfo("File type", "ANSI");
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("File type", "ANSI");
                         break;
                     case 2: // BIN
-                        AnsiSauce_.NonSauceInfo("File type", "BIN");
-                        AnsiSauce_.NonSauceInfo("Binary data length", (XBIN_.DataRawLength / 2));
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("File type", "BIN");
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("Binary data length", (XBIN_.DataRawLength / 2));
                         break;
                     case 3: // XBIN
-                        AnsiSauce_.NonSauceInfo("File type", "XBIN");
-                        AnsiSauce_.NonSauceInfo("Binary data length", (XBIN_.DataRawLength / 2));
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("File type", "XBIN");
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("Binary data length", (XBIN_.DataRawLength / 2));
                         break;
                 }
-                AnsiSauce_.NonSauceInfo("Steps", MovieLength);
-                AnsiSauce_.NonSauceInfo("Characters", CoreAnsi_.get()->AnsiState_.AnsiBufferI);
-                AnsiSauce_.NonSauceInfo("Overwrites/writes", std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter));
-                AnsiSauce_.NonSauceInfo("Inserts and deletes", CoreAnsi_.get()->AnsiState_.PrintCharInsDel);
-                AnsiSauce_.NonSauceInfo("Scrolls", CoreAnsi_.get()->AnsiState_.PrintCharScroll);
+                BinaryFile_.get()->AnsiSauce_.NonSauceInfo("Steps", MovieLength);
+                BinaryFile_.get()->AnsiSauce_.NonSauceInfo("Characters", CoreAnsi_.get()->AnsiState_.AnsiBufferI);
+
+                std::string CharInfo = "";
+                CharInfo = CharInfo + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " ";
+                CharInfo = CharInfo + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + " ";
+                CharInfo = CharInfo + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " ";
+                CharInfo = CharInfo + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll);
+
+                BinaryFile_.get()->AnsiSauce_.NonSauceInfo("Writes, Over, InsDel, Scrolls", CharInfo);
 
                 if (FileType == 3)
                 {
-                    AnsiSauce_.NonSauceInfo("XBIN size", std::to_string(XBIN_.FileW) + "x" + std::to_string(XBIN_.FileH));
-                    AnsiSauce_.NonSauceInfo("XBIN palette", (XBIN_.DataPal.Count > 0) ? "Yes" : "No");
+                    BinaryFile_.get()->AnsiSauce_.NonSauceInfo("XBIN size", std::to_string(XBIN_.FileW) + "x" + std::to_string(XBIN_.FileH));
+                    BinaryFile_.get()->AnsiSauce_.NonSauceInfo("XBIN palette", (XBIN_.DataPal.Count > 0) ? "Yes" : "No");
                     if ((XBIN_.FontN > 0) && (XBIN_.FontSize > 0))
                     {
-                        AnsiSauce_.NonSauceInfo("XBIN fonts", std::to_string(XBIN_.FontN) + ", " + std::to_string(XBIN_.FontSize) + "px");
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("XBIN fonts", std::to_string(XBIN_.FontN) + ", " + std::to_string(XBIN_.FontSize) + "px");
                     }
                     else
                     {
-                        AnsiSauce_.NonSauceInfo("XBIN fonts", XBIN_.FontN);
+                        BinaryFile_.get()->AnsiSauce_.NonSauceInfo("XBIN fonts", XBIN_.FontN);
                     }
-                    AnsiSauce_.NonSauceInfo("XBIN compression", (XBIN_.DataCompression) ? "Yes" : "No");
+                    BinaryFile_.get()->AnsiSauce_.NonSauceInfo("XBIN compression", (XBIN_.DataCompression) ? "Yes" : "No");
                 }
 
-                AnsiSauce_.CreateInfo();
                 MoviePos = 0;
                 switch (FileType)
                 {
                     case 0: // TXT
-                        CoreAnsi_.get()->AnsiProcessReset(true, true, 2, 0);
+                        CoreAnsi_.get()->AnsiProcessReset(true, 2, 0);
                         break;
                     case 1: // ANSI
-                        CoreAnsi_.get()->AnsiProcessReset(true, true, 2, 1);
+                        CoreAnsi_.get()->AnsiProcessReset(true, 2, 1);
                         break;
                     case 2: // BIN
                     case 3: // XBIN
-                        CoreAnsi_.get()->AnsiProcessReset(true, true, 2, 3);
+                        CoreAnsi_.get()->AnsiProcessReset(true, 2, 3);
                         break;
                 }
                 CoreAnsi_.get()->AnsiProcessSupply(FileCtX);
@@ -417,17 +426,24 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             FileManager_.EventKey(KeyName, KeyChar, ModShift, ModCtrl, ModAlt);
             if (FileManager_.RequestRepaint)
             {
-                Repaint(true);
+                if (WorkStateS == WorkStateSDef::FileMan)
+                {
+                    Repaint(true);
+                }
+                if (WorkStateS == WorkStateSDef::FileMan0)
+                {
+                    Screen_Refresh();
+                }
                 FileManager_.Repaint();
             }
             if (FileManager_.RequestCloseOld)
             {
                 Repaint(true);
-                if ( WorkStateS == WorkStateSDef::FileMan)
+                if (WorkStateS == WorkStateSDef::FileMan)
                 {
                     WorkStateS = WorkStateSDef::DisplayPause;
                 }
-                else
+                if (WorkStateS == WorkStateSDef::FileMan0)
                 {
                     WorkStateS = WorkStateSDef::InfoScreen;
                 }
@@ -603,6 +619,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case _("3_PageUp"):
             {
                 int FType = -1;
+                int ItemIdx0 = BinaryFile_.get()->DirItemIdx;
                 while (FType < 0)
                 {
                     if (BinaryFile_.get()->DirItemIdx > 0)
@@ -614,6 +631,13 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                         BinaryFile_.get()->DirItemIdx = (BinaryFile_.get()->DirItemName.Count - 1);
                     }
                     FType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->DirItemIdx);
+                    if (BinaryFile_.get()->IsFileOmmit(BinaryFile_.get()->DirItemIdx))
+                    {
+                        if (ItemIdx0 != BinaryFile_.get()->DirItemIdx)
+                        {
+                            FType = -1;
+                        }
+                    }
                 }
                 BinaryFile_.get()->CurrentFileName = BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx];
                 if (WorkDisp == "2_")
@@ -629,6 +653,7 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
         case _("3_PageDown"):
             {
                 int FType = -1;
+                int ItemIdx0 = BinaryFile_.get()->DirItemIdx;
                 while (FType < 0)
                 {
                     if (BinaryFile_.get()->DirItemIdx < (BinaryFile_.get()->DirItemName.Count - 1))
@@ -640,6 +665,13 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
                         BinaryFile_.get()->DirItemIdx = 0;
                     }
                     FType = BinaryFile_.get()->GetFileType(BinaryFile_.get()->DirItemIdx);
+                    if (BinaryFile_.get()->IsFileOmmit(BinaryFile_.get()->DirItemIdx))
+                    {
+                        if (ItemIdx0 != BinaryFile_.get()->DirItemIdx)
+                        {
+                            FType = -1;
+                        }
+                    }
                 }
                 BinaryFile_.get()->CurrentFileName = BinaryFile_.get()->DirItemName[BinaryFile_.get()->DirItemIdx];
                 if (WorkDisp == "2_")
@@ -689,6 +721,10 @@ void Core1Player::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             return;
         case _("1_Period"):
             WorkStateS = WorkStateSDef::FileMan;
+            FileManager_.Open(CF);
+            return;
+        case _("3_Period"):
+            WorkStateS = WorkStateSDef::FileMan0;
             FileManager_.Open(CF);
             return;
         case _("1_Backslash"):
@@ -811,8 +847,8 @@ void Core1Player::Repaint(bool Force)
                         MoviePosLead--;
                     }
                     CharMsg.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
-                    CharMsg.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
-                    CharMsg.AddString(" | " + std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count) + ((AnsiSauce_.DataIdx >= 0) ? "= " : ": "));
+                    CharMsg.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
+                    CharMsg.AddString(" | " + std::to_string(BinaryFile_.get()->DirItemIdx + 1) + "/" + std::to_string(BinaryFile_.get()->DirItemName.Count) + ((BinaryFile_.get()->AnsiSauce_.DataIdx >= 0) ? "= " : ": "));
 
                     int MaxS = (ScreenW - CharMsg.Count);
                     Str CurrentFileName = BinaryFile_.get()->CurrentFileName;
@@ -843,7 +879,7 @@ void Core1Player::Repaint(bool Force)
                         MoviePosLead--;
                     }
                     CharMsg.AddString(std::to_string(MoviePos) + "/" + std::to_string(MovieLength));
-                    CharMsg.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + "/" + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
+                    CharMsg.AddString(" | " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounter) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharCounterOver) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharInsDel) + " " + std::to_string(CoreAnsi_.get()->AnsiState_.PrintCharScroll));
                     CharMsg.AddString(" | " + TextWork::NumPlusMinus(FileDelayStepFactor));
                     CharMsg.AddString(" | " + std::to_string(FileDelayStep__));
 
@@ -1010,16 +1046,16 @@ void Core1Player::DisplayInfoText(bool Forced)
         if (InfoPosH < 0) { InfoPosH = 0; }
         if (InfoPosH > 80) { InfoPosH = 80; }
         if (InfoPosV < 0) { InfoPosV = 0; }
-        if (InfoPosV >= AnsiSauce_.Info.Count) { InfoPosV = AnsiSauce_.Info.Count - 1; }
+        if (InfoPosV >= BinaryFile_.get()->AnsiSauce_.Info.Count) { InfoPosV = BinaryFile_.get()->AnsiSauce_.Info.Count - 1; }
         Screen_Clear();
-        int CountX = AnsiSauce_.Info.Count;
-        if (ScreenH < AnsiSauce_.Info.Count - InfoPosV)
+        int CountX = BinaryFile_.get()->AnsiSauce_.Info.Count;
+        if (ScreenH < BinaryFile_.get()->AnsiSauce_.Info.Count - InfoPosV)
         {
             CountX = ScreenH + InfoPosV;
         }
         for (int i = InfoPosV; i < CountX; i++)
         {
-            std::string T = AnsiSauce_.Info[i];
+            std::string T = BinaryFile_.get()->AnsiSauce_.Info[i];
             if (InfoPosH > 0)
             {
                 if (T.size() >= InfoPosH)

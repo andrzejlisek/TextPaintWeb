@@ -50,7 +50,6 @@ private:
     int FileDelayStep = 1;
 
     Clipboard Clipboard_;
-    Raw FileCtX_;
     Str FileCtX;
 
     std::string ANSIBrowseWildcard;
@@ -66,8 +65,6 @@ private:
 
     int FileDelayStep__ = 1;
     int FileDelayStepFactor = 0;
-
-    AnsiSauce AnsiSauce_;
 
     int InfoPosH = 0;
     int InfoPosV = 0;

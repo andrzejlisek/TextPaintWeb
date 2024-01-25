@@ -31,7 +31,6 @@ public:
 
     int FavChar[256];
 
-    bool WinBitmapEnabled = true;
     int WinBitmapNearest(int CharCode, bool Backward);
 
     void SelectCharFavSet(int N);

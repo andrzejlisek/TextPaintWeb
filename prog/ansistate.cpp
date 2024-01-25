@@ -307,9 +307,8 @@ int AnsiState::AnsiParamGet(std::string S)
     return 0;
 }
 
-void AnsiState::Zero(bool __AnsiUseEOF_)
+void AnsiState::Zero()
 {
-    __AnsiUseEOF = __AnsiUseEOF_;
     AnsiBufferI = 0;
 
     __AnsiCounter = 0;
@@ -370,7 +369,6 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
     __AnsiSmoothScroll = false;
     __AnsiCommand = false;
 
-    __AnsiBeyondEOF = false;
     __AnsiMusic = false;
     __AnsiNoWrap = false;
     __AnsiDCS = "";
@@ -1106,7 +1104,6 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
 
     Dst.DECCOLMPreserve = Src.DECCOLMPreserve;
 
-    Dst.__AnsiUseEOF = Src.__AnsiUseEOF;
     Dst.IsScreenAlternate = Src.IsScreenAlternate;
 
     CopyListInt(Src.DecParamI, Dst.DecParamI);
@@ -1129,7 +1126,6 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     Dst.__AnsiSmoothScroll = Src.__AnsiSmoothScroll;
     Dst.__AnsiCommand = Src.__AnsiCommand;
 
-    Dst.__AnsiBeyondEOF = Src.__AnsiBeyondEOF;
     Dst.__AnsiMusic = Src.__AnsiMusic;
     Dst.__AnsiNoWrap = Src.__AnsiNoWrap;
     Dst.__AnsiDCS = Src.__AnsiDCS;

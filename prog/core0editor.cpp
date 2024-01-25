@@ -1268,12 +1268,9 @@ void Core0Editor::EventKey_Charmap(std::string KeyName, int KeyChar, bool ModShi
     switch (_(KeyName.c_str()))
     {
         case _("F4"):
-            if (EditorChar_.get()->SelectorState == 2)
-            {
-                DisplayState = DisplayStateDef::DispConfig;
-                DisplayConfig_.get()->Open();
-                CharmapPaint(0);
-            }
+            DisplayState = DisplayStateDef::DispConfig;
+            DisplayConfig_.get()->Open();
+            CharmapPaint(0);
             break;
     }
 }
@@ -2311,24 +2308,11 @@ void Core0Editor::CharmapPaint(int Depth)
                 DispCode = "     ";
             }
 
-            ScreenChar0(CharPosX + 24, CharPosY + 1, DispCode[0], PopupBack, PopupFore);
-            ScreenChar0(CharPosX + 25, CharPosY + 1, DispCode[1], PopupBack, PopupFore);
-            ScreenChar0(CharPosX + 26, CharPosY + 1, DispCode[2], PopupBack, PopupFore);
-            ScreenChar0(CharPosX + 27, CharPosY + 1, DispCode[3], PopupBack, PopupFore);
-            ScreenChar0(CharPosX + 28, CharPosY + 1, DispCode[4], PopupBack, PopupFore);
-
-            if (EditorChar_.get()->WinBitmapEnabled)
-            {
-                ScreenChar0(CharPosX + 30, CharPosY + 1, ' ', PopupBack, PopupFore);
-                ScreenChar0(CharPosX + 31, CharPosY + 1, ' ', PopupBack, PopupFore);
-                ScreenChar0(CharPosX + 32, CharPosY + 1, ' ', PopupBack, PopupFore);
-            }
-            else
-            {
-                ScreenChar0(CharPosX + 30, CharPosY + 1, 'A', PopupBack, PopupFore);
-                ScreenChar0(CharPosX + 31, CharPosY + 1, 'L', PopupBack, PopupFore);
-                ScreenChar0(CharPosX + 32, CharPosY + 1, 'L', PopupBack, PopupFore);
-            }
+            ScreenChar0(CharPosX + 28, CharPosY + 1, DispCode[0], PopupBack, PopupFore);
+            ScreenChar0(CharPosX + 29, CharPosY + 1, DispCode[1], PopupBack, PopupFore);
+            ScreenChar0(CharPosX + 30, CharPosY + 1, DispCode[2], PopupBack, PopupFore);
+            ScreenChar0(CharPosX + 31, CharPosY + 1, DispCode[3], PopupBack, PopupFore);
+            ScreenChar0(CharPosX + 32, CharPosY + 1, DispCode[4], PopupBack, PopupFore);
         }
         if (EditorChar_.get()->SelectorState == 2)
         {
@@ -2559,14 +2543,14 @@ void Core0Editor::FileLoad2()
                 FileH = std::max(FileH, LineCounter0 + 3);
             }
             CoreAnsi_.get()->AnsiTerminalResize(FileW, FileH, 0);
-            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 0);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 0);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
         case 1: // ANSI
             BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileTxt, 0);
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 1);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 1);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
@@ -2575,7 +2559,7 @@ void Core0Editor::FileLoad2()
             XBIN_.SetRaw(FileTxtRaw, -1, false);
             XBIN_.GetStr(FileTxt, BinaryFile_.get()->CurrentFileAttrGet(0));
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 3);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 3);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
@@ -2584,7 +2568,7 @@ void Core0Editor::FileLoad2()
             XBIN_.SetRaw(FileTxtRaw, -1, true);
             XBIN_.GetStr(FileTxt, BinaryFile_.get()->CurrentFileAttrGet(0));
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 3);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 3);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
@@ -2661,7 +2645,7 @@ void Core0Editor::FileLoad2()
         }
     }
     CoreAnsi_.get()->AnsiTerminalResize(AnsiMaxX_, AnsiMaxY_, 0);
-    CoreAnsi_.get()->AnsiProcessReset(true, false, 0, 1);
+    CoreAnsi_.get()->AnsiProcessReset(false, 0, 1);
 
 
     EditorData_.get()->TextBuffer.TrimLines();

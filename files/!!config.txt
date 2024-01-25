@@ -51,7 +51,7 @@ ANSIScrollSmooth=4
 
 ### Player configuration
 
-PlayerEnd=0
+PlayerEnd=1
 PlayerStep=100
 PlayerDelayFrame=200
 
@@ -82,10 +82,11 @@ Terminal2Codec=65001
 
 ### File extensions for type detect
 
-FileExtText=txt,bbs,lst,nfo,asc,doc,dox,diz,bat,htm,html
+FileExtText=txt,bbs,lst,asc,doc,dox,diz,bat,htm,html,log,ini,inf
 FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo,ams,mus
 FileExtBin=bin
 FileExtXbin=xb,xbin
+FileExtOmmit=exe,com,bat,dat,png,jpg,jpeg,jpe,gif,bmp,zip,rar,rip,pdf,arj
 
 
 ### Duospace font mode
@@ -339,7 +340,7 @@ BeyondLineMargin=-1
 ANSIBufferAbove=1
 ANSIBufferBelow=1
 
-ANSICharsDOS=0020,263A,263B,2665,2666,2663,2660,2022,25D8,25CB,25D9,2642,2640,266A,266B,263C,25BA,25C4,2195,203C,00B6,00A7,25AC,21A8,2191,2193,2192,2190,221F,2194,25B2,25BC,2302
+ANSICharsDOS=2800,263A,263B,2665,2666,2663,2660,2022,25D8,25CB,25D9,2642,2640,266A,266B,263C,25BA,25C4,2195,203C,00B6,00A7,25AC,21A8,2191,2193,2192,2190,221F,2194,25B2,25BC,2302
 ANSICharsVT52=0020,0020,2588,00B9,00B3,2075,2077,00B0,00B1,2192,2026,00F7,2193,2594,1FB76,1FB77,1FB78,1FB79,1FB7A,1FB7B,2581,2080,2081,2082,2083,2084,2085,2086,2087,2088,2089,00B6
 
 ANSIColorThresholdBlackWhite=48

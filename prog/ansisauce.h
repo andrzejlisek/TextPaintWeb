@@ -12,8 +12,8 @@ public:
     AnsiSauce();
 
     XList<std::string> Info;
-    Raw InfoRaw;
 
+    void Clear();
     void NonSauceInfo(std::string Label, long Value);
     void NonSauceInfo(std::string Label, std::string Value);
     void CreateInfo();
@@ -22,6 +22,7 @@ public:
     int DataIdx = -1;
 
 private:
+    int NonSaucePos = 0;
     int SauceIdx = -1;
     int CommentIdx = -1;
     std::string NameDataType[10] { "None", "Character", "Bitmap", "Vector", "Audio", "BinaryText", "XBin", "Archive", "Executable", "_" };
@@ -61,10 +62,6 @@ private:
 
     void ReadSAUCE();
     void ReadCOMNT();
-
-    XList<std::string> NonSauceInfo1;
-    XList<std::string> NonSauceInfo2;
-
 };
 
 #endif // ANSISAUCE_H

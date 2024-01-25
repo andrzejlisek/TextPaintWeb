@@ -5,6 +5,15 @@ AnsiSauce::AnsiSauce()
 
 }
 
+void AnsiSauce::Clear()
+{
+    NonSaucePos = 0;
+    Info.Clear();
+    SauceIdx = -1;
+    CommentIdx = -1;
+    DataIdx = -1;
+}
+
 void AnsiSauce::NonSauceInfo(std::string Label, long Value)
 {
     NonSauceInfo(Label, std::to_string(Value));
@@ -12,25 +21,22 @@ void AnsiSauce::NonSauceInfo(std::string Label, long Value)
 
 void AnsiSauce::NonSauceInfo(std::string Label, std::string Value)
 {
-    NonSauceInfo1.Add(Label);
-    NonSauceInfo2.Add(Value);
+    Info.Insert(NonSaucePos, Label + ": " + Value);
+    NonSaucePos++;
 }
 
 void AnsiSauce::CreateInfo()
 {
-    InfoRaw.Clear();
-    SauceIdx = -1;
-    CommentIdx = -1;
-    DataIdx = -1;
+    Clear();
 
     if (SauceIdx < 0)
     {
-        SauceIdx = Raw_.Count - 129;
-        if (GetByte(SauceIdx + 1) != 'S') { SauceIdx = -1; }
-        if (GetByte(SauceIdx + 2) != 'A') { SauceIdx = -1; }
-        if (GetByte(SauceIdx + 3) != 'U') { SauceIdx = -1; }
-        if (GetByte(SauceIdx + 4) != 'C') { SauceIdx = -1; }
-        if (GetByte(SauceIdx + 5) != 'E') { SauceIdx = -1; }
+        SauceIdx = Raw_.Count - 128;
+        if (GetByte(SauceIdx + 0) != 'S') { SauceIdx = -1; }
+        if (GetByte(SauceIdx + 1) != 'A') { SauceIdx = -1; }
+        if (GetByte(SauceIdx + 2) != 'U') { SauceIdx = -1; }
+        if (GetByte(SauceIdx + 3) != 'C') { SauceIdx = -1; }
+        if (GetByte(SauceIdx + 4) != 'E') { SauceIdx = -1; }
     }
 
     Field01Version = "";
@@ -51,10 +57,6 @@ void AnsiSauce::CreateInfo()
     Comment.Clear();
     Info.Clear();
 
-    for (int i = 0; i < NonSauceInfo1.Count; i++)
-    {
-        Info.Add(NonSauceInfo1[i] + ": " + NonSauceInfo2[i]);
-    }
     Info.Add("");
 
     if (SauceIdx >= 0)
@@ -73,6 +75,7 @@ void AnsiSauce::CreateInfo()
             {
                 DataIdx = CommentIdx;
             }
+
             ReadCOMNT();
         }
 
@@ -259,8 +262,7 @@ void AnsiSauce::CreateInfo()
 
 void AnsiSauce::LoadRaw(Raw &Raw__)
 {
-    NonSauceInfo1.Clear();
-    NonSauceInfo2.Clear();
+    Clear();
     Raw_ = Raw__;
 }
 
@@ -313,12 +315,7 @@ int AnsiSauce::GetByte(int Idx)
 
 void AnsiSauce::ReadSAUCE()
 {
-    for (int i = 0; i < (Raw_.Count - SauceIdx - 1); i++)
-    {
-        InfoRaw.Add(Raw_[SauceIdx + 1 + i]);
-    }
-
-    int Ptr = SauceIdx + 6;
+    int Ptr = SauceIdx + 5;
     for (int i = 0; i < 2; i++)
     {
         Field01Version = Field01Version + GetChar(Ptr);
@@ -378,12 +375,7 @@ void AnsiSauce::ReadSAUCE()
 
 void AnsiSauce::ReadCOMNT()
 {
-    for (int i = 0; i < (Raw_.Count - CommentIdx - 1); i++)
-    {
-        InfoRaw.Add(Raw_[CommentIdx + 1 + i]);
-    }
-
-    int Ptr = CommentIdx + 6;
+    int Ptr = CommentIdx + 5;
     while (true)
     {
         std::string CommentLine = "";

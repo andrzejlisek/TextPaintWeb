@@ -421,27 +421,37 @@ void Screen::CursorHide(bool Hide)
 
 void Screen::SetPalette(std::string PaletteColors)
 {
+    PaletteCustom = true;
     Screen::ScreenOtherString(1, PaletteColors);
 }
 
 void Screen::SetFont(std::string FontFile1, std::string FontFile2, std::string FontFile3, int FontMode)
 {
+    FontCustom = true;
     Screen::ScreenOtherString(2, FontFile1 + "|" + FontFile2 + "|" + FontFile3 + "|" + std::to_string(FontMode));
 }
 
 void Screen::SetCustomFont(int Size)
 {
+    for (int I = 0; I < 256; I++)
+    {
+        FontCustomMap[I] = I;
+    }
+    FontCustomMap[256] = 0;
+    FontCustom = true;
     Screen::ScreenOtherString(3, std::to_string(Size));
 }
 
-void Screen::SetCustomChar(std::string Data)
+void Screen::SetCustomChar(int CharCode, int CharDisp, std::string Data)
 {
+    FontCustomMap[CharCode] = CharDisp;
     Screen::ScreenOtherString(4, Data);
 }
 
 void Screen::SetPalette()
 {
     SetPalette(PaletteListColors[PaletteListSelect]);
+    PaletteCustom = false;
 }
 
 void Screen::SetFont()
@@ -450,6 +460,7 @@ void Screen::SetFont()
     std::string F2 = FontListFile2[FontListSelect];
     std::string F3 = FontListFile3[FontListSelect];
     SetFont(F1, F2, F3, FontListMode);
+    FontCustom = false;
 }
 
 void Screen::ResetCustomPaletteFont()

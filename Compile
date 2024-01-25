@@ -12,7 +12,7 @@ emcc -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp pr
  prog/editordata.cpp prog/editorinfo.cpp prog/editorchar.cpp prog/editorundoitem.cpp prog/editorundo.cpp prog/editorsemi.cpp \
  prog/editorpixelpaint.cpp prog/editorpixelpaintstate.cpp prog/editorclipboard.cpp prog/core0editor.cpp \
  prog/core1player.cpp \
- prog/terminalkeyboard.cpp prog/terminalmouse.cpp prog/terminalconn.cpp prog/terminalconntest.cpp prog/terminalconnworker.cpp prog/terminalconnworkertelnet.cpp prog/core2terminal.cpp \
+ prog/terminalkeyboard.cpp prog/terminalmouse.cpp prog/terminalconn.cpp prog/terminalconnworker.cpp prog/terminalconnworkertelnet.cpp prog/core2terminal.cpp \
  prog/core3keys.cpp prog/core4command.cpp prog/core9menu.cpp \
  progcore.cpp -s BUILD_AS_WORKER=1 -o compiled/progcore.js -s ALLOW_MEMORY_GROWTH
 

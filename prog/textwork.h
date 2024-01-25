@@ -38,6 +38,10 @@ public:
 
     static int StrToInt(std::string S, int Default);
     static long long StrToLong(std::string S, long long Default);
+
+    static std::string DebugPrint(Str Data);
+    static std::string DebugPrint(Raw Data);
+
 };
 
 #endif // TEXTWORK_H
