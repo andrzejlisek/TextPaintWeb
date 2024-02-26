@@ -160,14 +160,14 @@ TerminalKeyboard::TerminalKeyboard()
     TerminalKeys["PageDown_000_0"] = "##_[_6_~";
     TerminalKeys["Insert_000_1"] = "##_[_2_~";
     TerminalKeys["Delete_000_1"] = "##_[_3_~";
-    TerminalKeys["Home_000_1"] = "##_O_H";
-    TerminalKeys["End_000_1"] = "##_O_F";
+    TerminalKeys["Home_000_1"] = "##_[_H";
+    TerminalKeys["End_000_1"] = "##_[_F";
     TerminalKeys["PageUp_000_1"] = "##_[_5_~";
     TerminalKeys["PageDown_000_1"] = "##_[_6_~";
     TerminalKeys["Insert_000_2"] = "##_[_2_~";
     TerminalKeys["Delete_000_2"] = "##_[_3_~";
-    TerminalKeys["Home_000_2"] = "##_[_H";
-    TerminalKeys["End_000_2"] = "##_[_F";
+    TerminalKeys["Home_000_2"] = "##_O_H";
+    TerminalKeys["End_000_2"] = "##_O_F";
     TerminalKeys["PageUp_000_2"] = "##_[_5_~";
     TerminalKeys["PageDown_000_2"] = "##_[_6_~";
 
@@ -185,8 +185,8 @@ TerminalKeyboard::TerminalKeyboard()
     TerminalKeys["PageDown_CAS_1"] = "##_[_6_;_@_~";
     TerminalKeys["Insert_CAS_2"] = "##_[_2_;_@_~";
     TerminalKeys["Delete_CAS_2"] = "##_[_3_;_@_~";
-    TerminalKeys["Home_CAS_2"] = "##_[_H";
-    TerminalKeys["End_CAS_2"] = "##_[_F";
+    TerminalKeys["Home_CAS_2"] = "##_[_1_;_@_H";
+    TerminalKeys["End_CAS_2"] = "##_[_1_;_@_F";
     TerminalKeys["PageUp_CAS_2"] = "##_[_5_;_@_~";
     TerminalKeys["PageDown_CAS_2"] = "##_[_6_;_@_~";
 

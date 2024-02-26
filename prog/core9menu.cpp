@@ -8,25 +8,21 @@ Core9Menu::Core9Menu()
 void Core9Menu::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool ModCtrl, bool ModAlt)
 {
     bool WriteOpt = false;
-    switch (_(KeyName.c_str()))
+    switch (OptionTextKeyNumber(KeyName))
     {
-        case _("Digit0"):
-        case _("Numpad0"):
+        case 0:
             WriteOpt = true;
             Opt = 0;
             break;
-        case _("Digit1"):
-        case _("Numpad1"):
+        case 1:
             WriteOpt = true;
             Opt = 1;
             break;
-        case _("Digit2"):
-        case _("Numpad2"):
+        case 2:
             WriteOpt = true;
             Opt = 2;
             break;
-        case _("Digit3"):
-        case _("Numpad3"):
+        case 3:
             WriteOpt = true;
             Opt = 3;
             break;

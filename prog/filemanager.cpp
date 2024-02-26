@@ -300,11 +300,11 @@ void FileManager::RepaintDelete(int PosX, int PosY)
     int ItemIdx = BinaryFile_.get()->DirItemIdx;
     if (BinaryFile_.get()->GetFileType(ItemIdx) >= 0)
     {
-        Screen::ScreenWriteText(Str("Press ENTER to delete file."), PopupBack, PopupFore);
+        Screen::ScreenWriteText(Str("Press ENTER to remove file."), PopupBack, PopupFore);
     }
     else
     {
-        Screen::ScreenWriteText(Str("Press ENTER to delete sub-dir."), PopupBack, PopupFore);
+        Screen::ScreenWriteText(Str("Press ENTER to remove sub-dir."), PopupBack, PopupFore);
     }
 
     Screen::ScreenCursorMove(PosX + 2, PosY + 4);

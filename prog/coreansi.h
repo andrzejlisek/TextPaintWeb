@@ -93,8 +93,8 @@ private:
 
     int VT52_SemigraphChars[32];
 
-    bool __AnsiLineOccupy1_Use = false;
-    bool __AnsiLineOccupy2_Use = false;
+    bool __AnsiLineOccupy1_Use = true;
+    bool __AnsiLineOccupy2_Use = true;
 
     int ANSIScrollChars = 0;
     int ANSIScrollSmooth = 0;

@@ -38,6 +38,12 @@ public:
     void SaveConfig();
     void ScreenStatusBarSet(int ScreenStatusBar_);
     XBIN XBIN_;
+    int OptionTextKeyNumber(std::string KeyName);
+    std::string OptionTextInfo;
+    std::string OptionTextData;
+    void OptionTextInfoAddLine(std::string Info);
+    bool OptionTextKeyWrite(std::string KeyName, int KeyChar);
+    void OptionTextDisplayRefresh();
 protected:
     int ScreenStatusBar = 0;
     void ReadColor(std::string SettingValue, int &ColorB, int &ColorF);

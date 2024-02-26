@@ -161,7 +161,7 @@ void DisplayConfig::Repaint()
         }
     }
 
-    if ((PopupState == 2) && (Screen::FontCustom))
+    if ((PopupState == 2) && (Screen::FontCustom || Screen::FontSinglePage))
     {
         int HalfPos = (InfoH / 2) - 1;
         for (int YY = 0; YY < (InfoH - 2); YY++)
@@ -181,10 +181,21 @@ void DisplayConfig::Repaint()
             {
                 YY++;
             }
-            for (int XX = 0; XX < 16; XX++)
+            if (Screen::FontCustom)
             {
-                Screen::ScreenChar(OffsetX + (XX * 2), OffsetY + YY + 3, Screen::FontCustomMap[Ptr], CB_, CF_, 0, 0, 0);
-                Ptr++;
+                for (int XX = 0; XX < 16; XX++)
+                {
+                    Screen::ScreenChar(OffsetX + (XX * 2), OffsetY + YY + 3, Screen::FontCustomMap[Ptr], CB_, CF_, 0, 0, 0);
+                    Ptr++;
+                }
+            }
+            else
+            {
+                for (int XX = 0; XX < 16; XX++)
+                {
+                    Screen::ScreenChar(OffsetX + (XX * 2), OffsetY + YY + 3, Ptr, CB_, CF_, 0, 0, 0);
+                    Ptr++;
+                }
             }
         }
     }

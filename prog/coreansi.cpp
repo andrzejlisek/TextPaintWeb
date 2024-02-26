@@ -4,9 +4,6 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
 {
     CommandEndChar.AddString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@`{}~|");
 
-    __AnsiLineOccupy1_Use = CF.get()->ParamGetB("ANSIBufferAbove");
-    __AnsiLineOccupy2_Use = CF.get()->ParamGetB("ANSIBufferBelow");
-
     AnsiMaxX = CF.get()->ParamGetI("ANSIWidth");
     AnsiMaxY = CF.get()->ParamGetI("ANSIHeight");
     ScreenStatusBar = 0;

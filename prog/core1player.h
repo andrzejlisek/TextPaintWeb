@@ -48,6 +48,7 @@ private:
     std::shared_ptr<TextCodec> ServerEncoding;
 
     int FileDelayStep = 1;
+    int FileDelaySeek = 1000;
 
     Clipboard Clipboard_;
     Str FileCtX;

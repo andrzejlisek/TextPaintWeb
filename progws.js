@@ -72,6 +72,7 @@ function WebSocketPathFromServer(Name)
 
 function WebSocketFileSystemDir(Name)
 {
+    FileImportFinish(0, 2, Name, "~DIR", "", 0);
     Name = WebSocketPathToServer(Name);
     WebSocketObject.GetFiles(Name, "^.*$").then(
     (Params) => {

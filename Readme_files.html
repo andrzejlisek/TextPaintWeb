@@ -1,0 +1,206 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=windows-1250">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>TextPaint - File manager</title>
+</head>
+
+<body>
+
+<h1>File manager</h1>
+
+<p>This <strong>TextPaint</strong> has the internal file manager,
+which now allows to browse the files from internal storage and
+external storage via WebSocketApi.</p>
+
+<p>The file manager is available int these modules:</p>
+
+<ul>
+    <li><strong>Text editor</strong> - Press <strong>F10</strong>
+        key.</li>
+    <li><strong>Animation player</strong> - There are two ways:<ul>
+            <li><strong>Information screen</strong> - Press <strong>Enter</strong>
+                key.</li>
+            <li><strong>Animation playback</strong> - Press the <strong>.</strong>
+                (dot/period) key.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>The file magager is the pop-up window, where directories are
+highlighted by color inverse.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files1.png"
+width="256" height="256"></p>
+
+<p>In the file manager, there are special items, which are always
+visible.</p>
+
+<ul>
+    <li><strong>!!config.txt</strong> - configuration file.</li>
+    <li><strong>!!socket</strong> - WebApi socket, which accesses
+        to disk files via <a
+        href="https://github.com/andrzejlisek/WebApiServer">https://github.com/andrzejlisek/WebApiServer</a>.</li>
+</ul>
+
+<p>The <strong>!!</strong> is for enforce positioning special
+item at the list begin.</p>
+
+<p>In the file manager, there are posiible the following keys:</p>
+
+<ul>
+    <li><strong>Tab</strong> - Move the popup.</li>
+    <li><strong>Up arrow</strong> and <strong>Down arrow</strong>
+        - select item.</li>
+    <li><strong>Enter</strong> - Exit from the file manager when
+        selected file or enter into directory or upper directory.
+        The file selectrion has the following effect:<ul>
+            <li><strong>Text editor</strong> - You have to press
+                the <strong>F8</strong> to load selected file or
+                press the <strong>F7</strong> key to save the
+                current text into the selected file.</li>
+            <li><strong>Animation player</strong> - The file
+                manager is needed for change the current
+                directory. After closing the file manager, the
+                selected animation will be loaded.</li>
+        </ul>
+    </li>
+    <li><strong>Escape</strong> or <strong>Backspace</strong> -
+        Exit from the file manager without changing selected
+        file.</li>
+    <li><strong>Insert</strong> - Add new blank file. If you want
+        to add new direcotry, use shach charecter in name, for
+        example <strong>dirname/file</strong>. The empty
+        directory is not allowed.</li>
+    <li><strong>Delete</strong> - Remove file or directory.</li>
+    <li><strong>Home</strong> - Upload files. The ZIP files will
+        be extracted.</li>
+    <li><strong>End</strong> - Download file or directory. The
+        directory will be downloaded as single ZIP file.</li>
+    <li><strong>Space</strong> - Read and write options (codec
+        and file type).</li>
+</ul>
+
+<p>In the directory other than root directory, the path is be
+shown at the top and on file list, there is the <strong>..</strong>
+imaginary directory, which gives the access to upper directory.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files2.png"
+width="256" height="256"></p>
+
+<h1>File operations</h1>
+
+<p>The file manager allows for some file operations by
+appropriate keys listed in previous chapter.</p>
+
+<h2>New blank file</h2>
+
+<p>If you press the <strong>Insert</strong> key, you can add new
+blank file, which will be created within the current directory.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files3.png"
+width="256" height="256"></p>
+
+<p>You have to write the new file name. If you want to create
+subdirectory, input the name containing the <strong>/</strong>
+(slash) character, for example <strong>dirname/filename</strong>.
+You can not create directory without creating file.</p>
+
+<p>You can not add file within <strong>!!socket</strong>
+directory or its subdirectories.</p>
+
+<h2>Remove file</h2>
+
+<p>If you press the <strong>Delete</strong> key, you will be
+asket to confirm file or directory removement.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files4.png"
+width="256" height="256"></p>
+
+<p>Press enter to remove selected file.</p>
+
+<p>You can not remove files and directories within <strong>!!socket</strong>
+directory or its subdirectories.</p>
+
+<h2>Upload and download files</h2>
+
+<p>To upload files, press the <strong>Home</strong> key. The
+standard file open dialog will be shown and you can select one or
+several files to upload into the internal storage. If you select
+any ZIP file, the archive contents will be extracted.</p>
+
+<p>To download file or directory, press the <strong>End</strong>
+key. The standard file save dialog will be shown and you have to
+set the file number, which will be saved from internal storage.
+If you download the directory, the contents will be packet into
+single ZIP archive file.</p>
+
+<p>While upload/download procesing, there will be shown two
+numbers. The first number is number of currently processed file,
+the second number is quantity of all files.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files5.png"
+width="256" height="256"></p>
+
+<p>If you upload ZIP archive files, the quantity of all files
+will be increased by number of files within ZIP archive.</p>
+
+<h1>Text codec</h1>
+
+<p>You can change the text codec used for file load or save. To
+do this, you have to press <strong>Space</strong> key, select <strong>Codec</strong>
+by <strong>Left Arrow</strong> or <strong>Right Arrow</strong>.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files6.png"
+width="256" height="256"></p>
+
+<p>Using the <strong>Up Arrow</strong> or <strong>Down Arrow</strong>,
+select the text codec, then press <strong>Space</strong> key
+again.</p>
+
+<h1>File type</h1>
+
+<p>You can change the file type for file load or save. To do
+this, you have to press <strong>Space</strong> key, select <strong>Codec</strong>
+by <strong>Left Arrow</strong> or <strong>Right Arrow</strong>.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`files/files7.png"
+width="256" height="256"></p>
+
+<p>Using the <strong>Up Arrow</strong> or <strong>Down Arrow</strong>,
+select the text codec, then press <strong>Space</strong> key
+again.</p>
+
+<p>The options has the following meaning:</p>
+
+<ul>
+    <li><strong>Auto - Text</strong> - Apply file type depending
+        on extension according parameters in <strong>!!config.txt</strong>,
+        treat file with unknown extension as <strong>Text</strong>
+        file. If you load <strong>Bin</strong> or <strong>XBin</strong>
+        file into text editor and save file, the file will be
+        saved as <strong>Ansi</strong> file.</li>
+    <li><strong>Auto - Ansi</strong> - Apply file type depending
+        on extension according parameters in <strong>!!config.txt</strong>,
+        treat file with unknown extension as <strong>Ansi</strong>
+        file. If you load <strong>Bin</strong> or <strong>XBin</strong>
+        file into text editor and save file, the file will be
+        saved as <strong>Ansi</strong> file.</li>
+    <li><strong>Text</strong> - Treat every file as <strong>Text</strong>
+        file regardless the file extension.</li>
+    <li><strong>Ansi</strong> - Treat every file as <strong>Ansi</strong>
+        file regardless the file extension.</li>
+    <li><strong>Bin</strong> - Load every file as <strong>Bin</strong>
+        file regardless the file extension and save any edited
+        file as <strong>Ansi</strong> file.</li>
+    <li><strong>XBin</strong> - Load every file as <strong>XBin</strong>
+        file regardless the file extension and save any edited
+        file as <strong>Ansi</strong> file.</li>
+</ul>
+
+<p><script language="JavaScript"
+src="file:///media/xxx/WORK1/__ToBackup/Develop/HTML/HTML2MD/Prog/html2md.js"></script></p>
+</body>
+</html>

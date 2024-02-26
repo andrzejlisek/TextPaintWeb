@@ -26,7 +26,6 @@ private:
     XList<std::string> ConnListType;
     XList<std::string> ConnListAddr;
     XList<int> ConnListCodec;
-    void ConnListPrint();
     std::string ConnListKeys = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     std::string ConnSelectedType;
     std::string ConnSelectedAddr;
@@ -72,7 +71,7 @@ private:
     int TerminalStep;
     Clipboard Clipboard_;
 
-    enum WorkStateCDef { ConnListSelect, InfoScreen, Session, Toolbox, Toolbox_, EscapeKey, DispConf };
+    enum WorkStateCDef { ConnListSelectBefore, ConnListSelect, ConnListSelectCustom1, ConnListSelectCustom1Key, ConnListSelectCustom2, ConnListSelectCustom2Key, ConnListSelectCustom3, ConnListSelectCustom3Key, InfoScreen, InfoScreenBefore, Session, Toolbox, Toolbox_, EscapeKey, DispConf };
     WorkStateCDef WorkStateC = WorkStateCDef::InfoScreen;
 
     std::unique_ptr<TerminalConn> Conn;

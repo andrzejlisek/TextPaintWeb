@@ -28,12 +28,17 @@ void Core1Player::Init()
     }
 
     FileDelayStep = CF.get()->ParamGetI("PlayerStep");
+    FileDelaySeek = CF.get()->ParamGetI("PlayerSeek");
 
     if (FileDelayStep <= 0)
     {
         FileDelayStep = 1;
     }
-    CoreAnsi_.get()->AnsiSeekInterval(FileDelayStep * 10);
+    if (FileDelaySeek <= 0)
+    {
+        FileDelaySeek = 1;
+    }
+    CoreAnsi_.get()->AnsiSeekInterval(FileDelaySeek);
     CalcFileDelayStep();
 }
 
@@ -113,7 +118,7 @@ void Core1Player::EventTick()
                 Screen_WriteLine();
                 Screen_WriteLine();
                 Screen_WriteLine();
-                Screen_WriteText("Press Enter to select a file or Tab to quit.");
+                Screen_WriteText("Press Enter to select a file or Tab to exit.");
                 Screen_WriteLine();
                 Screen_Refresh();
                 WorkStateS = WorkStateSDef::InfoScreenWaitForKey;

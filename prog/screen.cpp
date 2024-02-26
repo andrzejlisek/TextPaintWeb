@@ -461,6 +461,7 @@ void Screen::SetFont()
     std::string F3 = FontListFile3[FontListSelect];
     SetFont(F1, F2, F3, FontListMode);
     FontCustom = false;
+    FontSinglePage = false;
 }
 
 void Screen::ResetCustomPaletteFont()

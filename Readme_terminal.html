@@ -1,0 +1,233 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=windows-1250">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>TextPaint - Terminal</title>
+</head>
+
+<body>
+
+<h1>Terminal</h1>
+
+<p>TextPaint provides simple terminal, whis can be used to test
+ANSI interpreter compatibility with VTxxx/ANSI terminal. Terminal
+supports following connection types:</p>
+
+<ul>
+    <li><strong>CMD</strong> - System command with redirecting
+        standard input, output and error streams.</li>
+    <li><strong>TELNET</strong> - Network connection using Telnet
+        protocol.</li>
+    <li><strong>RAWNET</strong> - Network connection without
+        using any protocol.</li>
+</ul>
+
+<p>Additionally, you can use internal VTTEST for simulate
+terminal connection without any real connection.</p>
+
+<h1>Connection list</h1>
+
+<p>In the <strong>!!config.txt</strong> file, you can predefine
+connection list. Each item consists of four following parameters:</p>
+
+<ul>
+    <li><strong>Name</strong> - Name visible on the screen before
+        connection.</li>
+    <li><strong>Type</strong> - Connection type. For <strong>TELNET</strong>,
+        you can additionally define the automatically sending
+        window size by suffinxing the type name with number. For
+        example, if you define type as <strong>TELNET20</strong>,
+        the window size will be sent automatically after <strong>20</strong>
+        ticks counted from connection establishment.</li>
+    <li><strong>Addr</strong> - Network address with port number
+        or full command with parameter for system command
+        depending on type.</li>
+    <li><strong>Codec</strong> - Text codec used in connection.
+        In most cases, you have use <strong>0</strong> as no
+        codec or <strong>65001</strong> for use UTF-8 codec.</li>
+</ul>
+
+<p>If rou run terminal, at the beginning you will see the
+predefined connections:</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`terminal/terminal1.png"
+width="256" height="256"></p>
+
+<p>You have to press the key pointing to desired connection. The <strong>0</strong>
+key will run internal VTTEST and last key in the list will allow
+to input other connection parameters, which are not in the list.</p>
+
+<h1>Terminal session</h1>
+
+<p>After selecting the connection, you will have to, choose and
+press key, which will be used as escape key.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`terminal/terminal2.png"
+width="256" height="256"></p>
+
+<p>The escape key means the key, which provides access to
+functions instead of sending keystroke to server.</p>
+
+<p>The escape key can be changed during the session. After
+pressing the key, the session will begin and you can use the
+server service.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`terminal/terminal3.png"
+width="256" height="256"></p>
+
+<p>During the session, if you press the selected escape key, the
+information window will popup and you will can use special keys:</p>
+
+<ul>
+    <li><strong>Escape</strong> or <strong>=</strong> - Return to
+        terminal (close information pop-up).</li>
+    <li><strong>Enter</strong> - Change current escape key.</li>
+    <li><strong>Tab</strong> - Move information window.</li>
+    <li><strong>Backspace</strong> - Exit to main menu.</li>
+    <li><strong>;</strong> or <strong>:</strong> - Switch number
+        key (number from <strong>1</strong> to <strong>9</strong>
+        followed by <strong>0</strong>) function between six
+        states:<ul>
+            <li><strong>State 1</strong> - Send keys from <strong>F1</strong>
+                to <strong>F10</strong>.</li>
+            <li><strong>State 2</strong> - Send keys from <strong>F11</strong>
+                to <strong>F20</strong>.</li>
+            <li><strong>State 3</strong> - Use <strong>&lt;</strong>
+                and <strong>&gt;</strong> keys to send the <strong>AnswerBack</strong>
+                message and use the number keys to send as
+                following:<ul>
+                    <li><strong>Number 2</strong> - NUL (00h) - <strong>Ctrl+2</strong>,
+                        <strong>Ctrl+@</strong>, <strong>Ctrl+Space</strong>.</li>
+                    <li><strong>Number 3</strong> - ESC (1Bh) - <strong>Ctrl+3</strong>,
+                        <strong>Ctrl+[</strong>, <strong>Ctrl+{</strong>.</li>
+                    <li><strong>Number 4</strong> - FS (1Ch) - <strong>Ctrl+4</strong>,
+                        <strong>Ctrl+\</strong>, <strong>Ctrl+|</strong>.</li>
+                    <li><strong>Number 5</strong> - GS (1Dh) - <strong>Ctrl+5</strong>,
+                        <strong>Ctrl+]</strong>, <strong>Ctrl+}</strong>.</li>
+                    <li><strong>Number 6</strong> - RS (1Eh) - <strong>Ctrl+6</strong>,
+                        <strong>Ctrl+^</strong>, <strong>Ctrl+~</strong>.</li>
+                    <li><strong>Number 7</strong> - US (1Fh) - <strong>Ctrl+7</strong>,
+                        <strong>Ctrl+_</strong>, <strong>Ctrl+/</strong>.</li>
+                    <li><strong>Number 8</strong> - DEL (7Fh) - <strong>Ctrl+8</strong>,
+                        <strong>Ctrl+?</strong>.</li>
+                </ul>
+            </li>
+            <li><strong>State 4</strong>, <strong>State 5</strong>
+                and <strong>State 6</strong> - The same as three
+                first states, there are available other keys for
+                send control codes instead of some functions.</li>
+        </ul>
+    </li>
+    <li><strong>&lt;</strong> - Send <strong>F11</strong> key or <strong>AnswerBack</strong>
+        message.</li>
+    <li><strong>&gt;</strong> - Send <strong>F12</strong> key or <strong>AnswerBack</strong>
+        message.</li>
+    <li><strong>Letter</strong> - Send letter with Ctrl modifier,
+        like Ctrl+X.</li>
+    <li><strong>{</strong> or <strong>}</strong> - Change codes
+        for function keys, arrows, and position keys. Theere are
+        the following settings:<ul>
+            <li><strong>1</strong> - Cursor keys - two variants.</li>
+            <li><strong>2</strong> - Keys from F1 to F4 - two
+                variants.</li>
+            <li><strong>3</strong> - Keys from F5 to F12 - two
+                variants.</li>
+            <li><strong>4</strong> - Editing keys (Ins, Del,
+                Home, End, PgUp, PgDown) - three variants.</li>
+            <li><strong>5</strong> - Enter key - three variants.</li>
+            <li><strong>6</strong> - Backspace key - two
+                variants.</li>
+            <li><strong>7</strong> - Numpad keys - two variants.</li>
+        </ul>
+    </li>
+    <li><strong>[</strong> or <strong>]</strong> - Enable forcing
+        modifier keys (Control, Alt, Shift) for function keys,
+        editing keys and arrows. Usable when pressing such key
+        with modifier is neccesary for appliaction, but TextPaint
+        does not receive such combination:<ul>
+            <li><strong>1</strong> - Force Control.</li>
+            <li><strong>2</strong> - Force Alt.</li>
+            <li><strong>3</strong> - Force Shift.</li>
+        </ul>
+    </li>
+    <li><strong>/</strong> - Connect od disconnect, depending on
+        current state.</li>
+    <li><strong>?</strong> - Send screen size to server, some
+        servers requires such information.</li>
+    <li><strong>~</strong> - Enable or disablo local echo. While
+        enabled, all printable characters, <strong>Enter</strong>
+        and <strong>Backspace</strong> key will be sent both to
+        server and to terminal.</li>
+    <li><strong>\</strong> - ANSI processing and display
+        parameters.</li>
+    <li><strong>`</strong> - Show or hide title bar. The title
+        bar contains terminal title defined by appropriate XTERM
+        command. The VT320 status bar is not available.</li>
+    <li><strong>,</strong> - Copy screen to system clipboard as
+        plain text. The leading and trailing blank lines will be
+        ommited.</li>
+    <li><strong>.</strong> - Paste text from system clipboard as
+        keystrokes.</li>
+</ul>
+
+<p><img src="readme_pics/pic.jpg" alt="`terminal/terminal4.png"
+width="256" height="256"></p>
+
+<h1>Telnet client limitations</h1>
+
+<p>TextPaint has some limitations compared to other Telnet/SSH
+software due to architecture and applied approaches:</p>
+
+<ul>
+    <li>Limited compatibility with VTx/ANSI terminals, the
+        compatibility is sufficient in most cases.</li>
+    <li>TextPaint recognizes XTERM 256 colors and 24-bit RGB, but
+        these colors are converted to standard 16 colors.</li>
+    <li>Features, which are not supported, but rarely used:<ul>
+            <li>Graphics in any form, including ReGIS, Sixel and
+                Tektronix 4014.</li>
+            <li>Printer.</li>
+            <li>Status bar.</li>
+            <li>Actions related to gryphs including DRCS and
+                XTERM fonts.</li>
+        </ul>
+    </li>
+    <li>For XTWINOPS command, there are assumptions and
+        limitations:<ul>
+            <li>Cell size in pixels for window size report or
+                change is always 8x16.</li>
+            <li>Reported window position is always (1,1).</li>
+            <li>Reported window state is always normal.</li>
+            <li>Resizing is the only command taking any effect.</li>
+            <li>Other commands (iconify/deiconify, set position,
+                raise/lower) does not work, but not matter for
+                any application/service.</li>
+            <li>Window size, text area size and screen size are
+                the same size in pixels or in characters.</li>
+        </ul>
+    </li>
+    <li>While SGR-Pixels mouse coordinates is enabled, the mouse
+        sent coordinated will be rounded to block coordinates
+        calculated as clicking in the middle of the 8x16 block.</li>
+</ul>
+
+<h1>Mouse operation</h1>
+
+<p>During telnet session, you can use mouse for copy any screen
+area into clipboard. The area will be rectangular between mouse
+button press and release. The area will not be highlighted.</p>
+
+<p>If the server enable any mouse events, the mouse block cursor
+will be shown and the mouse button events will be sent into
+server instead of text copying. If you want to copy any screen
+area during active mouse event, you have to display pop-up using
+defined escape key and drag mouse over desired screen area (the
+menu text will not be copied). Pop-up display temporary disables
+sending mouse events.</p>
+
+<p><script language="JavaScript"
+src="file:///media/xxx/WORK1/__ToBackup/Develop/HTML/HTML2MD/Prog/html2md.js"></script></p>
+</body>
+</html>

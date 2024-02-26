@@ -1,12 +1,3 @@
-### There is TextPaint configuration file. The lines without equation sign
-### and blank lines are ignored and can be used for comments. The description
-### lines are preceded by ### for clarity only. Any prefix is not required
-### for treat this line as comment.
-###
-### You can change this file using editor and the changes will take effect
-### after application restart or refresh.
-
-
 ### Application timer options
 
 TimerPeriod=50
@@ -16,6 +7,11 @@ TimerBlink=10
 TimerTick=1
 
 
+### WebApiServer WebSocket address
+
+WebSocket=ws://localhost:8888
+
+
 ### Window and screen option
 
 WinW=80
@@ -23,11 +19,73 @@ WinH=24
 WinScreenSize=70
 WinKeyboardSize=30
 WinTouchScreen=0
+DisplayInterpolate=2
+DisplayBlink=1
+DisplayAttrib=14
+SteadyCursor=0
 
 
-### WebApiServer WebSocket address
+### Player configuration
 
-WebSocket=ws://localhost:8888
+PlayerEnd=1
+PlayerStep=100
+PlayerDelayFrame=200
+PlayerSeek=1000
+
+
+### Terminal configuration
+
+TerminalName=xterm-256color
+TerminalType=5
+TerminalStep=100
+TerminalKeys=1102000
+TerminalAnswerBack=TextPaint
+
+
+### Terminal connections
+
+Terminal1Name=Telnet local host by network
+Terminal1Type=TELNET
+Terminal1Addr=localhost:23
+Terminal1Codec=65001
+Terminal2Name=Telnet local host by /bin/telnet command
+Terminal2Type=CMD
+Terminal2Addr=/bin/telnet localhost 23
+Terminal2Codec=65001
+
+
+### Render options
+
+RenderType=PNG
+RenderFile=File.png
+RenderStep=50
+RenderOffset=0
+RenderCursor=1
+RenderFrame=200
+RenderSliceX=0
+RenderSliceY=0
+RenderSliceW=0
+RenderSliceH=0
+RenderLeading=0
+RenderTrailing=0
+RenderBlinkPeriod=10
+RenderBlinkOffset=0
+
+
+### Bell options
+
+BellVolume=25
+BellFrequency=800
+BellDuration=100
+
+
+### File extensions for type detect
+
+FileExtText=txt,bbs,lst,asc,doc,dox,diz,bat,htm,html,log,ini,inf
+FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo,ams,mus
+FileExtBin=bin
+FileExtXbin=xb,xbin
+FileExtOmmit=exe,com,bat,dat,png,jpg,jpeg,jpe,gif,bmp,zip,rar,rip,pdf,arj
 
 
 ### Common ANSI process settings
@@ -49,54 +107,9 @@ ANSIScrollChars=400
 ANSIScrollSmooth=4
 
 
-### Player configuration
+### Font settings
 
-PlayerEnd=1
-PlayerStep=100
-PlayerDelayFrame=200
-
-
-### Terminal configuration
-
-TerminalEncoding=65001
-TerminalName=xterm-256color
-TerminalType=5
-TerminalVTFuncKeys=0
-TerminalVTArrowKeys=0
-TerminalStep=100
-TerminalKeys=1101000
-TerminalAnswerBack=TextPaint
-
-
-### Terminal connections
-
-Terminal1Name=Telnet local host by network
-Terminal1Addr=localhost:23
-Terminal1Type=TELNET
-Terminal1Codec=65001
-Terminal2Name=Telnet local host by /bin/telnet command
-Terminal2Addr=/bin/telnet localhost 23
-Terminal2Type=CMD
-Terminal2Codec=65001
-
-
-### File extensions for type detect
-
-FileExtText=txt,bbs,lst,asc,doc,dox,diz,bat,htm,html,log,ini,inf
-FileExtAnsi=ans,vt,isg,clr,gbs,lit,ice,wkd,cia,drk,mem,lgo,ams,mus
-FileExtBin=bin
-FileExtXbin=xb,xbin
-FileExtOmmit=exe,com,bat,dat,png,jpg,jpeg,jpe,gif,bmp,zip,rar,rip,pdf,arj
-
-
-### Duospace font mode
-
-# FontMode=0 - Monospace without double-width characters
-# FontMode=1 - Duospace font
-# FontMode=2 - Monospace with double-width characters and stretched single-width characters
-# If the FontChars parameter is not provided or blank, the parameter does not matter
 FontMode=1
-
 FontSelect=3
 
 
@@ -116,7 +129,7 @@ Font5File1=files/fonts/Dos/Dos09x14.png
 Font6Name=DOS 9x16
 Font6File1=files/fonts/Dos/Dos09x16.png
 
-# Unscii - several small fonts
+# Unscii small fonts
 Font7Name=Unscii 8x8 standard
 Font7File1=files/fonts/Unscii/Unscii08x08.png
 Font8Name=Unscii 8x8 alternative
@@ -134,9 +147,10 @@ Font12File1=files/fonts/Small/Small04x04.png
 Font13Name=VT220 8x10 font
 Font13File1=files/fonts/VT/VT08x10.png
 
+
 ### Duospace fonts
 
-# Unscii - single large font
+# Unscii large font
 Font14Name=Unscii DUO 8x16
 Font14File1=files/fonts/Unscii/Unscii08x16.png
 Font14File2=files/fonts/Unscii/Unscii08x16_double.png
@@ -179,7 +193,10 @@ Font23File1=files/fonts/Xterm/Xterm10x20_IMG.png
 Font23File2=files/fonts/Xterm/Xterm10x20_IMG_double.png
 Font23File3=files/fonts/Xterm/Xterm10x20_IMG_double.txt
 
-### No-codec fonts, which used page 0 only, contains 256 characters
+
+### No-codec 256-character fonts, which uses page 0 only, contains 256 characters
+
+# Amiga fonts
 Font24Name=Amiga 256 8x8 Topaz 1
 Font24File1=files/fonts/NoCodec/Amiga08x08-Topaz1.png
 Font25Name=Amiga 256 8x8 Topaz 2
@@ -196,15 +213,11 @@ Font30Name=Amiga 256 8x16 Topaz 2
 Font30File1=files/fonts/NoCodec/Amiga08x16-Topaz2.png
 Font31Name=Amiga 256 8x16 MicroKnight
 Font31File1=files/fonts/NoCodec/Amiga08x16-MicroKnight.png
+
+# Atari Portfolio font
 Font32Name=Portfolio 256 6x8
 Font32File1=files/fonts/NoCodec/Portfolio06x08.png
 
-
-### Display options
-DisplayInterpolate=2
-DisplayBlink=1
-DisplayAttrib=14
-SteadyCursor=0
 
 ### Color blending options
 ColorBlending=1
@@ -226,10 +239,13 @@ ColorBlending_14=1FB92,2584,1,1,1
 ColorBlending_15=1FB93,258C,1,1,1
 ColorBlending_16=1FB94,2590,1,1,1
 
+
 ### Color palette
-# The left half is normal display, the right half is the VT blink display
 
 PaletteSelect=1
+
+
+### Color palette list
 
 Palette1Name=DOS
 Palette1Colors=000000AA000000AA00AAAA000000AAAA00AA00AAAAAAAAAA555555FF555555FF55FFFF555555FFFF55FF55FFFFFFFFFF000000710000007100717100000071710071007171717171393939AA393939AA39AAAA393939AAAA39AA39AAAAAAAAAA
@@ -240,36 +256,19 @@ Palette2Colors=000000AA000000AA00AA55000000AAAA00AA00AAAAAAAAAA555555FF555555FF5
 Palette3Name=Windows
 Palette3Colors=000000800000008000808000000080800080008080C0C0C0808080FF000000FF00FFFF000000FFFF00FF00FFFFFFFFFF000000400000004000404000000040400040004040606060404040800000008000808000000080800080008080808080
 
-### Bell options
-# Volume is 0-100, frequency is in Hz, duration is in milliseconds
 
-BellVolume=25
-BellFrequency=800
-BellDuration=100
+### Editor color configuration
 
-
-
-
-### Render options - not implemented yet
-
-RenderType=PNG
-RenderFile=File.png
-RenderStep=50
-RenderOffset=0
-RenderCursor=1
-RenderFrame=200
-RenderSliceX=0
-RenderSliceY=0
-RenderSliceW=0
-RenderSliceH=0
-RenderLeading=0
-RenderTrailing=0
-RenderBlinkPeriod=10
-RenderBlinkOffset=0
+ColorNormal=07
+ColorBeyondLine=87
+ColorBeyondEnd=78
+ColorStatus=F0
+ColorPopup=0F
+ColorKeyboard=8F
+BeyondLineMargin=-1
 
 
-
-### Editor configuration
+### Editor character configuration
 
 Space=20,A0,2800
 
@@ -325,20 +324,8 @@ Pixel_5_13=28C4,28C5,28CC,28CD,28C6,28C7,28CE,28CF,28D4,28D5,28DC,28DD,28D6,28D7
 Pixel_5_14=28E0,28E1,28E8,28E9,28E2,28E3,28EA,28EB,28F0,28F1,28F8,28F9,28F2,28F3,28FA,28FB
 Pixel_5_15=28E4,28E5,28EC,28ED,28E6,28E7,28EE,28EF,28F4,28F5,28FC,28FD,28F6,28F7,28FE,28FF
 
-ColorNormal=07
-ColorBeyondLine=87
-ColorBeyondEnd=78
-ColorStatus=F0
-ColorPopup=0F
-ColorKeyboard=8F
-BeyondLineMargin=-1
-
-
 
 ### Special ANSI configuration
-
-ANSIBufferAbove=1
-ANSIBufferBelow=1
 
 ANSICharsDOS=2800,263A,263B,2665,2666,2663,2660,2022,25D8,25CB,25D9,2642,2640,266A,266B,263C,25BA,25C4,2195,203C,00B6,00A7,25AC,21A8,2191,2193,2192,2190,221F,2194,25B2,25BC,2302
 ANSICharsVT52=0020,0020,2588,00B9,00B3,2075,2077,00B0,00B1,2192,2026,00F7,2193,2594,1FB76,1FB77,1FB78,1FB79,1FB7A,1FB7B,2581,2080,2081,2082,2083,2084,2085,2086,2087,2088,2089,00B6
@@ -347,13 +334,15 @@ ANSIColorThresholdBlackWhite=48
 ANSIColorThresholdGray=20
 
 
-### Codec and type set in file manager
+### File handling settings
 
 FileCodec=65001
 FileType=0
 
-### There are files, which can be loaded as default.
 
+### Host fetch files
+
+# VT100 Xmas demos
 File1=xmas/xmas0.ans
 File2=xmas/xmas1.ans
 File3=xmas/xmas2.ans
@@ -365,6 +354,7 @@ File8=xmas/xmas7.ans
 File9=xmas/xmas8.ans
 File10=xmas/xmas9.ans
 
+# VT100 miscelaneous demos
 File11=vt100/bambi.godzila.vt
 File12=vt100/bambi.vt
 File13=vt100/barney.vt
@@ -459,14 +449,17 @@ File101=vt100/xmasshort.vt
 File102=vt100/xmas.vt
 File103=vt100/zorro.vt
 
+# ASCII/ANSI test files
 File104=test/charmap.ans
 File105=test/colors16.ans
 File106=test/colors256.ans
 File107=test/format.ans
-File108=test/test.ans
+File108=test/chartest.ans
 File109=test/font.ans
 File110=test/blend.ans
 File111=test/onebyte.txt
+File112=test/borders.txt
+File112=test/colorwheel.ans
 
 ### Favorite character table, you can store up to 256 characters
 

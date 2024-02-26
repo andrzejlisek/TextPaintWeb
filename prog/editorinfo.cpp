@@ -3,21 +3,22 @@
 EditorInfo::EditorInfo()
 {
     Info0.Add("Common keys:");
-    Info0.Add("  Arrows, Home, End, PageUp, PageDown - Move cursor");
-    Info0.Add("  Tab - Cursor display style");
-    Info0.Add("  Esc - Text writing direction");
-    Info0.Add("  F1, F2, F3, F4 - Change state or display information");
-    Info0.Add("  F7 - Save file");
-    Info0.Add("  F8 - Reload file");
-    Info0.Add("  F9 - Character selector");
-    Info0.Add("  F12 - Quit");
-    Info0.Add("  Z - Undo (not works in state 1 and 2)");
-    Info0.Add("  X - Redo (not works in state 1 and 2)");
+    Info0.Add("  Arrows, Home, End, PageUp, PageDown - Move cursor.");
+    Info0.Add("  Tab - Cursor display style.");
+    Info0.Add("  Esc - Text writing direction.");
+    Info0.Add("  F1, F2, F3, F4 - Change state or display information.");
+    Info0.Add("  F7 - Save file.");
+    Info0.Add("  F8 - Load file.");
+    Info0.Add("  F9 - Character selector.");
+    Info0.Add("  F10 - File manager.");
+    Info0.Add("  F12 - Exit (return to main menu).");
+    Info0.Add("  Z - Undo (not works in state 1 and 2).");
+    Info0.Add("  X - Redo (not works in state 1 and 2).");
     Info0.Add("");
-    Info0.Add("To undo or redo in state 0 or 1:");
-    Info0.Add("  1. Switch temporarily to state 2 or 3.");
+    Info0.Add("To undo or redo in state 1 or 2:");
+    Info0.Add("  1. Switch temporarily to state 3 or 4.");
     Info0.Add("  2. Press Z or X key to undo or redo.");
-    Info0.Add("  3. Switch back to state 0 or 1.");
+    Info0.Add("  3. Switch back to state 1 or 2.");
     Info0.Add("");
 
     Info1.Add("State 1 - Write text:");
@@ -25,15 +26,15 @@ EditorInfo::EditorInfo()
     Info1.Add("  Backspace - Move cursor in opposite direction.");
     Info1.Add("  Insert - Insert line or character.");
     Info1.Add("  Delete - Delete line or character.");
-    Info1.Add("  Enter - Change Insert/Delete mode");
-    Info1.Add("  Any alphanumeric key - Write key character");
+    Info1.Add("  Enter - Change Insert/Delete mode.");
+    Info1.Add("  Any alphanumeric key - Write key character.");
 
     Info2.Add("State 2 - Write characters:");
-    Info2.Add("  Backspace - Move cursor in opposite direction");
-    Info2.Add("  Insert - Insert line or character");
-    Info2.Add("  Delete - Delete line or character");
-    Info2.Add("  Enter - Change Insert/Delete mode");
-    Info2.Add("  Any alphanumeric key - Write favorite character asigned to key");
+    Info2.Add("  Backspace - Move cursor in opposite direction.");
+    Info2.Add("  Insert - Insert line or character.");
+    Info2.Add("  Delete - Delete line or character.");
+    Info2.Add("  Enter - Change Insert/Delete mode.");
+    Info2.Add("  Any alphanumeric key - Write favorite character asigned to key.");
 
     Info3.Add("State 3 - Character paint:");
     Info3.Add("  W,S,A,D - Change figure size.");
@@ -99,9 +100,7 @@ EditorInfo::EditorInfo()
     Info9.Add("  F3 - Select between states:");
     Info9.Add("    Character selector: Switch into Color selector.");
     Info9.Add("    Color selector: Switch into Character selector.");
-    Info9.Add("  F4 - Depends on state:");
-    Info9.Add("    Character selector: Browsing all pages, including invisible.");
-    Info9.Add("    Color selector: ANSI process parameters.");
+    Info9.Add("  F4 - Depends on state - ANSI process and display parameters.");
     Info9.Add("  Delete - Go to character or color under text cursor.");
     Info9.Add("  Insert - Depends on state:");
     Info9.Add("    Character selector: Switch between ordinary and favorite state.");

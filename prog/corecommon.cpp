@@ -156,3 +156,118 @@ void CoreCommon::ScreenStatusBarSet(int ScreenStatusBar_)
     CoreAnsi_.get()->AnsiTerminalResize(TermW, TermH, ScreenStatusBar_);
     ScreenStatusBar = ScreenStatusBar_;
 }
+
+int CoreCommon::OptionTextKeyNumber(std::string KeyName)
+{
+    switch (_(KeyName.c_str()))
+    {
+        case _("Digit0"): return 0;
+        case _("Digit1"): return 1;
+        case _("Digit2"): return 2;
+        case _("Digit3"): return 3;
+        case _("Digit4"): return 4;
+        case _("Digit5"): return 5;
+        case _("Digit6"): return 6;
+        case _("Digit7"): return 7;
+        case _("Digit8"): return 8;
+        case _("Digit9"): return 9;
+        case _("Numpad0"): return 0;
+        case _("Numpad1"): return 1;
+        case _("Numpad2"): return 2;
+        case _("Numpad3"): return 3;
+        case _("Numpad4"): return 4;
+        case _("Numpad5"): return 5;
+        case _("Numpad6"): return 6;
+        case _("Numpad7"): return 7;
+        case _("Numpad8"): return 8;
+        case _("Numpad9"): return 9;
+        case _("KeyA"): return 10;
+        case _("KeyB"): return 11;
+        case _("KeyC"): return 12;
+        case _("KeyD"): return 13;
+        case _("KeyE"): return 14;
+        case _("KeyF"): return 15;
+        case _("KeyG"): return 16;
+        case _("KeyH"): return 17;
+        case _("KeyI"): return 18;
+        case _("KeyJ"): return 19;
+        case _("KeyK"): return 20;
+        case _("KeyL"): return 21;
+        case _("KeyM"): return 22;
+        case _("KeyN"): return 23;
+        case _("KeyO"): return 24;
+        case _("KeyP"): return 25;
+        case _("KeyQ"): return 26;
+        case _("KeyR"): return 27;
+        case _("KeyS"): return 28;
+        case _("KeyT"): return 29;
+        case _("KeyU"): return 30;
+        case _("KeyV"): return 31;
+        case _("KeyW"): return 32;
+        case _("KeyX"): return 33;
+        case _("KeyY"): return 34;
+        case _("KeyZ"): return 35;
+    }
+    return -1;
+}
+
+void CoreCommon::OptionTextInfoAddLine(std::string Info)
+{
+    OptionTextInfo = OptionTextInfo + Info + "\n";
+}
+
+bool CoreCommon::OptionTextKeyWrite(std::string KeyName, int KeyChar)
+{
+    switch (_(KeyName.c_str()))
+    {
+        case _("NumpadEnter"):
+        case _("Enter"):
+            if (OptionTextData.size() > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        case _("Backspace"):
+            if (OptionTextData.size() > 0)
+            {
+                if (OptionTextData.size() > 1)
+                {
+                    OptionTextData = OptionTextData.substr(0, OptionTextData.size() - 1);
+                }
+                else
+                {
+                    OptionTextData = "";
+                }
+            }
+            break;
+        case _("Escape"):
+            OptionTextData = "";
+            break;
+        default:
+            if (KeyChar >= 32)
+            {
+                OptionTextData = OptionTextData + TextWork::CharToStr(KeyChar);
+            }
+    }
+    return false;
+}
+
+void CoreCommon::OptionTextDisplayRefresh()
+{
+    XList<std::string> OptTxt;
+    TextWork::StringSplit(OptionTextInfo + "\n" + OptionTextData, '\n', OptTxt);
+    Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
+    Screen::ScreenCursorMove(0, 0);
+    for (int I = 0; I < OptTxt.Count; I++)
+    {
+        if (I > 0)
+        {
+            Screen::ScreenWriteLine(Screen::TextNormalBack, Screen::TextNormalFore);
+        }
+        Screen::ScreenWriteText(Str::FromString(OptTxt[I]), Screen::TextNormalBack, Screen::TextNormalFore);
+    }
+    Screen::ScreenRefresh();
+}

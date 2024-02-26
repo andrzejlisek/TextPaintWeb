@@ -1,0 +1,815 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=windows-1250">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>TextPaint - Text editor</title>
+</head>
+
+<body>
+
+<h1>Text editor</h1>
+
+<p>One of the main <strong>TextPaint</strong> features is text
+editor. The editor differs from other plain-text editors:</p>
+
+<ul>
+    <li>Treats text file/screen as two-dimensional plane divided
+        into cells, where single cell consists of one character,
+        two colors (background and foreground) and single
+        attribute set.</li>
+    <li>Allows to draw primitive figures similarly as simple
+        graphics applications.</li>
+    <li>Supports ASCII (plain test) and ANSI (text with colors
+        and attributes) files.</li>
+</ul>
+
+<h1>Functionality and interface</h1>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor1.png"
+width="256" height="256"></p>
+
+<p><strong>TextPaint</strong> can work in one of the 4 states.
+The default state is <strong>state 1</strong>. In all states, you
+can use these keys:</p>
+
+<ul>
+    <li><strong>Arrows</strong> - Move cursor horizontally or
+        vertically.</li>
+    <li><strong>Home</strong>, <strong>End</strong>, <strong>Page
+        Up</strong>, <strong>Page Down</strong> - Move cursor
+        diagonally.</li>
+    <li><strong>Tab</strong> - Change cursor visualization type,
+        one of four modes. This function may help to match
+        writing/drawing to other objects.</li>
+    <li><strong>F1</strong> - Switch to <strong>state 1</strong>
+        (write text) or show information about <strong>state 1</strong>.</li>
+    <li><strong>F2</strong> - Switch to <strong>state 2</strong>
+        (write characters) or show information about <strong>state
+        2</strong>.</li>
+    <li><strong>F3</strong> - Switch to <strong>state 3</strong>
+        (character paint) or show information about <strong>state
+        3</strong>.</li>
+    <li><strong>F4</strong> - Switch to <strong>state 4</strong>
+        (pixel paint) or show information about <strong>state 4</strong>.</li>
+    <li><strong>F7</strong> - Save file.</li>
+    <li><strong>F8</strong> - Load file.</li>
+    <li><strong>F9</strong> - Open character and color selector.</li>
+    <li><strong>F10</strong> - Open file manager.</li>
+    <li><strong>F12</strong> - Exit to main menu.</li>
+    <li><strong>Z</strong> - Undo (not works in <strong>state 1</strong>
+        and <strong>state 2</strong>).</li>
+    <li><strong>X</strong> - Redo (not works in <strong>state 1</strong>
+        and <strong>state 2</strong>).</li>
+</ul>
+
+<p>To undo or redo editing text or characters (<strong>state 1</strong>
+or <strong>state 2</strong>), you can undo/redy by following
+procedure:</p>
+
+<ul>
+    <li>Switch temporarily to <strong>state 2</strong> or <strong>state
+        3</strong>.</li>
+    <li>Press <strong>Z</strong> or <strong>X</strong> key to
+        undo or redo.</li>
+    <li>Switch back to <strong>state 1</strong> or <strong>state
+        2</strong>.</li>
+</ul>
+
+<p>The other available keys depends on the current working state.
+The unnecessary spaces and lines are automatically trimmed during
+editing. You can write on the grey aread, then necessary lines or
+spaces will be added automatically.</p>
+
+<p>The colors are following:</p>
+
+<ul>
+    <li><strong>White text on black background</strong> - Actual
+        text.</li>
+    <li><strong>Dark gray</strong> - Space beyond end of line.</li>
+    <li><strong>Bright gray</strong> - Space below the last line.</li>
+    <li><strong>Black text in white background</strong> - Status
+        bar.</li>
+</ul>
+
+<h2>Context information</h2>
+
+<p>When you press the <strong>F1</strong>, <strong>F2</strong>, <strong>F3</strong>,
+<strong>F4</strong> key one more time, after switchint to the
+state, there will be displayed short information about selected
+state. Use arrow keys to scroll the text.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor2.png"
+width="256" height="256"></p>
+
+<p>To close information, press <strong>Esc</strong> or any <strong>F</strong>
+key (<strong>F1</strong>-<strong>F12</strong>).</p>
+
+<h2>Status bar</h2>
+
+<p>At the bottom of console window, there is the status bar, with
+black text on white background. The status bar in <strong>state 1</strong>,
+<strong>state 2</strong> and <strong>state 3</strong> has the
+following informations from left to right:</p>
+
+<ul>
+    <li>Font and cursor size (width and height).</li>
+    <li>Cursor position (row and column). The character between
+        numbers indicated current text area:<ul>
+            <li><strong>Colon</strong> - All cells of the cursor
+                are inside some text line.</li>
+            <li><strong>Semicolon</strong> - At least one cursor
+                cell is beyond end of text line, but all cursor
+                cells are not below the last line.</li>
+            <li><strong>Comma</strong> - At least one cell of the
+                cursor is below the last line of text.</li>
+        </ul>
+    </li>
+    <li>Character number and glyph under the most cursor cells.</li>
+    <li>Number of background and foreground color under the most
+        cursor cells, the hyphen indicates, that color is not
+        defined (used default).</li>
+    <li>Attribute state as 7-character string under the most
+        cursor cells, where underscore means disabled attribute
+        and letter means enabled attribute as following:<ul>
+            <li><strong>B</strong> - Bold.</li>
+            <li><strong>I</strong> - Italic.</li>
+            <li><strong>U</strong> - Underscore.</li>
+            <li><strong>S</strong> - Strikethrough.</li>
+            <li><strong>K</strong> - Blink.</li>
+            <li><strong>R</strong> - Reserved.</li>
+            <li><strong>C</strong> - Concealed.</li>
+        </ul>
+    </li>
+    <li>State indicator:<ul>
+            <li><strong>Text</strong> - Write text (<strong>state
+                1</strong>), followed by direction indicator:<ul>
+                    <li><strong>R - Right</strong> - From left to
+                        right.</li>
+                    <li><strong>RD - Right/Down</strong> - From
+                        up-left to down-right.</li>
+                    <li><strong>D - Down</strong> - From up to
+                        down.</li>
+                    <li><strong>DL - Down/Left</strong> - From
+                        up-right to down-left.</li>
+                    <li><strong>L - Left</strong> - From right to
+                        left.</li>
+                    <li><strong>LU - Left/Up</strong> - From
+                        down-right to up-left.</li>
+                    <li><strong>U - Up</strong> - From down to
+                        up.</li>
+                    <li><strong>UR - Up/Right</strong> - From
+                        down-left to up-right.</li>
+                </ul>
+            </li>
+            <li><strong>Char</strong> - Write character (<strong>state
+                2</strong>), followed by direction indicator the
+                same as in the <strong>state 1</strong>.</li>
+            <li><strong>Rect</strong> - Character drawing (<strong>state
+                3</strong>), rectangle shape.</li>
+            <li><strong>Dia</strong> - Character drawing (<strong>state
+                3</strong>), diamond shape.</li>
+        </ul>
+    </li>
+    <li>Elements in <strong>state 3</strong> only:<ul>
+            <li>Shape size.</li>
+            <li>Character code/glyph or character set name used
+                to draw figure.</li>
+        </ul>
+    </li>
+    <li>Insert/delete mode:<ul>
+            <li><strong>H-block</strong> - Insert or delete text
+                inside one line, at right from the cursor - moves
+                text horizontally.</li>
+            <li><strong>V-block</strong> - Insert or delete text
+                inside one column, below the cursor - moves text
+                vertically.</li>
+            <li><strong>H-line</strong> - Insert or delete
+                columns - moves text horizontally.</li>
+            <li><strong>V-line</strong> - Insert or delete rows -
+                moves text vertically.</li>
+            <li><strong>H-roll</strong> - Roll the text
+                horizontally - combine of insertion and deletion
+                by font width, works in the <strong>state 3</strong>
+                only and when the rectangle width is greater than
+                1.</li>
+            <li><strong>V-roll</strong> - Roll the text
+                vertically - combine of insertion and deletion by
+                font height, works in the <strong>state 3</strong>
+                only and when the rectangle height is greater
+                than 1.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>The status bar in <strong>state 4</strong> has different
+layout, which is described in subchapter about <strong>state 4</strong>.</p>
+
+<h1>Character and color selector</h1>
+
+<p><strong>TextPaint</strong> has two similar selectors. In order
+to enter into selector, press <strong>F9</strong> key and switch
+between selectors by pressing <strong>F3</strong> key.</p>
+
+<h2>Character selector</h2>
+
+<p>In the <strong>state 3</strong> and <strong>state 4</strong>,
+you can draw using selected character. The current drawing
+character and character code is shown on the status bar when the
+character is used to draw. In the <strong>state 1</strong>, <strong>state
+2</strong> and <strong>state 3</strong>, if you insert space (in
+mode <strong>H-block</strong> and <strong>V-block</strong> only),
+the selected character will be inserted. You can invoke the
+character selector in every state by pressing the <strong>F9</strong>
+key.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor3.png"
+width="256" height="256"></p>
+
+<p>At the top of character table there will be display the
+character hexadecimal code and character glyph. The code consists
+of 4 or 5 digits. The plane 16 forces code length to be 6 digits,
+but is used very rarely, so the two leading digits for plane 16
+is replaced by <strong>G</strong> for get 5-digital code. The <strong>G</strong>
+digit is outside of hexadecimal digit set and means 16. For
+example, the <strong>G1234</strong> has the same meaning as <strong>101234</strong>.</p>
+
+<p>The character selector can work in two states:</p>
+
+<ul>
+    <li><strong>Ordinary</strong> - Browse all characters. By
+        default, browsing the pages is limited for containing
+        visible characters, but the limit can be enabled and
+        disabled by pressing <strong>Backspace</strong> key.</li>
+    <li><strong>Favorite</strong> - The 256 places of favorite
+        characters, 95 of them can be assigned to alphanumeric
+        keys.</li>
+</ul>
+
+<p>You can use the following keys while the character table is
+shown:</p>
+
+<ul>
+    <li><strong>Arrows</strong> - Select character on the current
+        page. You can go beyond the current page range to switch
+        the page.</li>
+    <li><strong>Page Up</strong>, <strong>Page Down</strong> -
+        Flip one page up or down (go ahead 256 characters).</li>
+    <li><strong>Home</strong>, <strong>End</strong> - Flip 16
+        pages up or down (go ahead 4096 characters).</li>
+    <li><strong>F1</strong>, <strong>F2</strong> - Switch the
+        plane (go ahead 65536 characters).</li>
+    <li><strong>F3</strong> - Switch to color selector.</li>
+    <li><strong>F4</strong> - Open the ANSI process and display
+        parameters.</li>
+    <li><strong>Insert</strong> - Switch between ordinary and
+        favorite state:<ul>
+            <li><strong>Ordinary</strong>: If the pinted
+                character exists in favorite set, there will be
+                pointed.</li>
+            <li><strong>Favorite</strong>: There will be pointed
+                the same character, which is pointed in favorite
+                state.</li>
+        </ul>
+    </li>
+    <li><strong>Delete</strong> - Go to character being under the
+        cursor.</li>
+    <li><strong>Backspace</strong>:<ul>
+            <li><strong>Ordinary</strong>: Select character for
+                save as favorite.</li>
+            <li><strong>Favorite</strong>: Select character or
+                put character on pointed place.</li>
+        </ul>
+    </li>
+    <li><strong>Tab</strong> - Move character selector window
+        from corner to corner. You can use this if the window
+        covers some text or window is bigger than screen.</li>
+    <li><strong>Escape</strong> - Close without changing selected
+        character.</li>
+    <li><strong>Enter</strong> - Change selected character and
+        close.</li>
+    <li><strong>Any alphanumeric key</strong>:<ul>
+            <li><strong>Ordinary</strong>: Save pointed character
+                as favorite under pressed key.</li>
+            <li><strong>Favorite</strong>: Go to place assigned
+                with pressed key.</li>
+        </ul>
+    </li>
+</ul>
+
+<h2>Color selector</h2>
+
+<p>You can turn character selector into color selector or turn
+color selector into character chelector by pressing <strong>F3</strong>.
+In color selector, you can select the color and input text mode.
+The text and colors are treated as two independed layers, which
+can be modifed simultaneously or separately.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor4.png"
+width="256" height="256"></p>
+
+<p>While the color selector is showm, you can use the following
+keys:</p>
+
+<ul>
+    <li><strong>Up arrow</strong>, <strong>Down arrow</strong> -
+        Select background color.</li>
+    <li><strong>Left arrow</strong>, <strong>Right arrow</strong>
+        - Select foreground color.</li>
+    <li><strong>Page up</strong>, <strong>Page down</strong> -
+        Number of columns for ANSI file load. Use if file is
+        loaded incorrectly, applicable when file is loaded as
+        ANSI. Value 0 means automatic and will be updated after
+        file load.</li>
+    <li><strong>Home</strong>, <strong>End</strong> - Number of
+        rows for ANSI file load. Use if file is loaded
+        incorrectly, applicable when file is loaded as ANSI.
+        Value 0 means automatic and will be updated after file
+        load.</li>
+    <li><strong>F1</strong> - Switch between CR character
+        processing while loading ANSI file:<ul>
+            <li><strong>0</strong> - Treat as CR character
+                (default).</li>
+            <li><strong>1</strong> - Treat as CR+LF sequence.</li>
+            <li><strong>2</strong> - Ignore CR character.</li>
+        </ul>
+    </li>
+    <li><strong>F2</strong> - Switch between LF character
+        processing while loading ANSI file:<ul>
+            <li><strong>0</strong> - Treat as LF character
+                (default).</li>
+            <li><strong>1</strong> - Treat as CR+LF sequence.</li>
+            <li><strong>2</strong> - Ignore LF character.</li>
+        </ul>
+    </li>
+    <li><strong>F3</strong> - Switch to character selector.</li>
+    <li><strong>F4</strong> - Open the ANSI process and display
+        parameters.</li>
+    <li><strong>Insert</strong> - Switch between edit mode within
+        three states:<ul>
+            <li><strong>Text+color</strong> - Edit text and color
+                simultaneously.</li>
+            <li><strong>Text</strong> - Edit text only without
+                color changing.</li>
+            <li><strong>Color</strong> - Edit color only without
+                text changing.</li>
+        </ul>
+    </li>
+    <li><strong>Delete</strong> - Go to color and retrieve
+        attributes being under the cursor.</li>
+    <li><strong>Tab</strong> - Move color selector window from
+        corner to corner. You can use this if the window covers
+        some text or window is bigger than screen.</li>
+    <li><strong>Escape</strong> - Close without changing selected
+        color.</li>
+    <li><strong>Enter</strong> - Change selected color and close.</li>
+    <li><strong>Digit keys</strong> - Toggle attributes as
+        following:<ul>
+            <li><strong>1</strong> - Bold.</li>
+            <li><strong>2</strong> - Italic.</li>
+            <li><strong>3</strong> - Underline.</li>
+            <li><strong>4</strong> - Strikethrough.</li>
+            <li><strong>5</strong> - Blink.</li>
+            <li><strong>6</strong> - Reserved.</li>
+            <li><strong>7</strong> - Concealed.</li>
+        </ul>
+    </li>
+</ul>
+
+<p>You can change text without changing colors or colors without
+changing the text. In order to do, switch to appropriate mode
+using <strong>Insert</strong> key. The text and colors are
+independed layes. Actually, the attributes are in the color layer
+and may be treated as specific colors, other from background and
+foreground.</p>
+
+<h2>ANSI file loading</h2>
+
+<p>Many ANSI files are prepared for specified number of columns,
+in most cases for 80 columns and 24/25 rows with saving screen
+scroll. If you set other number of columns, the file may be
+loaded incorrectly. To correct this, enter into color selector,
+change number of columns or rows using <strong>Page up</strong>, <strong>Page
+down</strong>, <strong>Home</strong> or <strong>End</strong> keys
+and press Enter key. Then, you have to reload file using <strong>F8</strong>
+key.</p>
+
+<p>If the ANSI file loaded is actually plain text file, the file
+can contain different end-of-line character than expected. If the
+file is loaded incorrectly, you can change parsing of CR (<strong>0Dh</strong>)
+and LF (<strong>0Ah</strong>) character in color selector. You
+can press <strong>F1</strong> or <strong>F2</strong> during color
+selector to change way of the character processing, the current
+state is diaplayed as two digits on the top of character
+selector.</p>
+
+<p>Example settings:</p>
+
+<ul>
+    <li><strong>00</strong> - Standard process of CR and LF
+        characters, suitable for all ANSI files and text files
+        using CR+LF like files created in DOS and Windows.</li>
+    <li><strong>21</strong> - Use LF character as CR+LF (EOL),
+        suitable for plain text files created on Unix and Linux,
+        which uses LF as EOL.</li>
+    <li><strong>12</strong> - Use CR character as CR+LF (EOL),
+        suitable for plain text files created on systems, which
+        uses CR as EOL.</li>
+    <li><strong>11</strong> - Use every CR character and every LF
+        character as EOL separately.</li>
+</ul>
+
+<h1>Work states</h1>
+
+<p>The text editor works in one of 4 states, which you can swich
+by pressing <strong>F1</strong>, <strong>F2</strong>, <strong>F3</strong>,
+or <strong>F4</strong> key. In order to display help text about
+keys available in the current state, press the same function key
+again. For example, in order to get help about <strong>state 2</strong>,
+press <strong>F2</strong> while application works in <strong>state
+2</strong>.</p>
+
+<h2>State 1 - Write text</h2>
+
+<p>In the <strong>state 1</strong>, you can input alphanumeric
+characters like in every standard text editor, but there are few
+differences.</p>
+
+<p>You can use the following functional keys:</p>
+
+<ul>
+    <li><strong>Escape</strong> - Change writing direction.</li>
+    <li><strong>Backspace</strong> - Move cursor in opposite
+        direction (this not delete the char).</li>
+    <li><strong>Insert</strong> - Insert line or character.</li>
+    <li><strong>Delete</strong> - Delete line or character.</li>
+    <li><strong>Enter</strong> - Change Insert/Delete mode.</li>
+</ul>
+
+<h3>Undo and redo</h3>
+
+<p>You can undo or redo writing, but the direct function not
+exists. To undo or redo, you have to switch to <strong>state 3</strong>
+or <strong>state 4</strong> by pressing <strong>F3</strong> or <strong>F4</strong>.
+Then, you can undo or redo by pressing <strong>Z</strong> or <strong>X</strong>.
+After undo or redo, you can return to <strong>state 1</strong> by
+pressing <strong>F1</strong>.</p>
+
+<h3>Insert and delete</h3>
+
+<p>The <strong>Enter</strong>, <strong>Insert</strong> and <strong>Delete</strong>
+keys has different function than standard text editor.</p>
+
+<p>By pressing <strong>Enter</strong>, you can choose between
+four insert/delete modes:</p>
+
+<ul>
+    <li><strong>H-block</strong> - Insert or delete text inside
+        one line, at right from the cursor - moves text
+        horizontally.</li>
+    <li><strong>V-block</strong> - Insert or delete text inside
+        one column, below the cursor - moves text vertically.</li>
+    <li><strong>H-line</strong> - Insert or delete columns -
+        moves text horizontally.</li>
+    <li><strong>V-line</strong> - Insert or delete rows - moves
+        text vertically.</li>
+    <li><strong>H-roll</strong> - Roll the text horizontally -
+        combine of insertion and deletion by font width, works on
+        the <strong>state 3</strong> only and when the rectangle
+        width is greater than <strong>1</strong>.</li>
+    <li><strong>V-roll</strong> - Roll the text vertically -
+        combine of insertion and deletion by font height, works
+        on the <strong>state 3</strong> only and when the
+        rectangle height is greater than <strong>1</strong>.</li>
+</ul>
+
+<h2>State 2 - Write characters</h2>
+
+<p><strong>State 2</strong> works exactly by the same way as <strong>state
+1</strong> with one difference: If you press alphanumeric key,
+there will be written favorite characters assignet to the keys
+instead of ordinary characters. You can view and change the
+assigment in character selector.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor5.png"
+width="256" height="256"></p>
+
+<p>The state is most usable when you frequently write specified
+characters, because you can write the character just by pressing
+assigned key.</p>
+
+<h2>State 3 - Character drawing</h2>
+
+<p><strong>State 3</strong> is intended to the following actions:</p>
+
+<ul>
+    <li>Draw line using frame characters.</li>
+    <li>Undo and redo.</li>
+    <li>Draw the rectangle or diamond on the selected place
+        without painting line manually.</li>
+    <li>Copy and paste text.</li>
+    <li>Manually write frame elements.</li>
+    <li>Insert or delete larger portion of spaces.</li>
+    <li>Change font size.</li>
+</ul>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor6.png"
+width="256" height="256"></p>
+
+<p>In the <strong>state 3</strong>, you have the following
+functions available:</p>
+
+<ul>
+    <li><strong>W</strong>,<strong>S</strong>,<strong>A</strong>,<strong>D</strong>
+        - Change figure size.</li>
+    <li><strong>Q</strong>,<strong>E</strong> - Change cursor
+        position within the rectangle or diamond.</li>
+    <li><strong>Q</strong> - Move counter clockwise.</li>
+    <li><strong>E</strong> - Move clockwise.</li>
+    <li><strong>1</strong> - Change figure shape one of 9
+        possible shapes.</li>
+    <li><strong>2</strong> - Change character set.</li>
+    <li><strong>3</strong> - Draw hollow frame.</li>
+    <li><strong>4</strong> - Draw filled frame.</li>
+    <li><strong>5</strong> - Start or stop drawing line by moving
+        cursor.</li>
+    <li><strong>6</strong>,<strong>7</strong> - Font width.</li>
+    <li><strong>8</strong>,<strong>9</strong> - Font height.</li>
+    <li><strong>C</strong> - Copy the text being inside the
+        figure.</li>
+    <li><strong>V</strong> - Paste the text into the area inside
+        the figure.</li>
+    <li><strong>Insert</strong> - Insert line or character (works
+        on rectangle shape only).</li>
+    <li><strong>Delete</strong> - Delete line or character (works
+        on rectangle shape only).</li>
+    <li><strong>Enter</strong> - Change Insert/Delete mode.</li>
+    <li><strong>I</strong> or <strong>Numpad Plus</strong> -
+        Write vertical line.</li>
+    <li><strong>K</strong> or <strong>Numpad Minus</strong> -
+        Write horizontal line.</li>
+    <li><strong>Space</strong> or <strong>Numpad 0</strong> -
+        Write selected character.</li>
+</ul>
+
+<h3>Writing frame elements</h3>
+
+<p>Apart from keys listed above, you can write frame elements
+(corners, tees and crosses) using some letter keys and numpad
+digits as in the following scheme:</p>
+
+<pre>  T---Y---U         T         7---8---9         7
+  |   |   |        / \        |   |   |        / \
+  |   |   |       G   Y       |   |   |       4   8
+  |   |   |      / \ / \      |   |   |      / \ / \
+  G---H---J     B   H   U     4---5---6     1   5   9
+  |   |   |      \ / \ /      |   |   |      \ / \ /
+  |   |   |       N   J       |   |   |       2   6
+  |   |   |        \ /        |   |   |        \ /
+  B---N---M         M         1---2---3         3</pre>
+
+<p>For example, the <strong>T</strong> key or <strong>Numpad 7</strong>
+writes the upper left corner as shown above. The diamond shape is
+treated as rectangle rotated clockwise by 45 degrees.</p>
+
+<h3>Insert and delete</h3>
+
+<p>The insert and delete function works by the same way as in <strong>state
+1</strong> and <strong>state 2</strong>, but there is few
+differences:</p>
+
+<ul>
+    <li>This function works only, when rectangle shape is
+        selected.</li>
+    <li>In <strong>H-block</strong> and <strong>H-line</strong>
+        modes, the rectangle width determines number of inserted
+        or deleted columns once.</li>
+    <li>In <strong>V-block</strong> and <strong>V-line</strong>
+        modes, the rectangle height determines number of inserted
+        or deleted columns once.</li>
+    <li>In <strong>H-block</strong> mode, there can be modified
+        few rows according to rectangle height.</li>
+    <li>In <strong>V-block</strong> mode, there can be modified
+        few columns according to rectangle width.</li>
+    <li>The <strong>H-roll</strong> and <strong>V-roll</strong>
+        modes works in the <strong>state 3</strong> only and
+        while the rectangle width (for <strong>H-roll</strong>)
+        or the rectangle height (for <strong>V-roll</strong>) is
+        greater then <strong>1</strong>.</li>
+</ul>
+
+<h3>Font size</h3>
+
+<p><strong>State 3</strong> is the only state, which allows to
+change font and cursor size, which will be applied for all
+states. The font width and height can be adjusted separately,
+between 1 and 32 cells. The cursor size represents the current
+font size and the size is indicated on the status bar. The move
+step is the same as current font width or height. To move cursor
+over another distance, change the font size.</p>
+
+<p>If you change font size whice the cursor is not at the first
+line and the first column, it is possible, it is possible, that
+the cursor distance from begining does not equal to multiply font
+width or height. In such case, when you move the cursor left or
+up, the first column or the first row will not reachable, because
+the remaining distance is less than font size. Cursor position
+above the first row or before the first column is not possible.</p>
+
+<p>While the font width or height is greater than <strong>1</strong>,
+the current character or color indicated on the status bar and
+used in some operation is determined be the most number of cells
+containing such character or color. If there are several
+characters in the same number of cells within the cursor, the
+first occurence will be used.</p>
+
+<p>You can copy and paste the text preserving the font size only
+when the font size is <strong>1x1</strong> while both copying and
+pasting. When you copy or paste with other font size, the text
+and color will be preserved. Otherwise, you can copy the text
+written with the bigger font into the other software or paste the
+text from the other software using desired font size.</p>
+
+<h2>State 4 - Pixel drawing</h2>
+
+<p>The <strong>state 4</strong> is purposed to draw pictures
+using semigraphical characters splitted into pixels. Some
+characters offers pixels by splitting for example to <strong>2x2</strong>
+pixels per character. You can paint by character or by pixels as
+defined in configuration file. In the state, there are two
+cursors:</p>
+
+<ul>
+    <li><strong>Main cursor</strong> - The cursor, which is moved
+        by <strong>Arrow</strong> keys and <strong>Home</strong>/<strong>End</strong>/<strong>PageUp</strong>/<strong>PageDown</strong>
+        keys. Pressing these keys causes movement of both
+        cursors.</li>
+    <li><strong>Size cursor</strong> - The second cursor, which
+        is connected with main cursor. This cursor determines
+        figure size for drawing lines, rectangles, ellipses, and
+        copying/pasting picture.</li>
+</ul>
+
+<p><img src="readme_pics/pic.jpg" alt="`editor/editor7.png"
+width="256" height="256"></p>
+
+<p>During <strong>state 4</strong>, there are following functions
+by keys:</p>
+
+<ul>
+    <li><strong>W</strong>,<strong>S</strong>,<strong>A</strong>,<strong>D</strong>
+        - Move size cursor.</li>
+    <li><strong>I</strong>,<strong>K</strong>,<strong>J</strong>,<strong>L</strong>
+        - Move picture between cursors.</li>
+    <li><strong>1</strong> - Change paint configuration:<ul>
+            <li>The first configuration uses one pixel per
+                character and allows to select character for
+                foreground and background in character selector.</li>
+            <li>The other configurations may use several pixels
+                per character. Every pixel configuration inside
+                character is mapped to appropriate character.</li>
+        </ul>
+    </li>
+    <li><strong>2</strong> - Change default color. This option
+        defines, how will be treated characters other than
+        characters used in current paint configuration.</li>
+    <li><strong>3</strong> - Draw one pixel (in hollow mode) or
+        flood fill (in fill mode).</li>
+    <li><strong>4</strong> - Draw line between cursors.</li>
+    <li><strong>5</strong> - Draw rectangle between cursors.</li>
+    <li><strong>6</strong> - Draw ellipse between cursors.</li>
+    <li><strong>P</strong> - Turn pencil on/off.</li>
+    <li><strong>M</strong> - Change picture move mode. The mode
+        is used while moving using <strong>I</strong>,<strong>K</strong>,<strong>J</strong>,<strong>L</strong>
+        keys:<ul>
+            <li><strong>Repeat</strong> - The edge of moved
+                picture will be repeated.</li>
+            <li><strong>Roll</strong> - The edge will be fillled
+                with edge from the other side of moved picture.</li>
+            <li><strong>Background</strong> - The edge will be
+                filled with background color.</li>
+            <li><strong>Foreground</strong> - The edge will be
+                filled with foreground color.</li>
+            <li><strong>Flip/Rotate</strong> - Flip or rotate
+                instead of movement. Use keys as following:<ul>
+                    <li><strong>I</strong> - Flip vertically.</li>
+                    <li><strong>K</strong> - Flip horizontally.</li>
+                    <li><strong>J</strong> - Rotate counter
+                        clockwise - works only when width equals
+                        to height.</li>
+                    <li><strong>L</strong> - Rotate clockwise -
+                        works only when width equals to height.</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li><strong>N</strong> - Invert colors between cursors.</li>
+    <li><strong>C</strong> - Copy picture between cursors as text
+        to clipboard. This function uses characters selected as
+        foreground and background color in first paint
+        configuration.</li>
+    <li><strong>V</strong> - Paste picture between cursors from
+        flipboard. The clipboard bust contain text using
+        characters selected as foreground and background color in
+        first paint configuration.</li>
+    <li><strong>Q</strong>,<strong>E</strong> - Move cursors
+        around rectangle corners determined by this cursors:<ul>
+            <li><strong>Q</strong> - Move counter clockwise.</li>
+            <li><strong>E</strong> - Move clockwise.</li>
+        </ul>
+    </li>
+    <li><strong>R</strong> - Change paint color wrom there
+        options:<ul>
+            <li><strong>Background</strong> - Use background
+                color.</li>
+            <li><strong>Foreground</strong> - Use foreground
+                color.</li>
+            <li><strong>Negative</strong> - Changes to opposite
+                color while drawing.</li>
+        </ul>
+    </li>
+    <li><strong>F</strong> - Change paint fill option for drawing
+        pixels, rectangles and ellipses:<ul>
+            <li><strong>Hollow</strong> - Draw pixels and hollow
+                figures.</li>
+            <li><strong>Fill</strong> - Draw floodfill and filled
+                figures.</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Status bar</h3>
+
+<p>In state 4, the status bar has different layout, described
+from left to right:</p>
+
+<ul>
+    <li>Font and cursor size (width and height).</li>
+    <li>Canvas cursor position and size in pixels. The size sign
+        (plus or minus) indicates direction from main cursor to
+        size cursor.</li>
+    <li>The <strong>state 4</strong> indicator with default color
+        and pencil state:<ul>
+            <li><strong>Pxl-B</strong> - The default color is
+                background, pencil is off.</li>
+            <li><strong>Pxl-F</strong> - The default color is
+                foreground, pencil is off.</li>
+            <li><strong>Pxl-B*</strong> - The default color is
+                background, pencil is on.</li>
+            <li><strong>Pxl-F*</strong> - The default color is
+                foreground, pencil is on.</li>
+        </ul>
+    </li>
+    <li>The paint configuration:<ul>
+            <li>The first configuration (one pixel per character)
+                is indicated by codes of used characters,
+                separated by slash.</li>
+            <li>The other configurations are indicated by
+                configuration name.</li>
+        </ul>
+    </li>
+    <li>Drawing color and fill mode:<ul>
+            <li><strong>Fore-H</strong> - Foreground color,
+                hollow.</li>
+            <li><strong>Back-H</strong> - Background color,
+                hollow.</li>
+            <li><strong>Nega-H</strong> - Negative color, hollow.</li>
+            <li><strong>Fore-F</strong> - Foreground color, fill.</li>
+            <li><strong>Back-F</strong> - Background color, fill.</li>
+            <li><strong>Nega-F</strong> - Negative color, fill.</li>
+        </ul>
+    </li>
+    <li>Picture move mode:<ul>
+            <li><strong>Repeat</strong> - The edge of moved
+                picture will be repeated.</li>
+            <li><strong>Roll</strong> - The edge will be fillled
+                with edge from the other side of moved picture.</li>
+            <li><strong>Back</strong> - The edge will be filled
+                with background color.</li>
+            <li><strong>Fore</strong> - The edge will be filled
+                with foreground color.</li>
+            <li><strong>FlipRot</strong> - Flip or rotate instead
+                of movement.</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Cursor display</h3>
+
+<p>Console can display cursor over the character, not over the
+pixel. If you select configuration with pixels smaller than
+character, you will move pixel by pixel, when you press cursor
+keys. The visible cursor will by over this character, which
+contains pointed pixel. To point a specified pixel, you have to
+observe the position on status bar or count movement from last
+visible cursor movement.</p>
+
+<p>To check position, you can draw pixel or other figure (key <strong>3</strong>,
+<strong>4</strong>, <strong>5</strong>, <strong>6</strong>) and
+undo the drawing by pressing <strong>Z</strong>.</p>
+
+<p><script language="JavaScript"
+src="file:///media/xxx/WORK1/__ToBackup/Develop/HTML/HTML2MD/Prog/html2md.js"></script></p>
+</body>
+</html>

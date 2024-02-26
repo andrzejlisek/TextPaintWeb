@@ -107,27 +107,13 @@ void Core2Terminal::Init()
         ConnN++;
     }
 
-    //ConnListName.Add("Other");
-    //ConnListType.Add("CUSTOM");
-    //ConnListAddr.Add("~");
-    //ConnListCodec.Add(0);
+    ConnListName.Add("Other");
+    ConnListType.Add("CUSTOM");
+    ConnListAddr.Add("~");
+    ConnListCodec.Add(0);
 
-    ConnListPrint();
-    WorkStateC = WorkStateCDef::ConnListSelect;
-}
-
-void Core2Terminal::ConnListPrint()
-{
-    Screen_Clear();
-    int L = std::min(ConnListName.Count, (int)(ConnListKeys.size()));
-    for (int I = 0; I < L; I++)
-    {
-        Screen_WriteText(ConnListKeys.substr(I, 1));
-        Screen_WriteText(" - ");
-        Screen_WriteText(ConnListName[I]);
-        Screen_WriteLine();
-    }
-    Screen_Refresh();
+    WorkStateC = WorkStateCDef::ConnListSelectBefore;
+    EventKey("", 0, false, false, false);
 }
 
 void Core2Terminal::EventTick()
@@ -191,69 +177,106 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
 {
     switch (WorkStateC)
     {
+        case WorkStateCDef::ConnListSelectBefore:
+            {
+                Screen_Clear();
+                int L = std::min(ConnListName.Count, (int)(ConnListKeys.size()));
+                for (int I = 0; I < L; I++)
+                {
+                    Screen_WriteText(ConnListKeys.substr(I, 1));
+                    Screen_WriteText(" - ");
+                    Screen_WriteText(ConnListName[I]);
+                    Screen_WriteLine();
+                }
+                Screen_Refresh();
+                WorkStateC = WorkStateCDef::ConnListSelect;
+            }
         case WorkStateCDef::ConnListSelect:
             {
-                int ConnSelectedItem = -1;
-                switch (_(KeyName.c_str()))
-                {
-                    case _("Digit0"): ConnSelectedItem = 0; break;
-                    case _("Digit1"): ConnSelectedItem = 1; break;
-                    case _("Digit2"): ConnSelectedItem = 2; break;
-                    case _("Digit3"): ConnSelectedItem = 3; break;
-                    case _("Digit4"): ConnSelectedItem = 4; break;
-                    case _("Digit5"): ConnSelectedItem = 5; break;
-                    case _("Digit6"): ConnSelectedItem = 6; break;
-                    case _("Digit7"): ConnSelectedItem = 7; break;
-                    case _("Digit8"): ConnSelectedItem = 8; break;
-                    case _("Digit9"): ConnSelectedItem = 9; break;
-                    case _("Numpad0"): ConnSelectedItem = 0; break;
-                    case _("Numpad1"): ConnSelectedItem = 1; break;
-                    case _("Numpad2"): ConnSelectedItem = 2; break;
-                    case _("Numpad3"): ConnSelectedItem = 3; break;
-                    case _("Numpad4"): ConnSelectedItem = 4; break;
-                    case _("Numpad5"): ConnSelectedItem = 5; break;
-                    case _("Numpad6"): ConnSelectedItem = 6; break;
-                    case _("Numpad7"): ConnSelectedItem = 7; break;
-                    case _("Numpad8"): ConnSelectedItem = 8; break;
-                    case _("Numpad9"): ConnSelectedItem = 9; break;
-                    case _("KeyA"): ConnSelectedItem = 10; break;
-                    case _("KeyB"): ConnSelectedItem = 11; break;
-                    case _("KeyC"): ConnSelectedItem = 12; break;
-                    case _("KeyD"): ConnSelectedItem = 13; break;
-                    case _("KeyE"): ConnSelectedItem = 14; break;
-                    case _("KeyF"): ConnSelectedItem = 15; break;
-                    case _("KeyG"): ConnSelectedItem = 16; break;
-                    case _("KeyH"): ConnSelectedItem = 17; break;
-                    case _("KeyI"): ConnSelectedItem = 18; break;
-                    case _("KeyJ"): ConnSelectedItem = 19; break;
-                    case _("KeyK"): ConnSelectedItem = 20; break;
-                    case _("KeyL"): ConnSelectedItem = 21; break;
-                    case _("KeyM"): ConnSelectedItem = 22; break;
-                    case _("KeyN"): ConnSelectedItem = 23; break;
-                    case _("KeyO"): ConnSelectedItem = 24; break;
-                    case _("KeyP"): ConnSelectedItem = 25; break;
-                    case _("KeyQ"): ConnSelectedItem = 26; break;
-                    case _("KeyR"): ConnSelectedItem = 27; break;
-                    case _("KeyS"): ConnSelectedItem = 28; break;
-                    case _("KeyT"): ConnSelectedItem = 29; break;
-                    case _("KeyU"): ConnSelectedItem = 30; break;
-                    case _("KeyV"): ConnSelectedItem = 31; break;
-                    case _("KeyW"): ConnSelectedItem = 32; break;
-                    case _("KeyX"): ConnSelectedItem = 33; break;
-                    case _("KeyY"): ConnSelectedItem = 34; break;
-                    case _("KeyZ"): ConnSelectedItem = 35; break;
-                }
+                int ConnSelectedItem = OptionTextKeyNumber(KeyName);
                 if (ConnSelectedItem >= 0)
                 {
-                    ConnSelectedAddr = ConnListAddr[ConnSelectedItem];
-                    ConnSelectedType = ConnListType[ConnSelectedItem];
-                    ConnSelectedCodec = ConnListCodec[ConnSelectedItem];
-                    WorkStateC = WorkStateCDef::InfoScreen;
-                    Screen_Clear();
-                    Screen_WriteText("Press key, which will be used as escape key...");
-                    Screen_Refresh();
+                    if (ConnSelectedItem < (ConnListAddr.Count - 1))
+                    {
+                        ConnSelectedAddr = ConnListAddr[ConnSelectedItem];
+                        ConnSelectedType = ConnListType[ConnSelectedItem];
+                        ConnSelectedCodec = ConnListCodec[ConnSelectedItem];
+                        WorkStateC = WorkStateCDef::InfoScreenBefore;
+                        EventKey("", 0, false, false, false);
+                    }
+                    if (ConnSelectedItem == (ConnListAddr.Count - 1))
+                    {
+                        WorkStateC = WorkStateCDef::ConnListSelectCustom1;
+                        EventKey("", 0, false, false, false);
+                    }
                 }
             }
+            break;
+        case WorkStateCDef::ConnListSelectCustom1:
+            Screen_Clear();
+            Screen_WriteText("Select connection type:");
+            Screen_WriteLine();
+            Screen_WriteText("1 - Command line");
+            Screen_WriteLine();
+            Screen_WriteText("2 - Telnet network");
+            Screen_WriteLine();
+            Screen_Refresh();
+            WorkStateC = WorkStateCDef::ConnListSelectCustom1Key;
+            break;
+        case WorkStateCDef::ConnListSelectCustom1Key:
+            switch (OptionTextKeyNumber(KeyName))
+            {
+                case 1:
+                    ConnSelectedType = "CMD";
+                    WorkStateC = WorkStateCDef::ConnListSelectCustom2;
+                    EventKey("", 0, false, false, false);
+                    break;
+                case 2:
+                    ConnSelectedType = "TELNET";
+                    WorkStateC = WorkStateCDef::ConnListSelectCustom2;
+                    EventKey("", 0, false, false, false);
+                    break;
+            }
+            break;
+        case WorkStateCDef::ConnListSelectCustom2:
+            OptionTextInfo = "Input connection address and press ENTER, press TAB to paste";
+            OptionTextData = "";
+            OptionTextDisplayRefresh();
+            WorkStateC = WorkStateCDef::ConnListSelectCustom2Key;
+            break;
+        case WorkStateCDef::ConnListSelectCustom2Key:
+            if (OptionTextKeyWrite(KeyName, KeyChar))
+            {
+                std::cout << "KonsolaZatwierdz [" << OptionTextData << "]" << std::endl;
+                WorkStateC = WorkStateCDef::ConnListSelectCustom3;
+                EventKey("", 0, false, false, false);
+            }
+            OptionTextDisplayRefresh();
+            break;
+        case WorkStateCDef::ConnListSelectCustom3:
+            OptionTextInfo = "Input codec number and press ENTER, press TAB to paste";
+            OptionTextData = "";
+            OptionTextDisplayRefresh();
+            WorkStateC = WorkStateCDef::ConnListSelectCustom3Key;
+            break;
+        case WorkStateCDef::ConnListSelectCustom3Key:
+            if (OptionTextKeyWrite(KeyName, KeyChar))
+            {
+                OptionTextDisplayRefresh();
+                std::cout << "kodek potwierdz [" << OptionTextData << "]" << std::endl;
+                WorkStateC = WorkStateCDef::InfoScreenBefore;
+                EventKey("", 0, false, false, false);
+            }
+            else
+            {
+                OptionTextDisplayRefresh();
+            }
+            break;
+        case WorkStateCDef::InfoScreenBefore:
+            WorkStateC = WorkStateCDef::InfoScreen;
+            Screen_Clear();
+            Screen_WriteText("Press key, which will be used as escape key...");
+            Screen_Refresh();
             break;
         case WorkStateCDef::InfoScreen:
             EscapeKey_ = EscapeKeyId(KeyName, KeyChar);
@@ -1342,7 +1365,7 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
         InfoMsg.Add(" Esc = - Return to terminal ");
         InfoMsg.Add(" Enter - Change escape key ");
         InfoMsg.Add(" Tab - Move info ");
-        InfoMsg.Add(" Backspace - Quit ");
+        InfoMsg.Add(" Backspace - Exit ");
         switch (TerminalKeyboard_.TelnetFuncKeyOther)
         {
             case 0:
@@ -1371,8 +1394,8 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
             case _("20"): TelnetKeyboardConf_ = "F5-F12 - Normal"; break;
             case _("21"): TelnetKeyboardConf_ = "F5-F12 - Alter"; break;
             case _("30"): TelnetKeyboardConf_ = "Editing - DEC"; break;
-            case _("31"): TelnetKeyboardConf_ = "Editing - IBM 1"; break;
-            case _("32"): TelnetKeyboardConf_ = "Editing - IBM 2"; break;
+            case _("31"): TelnetKeyboardConf_ = "Editing - IBM N"; break;
+            case _("32"): TelnetKeyboardConf_ = "Editing - IBM A"; break;
             case _("40"): TelnetKeyboardConf_ = "Enter - CR"; break;
             case _("41"): TelnetKeyboardConf_ = "Enter - CR+lf"; break;
             case _("42"): TelnetKeyboardConf_ = "Enter - LF"; break;
