@@ -2,7 +2,7 @@
 #define COREANSI_H
 
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include "str.h"
 #include "configfile.h"
 #include "textwork.h"
@@ -64,7 +64,7 @@ public:
     void AnsiChar(int X, int Y, int Ch, int ColB, int ColF, int FontW, int FontH, int ColA);
     void AnsiScreenNegative(bool IsNega);
 
-    void AnsiProcessReset(bool AnsiScreenWork_, int SeekMode_, int AnsiOptions);
+    void AnsiProcessReset(bool AnsiScreenWork_, int SeekMode_, int AnsiOptions, bool UseScrollBufer);
     void AnsiProcessSupply(Str TextFileLine);
     void AnsiTerminalReset();
     bool AnsiTerminalResize(int NewW, int NewH, int ScreenStatusBar_);
@@ -72,9 +72,15 @@ public:
     int AnsiProcess(int ProcessCount);
     void AnsiResize(int NewW, int NewH);
 
+    XList<int> SeekLineList;
     bool AnsiSeek(int StepCount);
     void AnsiSeekInterval(int Period);
+    void AnsiSeekLine();
     void AnsiRepaintCursor();
+
+    bool ANSIScrollChangePrepare = false;
+    int ANSIScrollChangeSmooth = 0;
+    int ANSIScrollChangeChars = 0;
 private:
 
     bool UseAnsiCommands = true;
@@ -93,8 +99,7 @@ private:
 
     int VT52_SemigraphChars[32];
 
-    bool __AnsiLineOccupy1_Use = true;
-    bool __AnsiLineOccupy2_Use = true;
+    bool __AnsiLineOccupyUseScrollBuffer = true;
 
     int ANSIScrollChars = 0;
     int ANSIScrollSmooth = 0;
@@ -102,7 +107,7 @@ private:
     int ColorThresholdBlackWhite = 48;
     int ColorThresholdGray = 20;
 
-    std::map<int, int> AnsiColor16_;
+    std::unordered_map<int, int> AnsiColor16_;
 
     int AnsiColor16(int R, int G, int B);
 

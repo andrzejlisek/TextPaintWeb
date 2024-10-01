@@ -30,7 +30,7 @@ public:
     static inline void (*ScreenClear_)( int, int );
     static inline void (*ScreenChar_)( int, int, int, int, int, int, int, int );
     static inline void (*ScreenResize_)( int, int );
-    static inline void (*ScreenCursorMove_)( int, int );
+    static inline void (*ScreenCursorMove_)( int, int, int );
     static inline void (*ScreenTextMove_)( int, int, int, int, int, int );
     static inline void (*ScreenLineOffset_)( int, int, int, int, int, int );
     static inline void (*WorkerSend)( int, std::string );
@@ -42,6 +42,7 @@ public:
     static void ScreenTextMove(int X1, int Y1, int X2, int Y2, int W, int H);
     static void ScreenResize(int NewW, int NewH);
     static void ScreenCursorMove(int X, int Y);
+    static void ScreenCursorMove(int X, int Y, int Opt);
     static void ScreenRefresh();
     static void ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore, int ColorAttr);
 
@@ -64,6 +65,7 @@ public:
     static inline int CurrentY = 0;
     static inline int CurrentW = 1;
     static inline int CurrentH = 1;
+    static inline int CurrentOpt = 0;
 
     static void MouseActive(bool X);
 
@@ -79,7 +81,7 @@ public:
     static inline constexpr int UnicodeCount = 0x110000;
 
     static void Bell();
-    static void CursorHide(bool Hide);
+    static void CursorHideTerm(bool Hide, int Term);
 
     static inline int FontListSelect = 0;
     static inline int FontListMode = 0;
@@ -101,7 +103,7 @@ public:
     static void SetFont();
 
     static inline bool PaletteCustom = false;
-    static inline std::map<int, int> FontSingleChar;
+    static inline std::unordered_map<int, int> FontSingleChar;
     static inline bool FontSinglePage = false;
     static inline bool FontCustom = false;
     static inline int FontCustomMap[257];
@@ -109,6 +111,7 @@ private:
     static inline XList<int> Range1;
     static inline XList<int> Range2;
     static inline bool CursorHideState = false;
+    static inline int CursorTermState = 0;
 
     struct ScreenLineOffsetDef
     {

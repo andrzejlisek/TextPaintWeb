@@ -25,6 +25,7 @@ public:
     std::shared_ptr<CoreAnsi> CoreAnsi_;
     std::shared_ptr<DisplayConfig> DisplayConfig_;
 
+    void UpdateConfig(std::shared_ptr<ConfigFile> CF);
     void ScreenChar0(int X, int Y, int Chr, int Back, int Fore, int Attr, int FontW, int FontH);
     void ScreenChar0(int X, int Y, int Chr, int Back, int Fore);
     virtual void Init();
@@ -44,6 +45,8 @@ public:
     void OptionTextInfoAddLine(std::string Info);
     bool OptionTextKeyWrite(std::string KeyName, int KeyChar);
     void OptionTextDisplayRefresh();
+    int ProcessTimerStep = 100;
+    int ProcessTimerStepText = 1;
 protected:
     int ScreenStatusBar = 0;
     void ReadColor(std::string SettingValue, int &ColorB, int &ColorF);

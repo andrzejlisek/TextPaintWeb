@@ -17,7 +17,7 @@ let VTTEST_ = document.getElementById("vttest").contentWindow;
 let ProgInit_ConfData = "";
 
 let ScreenTimerCallback = 1000000;
-let ScreenTimerPeriod = 100;
+let ScreenTimerFrames = 3;
 let ScreenTimerCounter = 0;
 let ScreenTimerCounterLoop = 10;
 let ScreenTimerCursor = 1;
@@ -28,7 +28,10 @@ let ScreenTimerTickEvent = 1;
 
 let WaitTimeout = 500;
 
-let ScreenCursorSteady = false;
+let ScreenDisplayCursor = 0;
+let ScreenDisplayCursor1 = true;
+let ScreenDisplayCursor0 = false;
+let ScreenDisplayCursorShape = 0;
 let ScreenMouseActive = false;
 let ScreenMouseProgMoveX = -1;
 let ScreenMouseProgMoveY = -1;
@@ -203,5 +206,23 @@ function String_fromCharCode(T)
         var V2 = T & 1023;
         return String.fromCharCode(V1 + 0xD800, V2 + 0xDC00);
     }
+}
+
+// Greatest common divisor
+function GCD(Num1, Num2)
+{
+    while (Num2 != 0)
+    {
+        var Num3 = Num1 % Num2;
+        Num1 = Num2;
+        Num2 = Num3;
+    }
+    return Num1;
+}
+
+// Least common multiple
+function LCM(Num1, Num2)
+{
+    return (Num1 * Num2) / GCD(Num1, Num2);
 }
 

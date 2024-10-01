@@ -1,10 +1,12 @@
 ### Application timer options
 
-TimerPeriod=50
-TimerLoop=20
+TimerFrames=3
 TimerCursor=2
 TimerBlink=10
 TimerTick=1
+TimerStep=100
+TimerStepText=4
+TimerStepChange=0
 
 
 ### WebApiServer WebSocket address
@@ -12,23 +14,23 @@ TimerTick=1
 WebSocket=ws://localhost:8888
 
 
-### Window and screen option
+### Window and screen options
 
 WinW=80
 WinH=24
+WinAuto=1
 WinScreenSize=70
 WinKeyboardSize=30
 WinTouchScreen=0
 DisplayInterpolate=2
 DisplayBlink=1
 DisplayAttrib=14
-SteadyCursor=0
+DisplayCursor=1
 
 
 ### Player configuration
 
 PlayerEnd=1
-PlayerStep=100
 PlayerDelayFrame=200
 PlayerSeek=1000
 
@@ -37,7 +39,6 @@ PlayerSeek=1000
 
 TerminalName=xterm-256color
 TerminalType=5
-TerminalStep=100
 TerminalKeys=1102000
 TerminalAnswerBack=TextPaint
 
@@ -52,24 +53,6 @@ Terminal2Name=Telnet local host by /bin/telnet command
 Terminal2Type=CMD
 Terminal2Addr=/bin/telnet localhost 23
 Terminal2Codec=65001
-
-
-### Render options
-
-RenderType=PNG
-RenderFile=File.png
-RenderStep=50
-RenderOffset=0
-RenderCursor=1
-RenderFrame=200
-RenderSliceX=0
-RenderSliceY=0
-RenderSliceW=0
-RenderSliceH=0
-RenderLeading=0
-RenderTrailing=0
-RenderBlinkPeriod=10
-RenderBlinkOffset=0
 
 
 ### Bell options

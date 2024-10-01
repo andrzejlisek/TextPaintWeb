@@ -42,6 +42,7 @@ public:
 
     bool StatusBar = false;
     bool CursorHide = false;
+    int CursorTerm = 0;
 
     int __AnsiBack_ = -1;
     int __AnsiFore_ = -1;
@@ -160,8 +161,8 @@ public:
     int ReportCursorX();
     int ReportCursorY();
 
-    static void Copy(AnsiState &Src, AnsiState &Dst);
-    AnsiState Clone();
+    static void Copy(AnsiState &Src, AnsiState &Dst, bool UseScrollBuffer);
+    AnsiState Clone(bool UseScrollBuffer);
 private:
     void CharMapSwap(int N);
 

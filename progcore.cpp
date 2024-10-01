@@ -88,11 +88,12 @@ void ScreenResize(int NewW, int NewH)
     RespondPartial();
 }
 
-void ScreenCursorMove(int X, int Y)
+void ScreenCursorMove(int X, int Y, int Opt)
 {
     BufNum(104);
     BufNum(X);
     BufNum(Y);
+    BufNum(Opt);
     RespondPartial();
 }
 
@@ -176,6 +177,16 @@ void ScreenSetConfig()
     
     FileConfig("FontSelect");
     FileConfig("PaletteSelect");
+
+    FileConfig("TimerStep");
+    FileConfig("TimerStepText");
+    FileConfig("TimerStepChange");
+    FileConfig("ANSIScrollChars");
+    FileConfig("ANSIScrollCharsChange");
+    FileConfig("ANSIScrollSmooth");
+
+    FileConfig("DisplayCursor");
+    FileConfig("WinAuto");
 }
 
 void WorkerSend(int T, std::string X)
@@ -322,14 +333,12 @@ extern "C"
                     FileConfig("FontName2");
                     FileConfig("FontChars");
                     FileConfig("FontMode");
-                    FileConfig("TimerPeriod");
-                    FileConfig("TimerLoop");
+                    FileConfig("TimerFrames");
                     FileConfig("TimerCursor");
                     FileConfig("TimerBlink");
                     FileConfig("TimerTick");
                     FileConfig("WinScreenSize");
                     FileConfig("WinKeyboardSize");
-                    FileConfig("SteadyCursor");
                     {
                         int I_ = 1;
                         while (CF.get()->ParamExists("ColorBlending_" + std::to_string(I_)))
@@ -483,7 +492,11 @@ extern "C"
                 BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
                 BinaryFile_.get()->SysSaveConfig();
             }
-            Core.get()->CoreAnsi_.get()->UpdateConfig(CF);
+            if (Core)
+            {
+                Core.get()->UpdateConfig(CF);
+                Core.get()->CoreAnsi_.get()->UpdateConfig(CF);
+            }
             Fire = false;
         }
         if (EvtName == "ScreenFont")

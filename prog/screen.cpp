@@ -61,6 +61,7 @@ void Screen::UpdateFontParams(std::shared_ptr<ConfigFile> CF)
 
 void Screen::StaticInit(std::shared_ptr<ConfigFile> CF)
 {
+    WinAuto = CF.get()->ParamGetB("WinAuto");
     FontListMode = CF.get()->ParamGetI("FontMode");
 
     // Font list
@@ -231,6 +232,18 @@ void Screen::ScreenCursorMove(int X, int Y)
     if (Y >= CurrentH) Y = CurrentH - 1;
     CurrentX = X;
     CurrentY = Y;
+    CurrentOpt = 0;
+}
+
+void Screen::ScreenCursorMove(int X, int Y, int Opt)
+{
+    if (X < 0) X = 0;
+    if (Y < 0) Y = 0;
+    if (X >= CurrentW) X = CurrentW - 1;
+    if (Y >= CurrentH) Y = CurrentH - 1;
+    CurrentX = X;
+    CurrentY = Y;
+    CurrentOpt = Opt;
 }
 
 void Screen::ScreenRefresh()
@@ -244,7 +257,7 @@ void Screen::ScreenRefresh()
             ScreenLineOffsetArray[I].NeedSet = false;
         }
     }
-    ScreenCursorMove_(CurrentX, CurrentY);
+    ScreenCursorMove_(CurrentX, CurrentY, CurrentOpt);
 }
 
 void Screen::ScreenLineOffset(int Y, int Offset, int Blank, int ColorBack, int ColorFore, int ColorAttr)
@@ -403,7 +416,7 @@ void Screen::Bell()
     ScreenOther(0);
 }
 
-void Screen::CursorHide(bool Hide)
+void Screen::CursorHideTerm(bool Hide, int Term)
 {
     if (CursorHideState != Hide)
     {
@@ -416,6 +429,11 @@ void Screen::CursorHide(bool Hide)
             ScreenOther(4);
         }
         CursorHideState = Hide;
+    }
+    if (CursorTermState != Term)
+    {
+        ScreenOther(10 + Term);
+        CursorTermState = Term;
     }
 }
 

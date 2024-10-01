@@ -18,9 +18,6 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
         AnsiTerminalResize(AnsiMaxX, AnsiMaxY + 1, ScreenStatusBar);
     }
 
-    ANSIScrollChars = CF.get()->ParamGetI("ANSIScrollChars");
-    ANSIScrollSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
-
     ColorThresholdBlackWhite = CF.get()->ParamGetI("ANSIColorThresholdBlackWhite");
     ColorThresholdGray = CF.get()->ParamGetI("ANSIColorThresholdGray");
 
@@ -83,15 +80,10 @@ CoreAnsi::CoreAnsi(std::shared_ptr<ConfigFile> CF)
     Color256[232 + 23] = AnsiColor16(255, 255, 255);
     Color256[256] = -1;
 
-    if (ANSIScrollChars <= 0)
-    {
-        ANSIScrollSmooth = 0;
-    }
-    if (ANSIScrollSmooth > 5)
-    {
-        ANSIScrollSmooth = 0;
-    }
-    AnsiScrollPrepare();
+    ANSIScrollChangeSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
+    ANSIScrollChangeChars = CF.get()->ParamGetI("ANSIScrollChars");
+    ANSIScrollChangePrepare = true;
+    //AnsiScrollPrepare();
 
 
 
@@ -141,6 +133,12 @@ void CoreAnsi::UpdateConfig(std::shared_ptr<ConfigFile> CF)
     ANSI8bit = CF.get()->ParamGetB("ANSI8bit");
     ANSIPrintBackspace = CF.get()->ParamGetB("ANSIPrintBackspace");
     ANSIPrintTab = CF.get()->ParamGetB("ANSIPrintTab");
+    ANSIScrollChangeSmooth = CF.get()->ParamGetI("ANSIScrollSmooth");
+    ANSIScrollChangeChars = CF.get()->ParamGetI("ANSIScrollChars");
+    if ((ANSIScrollChangeSmooth != ANSIScrollSmooth) || (ANSIScrollChangeChars != ANSIScrollChars))
+    {
+        ANSIScrollChangePrepare = true;
+    }
 }
 
 void CoreAnsi::AnsiRepaint(bool AdditionalBuffers)

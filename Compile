@@ -2,9 +2,9 @@
 
 rm compiled/*
 
-emcc -std=c++20 progio.cpp -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -o compiled/progio.js
+emcc -O3 -std=c++20 progio.cpp -s "EXPORTED_RUNTIME_METHODS=['ccall','cwrap']" -o compiled/progio.js
 
-emcc -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp prog/raw.cpp prog/str.cpp prog/textwork.cpp prog/textcodec.cpp \
+emcc -O3 -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp prog/raw.cpp prog/str.cpp prog/textwork.cpp prog/textcodec.cpp \
  prog/clipboard.cpp prog/stopwatch.cpp prog/xbin.cpp \
  prog/coreansi.cpp prog/coreansi_char.cpp prog/coreansi_fontsize.cpp prog/coreansi_parse.cpp prog/coreansi_process.cpp prog/coreansi_scroll.cpp \
  prog/ansilineoccupyex.cpp prog/ansilineoccupy.cpp prog/ansilineoccupyitem.cpp prog/ansilineoccupyitemundoredo.cpp prog/ansisauce.cpp prog/ansistate.cpp \
@@ -16,7 +16,7 @@ emcc -std=c++20 prog/screen.cpp prog/ansifile.cpp prog/hex.cpp prog/xlist.cpp pr
  prog/core3keys.cpp prog/core4command.cpp prog/core9menu.cpp \
  progcore.cpp -s BUILD_AS_WORKER=1 -o compiled/progcore.js -s ALLOW_MEMORY_GROWTH
 
-emcc -std=c++20 prog/stopwatch.cpp vttest/fakeio.cpp \
+emcc -O3 -std=c++20 prog/stopwatch.cpp vttest/fakeio.cpp \
  vttest/charsets.cpp vttest/color.cpp vttest/draw.cpp vttest/esc.cpp vttest/keyboard.cpp vttest/mouse.cpp vttest/nonvt100.cpp \
  vttest/printer.cpp vttest/reports.cpp vttest/reset.cpp vttest/setup.cpp vttest/sixel.cpp vttest/status.cpp vttest/tek4014.cpp \
  vttest/ttymodes.cpp vttest/unix_io.cpp vttest/utf8.cpp \

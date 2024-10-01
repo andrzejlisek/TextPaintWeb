@@ -30,6 +30,8 @@ private:
     int PopupState = 0;
     int InfoW = 0;
     int InfoH = 0;
+    std::string IncDecDisplay(int BaseValue, int ParamValue, int Direction);
+    int IncDecChange(int BaseValue, int ParamValue, int Direction);
 };
 
 #endif // DISPLAYCONFIG_H

@@ -2,297 +2,331 @@
 
 TerminalKeyboard::TerminalKeyboard()
 {
-    TerminalKeys0.Add("Up");
-    TerminalKeys0.Add("Down");
-    TerminalKeys0.Add("Right");
-    TerminalKeys0.Add("Left");
-    TerminalKeys1.Add("F1");
-    TerminalKeys1.Add("F2");
-    TerminalKeys1.Add("F3");
-    TerminalKeys1.Add("F4");
-    TerminalKeys2.Add("F5");
-    TerminalKeys2.Add("F6");
-    TerminalKeys2.Add("F7");
-    TerminalKeys2.Add("F8");
-    TerminalKeys2.Add("F9");
-    TerminalKeys2.Add("F10");
-    TerminalKeys2.Add("F11");
-    TerminalKeys2.Add("F12");
-    TerminalKeys3.Add("Home");
-    TerminalKeys3.Add("End");
-    TerminalKeys4.Add("Insert");
-    TerminalKeys4.Add("Delete");
-    TerminalKeys4.Add("PageUp");
-    TerminalKeys4.Add("PageDown");
-    TerminalKeys4.Add("F13");
-    TerminalKeys4.Add("F14");
-    TerminalKeys4.Add("F15");
-    TerminalKeys4.Add("F16");
-    TerminalKeys4.Add("F17");
-    TerminalKeys4.Add("F18");
-    TerminalKeys4.Add("F19");
-    TerminalKeys4.Add("F20");
+    std::vector<std::string> TerminalKeysCAS;
+    TerminalKeysCAS.push_back("Up");
+    TerminalKeysCAS.push_back("Down");
+    TerminalKeysCAS.push_back("Right");
+    TerminalKeysCAS.push_back("Left");
+    TerminalKeysCAS.push_back("F1");
+    TerminalKeysCAS.push_back("F2");
+    TerminalKeysCAS.push_back("F3");
+    TerminalKeysCAS.push_back("F4");
+    TerminalKeysCAS.push_back("F5");
+    TerminalKeysCAS.push_back("F6");
+    TerminalKeysCAS.push_back("F7");
+    TerminalKeysCAS.push_back("F8");
+    TerminalKeysCAS.push_back("F9");
+    TerminalKeysCAS.push_back("F10");
+    TerminalKeysCAS.push_back("F11");
+    TerminalKeysCAS.push_back("F12");
+    TerminalKeysCAS.push_back("Home");
+    TerminalKeysCAS.push_back("End");
+    TerminalKeysCAS.push_back("Insert");
+    TerminalKeysCAS.push_back("Delete");
+    TerminalKeysCAS.push_back("PageUp");
+    TerminalKeysCAS.push_back("PageDown");
+    TerminalKeysCAS.push_back("F13");
+    TerminalKeysCAS.push_back("F14");
+    TerminalKeysCAS.push_back("F15");
+    TerminalKeysCAS.push_back("F16");
+    TerminalKeysCAS.push_back("F17");
+    TerminalKeysCAS.push_back("F18");
+    TerminalKeysCAS.push_back("F19");
+    TerminalKeysCAS.push_back("F20");
 
-    // Common keys
-    TerminalKeys["Escape"] = "1B";
-    TerminalKeys["Tab"] = "09";
-    TerminalKeys["Enter_0"] = "0D";
-    TerminalKeys["Enter_1"] = "0D0A";
-    TerminalKeys["Enter_2"] = "0A";
-    TerminalKeys["Enter_3"] = "0D0A";
-    TerminalKeys["Backspace_0"] = "7F";
-    TerminalKeys["Backspace_1"] = "08";
+    std::unordered_map<std::string, std::string> TerminalKeysTempl;
 
     // Keys depending on configuration 0
-    TerminalKeys["Up_000_0"] = "##_[_A";
-    TerminalKeys["Down_000_0"] = "##_[_B";
-    TerminalKeys["Right_000_0"] = "##_[_C";
-    TerminalKeys["Left_000_0"] = "##_[_D";
-    TerminalKeys["Up_000_1"] = "##_O_A";
-    TerminalKeys["Down_000_1"] = "##_O_B";
-    TerminalKeys["Right_000_1"] = "##_O_C";
-    TerminalKeys["Left_000_1"] = "##_O_D";
-
-    TerminalKeys["Up_CAS_0"] = "##_[_1_;_@_A";
-    TerminalKeys["Down_CAS_0"] = "##_[_1_;_@_B";
-    TerminalKeys["Right_CAS_0"] = "##_[_1_;_@_C";
-    TerminalKeys["Left_CAS_0"] = "##_[_1_;_@_D";
-    TerminalKeys["Up_CAS_1"] = "##_[_1_;_@_A";
-    TerminalKeys["Down_CAS_1"] = "##_[_1_;_@_B";
-    TerminalKeys["Right_CAS_1"] = "##_[_1_;_@_C";
-    TerminalKeys["Left_CAS_1"] = "##_[_1_;_@_D";
+    TerminalKeysTempl["Up_CAS_0"] = "##_[_1_;_@_A";
+    TerminalKeysTempl["Down_CAS_0"] = "##_[_1_;_@_B";
+    TerminalKeysTempl["Right_CAS_0"] = "##_[_1_;_@_C";
+    TerminalKeysTempl["Left_CAS_0"] = "##_[_1_;_@_D";
+    TerminalKeysTempl["Up_CAS_1"] = "##_[_1_;_@_A";
+    TerminalKeysTempl["Down_CAS_1"] = "##_[_1_;_@_B";
+    TerminalKeysTempl["Right_CAS_1"] = "##_[_1_;_@_C";
+    TerminalKeysTempl["Left_CAS_1"] = "##_[_1_;_@_D";
 
     // Keys depending on configuration 1 and 2
-    TerminalKeys["F1_000_0"] = "##_[_1_1_~";
-    TerminalKeys["F2_000_0"] = "##_[_1_2_~";
-    TerminalKeys["F3_000_0"] = "##_[_1_3_~";
-    TerminalKeys["F4_000_0"] = "##_[_1_4_~";
-    TerminalKeys["F5_000_0"] = "##_[_1_5_~";
-    TerminalKeys["F6_000_0"] = "##_[_1_7_~";
-    TerminalKeys["F7_000_0"] = "##_[_1_8_~";
-    TerminalKeys["F8_000_0"] = "##_[_1_9_~";
-    TerminalKeys["F9_000_0"] = "##_[_2_0_~";
-    TerminalKeys["F10_000_0"] = "##_[_2_1_~";
-    TerminalKeys["F11_000_0"] = "##_[_2_3_~";
-    TerminalKeys["F12_000_0"] = "##_[_2_4_~";
+    TerminalKeysTempl["F1_CAS_0"] = "##_[_1_1_;_@_~";
+    TerminalKeysTempl["F2_CAS_0"] = "##_[_1_2_;_@_~";
+    TerminalKeysTempl["F3_CAS_0"] = "##_[_1_3_;_@_~";
+    TerminalKeysTempl["F4_CAS_0"] = "##_[_1_4_;_@_~";
+    TerminalKeysTempl["F5_CAS_0"] = "##_[_1_5_;_@_~";
+    TerminalKeysTempl["F6_CAS_0"] = "##_[_1_7_;_@_~";
+    TerminalKeysTempl["F7_CAS_0"] = "##_[_1_8_;_@_~";
+    TerminalKeysTempl["F8_CAS_0"] = "##_[_1_9_;_@_~";
+    TerminalKeysTempl["F9_CAS_0"] = "##_[_2_0_;_@_~";
+    TerminalKeysTempl["F10_CAS_0"] = "##_[_2_1_;_@_~";
+    TerminalKeysTempl["F11_CAS_0"] = "##_[_2_3_;_@_~";
+    TerminalKeysTempl["F12_CAS_0"] = "##_[_2_4_;_@_~";
 
-    TerminalKeys["F13_000_0"] = "##_[_2_5_~";
-    TerminalKeys["F14_000_0"] = "##_[_2_6_~";
-    TerminalKeys["F15_000_0"] = "##_[_2_8_~";
-    TerminalKeys["F16_000_0"] = "##_[_2_9_~";
-    TerminalKeys["F17_000_0"] = "##_[_3_1_~";
-    TerminalKeys["F18_000_0"] = "##_[_3_2_~";
-    TerminalKeys["F19_000_0"] = "##_[_3_3_~";
-    TerminalKeys["F20_000_0"] = "##_[_3_4_~";
+    TerminalKeysTempl["F13_CAS_0"] = "##_[_2_5_;_@_~";
+    TerminalKeysTempl["F14_CAS_0"] = "##_[_2_6_;_@_~";
+    TerminalKeysTempl["F15_CAS_0"] = "##_[_2_8_;_@_~";
+    TerminalKeysTempl["F16_CAS_0"] = "##_[_2_9_;_@_~";
+    TerminalKeysTempl["F17_CAS_0"] = "##_[_3_1_;_@_~";
+    TerminalKeysTempl["F18_CAS_0"] = "##_[_3_2_;_@_~";
+    TerminalKeysTempl["F19_CAS_0"] = "##_[_3_3_;_@_~";
+    TerminalKeysTempl["F20_CAS_0"] = "##_[_3_4_;_@_~";
 
-    TerminalKeys["F1_CAS_0"] = "##_[_1_1_;_@_~";
-    TerminalKeys["F2_CAS_0"] = "##_[_1_2_;_@_~";
-    TerminalKeys["F3_CAS_0"] = "##_[_1_3_;_@_~";
-    TerminalKeys["F4_CAS_0"] = "##_[_1_4_;_@_~";
-    TerminalKeys["F5_CAS_0"] = "##_[_1_5_;_@_~";
-    TerminalKeys["F6_CAS_0"] = "##_[_1_7_;_@_~";
-    TerminalKeys["F7_CAS_0"] = "##_[_1_8_;_@_~";
-    TerminalKeys["F8_CAS_0"] = "##_[_1_9_;_@_~";
-    TerminalKeys["F9_CAS_0"] = "##_[_2_0_;_@_~";
-    TerminalKeys["F10_CAS_0"] = "##_[_2_1_;_@_~";
-    TerminalKeys["F11_CAS_0"] = "##_[_2_3_;_@_~";
-    TerminalKeys["F12_CAS_0"] = "##_[_2_4_;_@_~";
+    TerminalKeysTempl["F1_CAS_1"] = "##_[_1_;_@_P";
+    TerminalKeysTempl["F2_CAS_1"] = "##_[_1_;_@_Q";
+    TerminalKeysTempl["F3_CAS_1"] = "##_[_1_;_@_R";
+    TerminalKeysTempl["F4_CAS_1"] = "##_[_1_;_@_S";
+    TerminalKeysTempl["F5_CAS_1"] = "##_[_1_;_@_T";
+    TerminalKeysTempl["F6_CAS_1"] = "##_[_1_;_@_U";
+    TerminalKeysTempl["F7_CAS_1"] = "##_[_1_;_@_V";
+    TerminalKeysTempl["F8_CAS_1"] = "##_[_1_;_@_W";
+    TerminalKeysTempl["F9_CAS_1"] = "##_[_1_;_@_X";
+    TerminalKeysTempl["F10_CAS_1"] = "##_[_1_;_@_Y";
+    TerminalKeysTempl["F11_CAS_1"] = "##_[_1_;_@_Z";
+    TerminalKeysTempl["F12_CAS_1"] = "##_[_1_;_@_[";
 
-    TerminalKeys["F13_CAS_0"] = "##_[_2_5_;_@_~";
-    TerminalKeys["F14_CAS_0"] = "##_[_2_6_;_@_~";
-    TerminalKeys["F15_CAS_0"] = "##_[_2_8_;_@_~";
-    TerminalKeys["F16_CAS_0"] = "##_[_2_9_;_@_~";
-    TerminalKeys["F17_CAS_0"] = "##_[_3_1_;_@_~";
-    TerminalKeys["F18_CAS_0"] = "##_[_3_2_;_@_~";
-    TerminalKeys["F19_CAS_0"] = "##_[_3_3_;_@_~";
-    TerminalKeys["F20_CAS_0"] = "##_[_3_4_;_@_~";
-
-    TerminalKeys["F1_000_1"] = "##_O_P";
-    TerminalKeys["F2_000_1"] = "##_O_Q";
-    TerminalKeys["F3_000_1"] = "##_O_R";
-    TerminalKeys["F4_000_1"] = "##_O_S";
-    TerminalKeys["F5_000_1"] = "##_O_T";
-    TerminalKeys["F6_000_1"] = "##_O_U";
-    TerminalKeys["F7_000_1"] = "##_O_V";
-    TerminalKeys["F8_000_1"] = "##_O_W";
-    TerminalKeys["F9_000_1"] = "##_O_X";
-    TerminalKeys["F10_000_1"] = "##_O_Y";
-    TerminalKeys["F11_000_1"] = "##_O_Z";
-    TerminalKeys["F12_000_1"] = "##_O_[";
-
-    TerminalKeys["F13_000_1"] = "##_O_\\";
-    TerminalKeys["F14_000_1"] = "##_O_]";
-    TerminalKeys["F15_000_1"] = "##_O_^";
-    TerminalKeys["F16_000_1"] = "##_O__";
-    TerminalKeys["F17_000_1"] = "";
-    TerminalKeys["F18_000_1"] = "";
-    TerminalKeys["F19_000_1"] = "";
-    TerminalKeys["F20_000_1"] = "";
-
-    TerminalKeys["F1_CAS_1"] = "##_[_1_;_@_P";
-    TerminalKeys["F2_CAS_1"] = "##_[_1_;_@_Q";
-    TerminalKeys["F3_CAS_1"] = "##_[_1_;_@_R";
-    TerminalKeys["F4_CAS_1"] = "##_[_1_;_@_S";
-    TerminalKeys["F5_CAS_1"] = "##_[_1_;_@_T";
-    TerminalKeys["F6_CAS_1"] = "##_[_1_;_@_U";
-    TerminalKeys["F7_CAS_1"] = "##_[_1_;_@_V";
-    TerminalKeys["F8_CAS_1"] = "##_[_1_;_@_W";
-    TerminalKeys["F9_CAS_1"] = "##_[_1_;_@_X";
-    TerminalKeys["F10_CAS_1"] = "##_[_1_;_@_Y";
-    TerminalKeys["F11_CAS_1"] = "##_[_1_;_@_Z";
-    TerminalKeys["F12_CAS_1"] = "##_[_1_;_@_[";
-
-    TerminalKeys["F13_CAS_1"] = "##_[_1_;_@_\\";
-    TerminalKeys["F14_CAS_1"] = "##_[_1_;_@_]";
-    TerminalKeys["F15_CAS_1"] = "##_[_1_;_@_^";
-    TerminalKeys["F16_CAS_1"] = "##_[_1_;_@__";
-    TerminalKeys["F17_CAS_1"] = "";
-    TerminalKeys["F18_CAS_1"] = "";
-    TerminalKeys["F19_CAS_1"] = "";
-    TerminalKeys["F20_CAS_1"] = "";
+    TerminalKeysTempl["F13_CAS_1"] = "##_[_1_;_@_\\";
+    TerminalKeysTempl["F14_CAS_1"] = "##_[_1_;_@_]";
+    TerminalKeysTempl["F15_CAS_1"] = "##_[_1_;_@_^";
+    TerminalKeysTempl["F16_CAS_1"] = "##_[_1_;_@__";
+    TerminalKeysTempl["F17_CAS_1"] = "";
+    TerminalKeysTempl["F18_CAS_1"] = "";
+    TerminalKeysTempl["F19_CAS_1"] = "";
+    TerminalKeysTempl["F20_CAS_1"] = "";
 
     // Keys depending on configuration 3
-    TerminalKeys["Insert_000_0"] = "##_[_2_~";
-    TerminalKeys["Delete_000_0"] = "##_[_3_~";
-    TerminalKeys["Home_000_0"] = "##_[_1_~";
-    TerminalKeys["End_000_0"] = "##_[_4_~";
-    TerminalKeys["PageUp_000_0"] = "##_[_5_~";
-    TerminalKeys["PageDown_000_0"] = "##_[_6_~";
-    TerminalKeys["Insert_000_1"] = "##_[_2_~";
-    TerminalKeys["Delete_000_1"] = "##_[_3_~";
-    TerminalKeys["Home_000_1"] = "##_[_H";
-    TerminalKeys["End_000_1"] = "##_[_F";
-    TerminalKeys["PageUp_000_1"] = "##_[_5_~";
-    TerminalKeys["PageDown_000_1"] = "##_[_6_~";
-    TerminalKeys["Insert_000_2"] = "##_[_2_~";
-    TerminalKeys["Delete_000_2"] = "##_[_3_~";
-    TerminalKeys["Home_000_2"] = "##_O_H";
-    TerminalKeys["End_000_2"] = "##_O_F";
-    TerminalKeys["PageUp_000_2"] = "##_[_5_~";
-    TerminalKeys["PageDown_000_2"] = "##_[_6_~";
-
-    TerminalKeys["Insert_CAS_0"] = "##_[_2_;_@_~";
-    TerminalKeys["Delete_CAS_0"] = "##_[_3_;_@_~";
-    TerminalKeys["Home_CAS_0"] = "##_[_1_;_@_~";
-    TerminalKeys["End_CAS_0"] = "##_[_4_;_@_~";
-    TerminalKeys["PageUp_CAS_0"] = "##_[_5_;_@_~";
-    TerminalKeys["PageDown_CAS_0"] = "##_[_6_;_@_~";
-    TerminalKeys["Insert_CAS_1"] = "##_[_2_;_@_~";
-    TerminalKeys["Delete_CAS_1"] = "##_[_3_;_@_~";
-    TerminalKeys["Home_CAS_1"] = "##_[_1_;_@_H";
-    TerminalKeys["End_CAS_1"] = "##_[_1_;_@_F";
-    TerminalKeys["PageUp_CAS_1"] = "##_[_5_;_@_~";
-    TerminalKeys["PageDown_CAS_1"] = "##_[_6_;_@_~";
-    TerminalKeys["Insert_CAS_2"] = "##_[_2_;_@_~";
-    TerminalKeys["Delete_CAS_2"] = "##_[_3_;_@_~";
-    TerminalKeys["Home_CAS_2"] = "##_[_1_;_@_H";
-    TerminalKeys["End_CAS_2"] = "##_[_1_;_@_F";
-    TerminalKeys["PageUp_CAS_2"] = "##_[_5_;_@_~";
-    TerminalKeys["PageDown_CAS_2"] = "##_[_6_;_@_~";
+    TerminalKeysTempl["Insert_CAS_0"] = "##_[_2_;_@_~";
+    TerminalKeysTempl["Delete_CAS_0"] = "##_[_3_;_@_~";
+    TerminalKeysTempl["Home_CAS_0"] = "##_[_1_;_@_~";
+    TerminalKeysTempl["End_CAS_0"] = "##_[_4_;_@_~";
+    TerminalKeysTempl["PageUp_CAS_0"] = "##_[_5_;_@_~";
+    TerminalKeysTempl["PageDown_CAS_0"] = "##_[_6_;_@_~";
+    TerminalKeysTempl["Insert_CAS_1"] = "##_[_2_;_@_~";
+    TerminalKeysTempl["Delete_CAS_1"] = "##_[_3_;_@_~";
+    TerminalKeysTempl["Home_CAS_1"] = "##_[_1_;_@_H";
+    TerminalKeysTempl["End_CAS_1"] = "##_[_1_;_@_F";
+    TerminalKeysTempl["PageUp_CAS_1"] = "##_[_5_;_@_~";
+    TerminalKeysTempl["PageDown_CAS_1"] = "##_[_6_;_@_~";
+    TerminalKeysTempl["Insert_CAS_2"] = "##_[_2_;_@_~";
+    TerminalKeysTempl["Delete_CAS_2"] = "##_[_3_;_@_~";
+    TerminalKeysTempl["Home_CAS_2"] = "##_[_1_;_@_H";
+    TerminalKeysTempl["End_CAS_2"] = "##_[_1_;_@_F";
+    TerminalKeysTempl["PageUp_CAS_2"] = "##_[_5_;_@_~";
+    TerminalKeysTempl["PageDown_CAS_2"] = "##_[_6_;_@_~";
 
     // Keys for VT52 mode
-    TerminalKeys["Up_000_9"] = "##_A";
-    TerminalKeys["Down_000_9"] = "##_B";
-    TerminalKeys["Right_000_9"] = "##_C";
-    TerminalKeys["Left_000_9"] = "##_D";
-    TerminalKeys["F1_000_9"] = "##_P";
-    TerminalKeys["F2_000_9"] = "##_Q";
-    TerminalKeys["F3_000_9"] = "##_R";
-    TerminalKeys["F4_000_9"] = "##_S";
-    TerminalKeys["F5_000_9"] = "##_T";
-    TerminalKeys["F6_000_9"] = "##_U";
-    TerminalKeys["F7_000_9"] = "##_V";
-    TerminalKeys["F8_000_9"] = "##_W";
-    TerminalKeys["F9_000_9"] = "##_X";
-    TerminalKeys["F10_000_9"] = "##_Y";
-    TerminalKeys["F11_000_9"] = "##_Z";
-    TerminalKeys["F12_000_9"] = "##_[";
+    TerminalKeysTempl["Up_000_9"] = "##_A";
+    TerminalKeysTempl["Down_000_9"] = "##_B";
+    TerminalKeysTempl["Right_000_9"] = "##_C";
+    TerminalKeysTempl["Left_000_9"] = "##_D";
+    TerminalKeysTempl["F1_000_9"] = "##_P";
+    TerminalKeysTempl["F2_000_9"] = "##_Q";
+    TerminalKeysTempl["F3_000_9"] = "##_R";
+    TerminalKeysTempl["F4_000_9"] = "##_S";
+    TerminalKeysTempl["F5_000_9"] = "##_T";
+    TerminalKeysTempl["F6_000_9"] = "##_U";
+    TerminalKeysTempl["F7_000_9"] = "##_V";
+    TerminalKeysTempl["F8_000_9"] = "##_W";
+    TerminalKeysTempl["F9_000_9"] = "##_X";
+    TerminalKeysTempl["F10_000_9"] = "##_Y";
+    TerminalKeysTempl["F11_000_9"] = "##_Z";
+    TerminalKeysTempl["F12_000_9"] = "##_[";
 
-    TerminalKeys["F13_000_9"] = "##_\\";
-    TerminalKeys["F14_000_9"] = "##_]";
-    TerminalKeys["F15_000_9"] = "##_^";
-    TerminalKeys["F16_000_9"] = "##__";
-    TerminalKeys["F17_000_9"] = "";
-    TerminalKeys["F18_000_9"] = "";
-    TerminalKeys["F19_000_9"] = "";
-    TerminalKeys["F20_000_9"] = "";
+    TerminalKeysTempl["F13_000_9"] = "##_\\";
+    TerminalKeysTempl["F14_000_9"] = "##_]";
+    TerminalKeysTempl["F15_000_9"] = "##_^";
+    TerminalKeysTempl["F16_000_9"] = "##__";
+    TerminalKeysTempl["F17_000_9"] = "";
+    TerminalKeysTempl["F18_000_9"] = "";
+    TerminalKeysTempl["F19_000_9"] = "";
+    TerminalKeysTempl["F20_000_9"] = "";
 
-    TerminalKeys["Insert_000_9"] = "##_L";
-    TerminalKeys["Delete_000_9"] = "##_M";
-    TerminalKeys["Home_000_9"] = "##_H";
-    TerminalKeys["End_000_9"] = "##_E";
-    TerminalKeys["PageUp_000_9"] = "##_I";
-    TerminalKeys["PageDown_000_9"] = "##_G";
+    TerminalKeysTempl["Insert_000_9"] = "##_L";
+    TerminalKeysTempl["Delete_000_9"] = "##_M";
+    TerminalKeysTempl["Home_000_9"] = "##_H";
+    TerminalKeysTempl["End_000_9"] = "##_E";
+    TerminalKeysTempl["PageUp_000_9"] = "##_I";
+    TerminalKeysTempl["PageDown_000_9"] = "##_G";
 
-    // Alternate numeric keys
-    TerminalKeys["NumPad_Numpad0_0"] = "##_O_p";
-    TerminalKeys["NumPad_Numpad1_0"] = "##_O_q";
-    TerminalKeys["NumPad_Numpad2_0"] = "##_O_r";
-    TerminalKeys["NumPad_Numpad3_0"] = "##_O_s";
-    TerminalKeys["NumPad_Numpad4_0"] = "##_O_t";
-    TerminalKeys["NumPad_Numpad5_0"] = "##_O_u";
-    TerminalKeys["NumPad_Numpad6_0"] = "##_O_v";
-    TerminalKeys["NumPad_Numpad7_0"] = "##_O_w";
-    TerminalKeys["NumPad_Numpad8_0"] = "##_O_x";
-    TerminalKeys["NumPad_Numpad9_0"] = "##_O_y";
-    TerminalKeys["NumPad_NumpadDecimal_0"] = "##_O_n";
-    TerminalKeys["NumPad_NumpadAdd_0"] = "##_O_l";
-    TerminalKeys["NumPad_NumpadSubtract_0"] = "##_O_m";
-    TerminalKeys["NumPad_NumpadEnter_0"] = "##_O_M";
-    TerminalKeys["NumPad_NumpadMultiply_0"] = "";
-    TerminalKeys["NumPad_NumpadDivide_0"] = "";
-
-    TerminalKeys["NumPad_Numpad0_1"] = "##_?_p";
-    TerminalKeys["NumPad_Numpad1_1"] = "##_?_q";
-    TerminalKeys["NumPad_Numpad2_1"] = "##_?_r";
-    TerminalKeys["NumPad_Numpad3_1"] = "##_?_s";
-    TerminalKeys["NumPad_Numpad4_1"] = "##_?_t";
-    TerminalKeys["NumPad_Numpad5_1"] = "##_?_u";
-    TerminalKeys["NumPad_Numpad6_1"] = "##_?_v";
-    TerminalKeys["NumPad_Numpad7_1"] = "##_?_w";
-    TerminalKeys["NumPad_Numpad8_1"] = "##_?_x";
-    TerminalKeys["NumPad_Numpad9_1"] = "##_?_y";
-    TerminalKeys["NumPad_NumpadDecimal_1"] = "##_?_n";
-    TerminalKeys["NumPad_NumpadAdd_1"] = "##_?_l";
-    TerminalKeys["NumPad_NumpadSubtract_1"] = "##_?_m";
-    TerminalKeys["NumPad_NumpadEnter_1"] = "##_?_M";
-    TerminalKeys["NumPad_NumpadMultiply_1"] = "";
-    TerminalKeys["NumPad_NumpadDivide_1"] = "";
+    std::unordered_map<std::string, std::string> TerminalKeys_;
 
     // Generating codes for CAS modifiers
-    XList<std::string> TerminalKeysCAS;
-    TerminalKeysCAS.AddRange(TerminalKeys0);
-    TerminalKeysCAS.AddRange(TerminalKeys1);
-    TerminalKeysCAS.AddRange(TerminalKeys2);
-    TerminalKeysCAS.AddRange(TerminalKeys3);
-    TerminalKeysCAS.AddRange(TerminalKeys4);
-    for (int i = 0; i < TerminalKeysCAS.Count; i++)
+    for (int i = 0; i < TerminalKeysCAS.size(); i++)
     {
         std::string N = TerminalKeysCAS[i];
         for (int ii = 0; ii < 3; ii++)
         {
             std::string N_ = std::to_string(ii);
-            if (TerminalKeys.count(N + "_000_" + N_) > 0)
+            if (TerminalKeysTempl.count(N + "_000_" + N_) > 0)
             {
-                std::string NN = TerminalKeys[N + "_CAS_" + N_];
-                TerminalKeys[N + "_001_" + N_] = TextWork::StringReplace(NN, "_@", "_2");
-                TerminalKeys[N + "_010_" + N_] = TextWork::StringReplace(NN, "_@", "_3");
-                TerminalKeys[N + "_011_" + N_] = TextWork::StringReplace(NN, "_@", "_4");
-                TerminalKeys[N + "_100_" + N_] = TextWork::StringReplace(NN, "_@", "_5");
-                TerminalKeys[N + "_101_" + N_] = TextWork::StringReplace(NN, "_@", "_6");
-                TerminalKeys[N + "_110_" + N_] = TextWork::StringReplace(NN, "_@", "_7");
-                TerminalKeys[N + "_111_" + N_] = TextWork::StringReplace(NN, "_@", "_8");
+                std::string NN = TerminalKeysTempl[N + "_CAS_" + N_];
+                TerminalKeys_[N + "_001_" + N_] = TextWork::StringReplace(NN, "_@", "_2");
+                TerminalKeys_[N + "_010_" + N_] = TextWork::StringReplace(NN, "_@", "_3");
+                TerminalKeys_[N + "_011_" + N_] = TextWork::StringReplace(NN, "_@", "_4");
+                TerminalKeys_[N + "_100_" + N_] = TextWork::StringReplace(NN, "_@", "_5");
+                TerminalKeys_[N + "_101_" + N_] = TextWork::StringReplace(NN, "_@", "_6");
+                TerminalKeys_[N + "_110_" + N_] = TextWork::StringReplace(NN, "_@", "_7");
+                TerminalKeys_[N + "_111_" + N_] = TextWork::StringReplace(NN, "_@", "_8");
             }
         }
-        if (TerminalKeys.count(N + "_000_9") > 0)
+        if (TerminalKeysTempl.count(N + "_000_9") > 0)
         {
-            TerminalKeys[N + "_001_9"] = TerminalKeys[N + "_000_9"];
-            TerminalKeys[N + "_010_9"] = TerminalKeys[N + "_000_9"];
-            TerminalKeys[N + "_011_9"] = TerminalKeys[N + "_000_9"];
-            TerminalKeys[N + "_100_9"] = TerminalKeys[N + "_000_9"];
-            TerminalKeys[N + "_101_9"] = TerminalKeys[N + "_000_9"];
-            TerminalKeys[N + "_110_9"] = TerminalKeys[N + "_000_9"];
-            TerminalKeys[N + "_111_9"] = TerminalKeys[N + "_000_9"];
+            TerminalKeys_[N + "_000_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_001_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_010_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_011_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_100_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_101_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_110_9"] = TerminalKeysTempl[N + "_000_9"];
+            TerminalKeys_[N + "_111_9"] = TerminalKeysTempl[N + "_000_9"];
+        }
+    }
+
+    // Common keys
+    TerminalKeys_["Escape"] = "1B";
+    TerminalKeys_["Tab"] = "09";
+    TerminalKeys_["Enter_0"] = "0D";
+    TerminalKeys_["Enter_1"] = "0D0A";
+    TerminalKeys_["Enter_2"] = "0A";
+    TerminalKeys_["Enter_3"] = "0D0A";
+    TerminalKeys_["Backspace_0"] = "7F";
+    TerminalKeys_["Backspace_1"] = "08";
+
+    // Keys depending on configuration 0
+    TerminalKeys_["Up_000_0"] = "##_[_A";
+    TerminalKeys_["Down_000_0"] = "##_[_B";
+    TerminalKeys_["Right_000_0"] = "##_[_C";
+    TerminalKeys_["Left_000_0"] = "##_[_D";
+    TerminalKeys_["Up_000_1"] = "##_O_A";
+    TerminalKeys_["Down_000_1"] = "##_O_B";
+    TerminalKeys_["Right_000_1"] = "##_O_C";
+    TerminalKeys_["Left_000_1"] = "##_O_D";
+
+    // Keys depending on configuration 1 and 2
+    TerminalKeys_["F1_000_0"] = "##_[_1_1_~";
+    TerminalKeys_["F2_000_0"] = "##_[_1_2_~";
+    TerminalKeys_["F3_000_0"] = "##_[_1_3_~";
+    TerminalKeys_["F4_000_0"] = "##_[_1_4_~";
+    TerminalKeys_["F5_000_0"] = "##_[_1_5_~";
+    TerminalKeys_["F6_000_0"] = "##_[_1_7_~";
+    TerminalKeys_["F7_000_0"] = "##_[_1_8_~";
+    TerminalKeys_["F8_000_0"] = "##_[_1_9_~";
+    TerminalKeys_["F9_000_0"] = "##_[_2_0_~";
+    TerminalKeys_["F10_000_0"] = "##_[_2_1_~";
+    TerminalKeys_["F11_000_0"] = "##_[_2_3_~";
+    TerminalKeys_["F12_000_0"] = "##_[_2_4_~";
+
+    TerminalKeys_["F13_000_0"] = "##_[_2_5_~";
+    TerminalKeys_["F14_000_0"] = "##_[_2_6_~";
+    TerminalKeys_["F15_000_0"] = "##_[_2_8_~";
+    TerminalKeys_["F16_000_0"] = "##_[_2_9_~";
+    TerminalKeys_["F17_000_0"] = "##_[_3_1_~";
+    TerminalKeys_["F18_000_0"] = "##_[_3_2_~";
+    TerminalKeys_["F19_000_0"] = "##_[_3_3_~";
+    TerminalKeys_["F20_000_0"] = "##_[_3_4_~";
+
+    TerminalKeys_["F1_000_1"] = "##_O_P";
+    TerminalKeys_["F2_000_1"] = "##_O_Q";
+    TerminalKeys_["F3_000_1"] = "##_O_R";
+    TerminalKeys_["F4_000_1"] = "##_O_S";
+    TerminalKeys_["F5_000_1"] = "##_O_T";
+    TerminalKeys_["F6_000_1"] = "##_O_U";
+    TerminalKeys_["F7_000_1"] = "##_O_V";
+    TerminalKeys_["F8_000_1"] = "##_O_W";
+    TerminalKeys_["F9_000_1"] = "##_O_X";
+    TerminalKeys_["F10_000_1"] = "##_O_Y";
+    TerminalKeys_["F11_000_1"] = "##_O_Z";
+    TerminalKeys_["F12_000_1"] = "##_O_[";
+
+    TerminalKeys_["F13_000_1"] = "##_O_\\";
+    TerminalKeys_["F14_000_1"] = "##_O_]";
+    TerminalKeys_["F15_000_1"] = "##_O_^";
+    TerminalKeys_["F16_000_1"] = "##_O__";
+    TerminalKeys_["F17_000_1"] = "";
+    TerminalKeys_["F18_000_1"] = "";
+    TerminalKeys_["F19_000_1"] = "";
+    TerminalKeys_["F20_000_1"] = "";
+
+    // Keys depending on configuration 3
+    TerminalKeys_["Insert_000_0"] = "##_[_2_~";
+    TerminalKeys_["Delete_000_0"] = "##_[_3_~";
+    TerminalKeys_["Home_000_0"] = "##_[_1_~";
+    TerminalKeys_["End_000_0"] = "##_[_4_~";
+    TerminalKeys_["PageUp_000_0"] = "##_[_5_~";
+    TerminalKeys_["PageDown_000_0"] = "##_[_6_~";
+    TerminalKeys_["Insert_000_1"] = "##_[_2_~";
+    TerminalKeys_["Delete_000_1"] = "##_[_3_~";
+    TerminalKeys_["Home_000_1"] = "##_[_H";
+    TerminalKeys_["End_000_1"] = "##_[_F";
+    TerminalKeys_["PageUp_000_1"] = "##_[_5_~";
+    TerminalKeys_["PageDown_000_1"] = "##_[_6_~";
+    TerminalKeys_["Insert_000_2"] = "##_[_2_~";
+    TerminalKeys_["Delete_000_2"] = "##_[_3_~";
+    TerminalKeys_["Home_000_2"] = "##_O_H";
+    TerminalKeys_["End_000_2"] = "##_O_F";
+    TerminalKeys_["PageUp_000_2"] = "##_[_5_~";
+    TerminalKeys_["PageDown_000_2"] = "##_[_6_~";
+
+    // Alternate numeric keys
+    TerminalKeys_["NumPad_Numpad0_0"] = "##_O_p";
+    TerminalKeys_["NumPad_Numpad1_0"] = "##_O_q";
+    TerminalKeys_["NumPad_Numpad2_0"] = "##_O_r";
+    TerminalKeys_["NumPad_Numpad3_0"] = "##_O_s";
+    TerminalKeys_["NumPad_Numpad4_0"] = "##_O_t";
+    TerminalKeys_["NumPad_Numpad5_0"] = "##_O_u";
+    TerminalKeys_["NumPad_Numpad6_0"] = "##_O_v";
+    TerminalKeys_["NumPad_Numpad7_0"] = "##_O_w";
+    TerminalKeys_["NumPad_Numpad8_0"] = "##_O_x";
+    TerminalKeys_["NumPad_Numpad9_0"] = "##_O_y";
+    TerminalKeys_["NumPad_NumpadDecimal_0"] = "##_O_n";
+    TerminalKeys_["NumPad_NumpadAdd_0"] = "##_O_l";
+    TerminalKeys_["NumPad_NumpadSubtract_0"] = "##_O_m";
+    TerminalKeys_["NumPad_NumpadEnter_0"] = "##_O_M";
+    TerminalKeys_["NumPad_NumpadMultiply_0"] = "";
+    TerminalKeys_["NumPad_NumpadDivide_0"] = "";
+
+    TerminalKeys_["NumPad_Numpad0_1"] = "##_?_p";
+    TerminalKeys_["NumPad_Numpad1_1"] = "##_?_q";
+    TerminalKeys_["NumPad_Numpad2_1"] = "##_?_r";
+    TerminalKeys_["NumPad_Numpad3_1"] = "##_?_s";
+    TerminalKeys_["NumPad_Numpad4_1"] = "##_?_t";
+    TerminalKeys_["NumPad_Numpad5_1"] = "##_?_u";
+    TerminalKeys_["NumPad_Numpad6_1"] = "##_?_v";
+    TerminalKeys_["NumPad_Numpad7_1"] = "##_?_w";
+    TerminalKeys_["NumPad_Numpad8_1"] = "##_?_x";
+    TerminalKeys_["NumPad_Numpad9_1"] = "##_?_y";
+    TerminalKeys_["NumPad_NumpadDecimal_1"] = "##_?_n";
+    TerminalKeys_["NumPad_NumpadAdd_1"] = "##_?_l";
+    TerminalKeys_["NumPad_NumpadSubtract_1"] = "##_?_m";
+    TerminalKeys_["NumPad_NumpadEnter_1"] = "##_?_M";
+    TerminalKeys_["NumPad_NumpadMultiply_1"] = "";
+    TerminalKeys_["NumPad_NumpadDivide_1"] = "";
+
+    // Woraround to fix -O3 compilation bug
+    //if (Screen::CurrentOpt < 0)
+    //{
+    //    //std::cout << "{" << TerminalKeys_["Right_000_1"] << "}" << std::endl;
+    //}
+
+
+    for (auto item : TerminalKeys_)
+    {
+        TerminalKeys[item.first] = item.second;
+
+        bool IsError = false;
+        std::string KeyStrTest = item.second;
+        if ((KeyStrTest.length() % 2) != 0)
+        {
+            IsError = true;
+        }
+        for (int I = 0; I < KeyStrTest.length(); I++)
+        {
+            if ((KeyStrTest[I] < 32) || (KeyStrTest[I] > 126))
+            {
+                IsError = true;
+            }
+        }
+        if (IsError)
+        {
+            std::cout << " [" << item.first << "]  [" << item.second << "]" << std::endl;
+            //std::cout << "ERROR: [" << item.first << "]  [" << item.second << "]" << std::endl;
         }
     }
 }

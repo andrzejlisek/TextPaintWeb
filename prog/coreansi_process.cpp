@@ -1,12 +1,14 @@
 #include "coreansi.h"
 
-void CoreAnsi::AnsiProcessReset(bool AnsiScreenWork_, int SeekMode_, int AnsiOptions)
+void CoreAnsi::AnsiProcessReset(bool AnsiScreenWork_, int SeekMode_, int AnsiOptions, bool UseScrollBufer)
 {
+    __AnsiLineOccupyUseScrollBuffer = UseScrollBufer;
     if (SeekMode_ <= 1)
     {
         SeekStateSaveLast = -1;
         SeekStateSaveNext = -1;
         SeekState.Clear();
+        SeekLineList.Clear();
     }
     UseAnsiCommands = ((AnsiOptions & 1) > 0);
     UseCustomPaletteFont = ((AnsiOptions & 2) > 0);
@@ -100,7 +102,7 @@ void CoreAnsi::SeekStateSave(bool StdProc)
         if (((StdProc && AnsiState_.AnsiScrollZeroOffset)) || AnsiState_.AnsiScrollSeekSave)
         {
             AnsiState_.AnsiScrollSeekSave = false;
-            SeekState.Add(AnsiState_.Clone());
+            SeekState.Add(AnsiState_.Clone(__AnsiLineOccupyUseScrollBuffer));
             SeekStateSaveLast = AnsiState_.__AnsiProcessStep;
             SeekStateSaveNext = SeekStateSaveLast + SeekPeriod;
         }
@@ -143,7 +145,7 @@ bool CoreAnsi::AnsiSeek(int StepCount)
         {
             MustResize = true;
         }
-        AnsiState::Copy(SeekState[SeekIdx], AnsiState_);
+        AnsiState::Copy(SeekState[SeekIdx], AnsiState_, __AnsiLineOccupyUseScrollBuffer);
         if (MustResize)
         {
             AnsiResize(AnsiState_.TerminalW, AnsiState_.TerminalH);
@@ -168,6 +170,14 @@ void CoreAnsi::AnsiSeekInterval(int Period)
 {
     SeekPeriod = Period;
     SeekPeriod0 = Period + Period;
+}
+
+void CoreAnsi::AnsiSeekLine()
+{
+    if (SeekMode == 1)
+    {
+        SeekLineList.Add(AnsiState_.__AnsiProcessStep);
+    }
 }
 
 int CoreAnsi::AnsiProcess(int ProcessCount)

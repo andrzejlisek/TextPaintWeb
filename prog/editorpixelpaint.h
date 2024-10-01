@@ -5,7 +5,7 @@
 #include "editorpixelpaintstate.h"
 #include "editorclipboard.h"
 #include "configfile.h"
-#include <map>
+#include <unordered_map>
 #include "textwork.h"
 
 class EditorPixelPaint
@@ -20,8 +20,8 @@ public:
         std::string Name = "";
         int CharW = 0;
         int CharH = 0;
-        std::map<int, int> IntToChar;
-        std::map<int, int> CharToInt;
+        std::unordered_map<int, int> IntToChar;
+        std::unordered_map<int, int> CharToInt;
     };
     int PaintModeCount = 0;
     bool IsCharPaint();

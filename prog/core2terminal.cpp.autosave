@@ -9,7 +9,6 @@ void Core2Terminal::Init()
 {
     B64 = std::make_unique<TextCodec>(TextCodec::BASE64);
 
-    UpdateConfig(CF);
     CoreAnsi_ = std::make_shared<CoreAnsi>(CF);
     DisplayConfig_.get()->CoreAnsi_ = CoreAnsi_;
     DisplayConfig_.get()->PopupBack = PopupBack;
@@ -73,6 +72,12 @@ void Core2Terminal::Init()
         }
     }
 
+    TerminalStep = CF.get()->ParamGetI("TimerStep");
+    if (TerminalStep <= 0)
+    {
+        TerminalStep = 2000000000;
+    }
+
     Conn = std::make_unique<TerminalConn>();
 
     ConnListName.Clear();
@@ -125,11 +130,11 @@ void Core2Terminal::EventTick()
         }
     }
 
-    int Processed = CoreAnsi_.get()->AnsiProcess(ProcessTimerStep);
+    int Processed = CoreAnsi_.get()->AnsiProcess(TerminalStep);
     if (Processed > 0)
     {
         TelnetDisplayInfoRepaint = true;
-        Screen::CursorHideTerm(CoreAnsi_.get()->AnsiState_.CursorHide, CoreAnsi_.get()->AnsiState_.CursorTerm);
+        Screen::CursorHide(CoreAnsi_.get()->AnsiState_.CursorHide);
         CoreAnsi_.get()->AnsiRepaintCursor();
         bool NeedStatusRepaint = false;
         if (ScreenW != Screen::CurrentW)
@@ -242,6 +247,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
         case WorkStateCDef::ConnListSelectCustom2Key:
             if (OptionTextKeyWrite(KeyName, KeyChar))
             {
+                std::cout << "KonsolaZatwierdz [" << OptionTextData << "]" << std::endl;
                 WorkStateC = WorkStateCDef::ConnListSelectCustom3;
                 EventKey("", 0, false, false, false);
             }
@@ -257,6 +263,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             if (OptionTextKeyWrite(KeyName, KeyChar))
             {
                 OptionTextDisplayRefresh();
+                std::cout << "kodek potwierdz [" << OptionTextData << "]" << std::endl;
                 WorkStateC = WorkStateCDef::InfoScreenBefore;
                 EventKey("", 0, false, false, false);
             }
@@ -315,6 +322,10 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                         break;
                     case _("Enter"):
                     case _("NumpadEnter"):
+                        {
+                            WorkStateC = WorkStateCDef::EscapeKey;
+                        }
+                        break;
                     case _("Escape"):
                         {
                             WorkStateC = WorkStateCDef::Session;
@@ -376,7 +387,8 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                             {
                                 case '=':
                                     {
-                                        WorkStateC = WorkStateCDef::EscapeKey;
+                                        WorkStateC = WorkStateCDef::Session;
+                                        TerminalMouse_.MouseOn();
                                     }
                                     break;
                                 case ';':
@@ -577,7 +589,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             {
                 if (DisplayConfig_.get()->RequestResize)
                 {
-                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 2, 0);
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 1, 0);
                 }
                 CoreAnsi_.get()->AnsiRepaint(false);
                 DisplayStatusRepaint();
@@ -593,13 +605,6 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
         case _("Resize"):
             ScreenW = EvtParam1;
             ScreenH = EvtParam2;
-            if (EvtParam3 == 2)
-            {
-                CF.get()->ParamSet("WinW", EvtParam1);
-                CF.get()->ParamSet("WinH", EvtParam2);
-                BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
-                BinaryFile_.get()->SysSaveConfig();
-            }
             Screen::ScreenResize(ScreenW, ScreenH);
             CoreAnsi_.get()->AnsiTerminalResize(ScreenW, ScreenH, ScreenStatusBar);
             DisplayStatusRepaint();
@@ -709,7 +714,7 @@ void Core2Terminal::SendHex(std::string STR)
 void Core2Terminal::ConnOpen()
 {
     TerminalMouse_.Reset();
-    Screen::CursorHideTerm(false, 0);
+    Screen::CursorHide(false);
     Screen::ScreenClear(Screen::TextNormalBack, Screen::TextNormalFore);
     DisplayStatusRepaint();
     Screen::ScreenCursorMove(0, 0);
@@ -751,7 +756,7 @@ void Core2Terminal::ConnOpen()
             break;
     }
 
-    CoreAnsi_.get()->AnsiProcessReset(true, 0, 1, false);
+    CoreAnsi_.get()->AnsiProcessReset(true, 0, 1);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(1, 4);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(2, 2);
     CoreAnsi_.get()->AnsiState_.AnsiParamSet(3, 2);
@@ -1115,18 +1120,6 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                 SendHex("##_[_?_5_3_n");
             }
             break;
-        case _("[?55n"): // Locator status
-            if (SendAnswer)
-            {
-                SendHex("##_[_?_5_3_n");
-            }
-            break;
-        case _("[?56n"): // Locator type
-            if (SendAnswer)
-            {
-                SendHex("##_[_?_5_7_;_0_n");
-            }
-            break;
         case _("[?62n"): // DECMSR
             if (SendAnswer)
             {
@@ -1369,10 +1362,10 @@ void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)
         InfoMsg.Add(" Status: " + StatusInfo + " ");
         InfoMsg.Add(" Screen size: " + std::to_string(CoreAnsi_.get()->AnsiMaxX) + "x" + std::to_string(CoreAnsi_.get()->AnsiMaxY) + " ");
         InfoMsg.Add(" Escape key: " + EscapeKey_ + " ");
-        InfoMsg.Add(" Esc Enter - Return to terminal ");
+        InfoMsg.Add(" Esc = - Return to terminal ");
+        InfoMsg.Add(" Enter - Change escape key ");
         InfoMsg.Add(" Tab - Move info ");
         InfoMsg.Add(" Backspace - Exit ");
-        InfoMsg.Add(" = - Change escape key ");
         switch (TerminalKeyboard_.TelnetFuncKeyOther)
         {
             case 0:

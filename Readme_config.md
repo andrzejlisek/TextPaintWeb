@@ -1,6 +1,6 @@
 # Overview
 
-In the **/files** subdirectory, there is the \!\!config\.txt, whis is TextPaint configuration file The file stores the default configuration, which can be changed using TextPaint editor\. The modified configuration file is stored in database\.
+In the **/files** subdirectory, there is the **\!\!config\.txt**, whis is TextPaint configuration file\. The file stores the default configuration, which can be changed using TextPaint editor\. The modified configuration file is stored in database\.
 
 **TextPaint** can modify the file automatically when you use configuration functions, file manager and sometimes other options\.
 
@@ -24,8 +24,16 @@ The panel consists of following button rows:
 * **Process** \- Toggle the ANSI processing options\. The button captions indicates the current state\. The change affects after processing new data\. In the player, you have to reopen the file\. In the terminal, the will be affect fo new data only\.
 * **Colors** \- Set the color display options\. The button captions indicates the current state\. The result will be shown immediately and the affect the screen display only\.
 * **Font** \- Set the font display options\. The button captions indicates the current state\. The result will be shown immediately and the affect the screen display only\.
-* **Screen width** \- Change the screen width\. The values on the buttons indicates current resolution\.
-* **Screen height** \- Change the screen height\. The values on the buttons indicates current resolution\.
+* **Screen width** \- Change the screen width\. The values on the buttons indicates current resolution\. The **Auto resize/No resize** button sets the allow to automatic resize in terminal and animation player\.
+* **Screen height** \- Change the screen height\. The values on the buttons indicates current resolution\. The **Auto resize/No resize** button sets the allow to automatic resize in terminal and animation player\.
+* **Display step** \- Cursor style and display step in animation player:
+  * **Cursor style** \- Changes the cursor style from one of 7 styles including hidden \(invisible\) cursor\.
+  * **ANI** \- Displays and changes the step in characters in terminal and animation player within animation mode\.
+  * **TXT** \- Displays and changes the step in text lines in animation player within text mode\.
+* Display scroll \- Scroll settings:
+  * **Scroll steps** \- Changes the number of steps per one text line\. This affects on the scroll smooth\.
+  * **Steps** \- Changes the scroll speed in steps per one line\.
+  * **Dec Change/Inc Change** \- Changes the value change amount in **Display step** and **Display scroll** rows\. The current change amount are visible in the value changing buttons\.
 
 ## Application restart or configuration reset
 
@@ -36,7 +44,7 @@ The **Restart** button has the following workflow:
   * Click **Cancel** \- Display page refresh/leave confirmation \(text depends on browser\):
     * Confirm page refresh/leave \- **TextPaint** will be restarted\.
     * Discard page refresh/leave \- **TextPaint** will not be restarted\.
-  * Click OK \- Display **Clear file storage** confirmation:
+  * Click **OK** \- Display **Clear file storage** confirmation:
     * Click Cancel \- Remove **\!\!config\.txt** from storage\. You should restart the application by clicking the Restart button again\.
     * Click OK \- Remove all files from storage including **\!\!config\.txt** file\. You should restart the application\. You should restart the application by clicking the Restart button again\.
 
@@ -114,6 +122,14 @@ If you play XBIN fine and custom font makes the interface unreadable, you can re
 * Press **Insert** or **Delete** one more time to switch from state 2 to state 3\.
 * Press **Up Arrow** or **Down Arrow** key to change screen font\.
 
+## State 4 \- Display speed
+
+The state displays and allow to set the display speed during terminal session or animation playback\.
+
+![](readme_pics/config/popup4.png "")
+
+Every setting is preceeded by letter, which indicates the key, wich changes the setting\.
+
 # Configuration file contents
 
 The lines without equation sign and blank lines are ignored and can be used for comments\. Any prefix is not required for treat this line as comment\.
@@ -124,14 +140,19 @@ Some parameters contains the ordinal number\. In this document, the number is pr
 
 ## Application timer options
 
-**TextPaint** uses the timer, which periodically updates display \(cursor and blink\) and invokes event depending on **TextPaint** state\.
+**TextPaint** uses the timer, which periodically updates display \(cursor and blink\) and invokes event depending on **TextPaint** state\. *All these parameters can be changed everytime in the settings panel or settings pop\-up\.*
 
 
-* **TimerPeriod** \- The timer period in milliseconds\.
-* **TimerLoop** \- The counter period\. Every timer tick increments the counter by **1**, and if reach the TimerLoop value, the counter will be reset to **0**\.
-* **TimerCursor** \- Number of the ticks, which changes the cursor state between visible and invisible\. This value should be a divider of **TimerLoop** value\.
+* **TimerFrames** \- The number of display frames between tick, used in blinking cursor, blinking test, animation player and terminal\.
+* ***TimerCursor*** \- Number of the ticks, which changes the cursor state between visible and invisible\. This value should be a divider of **TimerLoop** value\.
 * **TimerBlink** \- Number of the ticks, which changes the blinking text state between normal and dimmed/invisible\. This value should be a divider of **TimerLoop** value\.
 * **TimerTick** \- Number of the ticks, which invokes the timer event in TextPaint\. This is used mostly in animation player and terminal for sequentally text display\.
+* ***TimerStep*** \- Number of characters per step in animation player and terminal session\.
+* ***TimerStepText*** \- Number of lines per step in animation player within text mode\.
+* ***TimerStepChange*** \- The change of ***TimerStep***, ***TimerStepText*** and ***ANSIScrollChars***, the value is from \-9 to 6 and represents the amounts:
+  * **Negative value **\- Multiple or divide by the absolute value of the number increased by 1\. For instance, the **\-4** represents the multiply or divide by 5\.
+  * **Zero** \- Increase or decrease by 1\.
+  * **Positive value** \- Increase or decrease by number represented by 10 powered by the value\.
 
 ## WebApiServer WebSocket address
 
@@ -147,6 +168,7 @@ There are the screen display parameters\. *All these parameters can be changed e
 
 * ***WinW*** \- Screen width in text cells\.
 * ***WinH*** \- Screen height in text cells\.
+* ***WinAuto*** \- Automated window resize according the ANSI/VTxxx codes, for instance change between 80 and 132 column display\.
 * ***WinScreenSize*** \- Percent of the whole screen, which is used for the TextPaint screen\.
 * ***WinKeyboardSize*** \- Percent of the whole screen, which is used for the on\-screen keyboard\.
 * ***WinTouchScreen*** \- Use the touch events instead of click events\. Recommended for use on devices with touchscreen, like tsmartphones\.
@@ -159,11 +181,18 @@ There are the screen display parameters\. *All these parameters can be changed e
   * **1** \- VTx style \- dimming colors\.
   * **2** \- DOS style \- disappearing text\.
 * ***DisplayAttrib*** \- Text display attributes presented as value from 0 to 15\. The value is sum of weights:
-  * **1** \- Bold
-  * **2** \- Italic
-  * **4** \- Underline
-  * **8** \- Strikethrough
-* ***SteadyCursor*** \- Cursor steeady display instead of blinking\.
+  * **1** \- Bold\.
+  * **2** \- Italic\.
+  * **4** \- Underline\.
+  * **8** \- Strikethrough\.
+* ***DisplayCursor*** \- Cursor style as following:
+  * **0** \- Hidden cursor\.
+  * **1** \- Blinking underline\.
+  * **2** \- Steady underline\.
+  * **3** \- Blinking vertical bar\.
+  * **4** \- Steady vertical bar\.
+  * **5** \- Blinking filled box\.
+  * **6** \- Steady filled box\.
 
 ## Player configuration
 
@@ -171,7 +200,6 @@ There are the parameters used in the animation player\.
 
 
 * ***PlayerEnd*** \- Seek to end file after file open or change\. *Press the ****Home**** or ****End**** key twice during playback to change the parameter\.*
-* **PlayerStep** \- Number of animation steps per single timer event\. in the player\. The step can be roughly changed by **\[** and **\]** keys during playback\.
 * **PlayerDelayFrame** \- The number of steps to wait to `1Bh [ 1; P1 V` escape sequence for the further file processing\.
 * **PlayerSeek** \- The number of steps for save the screen state in the memory:
   * Greater value \- shorter time for file load, possible hangs and freezes during playback backward\.
@@ -190,7 +218,6 @@ There are parameter used for the terminal function, including internal VTTEST\.
   * **3** \- VT320
   * **4** \- VT420
   * **5** \- VT520
-* **TerminalStep** \- Number of data processing steps per single timer event\.
 * ***TerminalKeys*** \- The terminal special key configuration as 7 digits\. *The configuration can be changed in the terminal pop\-up and some of them will be changed automatically according special escape sequences\.* The digits are following:
   * Cursor/arrow keys
     * **0** \- **Normal** \- *The DECRST/DECCKM command changes to ****Normal****\.*
@@ -230,25 +257,6 @@ There is the terminal connection list, which will be displayed and accessible at
   * **CMD** \- Run system command and redirect standard streams \(input, output, error\)\.
 * **Terminal?Addr** \- Network address with port number or command with parameters\.
 * **Terminal?Codec** \- Text codec used in connection
-
-## Render options \- NOT IMPLEMENTED YET
-
-This parameters are used in animation player, for render to bitmap\.
-
-
-* **RenderFile** \- Image file name for rendering single image \(**RenderStep=0**\) or directory for rendering movie \(**RenderStep>0**\)
-* **RenderStep** \- Number of processed character between movie frames\. To render single image, use **RenderStep=0**\.
-* **RenderOffset** \- Offset in steps when rendering movie\. For example, if **RenderStep=10** and **RenderOffset=4**, the frames will be generated after step no: 4th, 14th, 24th and so on\.
-* **RenderCursor** \- Draw cursor on rendered image\. Possible value are **0** or **1**\.
-* **RenderFrame** \- Number of steps per one frame \(unit\) when you render file containing time markers\.
-* **RenderSliceX** \- The horizontal offset, works only if **RenderSliceW>0**\.
-* **RenderSliceY** \- The horizontal offset, works only if **RenderSliceH>0**\.
-* **RenderSliceW** \- The width of sliced picture\. Use **RenderSliceW=0** for disable slicing horizontally\.
-* **RenderSliceH** \- The height of sliced picture\. Use **RenderSliceH=0** for disable slicing vertically\.
-* **RenderLeading** \- Number of dummy leading ANSI processing steps before the file contents\. It can be used for create additional blank frames before ANSI animation\.
-* **RenderTrailing** \- Number of dummy trailing ANSI processing steps after the file contents\. It can be used for create additional repeating frames after ANSI animation\.
-* **RenderBlinkPeriod** \- Number of frames for one of the blinking state, the full blinking period \(including the base and alternate state\) equals thice the value\. Works when the **RenderStep>0** only\.
-* **RenderBlinkOffset** \- The Offset of the blinking cycle, which will begin the rendered animation\.
 
 ## Bell options
 

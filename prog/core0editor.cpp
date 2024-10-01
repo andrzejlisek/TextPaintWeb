@@ -97,7 +97,7 @@ void Core0Editor::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool
             {
                 if (DisplayConfig_.get()->RequestResize)
                 {
-                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 1, 0);
+                    EventOther("Resize", "", DisplayConfig_.get()->ResizeW, DisplayConfig_.get()->ResizeH, 2, 0);
                 }
                 else
                 {
@@ -149,6 +149,13 @@ void Core0Editor::EventOther(std::string EvtName, std::string EvtParam0, int Evt
         case _("Resize"):
             ScreenW = EvtParam1;
             ScreenH = EvtParam2;
+            if (EvtParam3 == 2)
+            {
+                CF.get()->ParamSet("WinW", EvtParam1);
+                CF.get()->ParamSet("WinH", EvtParam2);
+                BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
+                BinaryFile_.get()->SysSaveConfig();
+            }
             Screen::ScreenResize(ScreenW, ScreenH);
             TempMemoI.Add(DisplayState);
             switch (DisplayState)
@@ -379,7 +386,7 @@ void Core0Editor::EventKey_Editor_1(std::string KeyName, int KeyChar, bool ModSh
             MoveCursor(7);
             break;
 
-        case _("Escape"):
+        case _("F6"):
             {
                 TextMoveDir++;
                 if (TextMoveDir == 8)
@@ -2543,14 +2550,14 @@ void Core0Editor::FileLoad2()
                 FileH = std::max(FileH, LineCounter0 + 3);
             }
             CoreAnsi_.get()->AnsiTerminalResize(FileW, FileH, 0);
-            CoreAnsi_.get()->AnsiProcessReset(false, 0, 0);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 0, true);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
         case 1: // ANSI
             BinaryFile_.get()->Load(BinaryFile_.get()->CurrentFileName, FileTxt, 0);
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(false, 0, 1);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 1, true);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
@@ -2559,7 +2566,7 @@ void Core0Editor::FileLoad2()
             XBIN_.SetRaw(FileTxtRaw, -1, false);
             XBIN_.GetStr(FileTxt, BinaryFile_.get()->CurrentFileAttrGet(0));
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(false, 0, 3);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 3, true);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
@@ -2568,7 +2575,7 @@ void Core0Editor::FileLoad2()
             XBIN_.SetRaw(FileTxtRaw, -1, true);
             XBIN_.GetStr(FileTxt, BinaryFile_.get()->CurrentFileAttrGet(0));
             CoreAnsi_.get()->AnsiTerminalResize(CoreAnsi_.get()->AnsiMaxX, CoreAnsi_.get()->AnsiMaxY, 0);
-            CoreAnsi_.get()->AnsiProcessReset(false, 0, 3);
+            CoreAnsi_.get()->AnsiProcessReset(false, 0, 3, true);
             CoreAnsi_.get()->AnsiRingBell = false;
             CoreAnsi_.get()->AnsiProcessSupply(FileTxt);
             break;
@@ -2645,7 +2652,7 @@ void Core0Editor::FileLoad2()
         }
     }
     CoreAnsi_.get()->AnsiTerminalResize(AnsiMaxX_, AnsiMaxY_, 0);
-    CoreAnsi_.get()->AnsiProcessReset(false, 0, 1);
+    CoreAnsi_.get()->AnsiProcessReset(false, 0, 1, true);
 
 
     EditorData_.get()->TextBuffer.TrimLines();

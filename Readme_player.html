@@ -58,25 +58,27 @@ by pressing appropiate keys.</p>
         backward, according the FileDelaySteps and FileDelayTime
         parameters.</li>
     <li><strong>Up Arrow</strong> and <strong>Down Arrow</strong>
-        - Move animation position by one step.</li>
+        - Move animation position by one character (animation
+        mode) or one line (text mode).</li>
     <li><strong>Left Arrow</strong> and <strong>Right Arrow</strong>
-        - Move animation position by steps defined as
-        FileDelaySteps.</li>
+        - Move animation position by steps defined as <strong>TimerStep</strong>
+        or <strong>TimerStepText</strong>.</li>
     <li><strong>Home</strong> - Move into animation begin.</li>
     <li><strong>End</strong> - Move into animation end.</li>
-    <li><strong>]</strong> - Increase playing speed.</li>
-    <li><strong>[</strong> - Decrease playing speed.</li>
-    <li><strong>/</strong> - Reset playing speed.</li>
+    <li><strong>\</strong> - Switch into animation mode.</li>
+    <li><strong>[</strong> - Switch into text mode before scroll.</li>
+    <li><strong>]</strong> - Switch into text mode after scroll.</li>
     <li><strong>Page Up</strong> or <strong>Page Down</strong> -
-        Prowse for previous or next file.</li>
+        Browse for previous or next file.</li>
     <li><strong>,</strong> - Copy screen to clipboard.</li>
-    <li><strong>\</strong> - ANSI processing parameters and
+    <li><strong>.</strong> - Display file manager.</li>
+    <li><strong>/</strong> - ANSI processing parameters and
         display configuration.</li>
 </ul>
 
 <p>In order to exit to main menu, press the <strong>Escape</strong>
-key to return to information and press <strong>Tab</strong> key
-to exit.</p>
+key or <strong>equation sign</strong> key to return to
+information and press <strong>Tab</strong> key to exit.</p>
 
 <h1>Mouse operation</h1>
 
@@ -100,6 +102,14 @@ or <strong>~</strong> key you can switch between the five states.</p>
                     <li>Number of overwritten characters.</li>
                     <li>Number of insert/delete operations.</li>
                     <li>Number of scroll operations.</li>
+                </ul>
+            </li>
+            <li>Current display mode:<ul>
+                    <li><strong>ANI</strong> - Animation mode</li>
+                    <li><strong>TXB</strong> - Text mode before
+                        scroll.</li>
+                    <li><strong>TXA</strong> - Text mode after
+                        scroll.</li>
                 </ul>
             </li>
             <li>Current index number and number of all files
@@ -132,12 +142,12 @@ or <strong>~</strong> key you can switch between the five states.</p>
                     <li>Number of scroll operations.</li>
                 </ul>
             </li>
-            <li>Current animation speed:<ul>
-                    <li><strong>0</strong> - Default speed.</li>
-                    <li><strong>Positive number</strong> -
-                        Increased speed.</li>
-                    <li><strong>Negative number</strong> -
-                        Decreased speed.</li>
+            <li>Current display mode:<ul>
+                    <li><strong>ANI</strong> - Animation mode</li>
+                    <li><strong>TXB</strong> - Text mode before
+                        scroll.</li>
+                    <li><strong>TXA</strong> - Text mode after
+                        scroll.</li>
                 </ul>
             </li>
             <li>Current animation speed as number of playback
@@ -191,20 +201,21 @@ width="256" height="256"></p>
 <p><img src="readme_pics/pic.jpg" alt="`player/player2.png"
 width="256" height="256"></p>
 
-<p>Status bar at the bottom, screen height is expanded by one row.</p>
+<p>Status bar at the bottom, screen height is expanded by one
+row.</p>
 
 <p><img src="readme_pics/pic.jpg" alt="`player/player3.png"
 width="256" height="256"></p>
 
-<h1>Animation versus still picture</h1>
+<h1>Still picture, text and animation</h1>
 
 <p>The most ANSI files can be classified into three categories:</p>
 
 <ul>
     <li>Still picture, which size is in the screen size (usually
         80x24 or 80x25).</li>
-    <li>Still picture, which size exceedes the screen size
-        vertically (at the end of play, the bottom part is
+    <li>Still picture or text, which size exceedes the screen
+        size vertically (at the end of play, the bottom part is
         visible).</li>
     <li>Animation created using ANSI/VTxxx commands.</li>
 </ul>

@@ -27,6 +27,8 @@ private:
     int LoadFileChunk = 10;
     int FilePos = 0;
 
+    int DisplayTextMode = 0;
+
     Stopwatch FileTimeMeasure;
 
     int Time0;
@@ -47,7 +49,6 @@ private:
     bool ServerTelnet = false;
     std::shared_ptr<TextCodec> ServerEncoding;
 
-    int FileDelayStep = 1;
     int FileDelaySeek = 1000;
 
     Clipboard Clipboard_;
@@ -63,9 +64,6 @@ private:
 
     int MoviePos = 0;
     int MovieLength = 0;
-
-    int FileDelayStep__ = 1;
-    int FileDelayStepFactor = 0;
 
     int InfoPosH = 0;
     int InfoPosV = 0;
@@ -87,6 +85,9 @@ private:
     void DisplayInfoText(bool Forced);
 
     bool FileOpenFile0Info = false;
+
+    XList<int> LineList;
+    int WorkSeekAdvanceCalc(int Dir);
 };
 
 #endif // CORE1PLAYER_H

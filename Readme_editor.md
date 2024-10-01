@@ -21,6 +21,7 @@ One of the main **TextPaint** features is text editor\. The editor differs from 
 * **F2** \- Switch to **state 2** \(write characters\) or show information about **state 2**\.
 * **F3** \- Switch to **state 3** \(character paint\) or show information about **state 3**\.
 * **F4** \- Switch to **state 4** \(pixel paint\) or show information about **state 4**\.
+* **F6** \- Change text writing direction\.
 * **F7** \- Save file\.
 * **F8** \- Load file\.
 * **F9** \- Open character and color selector\.

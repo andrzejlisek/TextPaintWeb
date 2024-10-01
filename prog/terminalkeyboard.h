@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "coreansi.h"
-#include <map>
+#include <unordered_map>
 #include <string>
 #include "xlist.h"
 #include "textwork.h"
@@ -31,13 +31,7 @@ public:
     void TelnetKeyboardConfStep();
     void TelnetKeyboardModsMove();
     void TelnetKeyboardModsStep();
-    std::map<std::string, std::string> TerminalKeys;
-private:
-    XList<std::string> TerminalKeys0;
-    XList<std::string> TerminalKeys1;
-    XList<std::string> TerminalKeys2;
-    XList<std::string> TerminalKeys3;
-    XList<std::string> TerminalKeys4;
+    std::unordered_map<std::string, std::string> TerminalKeys;
 };
 
 #endif // TERMINALKEYBOARD_H

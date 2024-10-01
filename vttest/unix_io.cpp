@@ -1,4 +1,4 @@
-/* $Id: unix_io.c,v 1.31 2023/02/01 22:12:17 tom Exp $ */
+/* $Id: unix_io.c,v 1.33 2024/07/08 23:19:04 tom Exp $ */
 
 #include <cstdarg>
 //#include <unistd.h>
@@ -141,7 +141,8 @@ get_reply(void)
   int old_len = 0;
   int new_len = 0;
 
-  result[old_len++] = inchar();
+  fakeio::_fflush(stdout);
+  zleep(100);
   do {
     new_len = read_buffer(result + old_len, (int) sizeof(result) - 2 - old_len);
     old_len += new_len;

@@ -474,6 +474,11 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>Meaning</td>
     </tr>
     <tr>
+        <td>1Bh ] ... 07h</td>
+        <td>&nbsp;</td>
+        <td>Ignore.</td>
+    </tr>
+    <tr>
         <td>1Bh ( P1</td>
         <td>&nbsp;</td>
         <td>Character set for bank G0, details in <strong>Readme_charmap.md</strong>
@@ -514,31 +519,6 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>&nbsp;</td>
         <td>Character set for bank G3, details in <strong>Readme_charmap.md</strong>
         file.</td>
-    </tr>
-    <tr>
-        <td>1Bh Space F</td>
-        <td>S7C1T</td>
-        <td>Set the 7-bit controls for input.</td>
-    </tr>
-    <tr>
-        <td>1Bh Space G</td>
-        <td>S8C1T</td>
-        <td>Set the 8-bit controls for input.</td>
-    </tr>
-    <tr>
-        <td>1Bh n</td>
-        <td>LS2</td>
-        <td>Use character bank 2.</td>
-    </tr>
-    <tr>
-        <td>1Bh o</td>
-        <td>LS3</td>
-        <td>Use character bank 3.</td>
-    </tr>
-    <tr>
-        <td>1Bh c</td>
-        <td>RIS</td>
-        <td>Reset terminal.</td>
     </tr>
     <tr>
         <td>1Bh # 0</td>
@@ -595,11 +575,6 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>Ignore.</td>
     </tr>
     <tr>
-        <td>1Bh ] ... 07h</td>
-        <td>&nbsp;</td>
-        <td>Ignore.</td>
-    </tr>
-    <tr>
         <td>1Bh 6</td>
         <td>DECBI</td>
         <td>Move line left by deleting first character.</td>
@@ -621,6 +596,16 @@ or <strong>ANSIDOS=2</strong>.</p>
         character.</td>
     </tr>
     <tr>
+        <td>1Bh =</td>
+        <td>DECKPAM</td>
+        <td>Change numeric keypad mode to 1.</td>
+    </tr>
+    <tr>
+        <td>1Bh &gt;</td>
+        <td>DECKPNM</td>
+        <td>Change numeric keypad mode to 0.</td>
+    </tr>
+    <tr>
         <td>1Bh D - <strong>ANSIDOS=0</strong></td>
         <td>IND</td>
         <td>Move cursor down by 1 step, scroll screen if needed.</td>
@@ -629,6 +614,27 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>1Bh D - <strong>ANSIDOS=1</strong></td>
         <td>&nbsp;</td>
         <td>Ignore.</td>
+    </tr>
+    <tr>
+        <td>1Bh E</td>
+        <td>NEL</td>
+        <td>Move cursor down by 1 step, scroll screen if needed
+        and move cursor to first column.</td>
+    </tr>
+    <tr>
+        <td>1Bh Space F</td>
+        <td>S7C1T</td>
+        <td>Set the 7-bit controls for input.</td>
+    </tr>
+    <tr>
+        <td>1Bh Space G</td>
+        <td>S8C1T</td>
+        <td>Set the 8-bit controls for input.</td>
+    </tr>
+    <tr>
+        <td>1Bh H</td>
+        <td>HTS</td>
+        <td>Add current column to tabulator list</td>
     </tr>
     <tr>
         <td>1Bh M - <strong>ANSIDOS=0</strong></td>
@@ -641,39 +647,6 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>Enter to music state, ignore following characters.</td>
     </tr>
     <tr>
-        <td>1Bh E</td>
-        <td>NEL</td>
-        <td>Move cursor down by 1 step, scroll screen if needed
-        and move cursor to first column.</td>
-    </tr>
-    <tr>
-        <td>1Bh H</td>
-        <td>HTS</td>
-        <td>Add current column to tabulator list</td>
-    </tr>
-    <tr>
-        <td>1Bh P</td>
-        <td>DCS</td>
-        <td>Switch into DCS state. Next arriving character will
-        be buffered without printing.</td>
-    </tr>
-    <tr>
-        <td>1Bh \</td>
-        <td>ST</td>
-        <td>If within DCS state: Exit from DCS state and request
-        DCS report. Normally, ignore.</td>
-    </tr>
-    <tr>
-        <td>1Bh =</td>
-        <td>DECKPAM</td>
-        <td>Change numeric keypad mode to 1.</td>
-    </tr>
-    <tr>
-        <td>1Bh &gt;</td>
-        <td>DECKPNM</td>
-        <td>Change numeric keypad mode to 0.</td>
-    </tr>
-    <tr>
         <td>1Bh N</td>
         <td>SS2</td>
         <td>Ignore.</td>
@@ -684,6 +657,12 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>Ignore.</td>
     </tr>
     <tr>
+        <td>1Bh P</td>
+        <td>DCS</td>
+        <td>Switch into DCS state. Next arriving character will
+        be buffered without printing.</td>
+    </tr>
+    <tr>
         <td>1Bh V</td>
         <td>SPA</td>
         <td>Enable char protection against ED, EL and ECH.</td>
@@ -692,6 +671,27 @@ or <strong>ANSIDOS=2</strong>.</p>
         <td>1Bh W</td>
         <td>EPA</td>
         <td>Disable char protection against ED, EL and ECH.</td>
+    </tr>
+    <tr>
+        <td>1Bh \</td>
+        <td>ST</td>
+        <td>If within DCS state: Exit from DCS state and request
+        DCS report. Normally, ignore.</td>
+    </tr>
+    <tr>
+        <td>1Bh c</td>
+        <td>RIS</td>
+        <td>Reset terminal.</td>
+    </tr>
+    <tr>
+        <td>1Bh n</td>
+        <td>LS2</td>
+        <td>Use character bank 2.</td>
+    </tr>
+    <tr>
+        <td>1Bh o</td>
+        <td>LS3</td>
+        <td>Use character bank 3.</td>
     </tr>
     <tr>
         <td>05h - <strong>ANSIDOS=0</strong></td>
@@ -944,6 +944,46 @@ below. For example, DECSET / DECOM means 1Bh [ ? 6 h:</p>
     </tr>
 </table>
 
+<p>The similar <strong>h</strong>/<strong>l</strong> sequences,
+but without <strong>?</strong> character, ar SM and RM sequences:</p>
+
+<table border="1" width="100%">
+    <tr>
+        <td>Parameter</td>
+        <td>XTERM name</td>
+        <td>Meaning for SM - 1Bh [ P1 h</td>
+        <td>Meaning for RM - 1Bh [ P1 l</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>IRM</td>
+        <td>Enable inserting mode.</td>
+        <td>Disable inserting mode.</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>&nbsp;</td>
+        <td>Do not use char protection in ED, EL and ECH
+        commands.</td>
+        <td>Use char protection in ED, EL and ECH commands.</td>
+    </tr>
+    <tr>
+        <td>12</td>
+        <td>SRM</td>
+        <td>Disable local echo (<strong>WorkMode=2</strong>
+        only).</td>
+        <td>Enable local echo (<strong>WorkMode=2</strong> only).</td>
+    </tr>
+    <tr>
+        <td>20</td>
+        <td>LNM</td>
+        <td>Enable new line mode (<strong>WorkMode=2</strong>
+        only).</td>
+        <td>Disable new line mode (<strong>WorkMode=2</strong>
+        only).</td>
+    </tr>
+</table>
+
 <p>The standard sequences may contains parameters. When parameter
 is ommited, the default value is <strong>0</strong> or <strong>1</strong>,
 depending on sequence:</p>
@@ -955,63 +995,66 @@ depending on sequence:</p>
         <td>Meaning</td>
     </tr>
     <tr>
-        <td>1Bh [ ! p</td>
-        <td>DECSTR</td>
-        <td>Reset terminal state including clearing the screen.</td>
+        <td>1Bh [ P1 @</td>
+        <td>ICH</td>
+        <td>Insert space and move text being right to be cursor
+        P1 times.</td>
     </tr>
     <tr>
-        <td>1Bh [ s</td>
-        <td>SCOSC</td>
-        <td>Save current cursor position and text attributes.</td>
+        <td>1Bh [ P1 Space @</td>
+        <td>SL</td>
+        <td>Move left P1 columns.</td>
     </tr>
     <tr>
-        <td>1Bh [ u</td>
-        <td>SCORC</td>
-        <td>Restore saved cursor position and text attributes.</td>
+        <td>1Bh [ P1 A</td>
+        <td>CUU</td>
+        <td>Move cursor up through P1 steps.</td>
     </tr>
     <tr>
-        <td>1Bh [ 4 h</td>
-        <td>SM / IRM</td>
-        <td>Enable inserting mode.</td>
+        <td>1Bh [ P1 Space A</td>
+        <td>SR</td>
+        <td>Move right P1 columns.</td>
     </tr>
     <tr>
-        <td>1Bh [ 4 l</td>
-        <td>RM / IRM</td>
-        <td>Disable inserting mode.</td>
+        <td>1Bh [ P1 B</td>
+        <td>CUD</td>
+        <td>Move cursor down through P1 steps.</td>
     </tr>
     <tr>
-        <td>1Bh [ 6 h</td>
-        <td>SM / ???</td>
-        <td>Do not use char protection in ED, EL and ECH
-        commands.</td>
+        <td>1Bh [ P1 C</td>
+        <td>CUF</td>
+        <td>Move cursor right through P1 steps.</td>
     </tr>
     <tr>
-        <td>1Bh [ 6 l</td>
-        <td>RM / ???</td>
-        <td>Use char protection in ED, EL and ECH commands.</td>
+        <td>1Bh [ P1 D</td>
+        <td>CUB</td>
+        <td>Move cursor left through P1 steps.</td>
     </tr>
     <tr>
-        <td>1Bh [ 12 h</td>
-        <td>SM / SRM</td>
-        <td>Disable local echo (<strong>WorkMode=2</strong>
-        only).</td>
+        <td>1Bh [ P1 E</td>
+        <td>CNL</td>
+        <td>Move cursor to the first column and P1 lines down.</td>
     </tr>
     <tr>
-        <td>1Bh [ 12 l</td>
-        <td>RM / SRM</td>
-        <td>Enable local echo (<strong>WorkMode=2</strong> only).</td>
+        <td>1Bh [ P1 F</td>
+        <td>CPL</td>
+        <td>Move cursor to the first column and P1 lines up.</td>
     </tr>
     <tr>
-        <td>1Bh [ 20 h</td>
-        <td>SM / LNM</td>
-        <td>Enable new line mode (<strong>WorkMode=2</strong>
-        only).</td>
+        <td>1Bh [ P1 G</td>
+        <td>CHA</td>
+        <td>Move cursor to P1 column.</td>
     </tr>
     <tr>
-        <td>1Bh [ 20 l</td>
-        <td>RM / LNM</td>
-        <td>Disable new line mode (<strong>WorkMode=2</strong>
-        only).</td>
+        <td>1Bh [ P1 ; P2 H</td>
+        <td>CUP</td>
+        <td>Move cursor to column P1 and line P2, move cursor to
+        be within cursor area.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 I</td>
+        <td>CHT</td>
+        <td>Forward tabulation P1 times.</td>
     </tr>
     <tr>
         <td>1Bh [ 0 J</td>
@@ -1032,24 +1075,6 @@ depending on sequence:</p>
         screen (all characters).</td>
     </tr>
     <tr>
-        <td>1Bh [ 0 K</td>
-        <td>EL</td>
-        <td>Clear current line from cursor to right edge (all
-        characters).</td>
-    </tr>
-    <tr>
-        <td>1Bh [ 1 K</td>
-        <td>EL</td>
-        <td>Clear current line from left edge to cursor (all
-        characters).</td>
-    </tr>
-    <tr>
-        <td>1Bh [ 2 K</td>
-        <td>EL</td>
-        <td>Clear current line from left edge to right edge (all
-        characters).</td>
-    </tr>
-    <tr>
         <td>1Bh [ ? 0 J</td>
         <td>DECSED</td>
         <td>Clear screen from cursor to bottom right corner
@@ -1068,6 +1093,24 @@ depending on sequence:</p>
         screen (unprotected characters only).</td>
     </tr>
     <tr>
+        <td>1Bh [ 0 K</td>
+        <td>EL</td>
+        <td>Clear current line from cursor to right edge (all
+        characters).</td>
+    </tr>
+    <tr>
+        <td>1Bh [ 1 K</td>
+        <td>EL</td>
+        <td>Clear current line from left edge to cursor (all
+        characters).</td>
+    </tr>
+    <tr>
+        <td>1Bh [ 2 K</td>
+        <td>EL</td>
+        <td>Clear current line from left edge to right edge (all
+        characters).</td>
+    </tr>
+    <tr>
         <td>1Bh [ ? 0 K</td>
         <td>DECSEL</td>
         <td>Clear current line from cursor to right edge
@@ -1084,94 +1127,6 @@ depending on sequence:</p>
         <td>DECSEL</td>
         <td>Clear current line from left edge to right edge
         (unprotected characters only).</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 H</td>
-        <td>CUP</td>
-        <td>Move cursor to column P1 and line P2, move cursor to
-        be within cursor area.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 f</td>
-        <td>HVP</td>
-        <td>Move cursor to column P1 and line P2, move cursor to
-        be within cursor area.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 A</td>
-        <td>CUU</td>
-        <td>Move cursor up through P1 steps.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 B</td>
-        <td>CUD</td>
-        <td>Move cursor down through P1 steps.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 C</td>
-        <td>CUF</td>
-        <td>Move cursor right through P1 steps.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 D</td>
-        <td>CUB</td>
-        <td>Move cursor left through P1 steps.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 d</td>
-        <td>VPA</td>
-        <td>Move cursor to P1 line.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 e</td>
-        <td>VPR</td>
-        <td>Move cursor down through P1 lines.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 `</td>
-        <td>HPA</td>
-        <td>Move cursor to P1 column.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 a</td>
-        <td>HPR</td>
-        <td>Move cursor right through P1 columns.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 E</td>
-        <td>CNL</td>
-        <td>Move cursor to the first column and P1 lines down.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 F</td>
-        <td>CPL</td>
-        <td>Move cursor to the first column and P1 lines up.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 G</td>
-        <td>CHA</td>
-        <td>Move cursor to P1 column.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 S</td>
-        <td>SU</td>
-        <td>Scroll cursor area P1 times down.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 T</td>
-        <td>SD</td>
-        <td>Scroll cursor area P1 times up.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 r</td>
-        <td>DECSTBM</td>
-        <td>Define cursor area as from P1 line to P2 line, move
-        cursor to be within cursor area.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 s</td>
-        <td>DECSLRM</td>
-        <td>Define left and right margin.</td>
     </tr>
     <tr>
         <td>1Bh [ P1 L - <strong>ANSIDOS=0</strong></td>
@@ -1194,27 +1149,62 @@ depending on sequence:</p>
         <td>Enter to music state, ignore following characters.</td>
     </tr>
     <tr>
-        <td>1Bh [ ... m</td>
-        <td>SGR</td>
-        <td>Set attributes, number of parameters can vary.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 @</td>
-        <td>ICH</td>
-        <td>Insert space and move text being right to be cursor
-        P1 times.</td>
-    </tr>
-    <tr>
         <td>1Bh [ P1 P</td>
         <td>DCH</td>
         <td>Delete character and move text being right to be
         cursor P1 times.</td>
     </tr>
     <tr>
+        <td>1Bh [ P1 S</td>
+        <td>SU</td>
+        <td>Scroll cursor area P1 times down.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 T</td>
+        <td>SD</td>
+        <td>Scroll cursor area P1 times up.</td>
+    </tr>
+    <tr>
         <td>1Bh [ P1 X</td>
         <td>ECH</td>
         <td>Delete P1 characters right to be cursor without text
         movement.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 Z</td>
+        <td>CBT</td>
+        <td>Backward tabulation P1 times.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 `</td>
+        <td>HPA</td>
+        <td>Move cursor to P1 column.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 a</td>
+        <td>HPR</td>
+        <td>Move cursor right through P1 columns.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 b</td>
+        <td>REP</td>
+        <td>Repeat last printed character P1 times.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 d</td>
+        <td>VPA</td>
+        <td>Move cursor to P1 line.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 e</td>
+        <td>VPR</td>
+        <td>Move cursor down through P1 lines.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 f</td>
+        <td>HVP</td>
+        <td>Move cursor to column P1 and line P2, move cursor to
+        be within cursor area.</td>
     </tr>
     <tr>
         <td>1Bh [ 0 g</td>
@@ -1227,62 +1217,25 @@ depending on sequence:</p>
         <td>Clear tabulator list.</td>
     </tr>
     <tr>
-        <td>1Bh [ P1 I</td>
-        <td>CHT</td>
-        <td>Forward tabulation P1 times.</td>
+        <td>1Bh [ ... m</td>
+        <td>SGR</td>
+        <td>Set attributes, number of parameters can vary.</td>
     </tr>
     <tr>
-        <td>1Bh [ P1 Z</td>
-        <td>CBT</td>
-        <td>Backward tabulation P1 times.</td>
+        <td>1Bh [ ! p</td>
+        <td>DECSTR</td>
+        <td>Reset terminal state including clearing the screen.</td>
     </tr>
     <tr>
-        <td>1Bh [ P1 b</td>
-        <td>REP</td>
-        <td>Repeat last printed character P1 times.</td>
+        <td>1Bh [ P1 ; P2 &quot; p</td>
+        <td>DECSCL</td>
+        <td>Set the 7-bit controls for input when P2=1, otherwise
+        set 8-bit controls.</td>
     </tr>
     <tr>
-        <td>1Bh [ P1 Space @</td>
-        <td>SL</td>
-        <td>Move left P1 columns.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 Space A</td>
-        <td>SR</td>
-        <td>Move right P1 columns.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 $r</td>
-        <td>DECCARA</td>
-        <td>Set bold or blink or reverse in (P1,P2,P3,P4)
-        rectangle or clear bold, blink and reverse in rectangle.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 ; P6 ; P7 ; P8 $v</td>
-        <td>DECCRA</td>
-        <td>Copy (P1,P2,P3,P4) rectangle to (P5,P6).</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 ; P3 ; P4 $z</td>
-        <td>DECERA</td>
-        <td>Erase (P1,P2,P3,P4) rectangle (all characters).</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 $x</td>
-        <td>DECFRA</td>
-        <td>Fill in (P2,P3,P4,P5) rectangle with P1 character.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 $t</td>
-        <td>DECRARA</td>
-        <td>Change bold or blink or reverse in (P1,P2,P3,P4)
-        rectangle to opposite state.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 ; P3 ; P4 ${</td>
-        <td>DECSERA</td>
-        <td>Erase (P1,P2,P3,P4) rectangle (unprotected characters
-        only).</td>
+        <td>1Bh [ P1 Space q</td>
+        <td>DECSCUSR</td>
+        <td>Set the cursor style depending od P1</td>
     </tr>
     <tr>
         <td>1Bh [ P1 &quot; q</td>
@@ -1291,15 +1244,89 @@ depending on sequence:</p>
         protection against DECSED, DECSEL, DECSERA.</td>
     </tr>
     <tr>
-        <td>1Bh [ 1 $ }</td>
-        <td>DECSASD</td>
-        <td>Enter in &quot;status bar&quot; mode, character
-        printing and CUP, HVP, SGR, HPA, HPR will be ignored.</td>
+        <td>1Bh [ P1 ; P2 r</td>
+        <td>DECSTBM</td>
+        <td>Define cursor area as from P1 line to P2 line, move
+        cursor to be within cursor area.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 $r</td>
+        <td>DECCARA</td>
+        <td>Set bold or blink or reverse in (P1,P2,P3,P4)
+        rectangle or clear bold, blink and reverse in rectangle.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ s</td>
+        <td>SCOSC</td>
+        <td>Save current cursor position and text attributes.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 s</td>
+        <td>DECSLRM</td>
+        <td>Define left and right margin.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 t</td>
+        <td>DECSLPP</td>
+        <td>Resize screen to P1 lines, where P1 &gt;= 24.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ 4 ; P1 ; P2 t</td>
+        <td>XTWINOPS</td>
+        <td>Change resolution to P2 x P1 in pixels.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ 8 ; P1 ; P2 t</td>
+        <td>XTWINOPS</td>
+        <td>Change resolution to P2 x P1 in characters.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 $t</td>
+        <td>DECRARA</td>
+        <td>Change bold or blink or reverse in (P1,P2,P3,P4)
+        rectangle to opposite state.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ u</td>
+        <td>SCORC</td>
+        <td>Restore saved cursor position and text attributes.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 ; P6 ; P7 ; P8 $v</td>
+        <td>DECCRA</td>
+        <td>Copy (P1,P2,P3,P4) rectangle to (P5,P6).</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 ; P3 ; P4 ; P5 $x</td>
+        <td>DECFRA</td>
+        <td>Fill in (P2,P3,P4,P5) rectangle with P1 character.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 ; P3 ; P4 $z</td>
+        <td>DECERA</td>
+        <td>Erase (P1,P2,P3,P4) rectangle (all characters).</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 ; P2 ; P3 ; P4 ${</td>
+        <td>DECSERA</td>
+        <td>Erase (P1,P2,P3,P4) rectangle (unprotected characters
+        only).</td>
+    </tr>
+    <tr>
+        <td>1Bh [ P1 * |</td>
+        <td>DECSNLS</td>
+        <td>Resize screen to P1 lines.</td>
     </tr>
     <tr>
         <td>1Bh [ 0 $ }</td>
         <td>DECSASD</td>
         <td>Exit from &quot;status bar&quot; mode.</td>
+    </tr>
+    <tr>
+        <td>1Bh [ 1 $ }</td>
+        <td>DECSASD</td>
+        <td>Enter in &quot;status bar&quot; mode, character
+        printing and CUP, HVP, SGR, HPA, HPR will be ignored.</td>
     </tr>
     <tr>
         <td>1Bh [ P1 ' }</td>
@@ -1310,32 +1337,6 @@ depending on sequence:</p>
         <td>1Bh [ P1 ' ~</td>
         <td>DECDC</td>
         <td>Delete P1 columns.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 ; P2 &quot; p</td>
-        <td>DECSCL</td>
-        <td>Set the 7-bit controls for input when P2=1, otherwise
-        set 8-bit controls.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 * |</td>
-        <td>DECSNLS</td>
-        <td>Resize screen to P1 lines.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ P1 t</td>
-        <td>DECSLPP</td>
-        <td>Resize screen to P1 lines, where P1 &gt;= 24.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ 8 ; P1 ; P2 t</td>
-        <td>XTWINOPS</td>
-        <td>Change resolution to P2 x P1 in characters.</td>
-    </tr>
-    <tr>
-        <td>1Bh [ 4 ; P1 ; P2 t</td>
-        <td>XTWINOPS</td>
-        <td>Change resolution to P2 x P1 in pixels.</td>
     </tr>
 </table>
 
@@ -1353,9 +1354,31 @@ varies depending on <strong>TerminalType</strong> parameter):</p>
         <td>Response (for VT102)</td>
     </tr>
     <tr>
+        <td>1Bh P $ q r 1Bh \</td>
+        <td>DECRQSS / DECSTBM</td>
+        <td>1Bh P 1 $ r P1 ; P2 r 1B \ where P1 and P2 are the
+        first and last line</td>
+    </tr>
+    <tr>
+        <td>1Bh P $ q s 1Bh \</td>
+        <td>DECRQSS / DECSLRM</td>
+        <td>1Bh P 1 $ r P1 ; P2 s 1B \ where P1 and P2 are the
+        first and last column</td>
+    </tr>
+    <tr>
         <td>1Bh [ 0 c</td>
         <td>Primary DA *</td>
         <td>1Bh [ ? 6 c</td>
+    </tr>
+    <tr>
+        <td>1Bh [ &gt; 0 c</td>
+        <td>Secondary DA *</td>
+        <td>1Bh [ &gt; 0 ; 1 0 ; 0 c</td>
+    </tr>
+    <tr>
+        <td>1Bh [ = 0 c</td>
+        <td>Tertiary DA</td>
+        <td>1Bh P ! | 0 0 0 0 0 0 0 0 1Bh \</td>
     </tr>
     <tr>
         <td>1Bh [ 5 n</td>
@@ -1415,14 +1438,16 @@ varies depending on <strong>TerminalType</strong> parameter):</p>
         <td>1Bh [ ? 8 3 n</td>
     </tr>
     <tr>
-        <td>1Bh [ &gt; 0 c</td>
-        <td>Secondary DA *</td>
-        <td>1Bh [ &gt; 0 ; 1 0 ; 0 c</td>
+        <td>1Bh $ q &quot; p</td>
+        <td>DCS / DECSCL *</td>
+        <td>1Bh P 1 $ r P1 ; P2 &quot; p 1Bh \ where P2=0 when
+        8-bit controls, otherwise P2=1</td>
     </tr>
     <tr>
-        <td>1Bh [ = 0 c</td>
-        <td>Tertiary DA</td>
-        <td>1Bh P ! | 0 0 0 0 0 0 0 0 1Bh \</td>
+        <td>1Bh [ ? P1 $ p</td>
+        <td>DECRQM / DECLRMM</td>
+        <td>1Bh [ ? P1 ; VAL $ y where VAL is from 0 to 4,
+        depending on P1 value and current state</td>
     </tr>
     <tr>
         <td>1Bh [ 0 x</td>
@@ -1435,10 +1460,9 @@ varies depending on <strong>TerminalType</strong> parameter):</p>
         <td>1Bh [ 3 ; 1 ; 1 ; 1 1 2 ; 1 1 2 ; 1 ; 0 x</td>
     </tr>
     <tr>
-        <td>1Bh $ q &quot; p</td>
-        <td>DCS / DECSCL *</td>
-        <td>1Bh P 1 $ r P1 ; P2 &quot; p 1Bh \ where P2=0 when
-        8-bit controls, otherwise P2=1</td>
+        <td>1Bh P1 ; P2 ; P3 ; P4 ; P5 ; P6 * y</td>
+        <td>DECRQCRA</td>
+        <td>1Bh P P1 ! ~ 0 0 0 0 1Bh \</td>
     </tr>
     <tr>
         <td>1Bh $ q * |</td>
@@ -1447,32 +1471,9 @@ varies depending on <strong>TerminalType</strong> parameter):</p>
         lines</td>
     </tr>
     <tr>
-        <td>1Bh [ ? P1 $ p</td>
-        <td>DECRQM / DECLRMM</td>
-        <td>1Bh [ ? P1 ; VAL $ y where VAL is from 0 to 4,
-        depending on P1 value and current state</td>
-    </tr>
-    <tr>
-        <td>1Bh P $ q r 1Bh \</td>
-        <td>DECRQSS / DECSTBM</td>
-        <td>1Bh P 1 $ r P1 ; P2 r 1B \ where P1 and P2 are the
-        first and last line</td>
-    </tr>
-    <tr>
-        <td>1Bh P $ q s 1Bh \</td>
-        <td>DECRQSS / DECSLRM</td>
-        <td>1Bh P 1 $ r P1 ; P2 s 1B \ where P1 and P2 are the
-        first and last column</td>
-    </tr>
-    <tr>
         <td>05h</td>
         <td>&nbsp;</td>
         <td>AnswerBack message</td>
-    </tr>
-    <tr>
-        <td>1Bh P1 ; P2 ; P3 ; P4 ; P5 ; P6 * y</td>
-        <td>DECRQCRA</td>
-        <td>1Bh P P1 ! ~ 0 0 0 0 1Bh \</td>
     </tr>
 </table>
 
@@ -1945,16 +1946,6 @@ there are another escape sequence set. Each sequence concsists of
         <td width="50%">Meaning</td>
     </tr>
     <tr>
-        <td width="50%">1Bh F</td>
-        <td width="50%">Enable semigraphic character set
-        (different from standard VTx).</td>
-    </tr>
-    <tr>
-        <td>1Bh G</td>
-        <td>Disable semigraphic character set (different from
-        standard VTx).</td>
-    </tr>
-    <tr>
         <td>1Bh &lt;</td>
         <td>Exit from VT52 mode.</td>
     </tr>
@@ -1975,18 +1966,27 @@ there are another escape sequence set. Each sequence concsists of
         <td>Move cursor left.</td>
     </tr>
     <tr>
+        <td>1Bh E</td>
+        <td>Move cursor to upper left corner and clear whole
+        screen.</td>
+    </tr>
+    <tr>
+        <td width="50%">1Bh F</td>
+        <td width="50%">Enable semigraphic character set
+        (different from standard VTx).</td>
+    </tr>
+    <tr>
+        <td>1Bh G</td>
+        <td>Disable semigraphic character set (different from
+        standard VTx).</td>
+    </tr>
+    <tr>
         <td>1Bh H</td>
         <td>Move cursor to upper left corner.</td>
     </tr>
     <tr>
-        <td>1Bh Y XX YY</td>
-        <td>Move cursor to XX column and YY row, when XX and YY
-        are single character.</td>
-    </tr>
-    <tr>
-        <td>1Bh d</td>
-        <td>Clear the screen part from upper left corner to
-        cursor.</td>
+        <td>1Bh I</td>
+        <td>Move cursor up or scroll screen backward.</td>
     </tr>
     <tr>
         <td>1Bh J</td>
@@ -1994,22 +1994,18 @@ there are another escape sequence set. Each sequence concsists of
         corner.</td>
     </tr>
     <tr>
-        <td>1Bh E</td>
-        <td>Move cursor to upper left corner and clear whole
-        screen.</td>
+        <td>1Bh K</td>
+        <td>Clear current line from cursor to end.</td>
+    </tr>
+    <tr>
+        <td>1Bh Y XX YY</td>
+        <td>Move cursor to XX column and YY row, when XX and YY
+        are single character.</td>
     </tr>
     <tr>
         <td>1Bh Z</td>
         <td>Request for <strong>1Bh / Z</strong> response, only
         in <strong>WorkMode=3</strong>.</td>
-    </tr>
-    <tr>
-        <td>1Bh I</td>
-        <td>Move cursor up or scroll screen backward.</td>
-    </tr>
-    <tr>
-        <td>1Bh K</td>
-        <td>Clear current line from cursor to end.</td>
     </tr>
     <tr>
         <td>1Bh b P1</td>
@@ -2018,6 +2014,11 @@ there are another escape sequence set. Each sequence concsists of
     <tr>
         <td>1Bh c P1</td>
         <td>Foreground color (not implemented).</td>
+    </tr>
+    <tr>
+        <td>1Bh d</td>
+        <td>Clear the screen part from upper left corner to
+        cursor.</td>
     </tr>
 </table>
 
@@ -2065,7 +2066,7 @@ is:</p>
 <pre>vttest 24x80.80</pre>
 
 <p>There is the TextPaint compatibility with VTTEST v2.7 from
-2023-09-24. Some features, which will not need to bo compatible
+2024-07-08. Some features, which will not need to bo compatible
 and usable, are not tested.</p>
 
 <p>The results are the followin meaning:</p>

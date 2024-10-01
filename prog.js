@@ -5,9 +5,35 @@ let ProgEventOther;
 let ProgEventOtherFile;
 let ProgEventTickIdle = true;
 
+let ProgFpsMeasureCounter = 12;
+let ProgFpsMeasure1;
+let ProgFpsMeasure2;
+
 function ProgStart()
 {
-    ScreenTimerCallback = (ScreenTimerPeriod * 4) / 5;
+    ProgFpsMeasure1 = performance.now();
+    ProgStart1();
+}
+
+function ProgStart1()
+{
+    if (ProgFpsMeasureCounter > 0)
+    {
+        ProgFpsMeasureCounter--;
+        requestAnimationFrame(ProgStart1);
+    }
+    else
+    {
+        ProgFpsMeasure2 = performance.now();
+        requestAnimationFrame(ProgStart2);
+    }
+}
+
+function ProgStart2()
+{
+    const FramePeriod = (ProgFpsMeasure2 - ProgFpsMeasure1) / 10;
+    //ScreenTimerCallback = 1000;
+    ScreenTimerCallback = (ScreenTimerFrames * FramePeriod * 4) / 5;
     ProgStarted = true;
     ProgInitScreen();
     ScreenTimerStart();
@@ -59,9 +85,21 @@ function ProgScreenOther(Param)
             break;
         case 3:
             ScreenCursorHide = true;
+            ScreenSetDisplayConfigCursor();
             break;
         case 4:
             ScreenCursorHide = false;
+            ScreenSetDisplayConfigCursor();
+            break;
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+            ScreenCursorTerm = Param - 10;
+            ScreenSetDisplayConfigCursor();
             break;
     }
 }
@@ -113,8 +151,8 @@ function _ProgCallback(D_)
                 CallbackQueueI += 9;
                 break;
             case 104:
-                ScreenCursorMove(D[CallbackQueueI+1],D[CallbackQueueI+2]);
-                CallbackQueueI += 3;
+                ScreenCursorMove(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3]);
+                CallbackQueueI += 4;
                 break;
             case 105:
                 ScreenTextMove(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5],D[CallbackQueueI+6]);

@@ -6,7 +6,10 @@ let ScreenWW = 0;
 let ScreenHH = 0;
 let ScreenCursorX = 0;
 let ScreenCursorY = 0;
-let ScreenCursorSize = 0;
+let ScreenCursorOpt = 0;
+let ScreenCursorDbl = false;
+let ScreenCursorSizeH = 0;
+let ScreenCursorSizeV = 0;
 let ScreenBlinkState = false;
 let ScreenCellFontX = [];
 let ScreenCellFontY = [];
@@ -18,6 +21,7 @@ let ScreenBellTime = 100;
 let ScreenMouseX = 0;
 let ScreenMouseY = 0;
 let ScreenCursorHide = false;
+let ScreenCursorTerm = 0;
 
 var ScreenDiv = document.getElementById("screendiv");
 var ScreenVP = document.getElementById("screenvp");
@@ -108,6 +112,32 @@ function ScreenGlyphBufClear()
     }
 }
 
+function ScreenSetDisplayConfigCursorReset()
+{
+    ScreenCursorTerm = 0;
+    ScreenCursorHide = false;
+}
+
+function ScreenSetDisplayConfigCursor()
+{
+    ScreenDisplayCursor0 = (ScreenDisplayCursor == 2) || (ScreenDisplayCursor == 4) || (ScreenDisplayCursor == 6);
+    ScreenDisplayCursor1 = (ScreenDisplayCursor > 0);
+    ScreenDisplayCursorShape = (ScreenDisplayCursor > 0) ? Math.floor((ScreenDisplayCursor - 1) / 2) : 0;
+
+    if (ScreenCursorTerm > 0)
+    {
+        ScreenDisplayCursor0 = (ScreenCursorTerm == 2) || (ScreenCursorTerm == 4) || (ScreenCursorTerm == 6);
+        ScreenDisplayCursor1 = true;
+        ScreenDisplayCursorShape = Math.floor((ScreenCursorTerm - 1) / 2);
+    }
+
+    if (ScreenCursorHide)
+    {
+        ScreenDisplayCursor0 = false;
+        ScreenDisplayCursor1 = false;
+    }
+}
+
 function ScreenSetDisplayConfig(Repaint)
 {
     let IsChanged = false;
@@ -116,7 +146,7 @@ function ScreenSetDisplayConfig(Repaint)
     if (ScreenColorBlendingGamma != ConfigFileI("ColorBlendingGamma")) { IsChanged = true; CalcGamma = true; }
     if (ScreenDisplayInterpolate != ConfigFileI("DisplayInterpolate")) IsChanged = true;
     if (ScreenColorBlending != ConfigFileB("ColorBlending")) IsChanged = true;
-    if (ScreenCursorSteady != ConfigFileB("SteadyCursor")) IsChanged = true;
+    if (ScreenDisplayCursor != ConfigFileI("DisplayCursor")) IsChanged = true;
     if (ScreenSET_ANSIIgnoreConcealed != ConfigFileB("ANSIIgnoreConcealed")) IsChanged = true;
     if (ScreenSET_ANSIReverseMode != ConfigFileI("ANSIReverseMode")) IsChanged = true;
     if (ScreenSET_ANSIColors != ConfigFileB("ANSIColors")) IsChanged = true;
@@ -138,12 +168,14 @@ function ScreenSetDisplayConfig(Repaint)
     ScreenColorBlendingGamma = ConfigFileI("ColorBlendingGamma");
     ScreenDisplayInterpolate = ConfigFileI("DisplayInterpolate");
     ScreenColorBlending = ConfigFileB("ColorBlending");
-    ScreenCursorSteady = ConfigFileB("SteadyCursor");
+    ScreenDisplayCursor = ConfigFileI("DisplayCursor");
     ScreenSET_ANSIIgnoreConcealed = ConfigFileB("ANSIIgnoreConcealed");
     ScreenSET_ANSIReverseMode = ConfigFileI("ANSIReverseMode");
     ScreenSET_ANSIColors = ConfigFileB("ANSIColors");
     ScreenSET_ANSIColorBlink = ConfigFileB("ANSIColorBlink");
     ScreenSET_ANSIColorBold = ConfigFileB("ANSIColorBold");
+
+    ScreenSetDisplayConfigCursor();
 
     ScreenAttrB = ((ConfigFileI("DisplayAttrib") & 1) > 0) ? true : false;
     ScreenAttrI = ((ConfigFileI("DisplayAttrib") & 2) > 0) ? true : false;
@@ -776,14 +808,13 @@ function ScreenResize(NewW, NewH, DataClear)
         ScreenDataChr1.data[I * 4 + 3] = 255;
     }
 
-    ScreenCursorData = Screen0Ctx.getImageData(0, 0, ScreenCellW, ScreenCursorSize);
+    ScreenCursorData = Screen0Ctx.getImageData(0, 0, ScreenCellW, ScreenCellH);
     ScreenDrawCursorColor = -1;
-    N = ScreenCellW * ScreenCursorSize;
+    N = ScreenCellW * ScreenCellH;
     for (let I = 0; I < N; I++)
     {
         ScreenCursorData.data[I * 4 + 3] = 255;
     }
-    
     
     
     
@@ -825,14 +856,23 @@ function ScreenClear(ColorBack, ColorFore)
     }
 }
 
-function ScreenCursorMove(X, Y)
+function ScreenCursorMove(X, Y, Opt)
 {
-    if ((ScreenCursorX != X) || (ScreenCursorY != Y))
+    if ((ScreenCursorX != X) || (ScreenCursorY != Y) || (ScreenCursorOpt != Opt))
     {
         ScreenDrawCursor(false);
     }
     ScreenCursorX = X;
     ScreenCursorY = Y;
+    ScreenCursorOpt = Opt;
+    if (Opt)
+    {
+        ScreenCursorDbl = true;
+    }
+    else
+    {
+        ScreenCursorDbl = false;
+    }
 }
 
 function ScreenTextMove(X1, Y1, X2, Y2, W, H)
@@ -951,17 +991,29 @@ let ScreenDrawCursorColor = -1;
 
 function ScreenDrawCursorWork()
 {
-    if (CursorState)
+    if (CursorState && (ScreenLineOffsetVal[ScreenCursorY] == 0))
     {
-        const CursorX_ = ScreenCursorX * ScreenCellW;
-        const CursorY_ = ScreenCursorY * ScreenCellH + (ScreenCellH - ScreenCursorSize);
+        let CursorX_ = ScreenCursorX * ScreenCellW;
+        let CursorY_ = ScreenCursorY * ScreenCellH;
+        let CurW = ScreenCellW;
+        let CurH = ScreenCellH;
+        switch (ScreenDisplayCursorShape)
+        {
+            case 0:
+                CursorY_ += (ScreenCellH - ScreenCursorSizeV);
+                CurH = ScreenCursorSizeV;
+                break;
+            case 1:
+                CurW = ScreenCursorSizeH;
+                break;
+        }
         const ScreenDrawCursorColor_ = ScreenDataF_[ScreenCursorY * ScreenW + ScreenCursorX];
         if (ScreenDrawCursorColor != ScreenDrawCursorColor_)
         {
             ScreenDrawCursorColor = ScreenDrawCursorColor_;
             let Ptr1 = 0;
             let Ptr2 = (CursorY_ * (ScreenWW)) + CursorX_ << 2;
-            for (let I = 0; I < ScreenCursorSize; I++)
+            for (let I = 0; I < ScreenCellH; I++)
             {
                 for (let II = 0; II < ScreenCellW; II++)
                 {
@@ -974,21 +1026,26 @@ function ScreenDrawCursorWork()
                 Ptr2 = Ptr2 - (ScreenCellW << 2) + ((ScreenWW) << 2);
             }
         }
-        Screen0Ctx.putImageData(ScreenCursorData, CursorX_, CursorY_);
-        Screen1Ctx.putImageData(ScreenCursorData, CursorX_, CursorY_);
+        Screen0Ctx.putImageData(ScreenCursorData, CursorX_, CursorY_, 0, 0, CurW, CurH);
+        Screen1Ctx.putImageData(ScreenCursorData, CursorX_, CursorY_, 0, 0, CurW, CurH);
+        if (ScreenCursorDbl)
+        {
+            Screen0Ctx.putImageData(ScreenCursorData, CursorX_ + CurW, CursorY_, 0, 0, CurW, CurH);
+            Screen1Ctx.putImageData(ScreenCursorData, CursorX_ + CurW, CursorY_, 0, 0, CurW, CurH);
+        }
     }
 }
 
 function ScreenDrawCursor(State)
 {
-    if (ScreenCursorHide)
-    {
-        State = false;
-    }
     if (CursorState && (!State))
     {
         CursorState = false;
         ScreenRepaintChar(ScreenCursorX, ScreenCursorY);
+        if (ScreenCursorDbl)
+        {
+            ScreenRepaintChar(ScreenCursorX + 1, ScreenCursorY);
+        }
         return;
     }
     if ((!CursorState) && State)
@@ -1038,11 +1095,13 @@ function ScreenInit1()
 function ScreenInit2()
 {
     ScreenSetDisplayConfig(false);
-    ScreenTimerPeriod = ConfigFileI("TimerPeriod");
-    ScreenTimerCounterLoop = ConfigFileI("TimerLoop");
+    ScreenTimerFrames = ConfigFileI("TimerFrames");
     ScreenTimerCursor = ConfigFileI("TimerCursor");
     ScreenTimerBlink = ConfigFileI("TimerBlink");
     ScreenTimerTickEvent = ConfigFileI("TimerTick");
+
+    ScreenTimerCounterLoop = LCM(ScreenTimerCursor, ScreenTimerBlink);
+    ScreenTimerCounterLoop = LCM(ScreenTimerCounterLoop, ScreenTimerTickEvent);
 
     ScreenResize(1, 1, true);
     ScreenClear(ScreenDefaultBack, ScreenDefaultFore);
@@ -1110,8 +1169,10 @@ function ScreenSetFontAfterCreate()
     ScreenCellW = ScreenFont.CellW;
     ScreenCellH = ScreenFont.CellH;
     ScreenCellH2 = ScreenCellH / 2;
-    ScreenCursorSize = Math.floor(ScreenFont.CellH / 8);
-    if (ScreenCursorSize == 0) ScreenCursorSize = 1;
+    ScreenCursorSizeH = Math.floor(ScreenFont.CellW / 8);
+    if (ScreenCursorSizeH == 0) ScreenCursorSizeH = 1;
+    ScreenCursorSizeV = Math.floor(ScreenFont.CellH / 8);
+    if (ScreenCursorSizeV == 0) ScreenCursorSizeV = 1;
 
     for (let I = 0; I <= 16; I++)
     {

@@ -336,6 +336,7 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
 
     StatusBar = false;
     CursorHide = false;
+    CursorTerm = 0;
 
     PrintCharCounter = 0;
     PrintCharCounterOver = 0;
@@ -1090,7 +1091,7 @@ void AnsiState::CopyListList(XList<XList<int>> &Src, XList<XList<int>> &Dst)
     }
 }
 
-void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
+void AnsiState::Copy(AnsiState &Src, AnsiState &Dst, bool UseScrollBuffer)
 {
     Dst.TerminalW = Src.TerminalW;
     Dst.TerminalH = Src.TerminalH;
@@ -1112,11 +1113,14 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     CopyListStr(Src.__AnsiCmd, Dst.__AnsiCmd);
     CopyListInt(Src.__AnsiTabs, Dst.__AnsiTabs);
     AnsiLineOccupy::Copy(Src.__AnsiLineOccupy__, Dst.__AnsiLineOccupy__);
-    AnsiLineOccupy::Copy(Src.__AnsiLineOccupy1__, Dst.__AnsiLineOccupy1__);
-    AnsiLineOccupy::Copy(Src.__AnsiLineOccupy2__, Dst.__AnsiLineOccupy2__);
     AnsiLineOccupy::Copy(Src.__AnsiLineOccupy__0, Dst.__AnsiLineOccupy__0);
-    AnsiLineOccupy::Copy(Src.__AnsiLineOccupy1__0, Dst.__AnsiLineOccupy1__0);
-    AnsiLineOccupy::Copy(Src.__AnsiLineOccupy2__0, Dst.__AnsiLineOccupy2__0);
+    if (UseScrollBuffer)
+    {
+        AnsiLineOccupy::Copy(Src.__AnsiLineOccupy1__, Dst.__AnsiLineOccupy1__);
+        AnsiLineOccupy::Copy(Src.__AnsiLineOccupy2__, Dst.__AnsiLineOccupy2__);
+        AnsiLineOccupy::Copy(Src.__AnsiLineOccupy1__0, Dst.__AnsiLineOccupy1__0);
+        AnsiLineOccupy::Copy(Src.__AnsiLineOccupy2__0, Dst.__AnsiLineOccupy2__0);
+    }
     CopyListList(Src.CharProtection1, Dst.CharProtection1);
     CopyListList(Src.CharProtection2, Dst.CharProtection2);
     Dst.CharProtection1Print = Src.CharProtection1Print;
@@ -1133,6 +1137,7 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
 
     Dst.StatusBar = Src.StatusBar;
     Dst.CursorHide = Src.CursorHide;
+    Dst.CursorTerm = Src.CursorTerm;
 
     for (int i = 32; i < 128; i++)
     {
@@ -1225,9 +1230,9 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst)
     Dst.AnsiRingBellCount = Src.AnsiRingBellCount;
 }
 
-AnsiState AnsiState::Clone()
+AnsiState AnsiState::Clone(bool UseScrollBuffer)
 {
     AnsiState Obj;
-    Copy(*this, Obj);
+    Copy(*this, Obj, UseScrollBuffer);
     return Obj;
 }

@@ -95,7 +95,7 @@ void BufNum(int Num)
 void BufTxt(const char * Txt)
 {
     int TxtL = strlen(Txt);
-    while (IOBufSize <= (IOBufPtr + TxtL))
+    while (IOBufSize <= (IOBufPtr + TxtL + BufSizeStep))
     {
         BufExpand();
     }
@@ -106,7 +106,8 @@ void BufTxt(const char * Txt)
 void BufStr(std::string Str)
 {
     int StrL = Str.size();
-    while (IOBufSize <= (IOBufPtr + StrL))
+    int StrL_ = StrL + 10;
+    while (IOBufSize <= (IOBufPtr + StrL_ + BufSizeStep))
     {
         BufExpand();
     }
@@ -125,12 +126,17 @@ void BufStr(std::string Str)
             {
                 BufNum(Chr + 256);
             }
+            if (IOBufSize <= (IOBufPtr + StrL_ + BufSizeStep))
+            {
+                BufExpand();
+            }
         }
         else
         {
             IOBuf[IOBufPtr] = Chr;
             IOBufPtr++;
         }
+        StrL_--;
     }
 }
 

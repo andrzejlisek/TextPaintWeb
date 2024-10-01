@@ -1,13 +1,24 @@
+let ScreenTimerFramesX = 0;
+
 function ScreenTimerStart()
 {
     if (ScreenStarted && ProgStarted)
     {
-        setInterval(ScreenTimerTick, ScreenTimerPeriod);
+        ScreenTimerFramesX = 0;
+        requestAnimationFrame(ScreenTimerTick);
     }
 }
 
 function ScreenTimerTick()
 {
+    if (ScreenTimerFramesX > 0)
+    {
+        ScreenTimerFramesX--;
+        requestAnimationFrame(ScreenTimerTick);
+        return;
+    }
+    ScreenTimerFramesX = ScreenTimerFrames - 1;
+
     ScreenTimerCounter++;
     if (ScreenTimerCounter == ScreenTimerCounterLoop)
     {
@@ -19,11 +30,11 @@ function ScreenTimerTick()
         ScreenTimerCursorDisp = !ScreenTimerCursorDisp;
         if (ScreenTimerCursorDisp)
         {
-            ScreenDrawCursor(true);
+            ScreenDrawCursor(ScreenDisplayCursor1);
         }
         else
         {
-            ScreenDrawCursor(ScreenCursorSteady);
+            ScreenDrawCursor(ScreenDisplayCursor0);
         }
     }
 
@@ -46,4 +57,6 @@ function ScreenTimerTick()
     }
 
     VTTEST_.VTData("");
+    requestAnimationFrame(ScreenTimerTick);
 }
+

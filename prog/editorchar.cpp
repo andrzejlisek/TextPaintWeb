@@ -158,7 +158,7 @@ void EditorChar::EventKey(std::string KeyName, int KeyChar, bool ModShift, bool 
             }
             RepaintDepth = 1;
             return;
-        case _("Escape"):
+        case _("F9"):
             RepaintDepth = 101;
             return;
         case _("Enter"):

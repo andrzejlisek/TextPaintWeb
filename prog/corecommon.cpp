@@ -25,6 +25,21 @@ void CoreCommon::Init()
 
 }
 
+void CoreCommon::UpdateConfig(std::shared_ptr<ConfigFile> CF)
+{
+    ProcessTimerStep = CF.get()->ParamGetI("TimerStep");
+    if (ProcessTimerStep <= 0)
+    {
+        ProcessTimerStep = 1;
+    }
+    ProcessTimerStepText = CF.get()->ParamGetI("TimerStepText");
+    if (ProcessTimerStepText <= 0)
+    {
+        ProcessTimerStepText = 1;
+    }
+    Screen::WinAuto = CF.get()->ParamGetB("WinAuto");
+}
+
 void CoreCommon::ReadColor(std::string SettingValue, int &ColorB, int &ColorF)
 {
     if (SettingValue.length() == 2)
@@ -37,7 +52,7 @@ void CoreCommon::ReadColor(std::string SettingValue, int &ColorB, int &ColorF)
 
 void CoreCommon::InitCommon()
 {
-    Screen::CursorHide(false);
+    Screen::CursorHideTerm(false, 0);
     if (BinaryFile_.get()->PreInit)
     {
         TextCodec::CodecListCreate(CF.get()->ParamGetS("ANSICharsDOS"));
@@ -137,6 +152,8 @@ void CoreCommon::SaveConfig()
 {
     BinaryFile_.get()->SaveFromStringConfig(CF.get()->FileSave(0));
     BinaryFile_.get()->SysSaveConfig();
+    UpdateConfig(CF);
+    CoreAnsi_.get()->UpdateConfig(CF);
 }
 
 void CoreCommon::ScreenStatusBarSet(int ScreenStatusBar_)

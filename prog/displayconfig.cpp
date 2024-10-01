@@ -5,6 +5,110 @@ DisplayConfig::DisplayConfig()
 
 }
 
+std::string DisplayConfig::IncDecDisplay(int BaseValue, int ParamValue, int Direction)
+{
+    if (Direction < 0)
+    {
+        switch (ParamValue)
+        {
+            case -9: return std::to_string(BaseValue) + " / 10";
+            case -8: return std::to_string(BaseValue) + " / 9";
+            case -7: return std::to_string(BaseValue) + " / 8";
+            case -6: return std::to_string(BaseValue) + " / 7";
+            case -5: return std::to_string(BaseValue) + " / 6";
+            case -4: return std::to_string(BaseValue) + " / 5";
+            case -3: return std::to_string(BaseValue) + " / 4";
+            case -2: return std::to_string(BaseValue) + " / 3";
+            case -1: return std::to_string(BaseValue) + " / 2";
+            case 0: return std::to_string(BaseValue) + " - 1";
+            case 1: return std::to_string(BaseValue) + " - 10";
+            case 2: return std::to_string(BaseValue) + " - 100";
+            case 3: return std::to_string(BaseValue) + " - 1000";
+            case 4: return std::to_string(BaseValue) + " - 10000";
+            case 5: return std::to_string(BaseValue) + " - 100000";
+            case 6: return std::to_string(BaseValue) + " - 1000000";
+        }
+    }
+    else
+    {
+        switch (ParamValue)
+        {
+            case -9: return std::to_string(BaseValue) + " * 10";
+            case -8: return std::to_string(BaseValue) + " * 9";
+            case -7: return std::to_string(BaseValue) + " * 8";
+            case -6: return std::to_string(BaseValue) + " * 7";
+            case -5: return std::to_string(BaseValue) + " * 6";
+            case -4: return std::to_string(BaseValue) + " * 5";
+            case -3: return std::to_string(BaseValue) + " * 4";
+            case -2: return std::to_string(BaseValue) + " * 3";
+            case -1: return std::to_string(BaseValue) + " * 2";
+            case 0: return std::to_string(BaseValue) + " + 1";
+            case 1: return std::to_string(BaseValue) + " + 10";
+            case 2: return std::to_string(BaseValue) + " + 100";
+            case 3: return std::to_string(BaseValue) + " + 1000";
+            case 4: return std::to_string(BaseValue) + " + 10000";
+            case 5: return std::to_string(BaseValue) + " + 100000";
+            case 6: return std::to_string(BaseValue) + " + 1000000";
+        }
+    }
+    return "???";
+}
+
+int DisplayConfig::IncDecChange(int BaseValue, int ParamValue, int Direction)
+{
+    int Val = BaseValue;
+    if (Direction < 0)
+    {
+        switch (ParamValue)
+        {
+            case -9: Val = BaseValue / 10; break;
+            case -8: Val = BaseValue / 9; break;
+            case -7: Val = BaseValue / 8; break;
+            case -6: Val = BaseValue / 7; break;
+            case -5: Val = BaseValue / 6; break;
+            case -4: Val = BaseValue / 5; break;
+            case -3: Val = BaseValue / 4; break;
+            case -2: Val = BaseValue / 3; break;
+            case -1: Val = BaseValue / 2; break;
+            case 0: Val = BaseValue - 1; break;
+            case 1: Val = BaseValue - 10; break;
+            case 2: Val = BaseValue - 100; break;
+            case 3: Val = BaseValue - 1000; break;
+            case 4: Val = BaseValue - 10000; break;
+            case 5: Val = BaseValue - 100000; break;
+            case 6: Val = BaseValue - 1000000; break;
+        }
+        if (Val < 1) Val = 1;
+        return Val;
+    }
+    else
+    {
+        switch (ParamValue)
+        {
+            case -9: Val = BaseValue * 10; break;
+            case -8: Val = BaseValue * 9; break;
+            case -7: Val = BaseValue * 8; break;
+            case -6: Val = BaseValue * 7; break;
+            case -5: Val = BaseValue * 6; break;
+            case -4: Val = BaseValue * 5; break;
+            case -3: Val = BaseValue * 4; break;
+            case -2: Val = BaseValue * 3; break;
+            case -1: Val = BaseValue * 2; break;
+            case 0: Val = BaseValue + 1; break;
+            case 1: Val = BaseValue + 10; break;
+            case 2: Val = BaseValue + 100; break;
+            case 3: Val = BaseValue + 1000; break;
+            case 4: Val = BaseValue + 10000; break;
+            case 5: Val = BaseValue + 100000; break;
+            case 6: Val = BaseValue + 1000000; break;
+        }
+        if (Val > 1000000000) Val = 1000000000;
+        if (Val < 1) Val = 1000000000;
+        return Val;
+    }
+    return Val;
+}
+
 void DisplayConfig::Repaint()
 {
     int OffsetX = 0;
@@ -14,115 +118,162 @@ void DisplayConfig::Repaint()
 
     XList<Str> MenuInfo;
 
-    if (PopupState == 0)
+    switch (PopupState)
     {
-        MenuInfo.Add(Str(" Screen size: " + std::to_string(Screen::CurrentW) + "x" + std::to_string(Screen::CurrentH) + (Screen::WinAuto ? " auto" : "     ")));
-        MenuInfo.Add(Str(""));
-        switch (CoreAnsi_.get()->ANSIDOS)
-        {
-            case 0: MenuInfo.Add(Str(" K. Process mode: VTx/ISO")); break;
-            case 1: MenuInfo.Add(Str(" K. Process mode: DOS")); break;
-            case 2: MenuInfo.Add(Str(" K. Process mode: VTx/DEC")); break;
-        }
-        MenuInfo.Add(Str(" L. 8-bit controls: " + (CoreAnsi_.get()->ANSI8bit ? std::string("Yes") : std::string("No"))));
-        MenuInfo.Add(Str(" U. Backspace: " + (CoreAnsi_.get()->ANSIPrintBackspace ? std::string("Character") : std::string("Movement"))));
-        MenuInfo.Add(Str(" I. Tab: " + (CoreAnsi_.get()->ANSIPrintTab ? std::string("Character") : std::string("Movement"))));
-        switch (CoreAnsi_.get()->ANSI_CR)
-        {
-            case 0: MenuInfo.Add(Str(" O. CR: CR")); break;
-            case 1: MenuInfo.Add(Str(" O. CR: CR+LF")); break;
-            case 2: MenuInfo.Add(Str(" O. CR: Ignore")); break;
-        }
-        switch (CoreAnsi_.get()->ANSI_LF)
-        {
-            case 0: MenuInfo.Add(Str(" P. LF: LF")); break;
-            case 1: MenuInfo.Add(Str(" P. LF: CR+LF")); break;
-            case 2: MenuInfo.Add(Str(" P. LF: Ignore")); break;
-        }
-        MenuInfo.Add(Str(""));
-        MenuInfo.Add(Str(" Q. Use colors: " + (CF.get()->ParamGetI("ANSIColors") ? std::string("Yes") : std::string("No "))));
-        switch (CF.get()->ParamGetI("ANSIReverseMode"))
-        {
-            case 0: MenuInfo.Add(Str(" W. Reverse mode: None  ")); break;
-            case 1: MenuInfo.Add(Str(" W. Reverse mode: Before")); break;
-            case 2: MenuInfo.Add(Str(" W. Reverse mode: After ")); break;
-        }
-        MenuInfo.Add(Str(" E. Bold as color: " + (CF.get()->ParamGetB("ANSIColorBold") ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" R. Blink as color: " + (CF.get()->ParamGetB("ANSIColorBlink") ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" T. Ignore concealed: " + (CF.get()->ParamGetB("ANSIIgnoreConcealed") ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" "));
-        switch (CF.get()->ParamGetI("DisplayBlink"))
-        {
-            case 0: MenuInfo.Add(Str(" S. Blink: None")); break;
-            case 1: MenuInfo.Add(Str(" S. Blink: VTx ")); break;
-            case 2: MenuInfo.Add(Str(" S. Blink: DOS ")); break;
-        }
-        MenuInfo.Add(Str(" D. Bold: " + (((CF.get()->ParamGetI("DisplayAttrib") & 1) > 0) ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" F. Italic: " + (((CF.get()->ParamGetI("DisplayAttrib") & 2) > 0) ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" G. Underline: " + (((CF.get()->ParamGetI("DisplayAttrib") & 4) > 0) ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" H. Strikethrough: " + (((CF.get()->ParamGetI("DisplayAttrib") & 8) > 0) ? std::string("Yes") : std::string("No "))));
-        MenuInfo.Add(Str(" J. Color blending: " + (CF.get()->ParamGetB("ColorBlending") ? std::string("Yes") : std::string("No "))));
-    }
-    else
-    {
-        int ItemPos = 1;
-        XList<Str> ItemList;
-        if (PopupState == 1)
-        {
-            MenuInfo.Add(Str("Palette select"));
-            MenuInfo.Add(Str(""));
-            ItemPos = Screen::PaletteListSelect;
-            for (int I = 0; I < Screen::PaletteListName.Count; I++)
+        case 0:
             {
-                ItemList.Add(Str(Screen::PaletteListName[I]));
+                MenuInfo.Add(Str(" Screen size: " + std::to_string(Screen::CurrentW) + "x" + std::to_string(Screen::CurrentH) + (Screen::WinAuto ? " auto" : "     ")));
+                MenuInfo.Add(Str(""));
+                switch (CoreAnsi_.get()->ANSIDOS)
+                {
+                    case 0: MenuInfo.Add(Str(" K. Process mode: VTx/ISO")); break;
+                    case 1: MenuInfo.Add(Str(" K. Process mode: DOS")); break;
+                    case 2: MenuInfo.Add(Str(" K. Process mode: VTx/DEC")); break;
+                }
+                MenuInfo.Add(Str(" L. 8-bit controls: " + (CoreAnsi_.get()->ANSI8bit ? std::string("Yes") : std::string("No"))));
+                MenuInfo.Add(Str(" U. Backspace: " + (CoreAnsi_.get()->ANSIPrintBackspace ? std::string("Character") : std::string("Movement"))));
+                MenuInfo.Add(Str(" I. Tab: " + (CoreAnsi_.get()->ANSIPrintTab ? std::string("Character") : std::string("Movement"))));
+                switch (CoreAnsi_.get()->ANSI_CR)
+                {
+                    case 0: MenuInfo.Add(Str(" O. CR: CR")); break;
+                    case 1: MenuInfo.Add(Str(" O. CR: CR+LF")); break;
+                    case 2: MenuInfo.Add(Str(" O. CR: Ignore")); break;
+                }
+                switch (CoreAnsi_.get()->ANSI_LF)
+                {
+                    case 0: MenuInfo.Add(Str(" P. LF: LF")); break;
+                    case 1: MenuInfo.Add(Str(" P. LF: CR+LF")); break;
+                    case 2: MenuInfo.Add(Str(" P. LF: Ignore")); break;
+                }
+                MenuInfo.Add(Str(""));
+                MenuInfo.Add(Str(" Q. Use colors: " + (CF.get()->ParamGetI("ANSIColors") ? std::string("Yes") : std::string("No "))));
+                switch (CF.get()->ParamGetI("ANSIReverseMode"))
+                {
+                    case 0: MenuInfo.Add(Str(" W. Reverse mode: None  ")); break;
+                    case 1: MenuInfo.Add(Str(" W. Reverse mode: Before")); break;
+                    case 2: MenuInfo.Add(Str(" W. Reverse mode: After ")); break;
+                }
+                MenuInfo.Add(Str(" E. Bold as color: " + (CF.get()->ParamGetB("ANSIColorBold") ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" R. Blink as color: " + (CF.get()->ParamGetB("ANSIColorBlink") ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" T. Ignore concealed: " + (CF.get()->ParamGetB("ANSIIgnoreConcealed") ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" "));
+                switch (CF.get()->ParamGetI("DisplayBlink"))
+                {
+                    case 0: MenuInfo.Add(Str(" S. Blink: None")); break;
+                    case 1: MenuInfo.Add(Str(" S. Blink: VTx ")); break;
+                    case 2: MenuInfo.Add(Str(" S. Blink: DOS ")); break;
+                }
+                MenuInfo.Add(Str(" D. Bold: " + (((CF.get()->ParamGetI("DisplayAttrib") & 1) > 0) ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" F. Italic: " + (((CF.get()->ParamGetI("DisplayAttrib") & 2) > 0) ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" G. Underline: " + (((CF.get()->ParamGetI("DisplayAttrib") & 4) > 0) ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" H. Strikethrough: " + (((CF.get()->ParamGetI("DisplayAttrib") & 8) > 0) ? std::string("Yes") : std::string("No "))));
+                MenuInfo.Add(Str(" J. Color blending: " + (CF.get()->ParamGetB("ColorBlending") ? std::string("Yes") : std::string("No "))));
             }
-        }
-        if (PopupState == 2)
-        {
-            MenuInfo.Add(Str("Font select"));
-            switch (Screen::FontListMode)
+            break;
+        case 1:
+        case 2:
             {
-                case 0:
-                    MenuInfo.Add(Str(" [Monospace]  Duospace   Dbl-W "));
-                    break;
-                case 1:
-                    MenuInfo.Add(Str("  Monospace  [Duospace]  Dbl-W "));
-                    break;
-                case 2:
-                    MenuInfo.Add(Str("  Monospace   Duospace  [Dbl-W]"));
-                    break;
-            }
-            ItemPos = Screen::FontListSelect;
-            for (int I = 0; I < Screen::FontListName.Count; I++)
-            {
-                ItemList.Add(Str(Screen::FontListName[I]));
-            }
-        }
-        int HalfPos = (InfoH / 2) - 1;
-        for (int I = 0; I < (InfoH - 2); I++)
-        {
-            Str VisibleItem;
+                int ItemPos = 1;
+                XList<Str> ItemList;
+                if (PopupState == 1)
+                {
+                    MenuInfo.Add(Str("Palette select"));
+                    MenuInfo.Add(Str(""));
+                    ItemPos = Screen::PaletteListSelect;
+                    for (int I = 0; I < Screen::PaletteListName.Count; I++)
+                    {
+                        ItemList.Add(Str(Screen::PaletteListName[I]));
+                    }
+                }
+                if (PopupState == 2)
+                {
+                    MenuInfo.Add(Str("Font select"));
+                    switch (Screen::FontListMode)
+                    {
+                        case 0:
+                            MenuInfo.Add(Str(" [Monospace]  Duospace   Dbl-W "));
+                            break;
+                        case 1:
+                            MenuInfo.Add(Str("  Monospace  [Duospace]  Dbl-W "));
+                            break;
+                        case 2:
+                            MenuInfo.Add(Str("  Monospace   Duospace  [Dbl-W]"));
+                            break;
+                    }
+                    ItemPos = Screen::FontListSelect;
+                    for (int I = 0; I < Screen::FontListName.Count; I++)
+                    {
+                        ItemList.Add(Str(Screen::FontListName[I]));
+                    }
+                }
+                int HalfPos = (InfoH / 2) - 1;
+                for (int I = 0; I < (InfoH - 2); I++)
+                {
+                    Str VisibleItem;
 
-            int ItemListI = ItemPos - HalfPos + I;
-            if ((ItemListI >= 0) && (ItemListI < ItemList.Count))
-            {
-                VisibleItem.AddRange(ItemList[ItemListI]);
-            }
-            else
-            {
-                VisibleItem.AddString("");
-            }
+                    int ItemListI = ItemPos - HalfPos + I;
+                    if ((ItemListI >= 0) && (ItemListI < ItemList.Count))
+                    {
+                        VisibleItem.AddRange(ItemList[ItemListI]);
+                    }
+                    else
+                    {
+                        VisibleItem.AddString("");
+                    }
 
-            if (I == HalfPos)
-            {
-                VisibleItem.InsertString("> ");
+                    if (I == HalfPos)
+                    {
+                        VisibleItem.InsertString("> ");
+                    }
+                    else
+                    {
+                        VisibleItem.InsertString("  ");
+                    }
+                    MenuInfo.Add(VisibleItem);
+                }
             }
-            else
+            break;
+        case 3:
             {
-                VisibleItem.InsertString("  ");
+                MenuInfo.Add(Str(""));
+
+                switch (CF.get()->ParamGetI("DisplayCursor"))
+                {
+                    case 0: MenuInfo.Add(Str(" Q. Cursor: Hidden")); break;
+                    case 1: MenuInfo.Add(Str(" Q. Cursor: Blinking underline")); break;
+                    case 2: MenuInfo.Add(Str(" Q. Cursor: Steady underline")); break;
+                    case 3: MenuInfo.Add(Str(" Q. Cursor: Blinking vert. bar")); break;
+                    case 4: MenuInfo.Add(Str(" Q. Cursor: Steady vert. bar")); break;
+                    case 5: MenuInfo.Add(Str(" Q. Cursor: Blinking box")); break;
+                    case 6: MenuInfo.Add(Str(" Q. Cursor: Steady box")); break;
+                }
+
+                MenuInfo.Add(Str(""));
+                switch (CF.get()->ParamGetI("ANSIScrollSmooth"))
+                {
+                    case 0: MenuInfo.Add(Str(" W. Scroll: None")); break;
+                    case 1: MenuInfo.Add(Str(" W. Scroll: 1 step")); break;
+                    case 2: MenuInfo.Add(Str(" W. Scroll: 2 steps")); break;
+                    case 3: MenuInfo.Add(Str(" W. Scroll: 4 steps")); break;
+                    case 4: MenuInfo.Add(Str(" W. Scroll: 8 steps")); break;
+                    case 5: MenuInfo.Add(Str(" W. Scroll: 16 steps")); break;
+                }
+
+                MenuInfo.Add(Str(""));
+                MenuInfo.Add(Str(" E. Set step decrease"));
+                MenuInfo.Add(Str(" R. Set step increase"));
+
+                MenuInfo.Add(Str(""));
+                MenuInfo.Add(Str(" S. Set ANI step: " + IncDecDisplay(CF.get()->ParamGetI("TimerStep"), CF.get()->ParamGetI("TimerStepChange"),  1)));
+                MenuInfo.Add(Str(" X. Set ANI step: " + IncDecDisplay(CF.get()->ParamGetI("TimerStep"), CF.get()->ParamGetI("TimerStepChange"), -1)));
+
+                MenuInfo.Add(Str(" D. Set TXT step: " + IncDecDisplay(CF.get()->ParamGetI("TimerStepText"), CF.get()->ParamGetI("TimerStepChange"),  1)));
+                MenuInfo.Add(Str(" C. Set TXT step: " + IncDecDisplay(CF.get()->ParamGetI("TimerStepText"), CF.get()->ParamGetI("TimerStepChange"), -1)));
+
+                MenuInfo.Add(Str(" F. Set scroll: " + IncDecDisplay(CF.get()->ParamGetI("ANSIScrollChars"), CF.get()->ParamGetI("TimerStepChange"),  1)));
+                MenuInfo.Add(Str(" V. Set scroll: " + IncDecDisplay(CF.get()->ParamGetI("ANSIScrollChars"), CF.get()->ParamGetI("TimerStepChange"), -1)));
             }
-            MenuInfo.Add(VisibleItem);
-        }
+            break;
     }
 
     if ((MenuPos == 1) || (MenuPos == 3))
@@ -257,7 +408,7 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
         case _("Delete"):
             {
                 PopupState++;
-                if (PopupState == 3)
+                if (PopupState == 4)
                 {
                     PopupState = 0;
                 }
@@ -296,6 +447,9 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                     break;
                 case _("Space"):
                     Screen::WinAuto = !Screen::WinAuto;
+                    CF.get()->ParamSet("WinAuto", Screen::WinAuto);
+                    Screen::ScreenSetConfig();
+                    RequestSave = true;
                     break;
 
                 case _("KeyQ"):
@@ -514,6 +668,88 @@ void DisplayConfig::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                         CF.get()->ParamSet("FontMode", Screen::FontListMode);
                         Screen::SetFont();
                         RequestSave = true;
+                    }
+                    break;
+            }
+            break;
+        case 3:
+            switch (_(KeyName.c_str()))
+            {
+                case _("KeyQ"):
+                    {
+                        CF.get()->ParamSet("DisplayCursor", (CF.get()->ParamGetI("DisplayCursor") + 1) % 7);
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyW"):
+                    {
+                        CF.get()->ParamSet("ANSIScrollSmooth", (CF.get()->ParamGetI("ANSIScrollSmooth") + 1) % 6);
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyE"):
+                    {
+                        int Temp = CF.get()->ParamGetI("TimerStepChange");
+                        if (Temp > (-9)) Temp--;
+                        CF.get()->ParamSet("TimerStepChange", Temp);
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyR"):
+                    {
+                        int Temp = CF.get()->ParamGetI("TimerStepChange");
+                        if (Temp < 6) Temp++;
+                        CF.get()->ParamSet("TimerStepChange", Temp);
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+
+                case _("KeyS"):
+                    {
+                        CF.get()->ParamSet("TimerStep", IncDecChange(CF.get()->ParamGetI("TimerStep"), CF.get()->ParamGetI("TimerStepChange"),  1));
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyX"):
+                    {
+                        CF.get()->ParamSet("TimerStep", IncDecChange(CF.get()->ParamGetI("TimerStep"), CF.get()->ParamGetI("TimerStepChange"), -1));
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyD"):
+                    {
+                        CF.get()->ParamSet("TimerStepText", IncDecChange(CF.get()->ParamGetI("TimerStepText"), CF.get()->ParamGetI("TimerStepChange"),  1));
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyC"):
+                    {
+                        CF.get()->ParamSet("TimerStepText", IncDecChange(CF.get()->ParamGetI("TimerStepText"), CF.get()->ParamGetI("TimerStepChange"), -1));
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                    }
+                    break;
+                case _("KeyF"):
+                    {
+                        CF.get()->ParamSet("ANSIScrollChars", IncDecChange(CF.get()->ParamGetI("ANSIScrollChars"), CF.get()->ParamGetI("TimerStepChange"),  1));
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                        RequestReload = true;
+                    }
+                    break;
+                case _("KeyV"):
+                    {
+                        CF.get()->ParamSet("ANSIScrollChars", IncDecChange(CF.get()->ParamGetI("ANSIScrollChars"), CF.get()->ParamGetI("TimerStepChange"), -1));
+                        Screen::ScreenSetConfig();
+                        RequestSave = true;
+                        RequestReload = true;
                     }
                     break;
             }

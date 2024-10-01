@@ -68,7 +68,6 @@ private:
     TerminalKeyboard TerminalKeyboard_;
     TerminalMouse TerminalMouse_;
 
-    int TerminalStep;
     Clipboard Clipboard_;
 
     enum WorkStateCDef { ConnListSelectBefore, ConnListSelect, ConnListSelectCustom1, ConnListSelectCustom1Key, ConnListSelectCustom2, ConnListSelectCustom2Key, ConnListSelectCustom3, ConnListSelectCustom3Key, InfoScreen, InfoScreenBefore, Session, Toolbox, Toolbox_, EscapeKey, DispConf };

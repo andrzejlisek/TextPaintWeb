@@ -5,7 +5,7 @@
 #include "raw.h"
 #include "xlist.h"
 #include <string>
-#include <map>
+#include <unordered_map>
 
 class TextCodec
 {
@@ -51,7 +51,7 @@ public:
     std::string EncodingName;
     std::string FullName();
     int MapByteToText[256];
-    std::map<int, unsigned char> MapTextToByte;
+    std::unordered_map<int, unsigned char> MapTextToByte;
     static void Transcode(Str &S, int CodecSrc, int CodecDst);
     static void Transcode(Raw &S, int CodecSrc, int CodecDst);
     static Raw Code(Str &S, int Codec);

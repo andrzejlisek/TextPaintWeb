@@ -2,6 +2,22 @@
 
 void CoreAnsi::AnsiScrollPrepare()
 {
+    if (!ANSIScrollChangePrepare)
+    {
+        return;
+    }
+    ANSIScrollChars = ANSIScrollChangeChars;
+    ANSIScrollSmooth = ANSIScrollChangeSmooth;
+    ANSIScrollChangePrepare = false;
+    if (ANSIScrollChars <= 0)
+    {
+        ANSIScrollSmooth = 0;
+    }
+    if (ANSIScrollSmooth > 5)
+    {
+        ANSIScrollSmooth = 0;
+    }
+
     AnsiScrollPosition.Clear();
     AnsiScrollOffset.Clear();
     switch (ANSIScrollSmooth)
@@ -91,6 +107,14 @@ void CoreAnsi::AnsiScrollInit(int Lines, AnsiState::AnsiScrollCommandDef Command
     if (Lines == 0)
     {
         return;
+    }
+
+    if (ANSIScrollChangePrepare)
+    {
+        if (AnsiState_.AnsiScrollQueue_Counter.Count == 0)
+        {
+            AnsiScrollPrepare();
+        }
     }
 
     if (AnsiState_.__AnsiSmoothScroll && (ANSIScrollSmooth > 0))
@@ -197,6 +221,8 @@ void CoreAnsi::AnsiScrollFinish(AnsiState::AnsiScrollCommandDef Command, int Par
 
 void CoreAnsi::AnsiScrollClear()
 {
+    AnsiScrollPrepare();
+
     CoreAnsi::AnsiScrollSetOffset(AnsiState_.ScrollLastOffsetFirst, AnsiState_.ScrollLastOffsetLast,  0);
     AnsiState_.AnsiScrollZeroOffset = true;
     AnsiState_.AnsiScrollQueue_Counter.Clear();
@@ -262,6 +288,9 @@ int CoreAnsi::AnsiScrollProcess()
             AnsiState_.AnsiScrollQueue_Param4.PopFirst();
             AnsiState_.AnsiScrollQueue_First.PopFirst();
             AnsiState_.AnsiScrollQueue_Last.PopFirst();
+
+            AnsiScrollPrepare();
+
             if (AnsiState_.AnsiScrollQueue_Counter.Count == 0)
             {
                 AnsiState_.AnsiScrollProcessBlock = 2;
@@ -419,7 +448,7 @@ void CoreAnsi::AnsiScrollLines(int Lines)
         int ScrollMarginR = AnsiProcessGetXMax(false);
         if ((ScrollMarginL == 0) && (ScrollMarginR == AnsiMaxX))
         {
-            if (__AnsiLineOccupy2_Use)
+            if (__AnsiLineOccupyUseScrollBuffer)
             {
                 if (AnsiState_.__AnsiScrollLast == (AnsiMaxY - 1))
                 {
@@ -493,7 +522,7 @@ void CoreAnsi::AnsiScrollLines(int Lines)
         int ScrollMarginR = AnsiProcessGetXMax(false);
         if ((ScrollMarginL == 0) && (ScrollMarginR == AnsiMaxX))
         {
-            if (__AnsiLineOccupy1_Use)
+            if (__AnsiLineOccupyUseScrollBuffer)
             {
                 if (AnsiState_.__AnsiScrollFirst == 0)
                 {

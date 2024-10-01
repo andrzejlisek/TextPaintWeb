@@ -5,8 +5,8 @@ EditorInfo::EditorInfo()
     Info0.Add("Common keys:");
     Info0.Add("  Arrows, Home, End, PageUp, PageDown - Move cursor.");
     Info0.Add("  Tab - Cursor display style.");
-    Info0.Add("  Esc - Text writing direction.");
     Info0.Add("  F1, F2, F3, F4 - Change state or display information.");
+    Info0.Add("  F6 - Text writing direction.");
     Info0.Add("  F7 - Save file.");
     Info0.Add("  F8 - Load file.");
     Info0.Add("  F9 - Character selector.");
@@ -22,7 +22,6 @@ EditorInfo::EditorInfo()
     Info0.Add("");
 
     Info1.Add("State 1 - Write text:");
-    Info1.Add("  Esc - Change writing direction.");
     Info1.Add("  Backspace - Move cursor in opposite direction.");
     Info1.Add("  Insert - Insert line or character.");
     Info1.Add("  Delete - Delete line or character.");
@@ -110,7 +109,7 @@ EditorInfo::EditorInfo()
     Info9.Add("    Favorite: Select character or put character on pointed place.");
     Info9.Add("  Tab - Move character selector window.");
     Info9.Add("  Enter - Change selected character or color and close.");
-    Info9.Add("  Escape - Close without changing selected character or color.");
+    Info9.Add("  F9 - Close without changing selected character or color.");
     Info9.Add("  Any alphanumeric key (character selector only):");
     Info9.Add("    Ordinary: Save pointed character into favorite set under pressed key.");
     Info9.Add("    Favorite: Go to place assigned with pressed key.");

@@ -11,11 +11,10 @@ content="text/html; charset=windows-1250">
 
 <h1>Overview</h1>
 
-<p>In the <strong>/files</strong> subdirectory, there is the
-!!config.txt, whis is TextPaint configuration file The file
-stores the default configuration, which can be changed using
-TextPaint editor. The modified configuration file is stored in
-database.</p>
+<p>In the <strong>/files</strong> subdirectory, there is the <strong>!!config.txt</strong>,
+whis is TextPaint configuration file. The file stores the default
+configuration, which can be changed using TextPaint editor. The
+modified configuration file is stored in database.</p>
 
 <p><strong>TextPaint</strong> can modify the file automatically
 when you use configuration functions, file manager and sometimes
@@ -66,10 +65,41 @@ width="256" height="256"></p>
         will be shown immediately and the affect the screen
         display only.</li>
     <li><strong>Screen width</strong> - Change the screen width.
-        The values on the buttons indicates current resolution.</li>
+        The values on the buttons indicates current resolution.
+        The <strong>Auto resize/No resize</strong> button sets
+        the allow to automatic resize in terminal and animation
+        player.</li>
     <li><strong>Screen height</strong> - Change the screen
         height. The values on the buttons indicates current
-        resolution.</li>
+        resolution. The <strong>Auto resize/No resize</strong>
+        button sets the allow to automatic resize in terminal and
+        animation player.</li>
+    <li><strong>Display step</strong> - Cursor style and display
+        step in animation player:<ul>
+            <li><strong>Cursor style</strong> - Changes the
+                cursor style from one of 7 styles including
+                hidden (invisible) cursor.</li>
+            <li><strong>ANI</strong> - Displays and changes the
+                step in characters in terminal and animation
+                player within animation mode.</li>
+            <li><strong>TXT</strong> - Displays and changes the
+                step in text lines in animation player within
+                text mode.</li>
+        </ul>
+    </li>
+    <li>Display scroll - Scroll settings:<ul>
+            <li><strong>Scroll steps</strong> - Changes the
+                number of steps per one text line. This affects
+                on the scroll smooth.</li>
+            <li><strong>Steps</strong> - Changes the scroll speed
+                in steps per one line.</li>
+            <li><strong>Dec Change/Inc Change</strong> - Changes
+                the value change amount in <strong>Display step</strong>
+                and <strong>Display scroll</strong> rows. The
+                current change amount are visible in the value
+                changing buttons.</li>
+        </ul>
+    </li>
 </ul>
 
 <h2>Application restart or configuration reset</h2>
@@ -89,8 +119,8 @@ workflow:</p>
                         will not be restarted.</li>
                 </ul>
             </li>
-            <li>Click OK - Display <strong>Clear file storage</strong>
-                confirmation:<ul>
+            <li>Click <strong>OK</strong> - Display <strong>Clear
+                file storage</strong> confirmation:<ul>
                     <li>Click Cancel - Remove <strong>!!config.txt</strong>
                         from storage. You should restart the
                         application by clicking the Restart
@@ -237,6 +267,17 @@ the sequence:</p>
         key to change screen font.</li>
 </ul>
 
+<h2>State 4 - Display speed</h2>
+
+<p>The state displays and allow to set the display speed during
+terminal session or animation playback.</p>
+
+<p><img src="readme_pics/pic.jpg" alt="`config/popup4.png"
+width="256" height="256"></p>
+
+<p>Every setting is preceeded by letter, which indicates the key,
+wich changes the setting.</p>
+
 <h1>Configuration file contents</h1>
 
 <p>The lines without equation sign and blank lines are ignored
@@ -258,18 +299,16 @@ the number is presented as <strong>?</strong> character.</p>
 
 <p><strong>TextPaint</strong> uses the timer, which periodically
 updates display (cursor and blink) and invokes event depending on
-<strong>TextPaint</strong> state.</p>
+<strong>TextPaint</strong> state. <em>All these parameters can be
+changed everytime in the settings panel or settings pop-up.</em></p>
 
 <ul>
-    <li><strong>TimerPeriod</strong> - The timer period in
-        milliseconds.</li>
-    <li><strong>TimerLoop</strong> - The counter period. Every
-        timer tick increments the counter by <strong>1</strong>,
-        and if reach the TimerLoop value, the counter will be
-        reset to <strong>0</strong>.</li>
-    <li><strong>TimerCursor</strong> - Number of the ticks, which
-        changes the cursor state between visible and invisible.
-        This value should be a divider of <strong>TimerLoop</strong>
+    <li><strong>TimerFrames</strong> - The number of display
+        frames between tick, used in blinking cursor, blinking
+        test, animation player and terminal.</li>
+    <li><em><strong>TimerCursor</strong></em> - Number of the
+        ticks, which changes the cursor state between visible and
+        invisible. This value should be a divider of <strong>TimerLoop</strong>
         value.</li>
     <li><strong>TimerBlink</strong> - Number of the ticks, which
         changes the blinking text state between normal and
@@ -279,6 +318,26 @@ updates display (cursor and blink) and invokes event depending on
         invokes the timer event in TextPaint. This is used mostly
         in animation player and terminal for sequentally text
         display.</li>
+    <li><em><strong>TimerStep</strong></em> - Number of
+        characters per step in animation player and terminal
+        session.</li>
+    <li><em><strong>TimerStepText</strong></em> - Number of lines
+        per step in animation player within text mode.</li>
+    <li><em><strong>TimerStepChange</strong></em> - The change of
+        <em><strong>TimerStep</strong></em>, <em><strong>TimerStepText</strong></em>
+        and <em><strong>ANSIScrollChars</strong></em>, the value
+        is from -9 to 6 and represents the amounts:<ul>
+            <li><strong>Negative value </strong>- Multiple or
+                divide by the absolute value of the number
+                increased by 1. For instance, the <strong>-4</strong>
+                represents the multiply or divide by 5.</li>
+            <li><strong>Zero</strong> - Increase or decrease by
+                1.</li>
+            <li><strong>Positive value</strong> - Increase or
+                decrease by number represented by 10 powered by
+                the value.</li>
+        </ul>
+    </li>
 </ul>
 
 <h2>WebApiServer WebSocket address</h2>
@@ -303,6 +362,9 @@ settings pop-up.</em></p>
         cells.</li>
     <li><em><strong>WinH</strong></em> - Screen height in text
         cells.</li>
+    <li><em><strong>WinAuto</strong></em> - Automated window
+        resize according the ANSI/VTxxx codes, for instance
+        change between 80 and 132 column display.</li>
     <li><em><strong>WinScreenSize</strong></em> - Percent of the
         whole screen, which is used for the TextPaint screen.</li>
     <li><em><strong>WinKeyboardSize</strong></em> - Percent of
@@ -330,14 +392,23 @@ settings pop-up.</em></p>
     <li><em><strong>DisplayAttrib</strong></em> - Text display
         attributes presented as value from 0 to 15. The value is
         sum of weights:<ul>
-            <li><strong>1</strong> - Bold</li>
-            <li><strong>2</strong> - Italic</li>
-            <li><strong>4</strong> - Underline</li>
-            <li><strong>8</strong> - Strikethrough</li>
+            <li><strong>1</strong> - Bold.</li>
+            <li><strong>2</strong> - Italic.</li>
+            <li><strong>4</strong> - Underline.</li>
+            <li><strong>8</strong> - Strikethrough.</li>
         </ul>
     </li>
-    <li><em><strong>SteadyCursor</strong></em> - Cursor steeady
-        display instead of blinking.</li>
+    <li><em><strong>DisplayCursor</strong></em> - Cursor style as
+        following:<ul>
+            <li><strong>0</strong> - Hidden cursor.</li>
+            <li><strong>1</strong> - Blinking underline.</li>
+            <li><strong>2</strong> - Steady underline.</li>
+            <li><strong>3</strong> - Blinking vertical bar.</li>
+            <li><strong>4</strong> - Steady vertical bar.</li>
+            <li><strong>5</strong> - Blinking filled box.</li>
+            <li><strong>6</strong> - Steady filled box.</li>
+        </ul>
+    </li>
 </ul>
 
 <h2>Player configuration</h2>
@@ -349,10 +420,6 @@ settings pop-up.</em></p>
         after file open or change. <em>Press the </em><em><strong>Home</strong></em><em>
         or </em><em><strong>End</strong></em><em> key twice
         during playback to change the parameter.</em></li>
-    <li><strong>PlayerStep</strong> - Number of animation steps
-        per single timer event. in the player. The step can be
-        roughly changed by <strong>[</strong> and <strong>]</strong>
-        keys during playback.</li>
     <li><strong>PlayerDelayFrame</strong> - The number of steps
         to wait to <font face="Liberation Serif"><tt>1Bh [ 1; P1
         V</tt></font> escape sequence for the further file
@@ -387,8 +454,6 @@ internal VTTEST.</p>
             <li><strong>5</strong> - VT520</li>
         </ul>
     </li>
-    <li><strong>TerminalStep</strong> - Number of data processing
-        steps per single timer event.</li>
     <li><em><strong>TerminalKeys</strong></em> - The terminal
         special key configuration as 7 digits. <em>The
         configuration can be changed in the terminal pop-up and
@@ -487,54 +552,6 @@ and accessible at the teminal mode beginning.</p>
         port number or command with parameters.</li>
     <li><strong>Terminal?Codec</strong> - Text codec used in
         connection</li>
-</ul>
-
-<h2>Render options - NOT IMPLEMENTED YET</h2>
-
-<p>This parameters are used in animation player, for render to
-bitmap.</p>
-
-<ul>
-    <li><strong>RenderFile</strong> - Image file name for
-        rendering single image (<strong>RenderStep=0</strong>) or
-        directory for rendering movie (<strong>RenderStep&gt;0</strong>)</li>
-    <li><strong>RenderStep</strong> - Number of processed
-        character between movie frames. To render single image,
-        use <strong>RenderStep=0</strong>.</li>
-    <li><strong>RenderOffset</strong> - Offset in steps when
-        rendering movie. For example, if <strong>RenderStep=10</strong>
-        and <strong>RenderOffset=4</strong>, the frames will be
-        generated after step no: 4th, 14th, 24th and so on.</li>
-    <li><strong>RenderCursor</strong> - Draw cursor on rendered
-        image. Possible value are <strong>0</strong> or <strong>1</strong>.</li>
-    <li><strong>RenderFrame</strong> - Number of steps per one
-        frame (unit) when you render file containing time
-        markers.</li>
-    <li><strong>RenderSliceX</strong> - The horizontal offset,
-        works only if <strong>RenderSliceW&gt;0</strong>.</li>
-    <li><strong>RenderSliceY</strong> - The horizontal offset,
-        works only if <strong>RenderSliceH&gt;0</strong>.</li>
-    <li><strong>RenderSliceW</strong> - The width of sliced
-        picture. Use <strong>RenderSliceW=0</strong> for disable
-        slicing horizontally.</li>
-    <li><strong>RenderSliceH</strong> - The height of sliced
-        picture. Use <strong>RenderSliceH=0</strong> for disable
-        slicing vertically.</li>
-    <li><strong>RenderLeading</strong> - Number of dummy leading
-        ANSI processing steps before the file contents. It can be
-        used for create additional blank frames before ANSI
-        animation.</li>
-    <li><strong>RenderTrailing</strong> - Number of dummy
-        trailing ANSI processing steps after the file contents.
-        It can be used for create additional repeating frames
-        after ANSI animation.</li>
-    <li><strong>RenderBlinkPeriod</strong> - Number of frames for
-        one of the blinking state, the full blinking period
-        (including the base and alternate state) equals thice the
-        value. Works when the <strong>RenderStep&gt;0</strong>
-        only.</li>
-    <li><strong>RenderBlinkOffset</strong> - The Offset of the
-        blinking cycle, which will begin the rendered animation.</li>
 </ul>
 
 <h2>Bell options</h2>

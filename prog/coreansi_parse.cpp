@@ -123,6 +123,7 @@ void CoreAnsi::AnsiProcess_VT52()
         case 'I':
             AnsiState_.__AnsiWrapFlag = false;
             AnsiState_.__AnsiY -= 1;
+            AnsiSeekLine();
             if (AnsiState_.__AnsiY < AnsiState_.__AnsiScrollFirst)
             {
                 AnsiScrollInit(AnsiState_.__AnsiY - AnsiState_.__AnsiScrollFirst, AnsiState::AnsiScrollCommandDef::None);
@@ -492,6 +493,7 @@ void CoreAnsi::AnsiProcess_Fixed(int TextFileLine_i)
             {
                 AnsiState_.__AnsiWrapFlag = false;
                 AnsiState_.__AnsiY += 1;
+                AnsiSeekLine();
                 if (AnsiState_.__AnsiY > AnsiState_.__AnsiScrollLast)
                 {
                     AnsiScrollInit(AnsiState_.__AnsiY - AnsiState_.__AnsiScrollLast, AnsiState::AnsiScrollCommandDef::None);
@@ -504,6 +506,7 @@ void CoreAnsi::AnsiProcess_Fixed(int TextFileLine_i)
             AnsiState_.__AnsiWrapFlag = false;
             AnsiState_.__AnsiY += 1;
             AnsiState_.__AnsiX = AnsiProcessGetXMin(false);
+            AnsiSeekLine();
             if (AnsiState_.__AnsiY >= AnsiMaxY)
             {
                 AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
@@ -528,6 +531,7 @@ void CoreAnsi::AnsiProcess_Fixed(int TextFileLine_i)
             {
                 AnsiState_.__AnsiWrapFlag = false;
                 AnsiState_.__AnsiY -= 1;
+                AnsiSeekLine();
                 if (AnsiState_.__AnsiY < AnsiState_.__AnsiScrollFirst)
                 {
                     AnsiScrollInit(AnsiState_.__AnsiY - AnsiState_.__AnsiScrollFirst, AnsiState::AnsiScrollCommandDef::None);
@@ -1475,6 +1479,7 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     int T1 = AnsiState_.__AnsiScrollFirst;
                     int T2 = AnsiState_.__AnsiScrollLast;
                     AnsiState_.__AnsiScrollFirst = AnsiState_.__AnsiY;
+                    AnsiSeekLine();
                     AnsiScrollInit(0 - AnsiProcess_Int1(AnsiParams[0], AnsiCmd_), AnsiState::AnsiScrollCommandDef::FirstLast, T1, T2, 0, 0);
                 }
             }
@@ -1491,6 +1496,7 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
                     int T1 = AnsiState_.__AnsiScrollFirst;
                     int T2 = AnsiState_.__AnsiScrollLast;
                     AnsiState_.__AnsiScrollFirst = AnsiState_.__AnsiY;
+                    AnsiSeekLine();
                     AnsiScrollInit(AnsiProcess_Int1(AnsiParams[0], AnsiCmd_), AnsiState::AnsiScrollCommandDef::FirstLast, T1, T2, 0, 0);
                 }
             }
@@ -1553,12 +1559,14 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
         case 'S': // SU
             if (AnsiParams.Count == 1)
             {
+                AnsiSeekLine();
                 AnsiScrollInit(AnsiProcess_Int11(AnsiParams[0], AnsiCmd_), AnsiState::AnsiScrollCommandDef::None);
             }
             break;
         case 'T': // SD, XTHIMOUSE
             if (AnsiParams.Count == 1)
             {
+                AnsiSeekLine();
                 AnsiScrollInit(0 - AnsiProcess_Int11(AnsiParams[0], AnsiCmd_), AnsiState::AnsiScrollCommandDef::None);
             }
             if (AnsiParams.Count >= 5)
@@ -1777,19 +1785,41 @@ void CoreAnsi::AnsiProcess_CSI(std::string AnsiCmd_)
             }
             break;
         case 'q':
-            // DECSCA
-            if (TextWork::StringEndsWith(AnsiCmd_, "\"q"))
             {
-                if (AnsiParams.Count >= 1)
+                // DECSCA
+                if (TextWork::StringEndsWith(AnsiCmd_, "\"q"))
                 {
-                    AnsiParams[AnsiParams.Count - 1] = AnsiParams[AnsiParams.Count - 1].substr(0, AnsiParams[AnsiParams.Count - 1].size() - 1);
-                    if (AnsiProcess_Int0(AnsiParams[0], AnsiCmd_) == 1)
+                    if (AnsiParams.Count >= 1)
                     {
-                        AnsiState_.CharProtection1Print = true;
+                        AnsiParams[AnsiParams.Count - 1] = AnsiParams[AnsiParams.Count - 1].substr(0, AnsiParams[AnsiParams.Count - 1].size() - 1);
+                        if (AnsiProcess_Int0(AnsiParams[0], AnsiCmd_) == 1)
+                        {
+                            AnsiState_.CharProtection1Print = true;
+                        }
+                        else
+                        {
+                            AnsiState_.CharProtection1Print = false;
+                        }
                     }
-                    else
+                }
+
+                // DECSCUSR
+                if (TextWork::StringEndsWith(AnsiCmd_, " q"))
+                {
+                    if (AnsiParams.Count >= 1)
                     {
-                        AnsiState_.CharProtection1Print = false;
+                        AnsiParams[AnsiParams.Count - 1] = AnsiParams[AnsiParams.Count - 1].substr(0, AnsiParams[AnsiParams.Count - 1].size() - 1);
+                        switch (AnsiProcess_Int0(AnsiParams[0], AnsiCmd_))
+                        {
+                            case 0: AnsiState_.CursorTerm = 5; break;
+                            case 1: AnsiState_.CursorTerm = 5; break;
+                            case 2: AnsiState_.CursorTerm = 6; break;
+                            case 3: AnsiState_.CursorTerm = 1; break;
+                            case 4: AnsiState_.CursorTerm = 2; break;
+                            case 5: AnsiState_.CursorTerm = 3; break;
+                            case 6: AnsiState_.CursorTerm = 4; break;
+                            default: AnsiState_.CursorTerm = 0; break;
+                        }
                     }
                 }
             }
@@ -2763,11 +2793,11 @@ void CoreAnsi::AnsiRepaintCursor()
 {
     if (AnsiGetFontSize(AnsiState_.__AnsiY) > 0)
     {
-        Screen::ScreenCursorMove(AnsiState_.__AnsiX << 1, AnsiState_.__AnsiY + ScreenOffset);
+        Screen::ScreenCursorMove(AnsiState_.__AnsiX << 1, AnsiState_.__AnsiY + ScreenOffset, 1);
     }
     else
     {
-        Screen::ScreenCursorMove(AnsiState_.__AnsiX, AnsiState_.__AnsiY + ScreenOffset);
+        Screen::ScreenCursorMove(AnsiState_.__AnsiX, AnsiState_.__AnsiY + ScreenOffset, 0);
     }
     Screen::ScreenRefresh();
 }
@@ -2862,6 +2892,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                     {
                         AnsiState_.__AnsiX = AnsiProcessGetXMin(false);
                         AnsiState_.__AnsiY++;
+                        AnsiSeekLine();
                         if ((AnsiMaxY > 0) && (AnsiState_.__AnsiY > AnsiState_.__AnsiScrollLast))
                         {
                             int L = AnsiState_.__AnsiY - AnsiState_.__AnsiScrollLast;
@@ -2880,7 +2911,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                     {
                         AnsiState_.__AnsiX = AnsiProcessGetXMin(false);
                         AnsiState_.__AnsiY++;
-
+                        AnsiSeekLine();
                         if ((AnsiMaxY > 0) && (AnsiState_.__AnsiY > AnsiState_.__AnsiScrollLast))
                         {
                             int L = AnsiState_.__AnsiY - AnsiState_.__AnsiScrollLast;
@@ -2984,6 +3015,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                             case 1:
                                 AnsiState_.__AnsiWrapFlag = false;
                                 AnsiState_.__AnsiX = AnsiProcessGetXMin(false);
+                                AnsiSeekLine();
                                 if (AnsiState_.__AnsiY == AnsiState_.__AnsiScrollLast)
                                 {
                                     AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
@@ -3003,6 +3035,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         {
                             case 0:
                                 AnsiState_.__AnsiWrapFlag = false;
+                                AnsiSeekLine();
                                 if (AnsiState_.__AnsiY == AnsiState_.__AnsiScrollLast)
                                 {
                                     AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
@@ -3015,6 +3048,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                             case 1:
                                 AnsiState_.__AnsiWrapFlag = false;
                                 AnsiState_.__AnsiX = AnsiProcessGetXMin(false);
+                                AnsiSeekLine();
                                 if (AnsiState_.__AnsiY == AnsiState_.__AnsiScrollLast)
                                 {
                                     AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
@@ -3033,6 +3067,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                         {
                             case 0:
                                 AnsiState_.__AnsiWrapFlag = false;
+                                AnsiSeekLine();
                                 if (AnsiState_.__AnsiY == AnsiState_.__AnsiScrollLast)
                                 {
                                     AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
@@ -3045,6 +3080,7 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                             case 1:
                                 AnsiState_.__AnsiWrapFlag = false;
                                 AnsiState_.__AnsiX = AnsiProcessGetXMin(false);
+                                AnsiSeekLine();
                                 if (AnsiState_.__AnsiY == AnsiState_.__AnsiScrollLast)
                                 {
                                     AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
@@ -3061,14 +3097,14 @@ void CoreAnsi::AnsiCharPrint(int TextFileLine_i)
                     if (!ANSIDOS_)
                     {
                         AnsiState_.__AnsiWrapFlag = false;
-                        AnsiState_.__AnsiY++;
-                        if (AnsiMaxY > 0)
+                        AnsiSeekLine();
+                        if (AnsiState_.__AnsiY == AnsiState_.__AnsiScrollLast)
                         {
-                            if (AnsiState_.__AnsiY > AnsiState_.__AnsiScrollLast)
-                            {
-                                AnsiScrollInit(AnsiState_.__AnsiY - AnsiState_.__AnsiScrollLast, AnsiState::AnsiScrollCommandDef::None);
-                                AnsiState_.__AnsiY = AnsiState_.__AnsiScrollLast;
-                            }
+                            AnsiScrollInit(1, AnsiState::AnsiScrollCommandDef::None);
+                        }
+                        else
+                        {
+                            AnsiState_.__AnsiY++;
                         }
                     }
                     break;

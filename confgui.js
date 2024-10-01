@@ -5,6 +5,8 @@ let ConfLbl4 = document.getElementById("ConfLbl4");
 let ConfLbl5 = document.getElementById("ConfLbl5");
 let ConfLbl6 = document.getElementById("ConfLbl6");
 let ConfLbl7 = document.getElementById("ConfLbl7");
+let ConfLbl8 = document.getElementById("ConfLbl8");
+let ConfLbl9 = document.getElementById("ConfLbl9");
 
 let ConfBtn11 = document.getElementById("ConfBtn11");
 let ConfBtn12 = document.getElementById("ConfBtn12");
@@ -41,11 +43,25 @@ let ConfBtn61 = document.getElementById("ConfBtn61");
 let ConfBtn62 = document.getElementById("ConfBtn62");
 let ConfBtn63 = document.getElementById("ConfBtn63");
 let ConfBtn64 = document.getElementById("ConfBtn64");
+let ConfBtn65 = document.getElementById("ConfBtn65");
 
 let ConfBtn71 = document.getElementById("ConfBtn71");
 let ConfBtn72 = document.getElementById("ConfBtn72");
 let ConfBtn73 = document.getElementById("ConfBtn73");
 let ConfBtn74 = document.getElementById("ConfBtn74");
+let ConfBtn75 = document.getElementById("ConfBtn75");
+
+let ConfBtn81 = document.getElementById("ConfBtn81");
+let ConfBtn82 = document.getElementById("ConfBtn82");
+let ConfBtn83 = document.getElementById("ConfBtn83");
+let ConfBtn84 = document.getElementById("ConfBtn84");
+let ConfBtn85 = document.getElementById("ConfBtn85");
+
+let ConfBtn91 = document.getElementById("ConfBtn91");
+let ConfBtn92 = document.getElementById("ConfBtn92");
+let ConfBtn93 = document.getElementById("ConfBtn93");
+let ConfBtn94 = document.getElementById("ConfBtn94");
+let ConfBtn95 = document.getElementById("ConfBtn95");
 
 let ConfBtnAll = [];
 ConfBtnAll.push([ConfBtn11, ConfBtn12, ConfBtn13, ConfBtn14]);
@@ -53,10 +69,63 @@ ConfBtnAll.push([ConfBtn21, ConfBtn22, ConfBtn23, ConfBtn24]);
 ConfBtnAll.push([ConfBtn31, ConfBtn32, ConfBtn33, ConfBtn34, ConfBtn35, ConfBtn36]);
 ConfBtnAll.push([ConfBtn41, ConfBtn42, ConfBtn43, ConfBtn44, ConfBtn45, ConfBtn46]);
 ConfBtnAll.push([ConfBtn51, ConfBtn52, ConfBtn53, ConfBtn54, ConfBtn55, ConfBtn56]);
-ConfBtnAll.push([ConfBtn61, ConfBtn62, ConfBtn63, ConfBtn64]);
-ConfBtnAll.push([ConfBtn71, ConfBtn72, ConfBtn73, ConfBtn74]);
+ConfBtnAll.push([ConfBtn61, ConfBtn62, ConfBtn63, ConfBtn64, ConfBtn65]);
+ConfBtnAll.push([ConfBtn71, ConfBtn72, ConfBtn73, ConfBtn74, ConfBtn75]);
+ConfBtnAll.push([ConfBtn81, ConfBtn82, ConfBtn83, ConfBtn84, ConfBtn85]);
+ConfBtnAll.push([ConfBtn91, ConfBtn92, ConfBtn93, ConfBtn94, ConfBtn95]);
 
-let ConfLblAll = [ConfLbl1, ConfLbl2, ConfLbl3, ConfLbl4, ConfLbl5, ConfLbl6, ConfLbl7];
+let ConfLblAll = [ConfLbl1, ConfLbl2, ConfLbl3, ConfLbl4, ConfLbl5, ConfLbl6, ConfLbl7, ConfLbl8, ConfLbl9];
+
+let ConfScreenStep = [1, 10, 100, 1000, 10000, 100000, 1000000];
+
+function ConfScreenStepDisp(Idx, Dir, Val)
+{
+    if (Idx >= 0)
+    {
+        if (Dir > 0)
+        {
+            return ["", "-", "+"][Dir] + ConfScreenStep[Idx];
+        }
+        else
+        {
+            if (Dir == (-1))
+            {
+                Val = Val - ConfScreenStep[Idx];
+                if (Val < 1) Val = 1;
+                return Val;
+            }
+            else
+            {
+                if (Val > 1000000000) Val = 1000000000;
+                return Val + ConfScreenStep[Idx];
+            }
+        }
+    }
+    else
+    {
+        if (Dir > 0)
+        {
+            return ["", "/", "*"][Dir] + (1 - Idx);
+        }
+        else
+        {
+            if (Dir == (-1))
+            {
+                Val = Math.round(Val / (1 - Idx));
+                if (Val < 1) Val = 1;
+                return Val;
+            }
+            else
+            {
+                Val = Math.round(Val * (1 - Idx));
+                if (Val > 1000000000) Val = 1000000000;
+                if (Val < 1) Val = 1000000000;
+                return Val;
+            }
+        }
+    }
+}
+
 
 function ConfIsFullScreen()
 {
@@ -167,15 +236,42 @@ function ConfRepaint()
 
     let ScrS = ScreenW + "x" + ScreenH;
 
-    ConfBtn61.value = ScrS + "\n-10 cols";
-    ConfBtn62.value = ScrS + "\n-1 col";
-    ConfBtn63.value = ScrS + "\n+1 col";
-    ConfBtn64.value = ScrS + "\n+10 cols";
+    ConfBtn61.value = ConfigFileB("WinAuto") ? "Auto\nresize" : "No\nresize";
+    ConfBtn62.value = ScrS + "\n-10 cols";
+    ConfBtn63.value = ScrS + "\n-1 col";
+    ConfBtn64.value = ScrS + "\n+1 col";
+    ConfBtn65.value = ScrS + "\n+10 cols";
 
-    ConfBtn71.value = ScrS + "\n-10 rows";
-    ConfBtn72.value = ScrS + "\n-1 row";
-    ConfBtn73.value = ScrS + "\n+1 row";
-    ConfBtn74.value = ScrS + "\n+10 rows";
+    ConfBtn71.value = ConfigFileB("WinAuto") ? "Auto\nresize" : "No\nresize";
+    ConfBtn72.value = ScrS + "\n-10 rows";
+    ConfBtn73.value = ScrS + "\n-1 row";
+    ConfBtn74.value = ScrS + "\n+1 row";
+    ConfBtn75.value = ScrS + "\n+10 rows";
+
+    if (ScreenDisplayCursor == 0) ConfBtn81.value = "Hidden\ncursor";
+    if (ScreenDisplayCursor == 1) ConfBtn81.value = "Blinking\nunder";
+    if (ScreenDisplayCursor == 2) ConfBtn81.value = "Steady\nunder";
+    if (ScreenDisplayCursor == 3) ConfBtn81.value = "Blinking\nbar";
+    if (ScreenDisplayCursor == 4) ConfBtn81.value = "Steady\nbar";
+    if (ScreenDisplayCursor == 5) ConfBtn81.value = "Blinking\nbox";
+    if (ScreenDisplayCursor == 6) ConfBtn81.value = "Steady\nbox";
+    
+    ConfBtn82.value = "ANI " + ConfigFileI("TimerStep") + "\n" + ConfScreenStepDisp(ConfigFileI("TimerStepChange"), 1);
+    ConfBtn83.value = "ANI " + ConfigFileI("TimerStep") + "\n" + ConfScreenStepDisp(ConfigFileI("TimerStepChange"), 2);
+    ConfBtn84.value = "TXT " + ConfigFileI("TimerStepText") + "\n" + ConfScreenStepDisp(ConfigFileI("TimerStepChange"), 1);
+    ConfBtn85.value = "TXT " + ConfigFileI("TimerStepText") + "\n" + ConfScreenStepDisp(ConfigFileI("TimerStepChange"), 2);
+
+    if (ConfigFileI("ANSIScrollSmooth") == 0) ConfBtn91.value = "No\nscroll";
+    if (ConfigFileI("ANSIScrollSmooth") == 1) ConfBtn91.value = "Scroll\n1 step";
+    if (ConfigFileI("ANSIScrollSmooth") == 2) ConfBtn91.value = "Scroll\n2 steps";
+    if (ConfigFileI("ANSIScrollSmooth") == 3) ConfBtn91.value = "Scroll\n4 steps";
+    if (ConfigFileI("ANSIScrollSmooth") == 4) ConfBtn91.value = "Scroll\n8 steps";
+    if (ConfigFileI("ANSIScrollSmooth") == 5) ConfBtn91.value = "Scroll\n16 steps";
+
+    ConfBtn92.value = ConfigFileI("ANSIScrollChars") + "\n" + ConfScreenStepDisp(ConfigFileI("TimerStepChange"), 1);
+    ConfBtn93.value = ConfigFileI("ANSIScrollChars") + "\n" + ConfScreenStepDisp(ConfigFileI("TimerStepChange"), 2);
+    ConfBtn94.value = "Dec\nChange";
+    ConfBtn95.value = "Inc\nChange";
     
     const FntSizeW = Math.floor((BrowserW() * 1.0) / 40.0);
     const FntSizeH = Math.floor((BrowserH() * 1.0) / 30.0);
@@ -378,29 +474,86 @@ function ConfClick(id)
             break;            
 
         case 61:
-            ProgEventOtherFile("Resize", "", ScreenW - 10, ScreenH, 1, 0);
+            Temp = ConfigFileB("WinAuto");
+            Temp = !Temp;
+            ConfigFileGui("WinAuto", Temp);
             break;
         case 62:
-            ProgEventOtherFile("Resize", "", ScreenW -  1, ScreenH, 1, 0);
+            ProgEventOtherFile("Resize", "", ScreenW - 10, ScreenH, 1, 0);
             break;
         case 63:
-            ProgEventOtherFile("Resize", "", ScreenW +  1, ScreenH, 1, 0);
+            ProgEventOtherFile("Resize", "", ScreenW -  1, ScreenH, 1, 0);
             break;
         case 64:
+            ProgEventOtherFile("Resize", "", ScreenW +  1, ScreenH, 1, 0);
+            break;
+        case 65:
             ProgEventOtherFile("Resize", "", ScreenW + 10, ScreenH, 1, 0);
             break;
             
         case 71:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH - 10, 1, 0);
+            Temp = ConfigFileB("WinAuto");
+            Temp = !Temp;
+            ConfigFileGui("WinAuto", Temp);
             break;
         case 72:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH -  1, 1, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH - 10, 1, 0);
             break;
         case 73:
-            ProgEventOtherFile("Resize", "", ScreenW, ScreenH +  1, 1, 0);
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH -  1, 1, 0);
             break;
         case 74:
+            ProgEventOtherFile("Resize", "", ScreenW, ScreenH +  1, 1, 0);
+            break;
+        case 75:
             ProgEventOtherFile("Resize", "", ScreenW, ScreenH + 10, 1, 0);
+            break;
+
+        case 81:
+            ScreenDisplayCursor = (ScreenDisplayCursor + 1) % 7;
+            ConfigFileGui("DisplayCursor", ScreenDisplayCursor);
+            ScreenSetDisplayConfigCursorReset();
+            ScreenSetDisplayConfigCursor();
+            break;
+        case 82:
+            Temp = ConfScreenStepDisp(ConfigFileI("TimerStepChange"), -1, ConfigFileI("TimerStep"));
+            ConfigFileGui("TimerStep", Temp);
+            break;
+        case 83:
+            Temp = ConfScreenStepDisp(ConfigFileI("TimerStepChange"), -2, ConfigFileI("TimerStep"));
+            ConfigFileGui("TimerStep", Temp);
+            break;
+        case 84:
+            Temp = ConfScreenStepDisp(ConfigFileI("TimerStepChange"), -1, ConfigFileI("TimerStepText"));
+            ConfigFileGui("TimerStepText", Temp);
+            break;
+        case 85:
+            Temp = ConfScreenStepDisp(ConfigFileI("TimerStepChange"), -2, ConfigFileI("TimerStepText"));
+            ConfigFileGui("TimerStepText", Temp);
+            break;
+
+        case 91:
+            Temp = ConfigFileI("ANSIScrollSmooth");
+            Temp = (Temp + 1) % 6;
+            ConfigFileGui("ANSIScrollSmooth", Temp);
+            break;
+        case 92:
+            Temp = ConfScreenStepDisp(ConfigFileI("TimerStepChange"), -1, ConfigFileI("ANSIScrollChars"));
+            ConfigFileGui("ANSIScrollChars", Temp);
+            break;
+        case 93:
+            Temp = ConfScreenStepDisp(ConfigFileI("TimerStepChange"), -2, ConfigFileI("ANSIScrollChars"));
+            ConfigFileGui("ANSIScrollChars", Temp);
+            break;
+        case 94:
+            Temp = ConfigFileI("TimerStepChange");
+            if (Temp > -9) Temp--;
+            ConfigFileGui("TimerStepChange", Temp);
+            break;
+        case 95:
+            Temp = ConfigFileI("TimerStepChange");
+            if (Temp < (ConfScreenStep.length - 1)) Temp++;
+            ConfigFileGui("TimerStepChange", Temp);
             break;
     }
     

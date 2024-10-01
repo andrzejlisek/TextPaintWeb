@@ -95,14 +95,10 @@ int AnsiLineOccupy::CountItems(int I)
 void AnsiLineOccupy::Copy(AnsiLineOccupy &Src, AnsiLineOccupy &Dst)
 {
     Dst.Data.Clear();
-    for (int i = 0; i < Src.Data.Count; i++)
+    int i_ = Src.Data.Count;
+    for (int i = 0; i < i_; i++)
     {
-        Str Temp;
-        for (int ii = 0; ii < Src.Data[i].Count; ii++)
-        {
-            Temp.Add(Src.Data[i][ii]);
-        }
-        Dst.Data.Add(Temp);
+        Dst.Data.Add(Src.Data[i].Copy());
     }
 }
 
