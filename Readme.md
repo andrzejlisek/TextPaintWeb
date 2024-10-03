@@ -44,6 +44,7 @@ This documentation consists of several readme files:
 * **Readme\_player\.md** \- Animation player document\.
 * **Readme\_terminal\.md** \- Terminal document\.
 * **Readme\_keyboard\.md** \- Keyboard test document\.
+* **Readme\_history\.md** \- Description of important project commits\.
 
 
 
