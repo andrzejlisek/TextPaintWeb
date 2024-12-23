@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.133 2023/12/29 12:21:56 tom Exp $ */
+/* $Id: main.c,v 1.155 2024/12/05 00:37:39 tom Exp $ */
 
 /*
                                VTTEST.C
@@ -41,28 +41,36 @@
 #include "ttymodes.h"
 #include "esc.h"
 #include "fakeio.h"
+#ifdef LOCALE
+#include <locale.h>
+#endif
+
 #ifdef HAVE_LANGINFO_CODESET
 #include <langinfo.h>
 #endif
 
 /* *INDENT-EQLS* */
-FILE *log_fp    = 0;
+FILE *log_fp    = NULL;
+int allows_utf8 = FALSE;
+int assume_utf8 = FALSE;
 int brkrd       = FALSE;
-int reading     = FALSE;
+int debug_level = 0;
 int decac_bg    = -1;
 int decac_fg    = -1;
-int log_disabled = FALSE;
-int max_lines   = 24;
-int max_cols    = 132;
-int min_cols    = 80;
 int input_8bits = FALSE;
+int log_disabled = FALSE;
+int max_cols    = 132;
+int max_lines   = 24;
+int min_cols    = 80;
 int output_8bits = FALSE;
+int parse_7bits = FALSE;
+int quick_reply = FALSE;
+int reading     = FALSE;
 int slow_motion = FALSE;
 int tty_speed   = DEFAULT_SPEED;  /* nominal speed, for padding */
-int quick_reply = FALSE;
 int use_decac   = FALSE;
 int use_padding = FALSE;
-int assume_utf8 = FALSE;
+
 //jmp_buf intrenv;
 
 static char *program;
@@ -93,8 +101,27 @@ no_memory(void)
 static void
 usage(void)
 {
-  fakeio::_fprintf(stderr,
-          "Usage: vttest [-V] [-l] [-p] [-q] [-s] [-8] [-f font] [24x80.132]\n");
+  static const char *msg[] =
+  {
+    "Usage: vttest [options] [24x80.132]"
+    ,""
+    ,"Options:"
+    ,"  -V     print the program version, and exit"
+    ,"  -8     use 8-bit controls"
+    ,"  -d     debug (repeat for more detail)"
+    ,"  -c cmdfile  read commands from file"
+    ,"  -f fontfile load DRCS data from file"
+    ,"  -l logfile  log test results to vttest.log"
+    ,"  -p     use padding"
+    ,"  -q     filter replies to show only the most recent"
+    ,"  -s     add time delay for scrolling"
+    ,"  -u     allow some tests to use UTF-8"
+  };
+  size_t n;
+
+  for (n = 0; n < TABLESIZE(msg); ++n)
+    fakeio::_fprintf(stderr, "%s\n", msg[n]);
+
   fakeio::_exit(EXIT_FAILURE);
 }
 
@@ -114,7 +141,7 @@ fake_main(int argc, char *argv[])
 {
   /* *INDENT-OFF* */
   static MENU mainmenu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test of cursor movements",                          tst_movements },
       { "Test of screen features",                           tst_screen },
       { "Test of character sets",                            tst_characters },
@@ -127,15 +154,28 @@ fake_main(int argc, char *argv[])
       { "Test of reset and self-test",                       tst_rst },
       { "Test non-VT100 (e.g., VT220, XTERM) terminals",     tst_nonvt100 },
       { "Modify test-parameters",                            tst_setup },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
+  char *opt_command = NULL;
+  char *opt_softchr = NULL;
+  char *opt_logging = NULL;
 
   program = strrchr(argv[0], '/');
   if (program != NULL)
     ++program;
   else
     program = argv[0];
+
+#define OPT_ARG(value) \
+    do { \
+      if (!*++opt) { \
+        if (--argc < 1) \
+          usage(); \
+        value = *++argv; \
+      } \
+      opt = "?"; \
+    } while (0)
 
   while (argc-- > 1) {
     const char *opt = *++argv;
@@ -146,17 +186,17 @@ fake_main(int argc, char *argv[])
           version();
           fakeio::_putchar('\n');
           fakeio::_exit(EXIT_SUCCESS);
+        case 'c':
+          OPT_ARG(opt_command);
+          break;
+        case 'd':
+          debug_level++;
+          break;
         case 'f':
-          if (!*++opt) {
-            if (argc-- < 1)
-              usage();
-            opt = *++argv;
-          }
-          //setup_softchars(opt);
-          opt = "?";
+          OPT_ARG(opt_softchr);
           break;
         case 'l':
-          enable_logging();
+          OPT_ARG(opt_logging);
           break;
         case 'p':
           use_padding = TRUE;
@@ -166,6 +206,9 @@ fake_main(int argc, char *argv[])
           break;
         case 's':
           slow_motion = TRUE;
+          break;
+        case 'u':
+          allows_utf8 = TRUE;
           break;
         case '8':
           output_8bits = TRUE;
@@ -213,6 +256,16 @@ fake_main(int argc, char *argv[])
       }
     }
   }
+
+  /* do this first, to capture results from other options */
+  if (opt_logging)
+    enable_logging(opt_logging);
+  log_disabled = !log_disabled;
+  if (opt_command)
+    setup_replay(opt_command);
+
+  if (opt_softchr)
+    setup_softchars(opt_softchr);
 
 #ifdef UNIX
   initterminal(setjmp(intrenv));
@@ -282,7 +335,8 @@ tst_movements(MENU_ARGS)
     hlfxtra = (width - 80) / 2;
 
     if (LOG_ENABLED)
-      fakeio::_fprintf(log_fp, "tst_movements box(%d cols)\n", pass ? max_cols : min_cols);
+      fakeio::_fprintf(log_fp, NOTE_STR "tst_movements box(%d cols)\n",
+              pass ? max_cols : min_cols);
 
     decaln();
     cup(9, inner_l);
@@ -387,7 +441,8 @@ tst_movements(MENU_ARGS)
     int region = max_lines - 6;
 
     if (LOG_ENABLED)
-      fakeio::_fprintf(log_fp, "tst_movements wrap(%d cols)\n", pass ? max_cols : min_cols);
+      fakeio::_fprintf(log_fp, NOTE_STR "tst_movements wrap(%d cols)\n",
+              pass ? max_cols : min_cols);
 
     /* note: DECCOLM clears the screen */
     if (pass == 0) {
@@ -442,7 +497,8 @@ tst_movements(MENU_ARGS)
   deccolm(FALSE);   /* 80 cols */
 
   if (LOG_ENABLED)
-    fakeio::_fprintf(log_fp, "tst_movements cursor-controls in ESC sequences\n");
+    fakeio::_fprintf(log_fp,
+            NOTE_STR "tst_movements cursor-controls in ESC sequences\n");
 
   vt_clear(2);
   vt_move(1, 1);
@@ -457,8 +513,10 @@ tst_movements(MENU_ARGS)
   println("");
   /* Now put CR in CUF sequence. */
   tprintf("A ");
-  for (i = 2; i < 10; i++)
-    tprintf("%s%c%dC%c", csi_output(), CR, 2 * i - 2, '@' + i);
+  for (i = 2; i < 10; i++) {
+    cprintf("%s%c%dC", csi_output(), CR, 2 * i - 2);
+    tprintf("%c", '@' + i);
+  }
   println("");
   /* Now put VT in CUU sequence. */
   rm("20");
@@ -471,14 +529,17 @@ tst_movements(MENU_ARGS)
   holdit();
 
   if (LOG_ENABLED)
-    fakeio::_fprintf(log_fp, "tst_movements leading zeros in ESC sequences\n");
+    fakeio::_fprintf(log_fp,
+            NOTE_STR "tst_movements leading zeros in ESC sequences\n");
 
   vt_clear(2);
   vt_move(1, 1);
   println("Test of leading zeros in ESC sequences.");
   printxx("Two lines below you should see the sentence \"%s\".", ctext);
-  for (col = 1; *ctext; col++)
-    tprintf("%s00000000004;00000000%dH%c", csi_output(), col, *ctext++);
+  for (col = 1; *ctext; col++) {
+    cprintf("%s00000000004;00000000%dH", csi_output(), col);
+    tprintf("%c", *ctext++);
+  }
   cup(20, 1);
 
   restore_ttymodes();
@@ -987,7 +1048,7 @@ tst_bugs(MENU_ARGS)
   int i;
   /* *INDENT-OFF* */
   static MENU menutable[] = {
-    { "Exit to main menu",                                   0 },
+    { "Exit to main menu",                                   NULL },
     { "Bug A: Smooth scroll to jump scroll",                 bug_a },
     { "Bug B: Scrolling region",                             bug_b },
     { "Bug C: Wide to narrow screen",                        bug_c },
@@ -998,7 +1059,7 @@ tst_bugs(MENU_ARGS)
     { "Erase right half of double width lines",              bug_l },
     { "Funny scroll regions",                                bug_s },
     /* Add more here */
-    { "",                                                    0 }
+    { "",                                                    NULL }
   };
   /* *INDENT-ON* */
 
@@ -1157,7 +1218,7 @@ bug_d(MENU_ARGS)
 
     cup(4, 9);
     decdwl();
-    result = inchar();
+    result = (char) get_char();
     readnl();
     deccolm(FALSE);
   } while (result == '1');
@@ -1357,12 +1418,14 @@ initterminal(int pn)
 static void
 enable_iso2022(void)
 {
+  const char *env;
+
 #ifdef HAVE_LANGINFO_CODESET
-  char *env = nl_langinfo(CODESET);
+  (void) setlocale(LC_CTYPE, "");
+  env = nl_langinfo(CODESET);
   assume_utf8 = !strcmp(env, "UTF-8");
 #else
-  char *env;
-#if defined(HAVE_LOCALE_H) && defined(HAVE_STRSTR)
+#if defined(LOCALE)
   /*
    * This is preferable to using getenv() since it ensures that we are using
    * the locale which was actually initialized by the application.
@@ -1379,15 +1442,26 @@ enable_iso2022(void)
     assume_utf8 = TRUE;
   }
 #endif
+
   if (assume_utf8) {
-    esc("%@");
+    if (LOG_ENABLED) {
+      fakeio::_fprintf(log_fp, NOTE_STR "%senable ISO-2022 (%s)\n",
+              allows_utf8 ? "Do not " : "",
+              env);
+    }
+    if (!allows_utf8)
+      esc("%@");
+  } else {
+    if (LOG_ENABLED) {
+      fakeio::_fprintf(log_fp, NOTE_STR "UTF-8 is not enabled\n");
+    }
   }
 }
 
 static void
 disable_iso2022(void)
 {
-  if (assume_utf8) {
+  if (assume_utf8 && !allows_utf8) {
     esc("%G");
   }
 }
@@ -1397,7 +1471,7 @@ int
 setup_terminal(MENU_ARGS)
 {
   if (LOG_ENABLED)
-    fakeio::_fprintf(log_fp, "Setup Terminal with test-defaults\n");
+    fakeio::_fprintf(log_fp, NOTE_STR "Setup Terminal with test-defaults\n");
 
   enable_iso2022();
 
@@ -1424,7 +1498,7 @@ bye(void)
 {
   /* Force my personal prejudices upon the poor luser   */
   if (LOG_ENABLED)
-    fakeio::_fprintf(log_fp, "Cleanup & exit\n");
+    fakeio::_fprintf(log_fp, NOTE_STR "Cleanup & exit\n");
 
   default_level();  /* Enter ANSI mode (if in VT52 mode)    */
   decckm(FALSE);  /* cursor keys normal   */
@@ -1515,7 +1589,7 @@ scan_DA(const char *str, int *pos)
 }
 
 int
-scan_any(char *str, int *pos, int toc)
+scan_any(const char *str, int *pos, int toc)
 {
   int value = 0;
 
@@ -1563,7 +1637,7 @@ show_entry(MENU *table, int number)
 }
 
 static int
-next_menu(MENU *table, int top, int size)
+next_menu(const MENU *table, int top, int size)
 {
   int last;
   int next = top + size;
@@ -1584,10 +1658,9 @@ menu2(MENU *table, int top)
 {
   int i, tablesize, choice;
   char c;
-  char storage[BUFSIZ];
+  char storage[BUF_SIZE];
   int pagesize = max_lines - 7 - TITLE_LINE;
   int pagetop = 1;
-  int redraw = FALSE;
 
   tablesize = 0;
   for (i = 0; !end_of_menu(table, i); i++) {
@@ -1608,12 +1681,14 @@ menu2(MENU *table, int top)
       show_entry(table, pagetop + i);
     }
 
-    printxx("\n          Enter choice number (0 - %d): ", tablesize);
+    println("");
+    printxx("          Enter choice number (0 - %d): ", tablesize);
     for (;;) {
       char *s = storage;
+      int redraw = FALSE;
+
       inputline(s);
       choice = 0;
-      redraw = FALSE;
       while ((c = *s++) != '\0') {
         if (c == '*') {
           choice = -1;
@@ -1637,17 +1712,22 @@ menu2(MENU *table, int top)
         }
       }
 
-      if (redraw)
+      if (redraw) {
+        if (LOG_ENABLED)
+          fakeio::_fprintf(log_fp, NOTE_STR "Redrawing screen\n");
         break;
+      }
 
       if (choice < 0) {
+        if (LOG_ENABLED)
+          fakeio::_fprintf(log_fp, NOTE_STR "Selecting all choices\n");
         for (choice = 0; choice <= tablesize; choice++) {
           vt_clear(2);
-          if (table[choice].dispatch != 0) {
+          if (table[choice].dispatch != NULL) {
             const char *save = push_menu(choice);
             const char *name = table[choice].description;
             if (LOG_ENABLED)
-              fakeio::_fprintf(log_fp, "Menu %s: %s\n", current_menu, name);
+              fakeio::_fprintf(log_fp, NOTE_STR "choice %s: %s\n", current_menu, name);
             if ((*table[choice].dispatch) (name) == MENU_HOLD)
               holdit();
             pop_menu(save);
@@ -1658,18 +1738,18 @@ menu2(MENU *table, int top)
         return 1;
       } else if (choice <= tablesize) {
         vt_clear(2);
-        if (table[choice].dispatch != 0) {
+        if (table[choice].dispatch != NULL) {
           const char *save = push_menu(choice);
           const char *name = table[choice].description;
           if (LOG_ENABLED)
-            fakeio::_fprintf(log_fp, "Menu %s: %s\n", current_menu, name);
+            fakeio::_fprintf(log_fp, NOTE_STR "choice %s: %s\n", current_menu, name);
           if ((*table[choice].dispatch) (name) != MENU_NOHOLD)
             holdit();
           pop_menu(save);
         }
         if (LOG_ENABLED)
           fakeio::_fflush(log_fp);
-        return (table[choice].dispatch != 0);
+        return (table[choice].dispatch != NULL);
       }
       printxx("          Bad choice, try again: ");
     }
@@ -1691,7 +1771,7 @@ chrformat(const char *s, int col, int first)
 {
   int pass;
   int wrap = (min_cols - col);
-  char *result = 0;
+  char *result = NULL;
 
   if (quick_reply) {
     const char *quicker = s;
@@ -1784,7 +1864,7 @@ skip_prefix(const char *prefix, char *input)
 {
   while (*prefix != '\0') {
     if (*prefix++ != *input++)
-      return 0;
+      return NULL;
   }
   return input;
 }
@@ -1808,6 +1888,15 @@ skip_dcs(char *input)
 }
 
 char *
+skip_osc(char *input)
+{
+  if (CharOf(*input) == OSC) {
+    return input + 1;
+  }
+  return skip_prefix(osc_input(), input);
+}
+
+char *
 skip_ss3(char *input)
 {
   if (CharOf(*input) == SS3) {
@@ -1824,7 +1913,7 @@ skip_prefix_2(const char *prefix, const char *input)
 {
   while (*prefix != '\0') {
     if (*prefix++ != *input++)
-      return 0;
+      return NULL;
   }
   return input;
 }
@@ -1865,7 +1954,7 @@ skip_digits(char *src)
   char *base = src;
   while (*src != '\0' && isdigit(CharOf(*src)))
     src++;
-  return (base == src) ? 0 : src;
+  return (base == src) ? NULL : src;
 }
 
 #define xdigitOf(c) \
@@ -1875,10 +1964,10 @@ skip_digits(char *src)
             ? ((c) + 10 - 'A') \
             : ((c) + 10 - 'a')))
 
-char *
-skip_xdigits(char *src, int *value)
+const char *
+skip_xdigits(const char *src, int *value)
 {
-  char *base = src;
+  const char *base = src;
   *value = 0;
   while (*src != '\0' && isxdigit(CharOf(*src))) {
     int ch = CharOf(*src);
@@ -1886,7 +1975,7 @@ skip_xdigits(char *src, int *value)
     *value += xdigitOf(ch);
     src++;
   }
-  return (base == src) ? 0 : src;
+  return (base == src) ? NULL : src;
 }
 
 const char *
@@ -1895,7 +1984,7 @@ skip_digits_2(const char *src)
   const char *base = src;
   while (*src != '\0' && isdigit(CharOf(*src)))
     src++;
-  return (base == src) ? 0 : src;
+  return (base == src) ? NULL : src;
 }
 
 /*
@@ -1933,7 +2022,7 @@ strip_terminator(char *src)
     }
   }
   if (!ok && LOG_ENABLED)
-    fakeio::_fprintf(log_fp, "Missing ST\n");
+    fakeio::_fprintf(log_fp, NOTE_STR "Missing ST\n");
   return ok;
 }
 
@@ -1944,7 +2033,7 @@ parse_decrqss(char *report, const char *func)
   int code = -1;
   char *parse = report;
 
-  if ((parse = skip_dcs(parse)) != 0
+  if ((parse = skip_dcs(parse)) != NULL
       && strip_terminator(parse)
       && strip_suffix(parse, func)) {
     if (!strncmp(parse, "1$r", (size_t) 3))
@@ -2013,7 +2102,7 @@ show_result(const char *fmt, ...)
   va_end(ap);
 
   if (LOG_ENABLED) {
-    fakeio::_fputs("Result: ", log_fp);
+    fakeio::_fputs(NOTE_STR "result ", log_fp);
     va_start(ap, fmt);
     my_vfprintf(log_fp, ap, fmt);
     va_end(ap);

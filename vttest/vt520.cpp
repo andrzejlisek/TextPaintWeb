@@ -1,4 +1,4 @@
-/* $Id: vt520.c,v 1.23 2024/02/18 23:48:50 tom Exp $ */
+/* $Id: vt520.c,v 1.28 2024/12/05 00:43:14 tom Exp $ */
 
 /*
  * Reference:  VT520/VT525 Video Terminal Programmer Information
@@ -48,7 +48,7 @@ tst_vt520_cursor(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT420 features",                               tst_vt420_cursor },
       { origin_mode_mesg,                                    toggle_DECOM },
       { lrmm_mesg,                                           toggle_LRMM },
@@ -64,7 +64,7 @@ tst_vt520_cursor(MENU_ARGS)
       { "Test Next-Line (CNL)",                              tst_CNL },
       { "Test Previous-Line (CPL)",                          tst_CPL },
       { "Test Vertical-Position-Relative (VPR)",             tst_VPR },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -169,6 +169,83 @@ tst_DECSCUSR(MENU_ARGS)
     decscusr(tbl_decscusr[n].code);
     println(tbl_decscusr[n].text);
   }
+  return MENU_HOLD;
+}
+
+/******************************************************************************/
+
+#define A_BOLD      (1 << 1)
+#define A_UNDERLINE (1 << 4)
+#define A_BLINK     (1 << 5)
+#define A_REVERSE   (1 << 7)
+
+/*
+ * VT525 display alternate text colors
+ */
+static int
+tst_DECATC(MENU_ARGS)
+{
+  /* *INDENT-OFF* */
+  static struct {
+    int attr;
+  } table[] = {
+    { 0, },
+    { A_BOLD, },
+    {          A_REVERSE, },
+    {                      A_UNDERLINE, },
+    {                                    A_BLINK, },
+    { A_BOLD | A_REVERSE, },
+    { A_BOLD |             A_UNDERLINE, },
+    { A_BOLD |                           A_BLINK, },
+    {          A_REVERSE | A_UNDERLINE, },
+    {          A_REVERSE |               A_BLINK, },
+    {                      A_UNDERLINE | A_BLINK, },
+    { A_BOLD | A_REVERSE | A_UNDERLINE, },
+    { A_BOLD | A_REVERSE |               A_BLINK, },
+    { A_BOLD |             A_UNDERLINE | A_BLINK, },
+    {          A_REVERSE | A_UNDERLINE | A_BLINK, },
+    { A_BOLD | A_REVERSE | A_UNDERLINE | A_BLINK, },
+  };
+  /* *INDENT-ON* */
+  size_t n;
+
+  vt_move(1, 1);
+  println(the_title);
+  /* this test assumes that an application has used DECATC, etc., to set up
+   * suitable colors, and simply displays what has been set up.
+   */
+  for (n = 0; n < TABLESIZE(table); ++n) {
+    char buffer[80];
+
+    vt_move((int) n + 3, 10);
+    decstglt(1);
+    printxx("%2d ", (int) n);
+    if (table[n].attr & A_BOLD)
+      sgr("1");
+    if (table[n].attr & A_REVERSE)
+      sgr("7");
+    if (table[n].attr & A_UNDERLINE)
+      sgr("4");
+    if (table[n].attr & A_BLINK)
+      sgr("5");
+    printxx(" Testing ");
+    sgr("0");
+    decstglt(3);
+    *buffer = '\0';
+    if (table[n].attr & A_BOLD)
+      strcat(buffer, " bold");
+    if (table[n].attr & A_REVERSE)
+      strcat(buffer, " reverse");
+    if (table[n].attr & A_UNDERLINE)
+      strcat(buffer, " underline");
+    if (table[n].attr & A_BLINK)
+      strcat(buffer, " blink");
+    if (buffer[0] == 0)
+      strcpy(buffer, " normal text");
+    buffer[1] = (char) toupper(CharOf(buffer[1]));
+    printxx("%s", buffer);
+  }
+  vt_move(max_lines - 1, 1);
   return MENU_HOLD;
 }
 
@@ -297,7 +374,6 @@ rpt_DECATC(MENU_ARGS)
 
   int ps1;
   int row, col;
-  char *report;
   const char *show;
   const char *suffix = ",}";
 
@@ -315,6 +391,7 @@ rpt_DECATC(MENU_ARGS)
 
   for (ps1 = 0; ps1 < 16; ++ps1) {
     char func[80];
+    char *report;
     int fail = 1;
     int qps, qfg, qbg;
 
@@ -365,7 +442,6 @@ rpt_DECAC(MENU_ARGS)
 
   int ps1;
   int row, col;
-  char *report;
   const char *show;
   const char *suffix = ",|";
 
@@ -383,6 +459,7 @@ rpt_DECAC(MENU_ARGS)
 
   for (ps1 = 1; ps1 <= 2; ++ps1) {
     char func[80];
+    char *report;
     int fail = 1;
     int qps, qfg, qbg;
 
@@ -499,7 +576,7 @@ tst_VT510_DECRQSS(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT420 features (DECRQSS)",                     tst_vt420_DECRQSS },
       { "Select Communication Port (DECSCP)",                rpt_DECSCP },
       { "Select Communication Speed (DECSCS)",               rpt_DECSCS },
@@ -518,7 +595,7 @@ tst_VT510_DECRQSS(MENU_ARGS)
       { "Set Scroll Speed (DECSSCLS)",                       rpt_DECSSCLS },
       { "Set Transmit Rate Limit (DECSTRL)",                 rpt_DECSTRL },
       { "Set Warning Bell Volume (DECSWBV)",                 rpt_DECSWBV },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -535,7 +612,7 @@ tst_vt520_DECRQSS(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT510 features (DECRQSS)",                     tst_VT510_DECRQSS },
       { "Alternate Text Color (DECATC)",                     rpt_DECATC },
       { "Assign Color (DECAC)",                              rpt_DECAC },
@@ -548,7 +625,7 @@ tst_vt520_DECRQSS(MENU_ARGS)
       { "Session Page Memory Allocation (DECSPMA)",          rpt_DECSPMA },
       { "Terminal Mode Emulation (DECTME)",                  rpt_DECTME },
       { "Update Session (DECUS)",                            rpt_DECUS },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -567,11 +644,11 @@ tst_VT520_report_presentation(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT420 features",                               tst_vt420_report_presentation },
       { "Request Mode (DECRQM)/Report Mode (DECRPM)",        tst_DECRPM },
       { "Status-String Report (DECRQSS)",                    tst_vt520_DECRQSS },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -591,11 +668,11 @@ tst_vt520_reports(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT420 features",                               tst_vt420_reports },
       { "Test Presentation State Reports",                   tst_VT520_report_presentation },
       { "Test Device Status Reports (DSR)",                  tst_vt420_device_status },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -614,10 +691,11 @@ tst_vt520_screen(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test No Clear on Column Change (DECNCSM)",          tst_DECNCSM },
       { "Test Set Cursor Style (DECSCUSR)",                  tst_DECSCUSR },
-      { "",                                                  0 }
+      { "Test Alternate Text Color (DECATC)",                tst_DECATC },
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -639,14 +717,14 @@ tst_vt520(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT420 features",                               tst_vt420 },
       { "Test cursor-movement",                              tst_vt520_cursor },
       { "Test editing sequences",                            not_impl },
       { "Test keyboard-control",                             not_impl },
       { "Test reporting functions",                          tst_vt520_reports },
       { "Test screen-display functions",                     tst_vt520_screen },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 

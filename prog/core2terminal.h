@@ -78,6 +78,8 @@ private:
     std::string EscapeKey_;
     std::string EscapeKeyId(std::string KeyName, int KeyChar);
 
+    void SendReportBegin();
+    void SendReportEnd();
     void SendHex(std::string STR);
 
     void ProcessReceived(Raw &Data);

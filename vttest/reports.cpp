@@ -1,10 +1,10 @@
-/* $Id: reports.c,v 1.51 2023/11/22 23:26:50 tom Exp $ */
+/* $Id: reports.c,v 1.57 2024/12/05 00:37:39 tom Exp $ */
 
 #include "vttest.h"
 #include "ttymodes.h"
 #include "esc.h"
-#include <ctype.h>
-/* *INDENT-OFF* */
+#include <cctype>
+#include "fakeio.h" /* *INDENT-OFF* */
 static
 struct table {
     int key;
@@ -47,21 +47,21 @@ struct table {
     {  65, "VT500 family" },
     {  -1, "" }
 },extensions[] = {
-    {   1, "132 columns" },                             /* vt400 */
-    {   2, "printer port" },                            /* vt400 */
+    {   1, "132 columns" },                             /* vt400, vt382 */
+    {   2, "printer port" },                            /* vt400, vt382 */
     {   3, "ReGIS graphics" },                          /* kermit */
-    {   4, "Sixel graphics" },                          /* kermit */
-    {   5, "Katakana extension" },                      /* vt400? */
-    {   6, "selective erase" },                         /* vt400 */
+    {   4, "Sixel graphics" },                          /* vt382, kermit */
+    {   5, "Katakana extension" },                      /* vt382 */
+    {   6, "selective erase" },                         /* vt400, vt382 */
     {   7, "soft character set (DRCS)" },               /* vt400 */
-    {   8, "user-defined keys (UDK)" },                 /* vt400 */
+    {   8, "user-defined keys (UDK)" },                 /* vt400, vt382 */
     {   9, "national replacement character-sets" },     /* kermit */
-    {  10, "text ruling vector" },                      /* ? */
+    {  10, "Two-bytes Kanji" },                         /* vt382 */
     {  11, "25th status line" },                        /* ? */
     {  12, "Serbo-Croatian (SCS)" },                    /* vt500 */
     {  13, "local editing mode" },                      /* kermit */
     {  14, "8-bit architecture" },                      /* ? */
-    {  15, "DEC technical set" },                       /* vt400 */
+    {  15, "DEC technical set" },                       /* vt400, vt382 */
     {  16, "locator device port (ReGIS)" },             /* kermit */
     {  17, "terminal state reports" },                  /* ? */
     {  18, "user windows" },                            /* vt400 */
@@ -98,14 +98,14 @@ legend(int n, const char *input, const char *word, const char *description)
 {
   int i;
   size_t len = strlen(word);
-  char buf[BUFSIZ];
+  char buf[BUF_SIZE];
 
   for (i = 0; input[i] != 0; i++) {
     if ((i == 0 || !isalpha(CharOf(input[i - 1])))
         && !strncmp(word, input + i, len)) {
       sprintf(buf, "%-8s %-3s = %s", n ? "" : "Legend:", word, description);
       show_result("%s", buf);
-      println("");
+      fakeio::_putchar('\n');
       return n + 1;
     }
   }
@@ -184,14 +184,14 @@ tst_DA(MENU_ARGS)
 
   found = FALSE;
 
-  if ((cmp = skip_csi_2(report)) != 0) {
+  if ((cmp = skip_csi_2(report)) != NULL) {
     int i;
 
     for (i = 0; *attributes[i][0] != '\0'; i++) {
       if (!strcmp(cmp, attributes[i][0])) {
         int n = 0;
         show_result(" -- means %s", attributes[i][1]);
-        println("");
+        fakeio::_putchar('\n');
         n = legend(n, attributes[i][1], "STP", "Processor Option");
         n = legend(n, attributes[i][1], "AVO", "Advanced Video Option");
         n = legend(n, attributes[i][1], "GPO", "Graphics Processor Option");
@@ -203,14 +203,14 @@ tst_DA(MENU_ARGS)
   }
 
   if (!found) { /* this could be a vt200+ with some options disabled */
-    if (cmp != 0 && *cmp == '?') {
+    if (cmp != NULL && *cmp == '?') {
       int reportpos = 1;
       int value = scan_DA(cmp, &reportpos);
       show_result("%s\n", lookup(operating_level, value));
-      println("");
+      fakeio::_putchar('\n');
       if (value == 12) {
         if ((value = scan_DA(cmp, &reportpos)) >= 0) {
-          printxx("   ");
+          fakeio::_fputs("   ", stdout);
           switch (value) {
           case 2:
             show_result("no STP, AVO, no GPO (ReGIS)");
@@ -228,10 +228,10 @@ tst_DA(MENU_ARGS)
             printxx("unknown code %d", value);
             break;
           }
-          println("");
+          fakeio::_putchar('\n');
         }
         if ((value = scan_DA(cmp, &reportpos)) >= 0) {
-          printxx("   ");
+          fakeio::_fputs("   ", stdout);
           switch (value) {
           case 0:
             show_result("no printer");
@@ -243,17 +243,17 @@ tst_DA(MENU_ARGS)
             printxx("unknown code %d", value);
             break;
           }
-          println("");
+          fakeio::_putchar('\n');
         }
         if ((value = scan_DA(cmp, &reportpos)) >= 0) {
           tprintf("    ROM version %d", value);
-          println("");
+          fakeio::_putchar('\n');
         }
       } else {
         while ((value = scan_DA(cmp, &reportpos)) >= 0) {
-          printxx("   ");
+          fakeio::_fputs("   ", stdout);
           show_result("%d = %s\n", value, lookup(extensions, value));
-          println("");
+          fakeio::_putchar('\n');
         }
       }
       found = TRUE;
@@ -316,7 +316,7 @@ tst_DA_2(MENU_ARGS)
   vt_move(row = 3, col = 10);
   chrprint2(report, row, col);
 
-  if ((report = skip_csi(report)) != 0) {
+  if ((report = skip_csi(report)) != NULL) {
     if (sscanf(report, ">%d;%d;%d%c", &Pp, &Pv, &Pc, &ch) == 4
         && ch == 'c') {
       const char *name = "unknown";
@@ -374,14 +374,24 @@ tst_DA_3(MENU_ARGS)
 
   vt_move(row = 3, col = 10);
   chrprint2(report, row, col);
-  if ((report = skip_dcs(report)) != 0
-      && strip_terminator(report) != 0
-      && *report++ == '!'
-      && *report++ == '|'
-      && strlen(report) != 0) {
-    show = SHOW_SUCCESS;
+  show = SHOW_FAILURE;
+  if (report == NULL || *report == '\0') {
+    if (get_level() < 4)  /* vt420 and up support this */
+      show = "not supported";
   } else {
-    show = SHOW_FAILURE;
+    char *content;
+    if ((content = skip_dcs(report)) != NULL
+        && strip_terminator(content) != 0
+        && *content++ == '!'
+        && *content++ == '|'
+        && strlen(content) != 0) {
+      char *check;
+      if (strlen(content) == 8) {
+        (void) strtol(content, &check, 16);
+        if (*check == '\0')
+          show = SHOW_SUCCESS;
+      }
+    }
   }
   show_result("%s", show);
 
@@ -409,7 +419,7 @@ tst_DECREQTPARM(MENU_ARGS)
 
   report_is(report, 5, 1);
 
-  if ((cmp = skip_csi(report)) != 0)
+  if ((cmp = skip_csi(report)) != NULL)
     report = cmp;
 
   if (strlen(report) < 14
@@ -449,7 +459,7 @@ tst_DECREQTPARM(MENU_ARGS)
 
   report_is(report2, 13, 1);
 
-  if ((cmp = skip_csi(report2)) != 0)
+  if ((cmp = skip_csi(report2)) != NULL)
     report2 = cmp;
 
   if (strlen(report2) < 1
@@ -474,7 +484,8 @@ tst_DSR(MENU_ARGS)
   int found;
   int origin;
   int row, col;
-  char *report, *cmp;
+  char *report;
+  const char *cmp;
 
   set_tty_raw(TRUE);
 
@@ -487,7 +498,7 @@ tst_DSR(MENU_ARGS)
 
   report_is(report, row, col);
 
-  if ((cmp = skip_csi(report)) != 0)
+  if ((cmp = skip_csi(report)) != NULL)
     found = !strcmp(cmp, "0n") || !strcmp(cmp, "3n");
   else
     found = 0;
@@ -511,7 +522,7 @@ tst_DSR(MENU_ARGS)
 
     report_is(report, row, col);
 
-    if ((cmp = skip_csi(report)) != 0) {
+    if ((cmp = skip_csi(report)) != NULL) {
       found = (!strcmp(cmp, "5;1R")
                ? 1
                : ((!strcmp(cmp, "8;1R") && origin)
@@ -546,7 +557,7 @@ static int
 tst_ENQ(MENU_ARGS)
 {
   int row, col;
-  char *report;
+  const char *report;
 
   vt_move(5, 1);
   println("This is a test of the ANSWERBACK MESSAGE. (To load the A.B.M.");
@@ -575,7 +586,7 @@ static int
 tst_NLM(MENU_ARGS)
 {
   int row, col;
-  char *report;
+  const char *report;
 
   vt_move(1, 1);
   println("Test of LineFeed/NewLine mode.");
@@ -621,7 +632,7 @@ tst_reports(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                                   0 },
+      { "Exit",                                                   NULL },
       { "<ENQ> (AnswerBack Message)",                             tst_ENQ },
       { "Set/Reset Mode - LineFeed / Newline",                    tst_NLM },
       { "Device Status Report (DSR)                 VT100 & up",  tst_DSR },
@@ -629,7 +640,7 @@ tst_reports(MENU_ARGS)
       { "Secondary Device Attributes (DA)           VT220 & up",  tst_DA_2 },
       { "Tertiary Device Attributes (DA)            VT420",       tst_DA_3 },
       { "Request Terminal Parameters (DECREQTPARM)  VT100",       tst_DECREQTPARM },
-      { "",                                                       0 }
+      { "",                                                       NULL }
     };
   /* *INDENT-ON* */
 

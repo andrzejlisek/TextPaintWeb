@@ -122,6 +122,7 @@ The sequences consists of constant number of character in exception by **1Bh \]*
 
 | Escape sequence | XTERM name | Meaning |
 | --- | --- | --- |
+| 1Bh \] \.\.\. 07h |   | Ignore\. |
 | 1Bh \( P1 |   | Character set for bank G0, details in **Readme\_charmap\.md** file\. |
 | 1Bh \) P1 |   | Character set for bank G1, details in **Readme\_charmap\.md** file\. |
 | 1Bh \* P1 |   | Character set for bank G2, details in **Readme\_charmap\.md** file\. |
@@ -129,11 +130,6 @@ The sequences consists of constant number of character in exception by **1Bh \]*
 | 1Bh \- P1 |   | Character set for bank G1, details in **Readme\_charmap\.md** file\. |
 | 1Bh \. P1 |   | Character set for bank G2, details in **Readme\_charmap\.md** file\. |
 | 1Bh / P1 |   | Character set for bank G3, details in **Readme\_charmap\.md** file\. |
-| 1Bh Space F | S7C1T | Set the 7\-bit controls for input\. |
-| 1Bh Space G | S8C1T | Set the 8\-bit controls for input\. |
-| 1Bh n | LS2 | Use character bank 2\. |
-| 1Bh o | LS3 | Use character bank 3\. |
-| 1Bh c | RIS | Reset terminal\. |
 | 1Bh \# 0 |   | Ignore\. |
 | 1Bh \# 1 |   | Ignore\. |
 | 1Bh \# 2 |   | Ignore\. |
@@ -144,25 +140,29 @@ The sequences consists of constant number of character in exception by **1Bh \]*
 | 1Bh \# 7 |   | Ignore\. |
 | 1Bh \# 8 | DECALN | Fill screen with **E** character\. |
 | 1Bh \# 9 |   | Ignore\. |
-| 1Bh \] \.\.\. 07h |   | Ignore\. |
 | 1Bh 6 | DECBI | Move line left by deleting first character\. |
 | 1Bh 7 | DECSC | Save current cursor position and text attributes\. |
 | 1Bh 8 | DECRC | Restore saved cursor position and text attributes\. |
 | 1Bh 9 | DECFI | Move line right by inserting space before first character\. |
-| 1Bh D \- **ANSIDOS=0** | IND | Move cursor down by 1 step, scroll screen if needed\. |
-| 1Bh D \- **ANSIDOS=1** |   | Ignore\. |
-| 1Bh M \- **ANSIDOS=0** | RI | Move cursor up by 1 step, scroll screen if needed\. |
-| 1Bh M \- **ANSIDOS=1** |   | Enter to music state, ignore following characters\. |
-| 1Bh E | NEL | Move cursor down by 1 step, scroll screen if needed and move cursor to first column\. |
-| 1Bh H | HTS | Add current column to tabulator list |
-| 1Bh P | DCS | Switch into DCS state\. Next arriving character will be buffered without printing\. |
-| 1Bh \\ | ST | If within DCS state: Exit from DCS state and request DCS report\. Normally, ignore\. |
 | 1Bh = | DECKPAM | Change numeric keypad mode to 1\. |
 | 1Bh > | DECKPNM | Change numeric keypad mode to 0\. |
+| 1Bh D \- **ANSIDOS=0** | IND | Move cursor down by 1 step, scroll screen if needed\. |
+| 1Bh D \- **ANSIDOS=1** |   | Ignore\. |
+| 1Bh E | NEL | Move cursor down by 1 step, scroll screen if needed and move cursor to first column\. |
+| 1Bh Space F | S7C1T | Set the 7\-bit controls for input\. |
+| 1Bh Space G | S8C1T | Set the 8\-bit controls for input\. |
+| 1Bh H | HTS | Add current column to tabulator list |
+| 1Bh M \- **ANSIDOS=0** | RI | Move cursor up by 1 step, scroll screen if needed\. |
+| 1Bh M \- **ANSIDOS=1** |   | Enter to music state, ignore following characters\. |
 | 1Bh N | SS2 | Ignore\. |
 | 1Bh O | SS3 | Ignore\. |
+| 1Bh P | DCS | Switch into DCS state\. Next arriving character will be buffered without printing\. |
 | 1Bh V | SPA | Enable char protection against ED, EL and ECH\. |
 | 1Bh W | EPA | Disable char protection against ED, EL and ECH\. |
+| 1Bh \\ | ST | If within DCS state: Exit from DCS state and request DCS report\. Normally, ignore\. |
+| 1Bh c | RIS | Reset terminal\. |
+| 1Bh n | LS2 | Use character bank 2\. |
+| 1Bh o | LS3 | Use character bank 3\. |
 | 05h \- **ANSIDOS=0** | ENQ | Request the AnswerBack message\. |
 | 08h | BS | Move cursor one step left\. |
 | 09h \- **ANSIDOS=0** | TAB | Move cursor right to nearest multiply of 8 or defined tab stop\. |
@@ -214,81 +214,83 @@ The standard sequences with **?** and **h**/**l** charater are the binary option
 | 1048 |   | Save cursor\. | Restore cursor\. |
 | 1049 |   | Save cursor and switch to alternate screen\. | Clear screen, switch to main screen and restore cursor\. |
 
+The similar **h**/**l** sequences, but without **?** character, ar SM and RM sequences:
+
+| Parameter | XTERM name | Meaning for SM \- 1Bh \[ P1 h | Meaning for RM \- 1Bh \[ P1 l |
+| --- | --- | --- | --- |
+| 4 | IRM | Enable inserting mode\. | Disable inserting mode\. |
+| 6 |   | Do not use char protection in ED, EL and ECH commands\. | Use char protection in ED, EL and ECH commands\. |
+| 12 | SRM | Disable local echo \(**WorkMode=2** only\)\. | Enable local echo \(**WorkMode=2** only\)\. |
+| 20 | LNM | Enable new line mode \(**WorkMode=2** only\)\. | Disable new line mode \(**WorkMode=2** only\)\. |
+
 The standard sequences may contains parameters\. When parameter is ommited, the default value is **0** or **1**, depending on sequence:
 
 | Escape sequence | XTERM name | Meaning |
 | --- | --- | --- |
-| 1Bh \[ \! p | DECSTR | Reset terminal state including clearing the screen\. |
-| 1Bh \[ s | SCOSC | Save current cursor position and text attributes\. |
-| 1Bh \[ u | SCORC | Restore saved cursor position and text attributes\. |
-| 1Bh \[ 4 h | SM / IRM | Enable inserting mode\. |
-| 1Bh \[ 4 l | RM / IRM | Disable inserting mode\. |
-| 1Bh \[ 6 h | SM / ??? | Do not use char protection in ED, EL and ECH commands\. |
-| 1Bh \[ 6 l | RM / ??? | Use char protection in ED, EL and ECH commands\. |
-| 1Bh \[ 12 h | SM / SRM | Disable local echo \(**WorkMode=2** only\)\. |
-| 1Bh \[ 12 l | RM / SRM | Enable local echo \(**WorkMode=2** only\)\. |
-| 1Bh \[ 20 h | SM / LNM | Enable new line mode \(**WorkMode=2** only\)\. |
-| 1Bh \[ 20 l | RM / LNM | Disable new line mode \(**WorkMode=2** only\)\. |
-| 1Bh \[ 0 J | ED | Clear screen from cursor to bottom right corner \(all characters\)\. |
-| 1Bh \[ 1 J | ED | Clear screen from top left corner to cursor \(all characters\)\. |
-| 1Bh \[ 2 J | ED | Clear screen and move cursor to top left corner of screen \(all characters\)\. |
-| 1Bh \[ 0 K | EL | Clear current line from cursor to right edge \(all characters\)\. |
-| 1Bh \[ 1 K | EL | Clear current line from left edge to cursor \(all characters\)\. |
-| 1Bh \[ 2 K | EL | Clear current line from left edge to right edge \(all characters\)\. |
-| 1Bh \[ ? 0 J | DECSED | Clear screen from cursor to bottom right corner \(unprotected characters only\)\. |
-| 1Bh \[ ? 1 J | DECSED | Clear screen from top left corner to cursor \(unprotected characters only\)\. |
-| 1Bh \[ ? 2 J | DECSED | Clear screen and move cursor to top left corner of screen \(unprotected characters only\)\. |
-| 1Bh \[ ? 0 K | DECSEL | Clear current line from cursor to right edge \(unprotected characters only\)\. |
-| 1Bh \[ ? 1 K | DECSEL | Clear current line from left edge to cursor \(unprotected characters only\)\. |
-| 1Bh \[ ? 2 K | DECSEL | Clear current line from left edge to right edge \(unprotected characters only\)\. |
-| 1Bh \[ P1 ; P2 H | CUP | Move cursor to column P1 and line P2, move cursor to be within cursor area\. |
-| 1Bh \[ P1 ; P2 f | HVP | Move cursor to column P1 and line P2, move cursor to be within cursor area\. |
+| 1Bh \[ P1 @ | ICH | Insert space and move text being right to be cursor P1 times\. |
+| 1Bh \[ P1 Space @ | SL | Move left P1 columns\. |
 | 1Bh \[ P1 A | CUU | Move cursor up through P1 steps\. |
+| 1Bh \[ P1 Space A | SR | Move right P1 columns\. |
 | 1Bh \[ P1 B | CUD | Move cursor down through P1 steps\. |
 | 1Bh \[ P1 C | CUF | Move cursor right through P1 steps\. |
 | 1Bh \[ P1 D | CUB | Move cursor left through P1 steps\. |
-| 1Bh \[ P1 d | VPA | Move cursor to P1 line\. |
-| 1Bh \[ P1 e | VPR | Move cursor down through P1 lines\. |
-| 1Bh \[ P1 \` | HPA | Move cursor to P1 column\. |
-| 1Bh \[ P1 a | HPR | Move cursor right through P1 columns\. |
 | 1Bh \[ P1 E | CNL | Move cursor to the first column and P1 lines down\. |
 | 1Bh \[ P1 F | CPL | Move cursor to the first column and P1 lines up\. |
 | 1Bh \[ P1 G | CHA | Move cursor to P1 column\. |
-| 1Bh \[ P1 S | SU | Scroll cursor area P1 times down\. |
-| 1Bh \[ P1 T | SD | Scroll cursor area P1 times up\. |
-| 1Bh \[ P1 ; P2 r | DECSTBM | Define cursor area as from P1 line to P2 line, move cursor to be within cursor area\. |
-| 1Bh \[ P1 ; P2 s | DECSLRM | Define left and right margin\. |
+| 1Bh \[ P1 ; P2 H | CUP | Move cursor to column P1 and line P2, move cursor to be within cursor area\. |
+| 1Bh \[ P1 I | CHT | Forward tabulation P1 times\. |
+| 1Bh \[ 0 J | ED | Clear screen from cursor to bottom right corner \(all characters\)\. |
+| 1Bh \[ 1 J | ED | Clear screen from top left corner to cursor \(all characters\)\. |
+| 1Bh \[ 2 J | ED | Clear screen and move cursor to top left corner of screen \(all characters\)\. |
+| 1Bh \[ ? 0 J | DECSED | Clear screen from cursor to bottom right corner \(unprotected characters only\)\. |
+| 1Bh \[ ? 1 J | DECSED | Clear screen from top left corner to cursor \(unprotected characters only\)\. |
+| 1Bh \[ ? 2 J | DECSED | Clear screen and move cursor to top left corner of screen \(unprotected characters only\)\. |
+| 1Bh \[ 0 K | EL | Clear current line from cursor to right edge \(all characters\)\. |
+| 1Bh \[ 1 K | EL | Clear current line from left edge to cursor \(all characters\)\. |
+| 1Bh \[ 2 K | EL | Clear current line from left edge to right edge \(all characters\)\. |
+| 1Bh \[ ? 0 K | DECSEL | Clear current line from cursor to right edge \(unprotected characters only\)\. |
+| 1Bh \[ ? 1 K | DECSEL | Clear current line from left edge to cursor \(unprotected characters only\)\. |
+| 1Bh \[ ? 2 K | DECSEL | Clear current line from left edge to right edge \(unprotected characters only\)\. |
 | 1Bh \[ P1 L \- **ANSIDOS=0** | IL | Scroll cursor area P1 times up\. |
 | 1Bh \[ P1 L \- **ANSIDOS=1** |   | Ignore\. |
 | 1Bh \[ P1 M \- **ANSIDOS=0** | DL | Scroll cursor area P1 times down\. |
 | 1Bh \[ P1 M \- **ANSIDOS=1** |   | Enter to music state, ignore following characters\. |
-| 1Bh \[ \.\.\. m | SGR | Set attributes, number of parameters can vary\. |
-| 1Bh \[ P1 @ | ICH | Insert space and move text being right to be cursor P1 times\. |
 | 1Bh \[ P1 P | DCH | Delete character and move text being right to be cursor P1 times\. |
+| 1Bh \[ P1 S | SU | Scroll cursor area P1 times down\. |
+| 1Bh \[ P1 T | SD | Scroll cursor area P1 times up\. |
 | 1Bh \[ P1 X | ECH | Delete P1 characters right to be cursor without text movement\. |
+| 1Bh \[ P1 Z | CBT | Backward tabulation P1 times\. |
+| 1Bh \[ P1 \` | HPA | Move cursor to P1 column\. |
+| 1Bh \[ P1 a | HPR | Move cursor right through P1 columns\. |
+| 1Bh \[ P1 b | REP | Repeat last printed character P1 times\. |
+| 1Bh \[ P1 d | VPA | Move cursor to P1 line\. |
+| 1Bh \[ P1 e | VPR | Move cursor down through P1 lines\. |
+| 1Bh \[ P1 ; P2 f | HVP | Move cursor to column P1 and line P2, move cursor to be within cursor area\. |
 | 1Bh \[ 0 g | TBC | Remove current column from tabulator list\. |
 | 1Bh \[ 3 g | TBC | Clear tabulator list\. |
-| 1Bh \[ P1 I | CHT | Forward tabulation P1 times\. |
-| 1Bh \[ P1 Z | CBT | Backward tabulation P1 times\. |
-| 1Bh \[ P1 b | REP | Repeat last printed character P1 times\. |
-| 1Bh \[ P1 Space @ | SL | Move left P1 columns\. |
-| 1Bh \[ P1 Space A | SR | Move right P1 columns\. |
-| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 $r | DECCARA | Set bold or blink or reverse in \(P1,P2,P3,P4\) rectangle or clear bold, blink and reverse in rectangle\. |
-| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 ; P6 ; P7 ; P8 $v | DECCRA | Copy \(P1,P2,P3,P4\) rectangle to \(P5,P6\)\. |
-| 1Bh \[ P1 ; P2 ; P3 ; P4 $z | DECERA | Erase \(P1,P2,P3,P4\) rectangle \(all characters\)\. |
-| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 $x | DECFRA | Fill in \(P2,P3,P4,P5\) rectangle with P1 character\. |
-| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 $t | DECRARA | Change bold or blink or reverse in \(P1,P2,P3,P4\) rectangle to opposite state\. |
-| 1Bh \[ P1 ; P2 ; P3 ; P4 $\{ | DECSERA | Erase \(P1,P2,P3,P4\) rectangle \(unprotected characters only\)\. |
+| 1Bh \[ \.\.\. m | SGR | Set attributes, number of parameters can vary\. |
+| 1Bh \[ \! p | DECSTR | Reset terminal state including clearing the screen\. |
+| 1Bh \[ P1 ; P2 " p | DECSCL | Set the 7\-bit controls for input when P2=1, otherwise set 8\-bit controls\. |
+| 1Bh \[ P1 Space q | DECSCUSR | Set the cursor style depending od P1 |
 | 1Bh \[ P1 " q | DECSCA | Enable \(P1=1\) or disable \(P1<>1\) character protection against DECSED, DECSEL, DECSERA\. |
-| 1Bh \[ 1 $ \} | DECSASD | Enter in "status bar" mode, character printing and CUP, HVP, SGR, HPA, HPR will be ignored\. |
+| 1Bh \[ P1 ; P2 r | DECSTBM | Define cursor area as from P1 line to P2 line, move cursor to be within cursor area\. |
+| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 $r | DECCARA | Set bold or blink or reverse in \(P1,P2,P3,P4\) rectangle or clear bold, blink and reverse in rectangle\. |
+| 1Bh \[ s | SCOSC | Save current cursor position and text attributes\. |
+| 1Bh \[ P1 ; P2 s | DECSLRM | Define left and right margin\. |
+| 1Bh \[ P1 t | DECSLPP | Resize screen to P1 lines, where P1 >= 24\. |
+| 1Bh \[ 4 ; P1 ; P2 t | XTWINOPS | Change resolution to P2 x P1 in pixels\. |
+| 1Bh \[ 8 ; P1 ; P2 t | XTWINOPS | Change resolution to P2 x P1 in characters\. |
+| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 $t | DECRARA | Change bold or blink or reverse in \(P1,P2,P3,P4\) rectangle to opposite state\. |
+| 1Bh \[ u | SCORC | Restore saved cursor position and text attributes\. |
+| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 ; P6 ; P7 ; P8 $v | DECCRA | Copy \(P1,P2,P3,P4\) rectangle to \(P5,P6\)\. |
+| 1Bh \[ P1 ; P2 ; P3 ; P4 ; P5 $x | DECFRA | Fill in \(P2,P3,P4,P5\) rectangle with P1 character\. |
+| 1Bh \[ P1 ; P2 ; P3 ; P4 $z | DECERA | Erase \(P1,P2,P3,P4\) rectangle \(all characters\)\. |
+| 1Bh \[ P1 ; P2 ; P3 ; P4 $\{ | DECSERA | Erase \(P1,P2,P3,P4\) rectangle \(unprotected characters only\)\. |
+| 1Bh \[ P1 \* &#124; | DECSNLS | Resize screen to P1 lines\. |
 | 1Bh \[ 0 $ \} | DECSASD | Exit from "status bar" mode\. |
+| 1Bh \[ 1 $ \} | DECSASD | Enter in "status bar" mode, character printing and CUP, HVP, SGR, HPA, HPR will be ignored\. |
 | 1Bh \[ P1 ' \} | DECIC | Insert P1 columns\. |
 | 1Bh \[ P1 ' ~ | DECDC | Delete P1 columns\. |
-| 1Bh \[ P1 ; P2 " p | DECSCL | Set the 7\-bit controls for input when P2=1, otherwise set 8\-bit controls\. |
-| 1Bh \[ P1 \* &#124; | DECSNLS | Resize screen to P1 lines\. |
-| 1Bh \[ P1 t | DECSLPP | Resize screen to P1 lines, where P1 >= 24\. |
-| 1Bh \[ 8 ; P1 ; P2 t | XTWINOPS | Change resolution to P2 x P1 in characters\. |
-| 1Bh \[ 4 ; P1 ; P2 t | XTWINOPS | Change resolution to P2 x P1 in pixels\. |
 
 ## The request\-response sequences \(reports\)
 
@@ -296,7 +298,11 @@ Some sequences does not changing the terminal working, but received from server 
 
 | Request | XTERM name | Response \(for VT102\) |
 | --- | --- | --- |
+| 1Bh P $ q r 1Bh \\ | DECRQSS / DECSTBM | 1Bh P 1 $ r P1 ; P2 r 1B \\ where P1 and P2 are the first and last line |
+| 1Bh P $ q s 1Bh \\ | DECRQSS / DECSLRM | 1Bh P 1 $ r P1 ; P2 s 1B \\ where P1 and P2 are the first and last column |
 | 1Bh \[ 0 c | Primary DA \* | 1Bh \[ ? 6 c |
+| 1Bh \[ > 0 c | Secondary DA \* | 1Bh \[ > 0 ; 1 0 ; 0 c |
+| 1Bh \[ = 0 c | Tertiary DA | 1Bh P \! &#124; 0 0 0 0 0 0 0 0 1Bh \\ |
 | 1Bh \[ 5 n | DSR | 1Bh \[ 0 n |
 | 1Bh \[ 6 n | DSR / CPR | 1Bh \[ YY ; XX R where YY and XX are current cursor position |
 | 1Bh \[ ? 6 n | DSR / DECXCPR | 1Bh \[ YY ; XX ; 1 R where YY and XX are current cursor position |
@@ -308,17 +314,13 @@ Some sequences does not changing the terminal working, but received from server 
 | 1Bh \[ ? 6 3 ; 1 n | DSR / DECCKSR | 1Bh P 1 \! ~ 0 0 0 0 1Bh \\ |
 | 1Bh \[ ? 7 5 n | DSR / Data integrity | 1Bh \[ ? 7 0 n |
 | 1Bh \[ ? 8 5 n | DSR / Multi\-session | 1Bh \[ ? 8 3 n |
-| 1Bh \[ > 0 c | Secondary DA \* | 1Bh \[ > 0 ; 1 0 ; 0 c |
-| 1Bh \[ = 0 c | Tertiary DA | 1Bh P \! &#124; 0 0 0 0 0 0 0 0 1Bh \\ |
+| 1Bh $ q " p | DCS / DECSCL \* | 1Bh P 1 $ r P1 ; P2 " p 1Bh \\ where P2=0 when 8\-bit controls, otherwise P2=1 |
+| 1Bh \[ ? P1 $ p | DECRQM / DECLRMM | 1Bh \[ ? P1 ; VAL $ y where VAL is from 0 to 4, depending on P1 value and current state |
 | 1Bh \[ 0 x | DECREQTPARM | 1Bh \[ 2 ; 1 ; 1 ; 1 1 2 ; 1 1 2 ; 1 ; 0 x |
 | 1Bh \[ 1 x | DECREQTPARM | 1Bh \[ 3 ; 1 ; 1 ; 1 1 2 ; 1 1 2 ; 1 ; 0 x |
-| 1Bh $ q " p | DCS / DECSCL \* | 1Bh P 1 $ r P1 ; P2 " p 1Bh \\ where P2=0 when 8\-bit controls, otherwise P2=1 |
-| 1Bh $ q \* &#124; | DCS / DECSNLS | 1Bh P 1 $ r P1 \* &#124; 1Bh \\ where P1 is the number of lines |
-| 1Bh \[ ? P1 $ p | DECRQM / DECLRMM | 1Bh \[ ? P1 ; VAL $ y where VAL is from 0 to 4, depending on P1 value and current state |
-| 1Bh P $ q r 1Bh \\ | DECRQSS / DECSTBM | 1Bh P 1 $ r P1 ; P2 r 1B \\ where P1 and P2 are the first and last line |
-| 1Bh P $ q s 1Bh \\ | DECRQSS / DECSLRM | 1Bh P 1 $ r P1 ; P2 s 1B \\ where P1 and P2 are the first and last column |
-| 05h |   | AnswerBack message |
 | 1Bh P1 ; P2 ; P3 ; P4 ; P5 ; P6 \* y | DECRQCRA | 1Bh P P1 \! ~ 0 0 0 0 1Bh \\ |
+| 1Bh $ q \* &#124; | DCS / DECSNLS | 1Bh P 1 $ r P1 \* &#124; 1Bh \\ where P1 is the number of lines |
+| 05h |   | AnswerBack message |
 
 ## TerminalType\-affected request\-response sequences
 
@@ -480,23 +482,23 @@ The terminal and ANSI parser has VT52 mode, which can be entered by **1Bh \[ ? 2
 
 | Sequence | Meaning |
 | --- | --- |
-| 1Bh F | Enable semigraphic character set \(different from standard VTx\)\. |
-| 1Bh G | Disable semigraphic character set \(different from standard VTx\)\. |
 | 1Bh < | Exit from VT52 mode\. |
 | 1Bh A | Move cursor up\. |
 | 1Bh B | Move cursor down\. |
 | 1Bh C | Move cursor right\. |
 | 1Bh D | Move cursor left\. |
-| 1Bh H | Move cursor to upper left corner\. |
-| 1Bh Y XX YY | Move cursor to XX column and YY row, when XX and YY are single character\. |
-| 1Bh d | Clear the screen part from upper left corner to cursor\. |
-| 1Bh J | Clear the screen part from cursor to lower right corner\. |
 | 1Bh E | Move cursor to upper left corner and clear whole screen\. |
-| 1Bh Z | Request for **1Bh / Z** response, only in **WorkMode=3**\. |
+| 1Bh F | Enable semigraphic character set \(different from standard VTx\)\. |
+| 1Bh G | Disable semigraphic character set \(different from standard VTx\)\. |
+| 1Bh H | Move cursor to upper left corner\. |
 | 1Bh I | Move cursor up or scroll screen backward\. |
+| 1Bh J | Clear the screen part from cursor to lower right corner\. |
 | 1Bh K | Clear current line from cursor to end\. |
+| 1Bh Y XX YY | Move cursor to XX column and YY row, when XX and YY are single character\. |
+| 1Bh Z | Request for **1Bh / Z** response, only in **WorkMode=3**\. |
 | 1Bh b P1 | Background color \(not implemented\)\. |
 | 1Bh c P1 | Foreground color \(not implemented\)\. |
+| 1Bh d | Clear the screen part from upper left corner to cursor\. |
 
 Every other sequence will be ignored and treated as one\-character sequence\.
 
@@ -526,7 +528,7 @@ VTEST is popular VTxxx terminal test application\. Some tests uses features, whi
 vttest 24x80.80
 ```
 
-There is the TextPaint compatibility with VTTEST v2\.7 from 2023\-09\-24\. Some features, which will not need to bo compatible and usable, are not tested\.
+There is the TextPaint compatibility with VTTEST v2\.7 from 2024\-12\-04\. Some features, which will not need to bo compatible and usable, are not tested\.
 
 The results are the followin meaning:
 
@@ -690,7 +692,8 @@ The results are the followin meaning:
 | 11\.4\.5\.3 | Device Status Reports \(DSR\) | Pass | Checksum of rectangular area always returns zero\. |
 | 11\.4\.6 | Screen\-display functions |   |   |
 | 11\.4\.6\.1 | No Clear on Column Change \(DECNCSM\) | Pass | Uses 80/132 column switching\. |
-| 11\.4\.6\.2 | Set Cursor Style \(DECSCUSR\) | Fail / No glitches | Cursor is always in steady/blinking underline style\. |
+| 11\.4\.6\.2 | Set Cursor Style \(DECSCUSR\) | Pass | There is additional style, which returns to TextPaint default style\. |
+| 11\.4\.6\.3 | Alternate Text Color \(DECATC\) | Fail / No glitches | Test attributes displays propertly, DECATC is not implemented\. |
 | 11\.5 | ISO\-6429 cursor\-movement |   |   |
 | 11\.5\.1 | Character\-Position\-Absolute \(HPA\) | Pass |   |
 | 11\.5\.2 | Cursor\-Back\-Tab \(CBT\) | Pass |   |
@@ -733,9 +736,11 @@ The results are the followin meaning:
 | 11\.8\.2\.2 | Request Mode \(DECRQM\) / Report Mode \(DECRPM\) | Pass | Not all reports are supported, but terminal answers for every request\. |
 | 11\.8\.3 | Set window title | Pass |   |
 | 11\.8\.4 | Font features |   |   |
-| 11\.8\.4\.1 | Modify font | Impossible / No glitches | TextPaint always uses single, specified font\. |
-| 11\.8\.4\.2 | Report fonts | Impossible | Font reporting is not supported\. |
+| 11\.8\.4\.1 | Modify font | Impossible / No glitches | TextPaint ignores font commands\. |
+| 11\.8\.4\.2 | Report fonts | Pass | Reports as single fixed font with default xterm numbers\. |
 | 11\.8\.5 | Mouse features |   |   |
+| 11\.8\.5\.1 | Mode: coordinates | Pass | All coordinate modes works\. |
+| 11\.8\.5\.2 | Mode: focus | Impossible / No glitches | The focus event are never raised\. |
 | 11\.8\.5\.3 | X10 Mouse Compatibility | Pass |   |
 | 11\.8\.5\.4 | Normal Mouse Tracking | Pass |   |
 | 11\.8\.5\.5 | Mouse Highlight Tracking | Pass |   |
@@ -744,12 +749,12 @@ The results are the followin meaning:
 | 11\.8\.5\.8 | DEC Locator Events |   |   |
 | 11\.8\.5\.8\.1 | One\-Shot | Pass |   |
 | 11\.8\.5\.8\.2 | Repeated | Pass |   |
-| 11\.8\.5\.8\.3 | One\-Shot \(pixels\) | Pass | Bug in VTTEST: Pixel coordinates are not correctly shown\. |
-| 11\.8\.5\.8\.4 | Repeated \(pixels\) | Pass | Bug in VTTEST: Pixel coordinates are not correctly shown\. |
+| 11\.8\.5\.8\.3 | One\-Shot \(pixels\) | Pass | Bug in VTTEST: Click marks are not correctly shown\. |
+| 11\.8\.5\.8\.4 | Repeated \(pixels\) | Pass | Bug in VTTEST: Click marks are not correctly shown\. |
 | 11\.8\.5\.8\.5 | Filter Rectangle | Pass | Bug in VTTEST: Rectangle is not drawn correctly\. |
 | 11\.8\.5\.8\.6 | Filter Rectangle \(unfiltered\) | Pass |   |
 | 11\.8\.5\.8\.7 | XFree86 xterm: screensize | Pass |   |
-| 11\.8\.6 | Tektronix 4014 features | Impossible | Graphics is not necessary and not supported\. |
+| 11\.8\.6 | Tektronix 4014 features | Impossible | Graphics is not supported\. |
 | 11\.8\.7 | Alternate screen features |   |   |
 | 11\.8\.7\.3 | Alternate screen \(xterm\) | Pass |   |
 | 11\.8\.7\.4 | Improved alternate screen \(XFree86 xterm mode 1047\) | Pass |   |

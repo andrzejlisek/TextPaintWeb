@@ -2,6 +2,13 @@
 
 There is the history of important TextPaint commits\.
 
+## 2024\-12\-23
+
+
+* Refactor the VTTEST to remove the **coi\-serviceworker\.js** script\.
+* Update embedded VTTEST to 2024\-12\-04 version\.
+* Improve mouse and report handling in embedded VTTEST\.
+
 ## 2024\-10\-01
 
 

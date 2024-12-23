@@ -1,4 +1,4 @@
-/* $Id: esc.h,v 1.74 2023/11/22 08:59:57 tom Exp $ */
+/* $Id: esc.h,v 1.80 2024/10/14 17:15:14 tom Exp $ */
 
 #ifndef ESC_H
 #define ESC_H 1
@@ -11,10 +11,11 @@
 #define SO  0016  /* 14 */
 #define SI  0017  /* 15 */
 #define ESC 0033
-#define CSI 0233
 #define SS3 0217
 #define DCS 0220
+#define CSI 0233
 #define ST  0234
+#define OSC 0235
 
 /*
  * "ANSI" modes for DECRQM, DECRPM, SM and RM are a subset of the modes listed
@@ -56,6 +57,7 @@
 #define DECARM    8   /* autorepeat */
 #define DECEDM   10   /* edit */
 #define DECLTM   11   /* line transmit */
+#define DECKANAM 12   /* Katakana shift */
 #define DECSCFDM 13   /* space compression field delimiter */
 #define DECTEM   14   /* transmission execution */
 #define DECEKEM  16   /* edit key execution */
@@ -64,7 +66,7 @@
 #define DECTCEM  25   /* text cursor enable */
 #define DECRLM   34   /* left-to-right */
 #define DECHEBM  35   /* Hebrew keyboard mapping (VT520) */
-#define DECHCEM  36   /* Hebrew encoding */
+#define DECHEM   36   /* Hebrew encoding */
 #define DECTEK   38   /* 4010/4014 emulation (VT240, VT330/VT340) */
 #define DECNRCM  42   /* national replacement character set */
 #define DECGEPM  43   /* graphics expanded print */
@@ -74,6 +76,7 @@
 #define DECGRPM  47   /* graphics rotated print */
 #define DEC131TM 53   /* VT131 transmit */
 #define DECNAKB  57   /* Greek/N-A Keyboard Mapping */
+#define DECKKDM  59   /* Kanji/Katakana */
 #define DECHCCM  60   /* horizontal cursor coupling (disabled) */
 #define DECVCCM  61   /* vertical cursor coupling */
 #define DECPCCM  64   /* page cursor coupling */
@@ -82,6 +85,7 @@
 #define DECKBUM  68   /* keyboard usage */
 #define DECLRMM  69   /* left/right margin mode (VT420) */
 #define DECXRLM  73   /* transmit rate linking */
+#define DECSDM   80   /* Sixel display */
 #define DECKPM   81   /* keyboard positioning */
 #define DECNCSM  95   /* no clearing screen on column change */
 #define DECRLCM  96   /* right-to-left copy */
@@ -107,8 +111,6 @@ const char *csi_input(void);
 const char *csi_output(void);
 const char *dcs_input(void);
 const char *dcs_output(void);
-char *get_reply(void);
-char *instr(void);
 const char *osc_input(void);
 const char *osc_output(void);
 char *ss2_input(void);
@@ -117,7 +119,6 @@ char *ss3_input(void);
 char *ss3_output(void);
 char *st_input(void);
 char *st_output(void);
-char inchar(void);
 int cup(int pn1, int pn2);
 int decdc(int pn);
 int decic(int pn);
@@ -126,6 +127,7 @@ int default_1a(int pn);
 int println(const char *s);
 int printxx(const char *fmt, ...) GCC_PRINTFLIKE(1,2);
 int tprintf(const char *fmt, ...) GCC_PRINTFLIKE(1,2);
+int cprintf(const char *fmt, ...) GCC_PRINTFLIKE(1,2);
 void brc(int pn, int c);
 void brc2(int pn1, int pn2, int c);
 void brc3(int pn1, int pn2, int pn3, int c);
@@ -186,6 +188,7 @@ void decscpp(int cols);
 void decsed(int pn1);
 void decsel(int pn1);
 void decsera(int top, int left, int bottom, int right);
+void decstglt(int mode);
 void decsle(int mode);
 void decslpp(int rows);
 void decslrm(int pn1, int pn2);
@@ -230,7 +233,7 @@ void pp(void);
 void ppa(int pn);
 void ppb(int pn);
 void ppr(int pn);
-void put_char(FILE * fp, int c);
+void put_char(FILE *fp, int c);
 void put_string(FILE *fp, const char *s);
 void readnl(void);
 void rep(int pn);

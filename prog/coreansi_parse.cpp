@@ -143,8 +143,10 @@ void CoreAnsi::AnsiProcess_VT52()
             if (AnsiState_.__AnsiCmd.Count == 3)
             {
                 AnsiState_.__AnsiWrapFlag = false;
-                AnsiState_.__AnsiY = AnsiState_.__AnsiCmd[1] - 32;
-                AnsiState_.__AnsiX = AnsiState_.__AnsiCmd[2] - 32;
+                int NewY = AnsiState_.__AnsiCmd[1] - 32;
+                int NewX = AnsiState_.__AnsiCmd[2] - 32;
+                if (NewY < AnsiMaxY) AnsiState_.__AnsiY = NewY;
+                if (NewX < AnsiMaxX) AnsiState_.__AnsiX = NewX;
                 AnsiState_.__AnsiCommand = false;
             }
             break;
@@ -596,6 +598,10 @@ void CoreAnsi::AnsiProcess_Fixed(int TextFileLine_i)
                     if (Opt == "]2")
                     {
                         __AnsiResponse.Add("WindowTitle" + AnsiCmd_.substr(Sep + 1));
+                    }
+                    if (Opt == "]50")
+                    {
+                        __AnsiResponse.Add("WindowFont" + AnsiCmd_.substr(Sep + 1));
                     }
                 }
                 AnsiState_.__AnsiCommand = false;

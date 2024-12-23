@@ -1,4 +1,4 @@
-/* $Id: tek4014.c,v 1.16 2022/02/15 23:17:06 tom Exp $ */
+/* $Id: tek4014.c,v 1.19 2024/12/05 00:40:24 tom Exp $ */
 
 #include "vttest.h"
 #include "esc.h"
@@ -80,7 +80,7 @@ tek_font(int code)
  * Decode 2 bytes from a mouse report as a coordinate value.
  */
 static int
-tek_coord(char *report, int offset)
+tek_coord(const char *report, int offset)
 {
   int hi = FIVEBITS & CharOf(report[offset]);
   int lo = FIVEBITS & CharOf(report[offset + 1]);
@@ -109,8 +109,8 @@ tek_point(int pen, int y, int x)
           0x40 | (((x & LOBITS) >> SHIFTLO) & FIVEBITS));   /* must be last */
   fakeio::_fprintf(stdout, "%s", temp);
   if (LOG_ENABLED) {
-    fakeio::_fprintf(log_fp, "*Set point (%d,%d)\n", y, x);
-    fakeio::_fputs("Send: ", log_fp);
+    fakeio::_fprintf(log_fp, NOTE_STR "set point (%d,%d)\n", y, x);
+    fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, temp);
     fakeio::_fputs("\n", log_fp);
   }
@@ -132,12 +132,12 @@ log_mouse_click(char *report)
     int new_y = tek_coord(report, 3);
     fakeio::_fprintf(log_fp, "Report: ");
     if ((report[0] & 0x80) != 0
-        && strchr("lmrLMR", report[0] & 0x7f) != 0) {
-      fakeio::_fprintf(log_fp, "mouse %c", report[0] & 0x7f);
+        && strchr("lmrLMR", report[0] & 0x7f) != NULL) {
+      fakeio::_fprintf(log_fp, NOTE_STR "mouse %c", report[0] & 0x7f);
     } else {
-      fakeio::_fprintf(log_fp, "key %d", CharOf(report[0]));
+      fakeio::_fprintf(log_fp, NOTE_STR "key %d", CharOf(report[0]));
     }
-    fakeio::_fprintf(log_fp, " (%d,%d)\n", new_y, new_x);
+    fakeio::_fprintf(log_fp, NOTE_STR " (%d,%d)\n", new_y, new_x);
     fakeio::_fflush(log_fp);
   }
 }
@@ -210,7 +210,7 @@ tek_mouse_coords(MENU_ARGS)
      */
     printxx("\r\n");
     if ((report[0] & 0x80) != 0
-        && strchr("lmrLMR", report[0] & 0x7f) != 0) {
+        && strchr("lmrLMR", report[0] & 0x7f) != NULL) {
       printxx("mouse %c:", report[0] & 0x7f);
     } else {
       printxx("key: %d", CharOf(report[0]));
@@ -314,13 +314,13 @@ tst_tek4014(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-    { "Exit",                                                0 },
+    { "Exit",                                                NULL },
     { "Clear screen",                                        tek_clear },
     { "'Hello World!' in each font",                         tek_hello },
     { "Get mouse-clicks, showing coordinates",               tek_mouse_coords },
     { "Get mouse-clicks, drawing lines between",             tek_mouse_lines },
     { "Draw a grid",                                         tek_grid_demo },
-    { "",                                                    0 }
+    { "",                                                    NULL }
   };
   /* *INDENT-ON* */
 

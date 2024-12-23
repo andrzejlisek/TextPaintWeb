@@ -1,4 +1,4 @@
-/* $Id: sixel.c,v 1.22 2023/09/24 17:06:57 tom Exp $ */
+/* $Id: sixel.c,v 1.30 2024/12/05 00:43:14 tom Exp $ */
 
 #include "vttest.h"
 #include "ttymodes.h"
@@ -131,7 +131,7 @@ decode_header(void)
   for (s = font_string; *s; s++) {
     if (*s == L_CURL) {
       char *t;
-      char tmp[BUFSIZ];
+      char tmp[BUF_SIZE];
       size_t use = 0;
       for (t = s + 1; *t; t++) {
         if (is_inter(*t)) {
@@ -141,10 +141,12 @@ decode_header(void)
           char *tmp2;
           tmp[use++] = *t++;
           tmp[use] = '\0';
-          if ((tmp2 = (char*)malloc(use + 1)) == NULL)
+          if ((tmp2 = (char*)malloc(use + 1)) == NULL) {
             no_memory();
-          FontName = strcpy(tmp2, tmp);
-          StartingCharPtr = t;
+          } else {
+            FontName = strcpy(tmp2, tmp);
+            StartingCharPtr = t;
+          }
           break;
         }
       }
@@ -160,11 +162,11 @@ find_char(int chr)
 
   chr -= (' ' + StartingCharNum);
   if (chr < 0)
-    return 0;
+    return NULL;
   while (chr > 0) {
     do {
       if (*s == '\0')
-        return 0;
+        return NULL;
     } while (*s++ != ';');
     chr--;
   }
@@ -186,7 +188,7 @@ display_char(FILE *fp, int chr)
   char *s;
 
   s = find_char(chr);
-  if (s != 0) {
+  if (s != NULL) {
     int bit = 0;
     int high = 0;
     int n;
@@ -249,18 +251,20 @@ tst_display(MENU_ARGS)
   set_tty_raw(TRUE);
   set_tty_echo(FALSE);
 
+  pause_replay();
   do {
     d = c;
-    c = inchar();
+    c = get_char();
     if (c < 0)
       break;
     vt_move(6, 1);
     vt_clear(0);
     if (display_char(stdout, c)) {
       println("");
-      tprintf("Render: %cN%c", ESC, c);   /* use SS2 to invoke G2 into GL */
+      cprintf("Render: %cN%c", ESC, c);   /* use SS2 to invoke G2 into GL */
     }
   } while (c != d);
+  resume_replay();
 
   restore_ttymodes();
   return MENU_NOHOLD;
@@ -290,34 +294,36 @@ setup_softchars(const char *filename)
   size_t use = 0;
   char *buffer;
   char *s;
-  char *first = 0;
-  char *last = 0;
+  const char *first = NULL;
+  char *last = NULL;
   int save_8bits = input_8bits;
   input_8bits = FALSE;  /* use the 7-bit input-parsing */
 
   /* read the file into memory */
-  if ((fp = fopen(filename, "r")) == 0) {
+  if ((fp = fakeio::_fopen(filename, "r")) == NULL) {
     failed(filename);
   }
   if ((buffer = (char*)malloc(len)) == NULL)
     no_memory();
-  while ((c = fgetc(fp)) != EOF) {
+  while ((c = fakeio::_fgetc(fp)) != EOF) {
     if (use + 1 >= len) {
       char *check;
-      if ((check = (char*)realloc(buffer, len *= 2)) == NULL)
+      if ((check = (char*)realloc(buffer, len *= 2)) == NULL) {
         no_memory();
-      buffer = check;
+      } else {
+        buffer = check;
+      }
     }
     buffer[use++] = (char) c;
   }
   buffer[use] = '\0';
-  fclose(fp);
+  fakeio::_fclose(fp);
 
   /* find the DCS that begins the control string */
   /* and the ST that ends the control string */
   for (s = buffer; *s; s++) {
-    if (first == 0) {
-      if (skip_dcs(s) != 0)
+    if (first == NULL) {
+      if (skip_dcs(s) != NULL)
         first = s;
     } else {
       if (!strncmp(s, st_input(), (size_t) 2)) {
@@ -329,13 +335,13 @@ setup_softchars(const char *filename)
   }
   input_8bits = save_8bits;
 
-  if (first == 0 || last == 0) {
+  if (first == NULL || last == NULL) {
     fakeio::_fprintf(stderr, "Not a vtXXX font description: %s\n", filename);
     fakeio::_exit(EXIT_FAILURE);
   }
   for (s = buffer; (*s++ = *first++) != '\0';) ;
-  if (LOG_ENABLED && first != 0)
-    fakeio::_fprintf(log_fp, "Font String:\n%s\n", buffer);
+  if (LOG_ENABLED && first != NULL)
+    fakeio::_fprintf(log_fp, NOTE_STR "font string %s\n", buffer);
 
   font_string = buffer;
 
@@ -347,16 +353,16 @@ tst_softchars(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Download the soft characters (DECDLD)",             tst_DECDLD },
       { "Examine the soft characters",                       tst_display },
       { "Clear the soft characters",                         tst_cleanup },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
   vt_move(1, 1);
-  if (font_string == 0 || *font_string == 0) {
+  if (font_string == NULL || *font_string == 0) {
     printxx("You did not specify a font-file with the -f option\n");
     return MENU_HOLD;
   }

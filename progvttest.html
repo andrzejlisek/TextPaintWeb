@@ -4,7 +4,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="utf-8" />
         <title>TextPaint</title>
-        <script src="coi-serviceworker.js"></script>
     </head>
     <body>
         <script type='text/javascript'>
@@ -17,6 +16,14 @@
                 if (VTRunning)
                 {
                     Module.ccall("EventData", null, ["string"], [Raw]);
+                }
+            }
+
+            function VTReport(Raw)
+            {
+                if (VTRunning)
+                {
+                    Module.ccall("EventReport", null, ["string"], [Raw]);
                 }
             }
 
@@ -86,6 +93,6 @@
       };
 
         </script>
-        <script async type="text/javascript" src="compiled/progvttest.js"></script>
+        <script async type="text/javascript" src="compiled/progvttestio.js"></script>
     </body>
 </html>

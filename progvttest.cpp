@@ -1,9 +1,21 @@
-#include "vttest/fakeio.h"
 #include <emscripten/emscripten.h>
-#include <thread>
+#include "vttest/fakeio.h"
+
+char respondBuf[100];
+
+void respondProv(std::string msg)
+{
+    memcpy(respondBuf, msg.c_str(), msg.size() + 1);
+    emscripten_worker_respond_provisionally(respondBuf, msg.size() + 1);
+}
+
+void respondLast(std::string msg)
+{
+    memcpy(respondBuf, msg.c_str(), msg.size() + 1);
+    emscripten_worker_respond(respondBuf, msg.size() + 1);
+}
 
 int fake_main(int argc, char *argv[]);
-
 
 int StrPrefixL = 7;
 char StrPrefix[10] = "VTMsg(\"";
@@ -99,21 +111,16 @@ void Base64Str2Raw()
     }
 }
 
-//emscripten_wasm_worker_t Wrk;
-std::thread * Wrk = NULL;
-
-char * ProgArgs[2];
+char * ProgArgs[8];
 
 void main0()
 {
-    if (ProgArgs[1][0] == 0)
+    int n = 0;
+    while (ProgArgs[n][0] != '!')
     {
-        fake_main(1, ProgArgs);
+        n++;
     }
-    else
-    {
-        fake_main(2, ProgArgs);
-    }
+    fake_main(n, ProgArgs);
 }
 
 void PrintStr(char * SS, int L, int StrType)
@@ -154,7 +161,7 @@ extern "C"
     int DebugParams;
 
     EMSCRIPTEN_KEEPALIVE
-    void EventData(char * data)
+    void EventData(char * data, int size)
     {
         Base64StrL = strlen(data);
         if (Base64StrL > 0)
@@ -243,35 +250,47 @@ extern "C"
                     }
                 }
 
-                emscripten_run_script(Base64Str);
+                respondProv(Base64Str);
             }
+        }
+        respondLast("$");
+    }
+
+    EMSCRIPTEN_KEEPALIVE
+    void EventReport(char * data, int size)
+    {
+        switch (data[0])
+        {
+            case '1':
+                fakeio::i_magic_set(0x31);
+                break;
+            case '0':
+                fakeio::i_magic_set(0x30);
+                break;
         }
     }
 
     EMSCRIPTEN_KEEPALIVE
-    void EventStart(char * arg, int DebugParams_)
+    void EventStart(char * data, int size)
     {
-        DebugParams = DebugParams_;
+        ProgArgs[0] = (char*)malloc(20);
+        ProgArgs[1] = (char*)malloc(20);
+        ProgArgs[2] = (char*)malloc(20);
+        ProgArgs[3] = (char*)malloc(20);
+        DebugParams = data[0] - 48;
         strcpy(ProgArgs[0], "/test/vttest");
-        strcpy(ProgArgs[1], arg);
+        strcpy(ProgArgs[1], "-l");
+        strcpy(ProgArgs[2], "vttest.log");
+        strcpy(ProgArgs[3], "!");
         fakeio::io_clear();
-        Wrk = new std::thread(main0);
+        main0();
+        respondLast("$");
     }
 
     EMSCRIPTEN_KEEPALIVE
-    void EventStop()
+    void EventStop(char * data, int size)
     {
-        pthread_cancel(Wrk->native_handle());
-        Wrk->join();
-        delete Wrk;
-        Wrk = NULL;
+        respondLast("$");
     }
-}
-
-int main()
-{
-    ProgArgs[0] = (char*)malloc(20);
-    ProgArgs[1] = (char*)malloc(100);
-    return 0;
 }
 

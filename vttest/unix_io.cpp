@@ -1,12 +1,10 @@
-/* $Id: unix_io.c,v 1.33 2024/07/08 23:19:04 tom Exp $ */
+/* $Id: unix_io.c,v 1.39 2024/10/20 17:18:13 tom Exp $ */
 
 #include <cstdarg>
-//#include <unistd.h>
+//#include <cunistd>
 #include "vttest.h"
 #include "esc.h"
 #include "fakeio.h"
-#define BUF_SIZE 1024
-
 static void
 give_up(SIG_ARGS GCC_UNUSED)
 {
@@ -14,7 +12,7 @@ give_up(SIG_ARGS GCC_UNUSED)
     fakeio::_fprintf(log_fp, "** killing program due to timeout\n");
     fakeio::_fflush(log_fp);
   }
-  fakeio::_kill(getpid(), (int) SIGTERM);
+  fakeio::_kill(0, 0);
 }
 
 static int last_char;
@@ -35,6 +33,7 @@ inchar(void)
   int lval;
   int ch;
   char one_byte = '\0';
+  int active = is_replaying();
 
   fakeio::_fflush(stdout);
   lval = last_char;
@@ -66,7 +65,17 @@ inchar(void)
   else
     last_char = ch;
   if ((last_char == 0177) && (last_char == lval))
-    give_up(SIGTERM);
+    give_up(0);
+
+  if (active)
+    pause_replay();
+  if (LOG_ENABLED) {
+    fakeio::_fputs(READ_STR, log_fp);
+    put_char(log_fp, last_char);
+    fakeio::_fputs("\n", log_fp);
+  }
+  if (active)
+    resume_replay();
   return (char) (last_char);
 }
 
@@ -119,16 +128,21 @@ instr(void)
 {
   static char result[BUF_SIZE];
 
+  FILE *save = log_fp;
   int i = 0;
 
+  pause_replay();
+  log_fp = NULL;
   result[i++] = inchar();
   (void) read_buffer(result + i, (int) sizeof(result) - 2);
+  log_fp = save;
 
   if (LOG_ENABLED) {
-    fakeio::_fputs("Reply: ", log_fp);
+    fakeio::_fputs(READ_STR, log_fp);
     put_string(log_fp, result);
     fakeio::_fputs("\n", log_fp);
   }
+  resume_replay();
 
   return (result);
 }
@@ -142,6 +156,8 @@ get_reply(void)
   int new_len = 0;
 
   fakeio::_fflush(stdout);
+  pause_replay();
+
   zleep(100);
   do {
     new_len = read_buffer(result + old_len, (int) sizeof(result) - 2 - old_len);
@@ -149,29 +165,47 @@ get_reply(void)
   } while (new_len != 0 && old_len < (BUF_SIZE - 2));
 
   if (LOG_ENABLED) {
-    fakeio::_fputs("Reply: ", log_fp);
+    fakeio::_fputs(READ_STR, log_fp);
     put_string(log_fp, result);
     fakeio::_fputs("\n", log_fp);
   }
+
+  resume_replay();
 
   return (result);
 }
 
 /*
- * Read to the next newline, truncating the buffer at BUFSIZ-1 characters
+ * Read to the next newline, truncating the buffer at BUF_SIZE-1 characters
  */
 void
 inputline(char *s)
 {
-  do {
-    int ch;
-    char *d = s;
-    while ((ch = fakeio::_getchar()) != EOF && ch != '\r' && ch != '\n') {
-      if ((d - s) < BUFSIZ - 2)
-        *d++ = (char) ch;
-    }
-    *d = 0;
-  } while (!*s);
+  char *result;
+
+  if (is_replaying() && (result = replay_string()) != NULL) {
+    strcpy(s, result);
+    puts(result);
+    fakeio::_fflush(stdout);
+    zleep(1000);
+  } else {
+    do {
+      int ch;
+      char *d = s;
+      result = s;
+      while ((ch = fakeio::_getchar()) != EOF && ch != '\r' && ch != '\n') {
+        if ((d - s) < BUF_SIZE - 2)
+          *d++ = (char) ch;
+      }
+      *d = 0;
+    } while (!*s);
+  }
+
+  if (LOG_ENABLED) {
+    fakeio::_fputs(READ_STR, log_fp);
+    put_string(log_fp, result);
+    fakeio::_fputs("\n", log_fp);
+  }
 }
 
 /*
@@ -210,22 +244,34 @@ holdit(void)
 void
 readnl(void)
 {
-  int ch = '\0';
-  char one_byte = '\0';
+  char *result;
 
-  fakeio::_fflush(stdout);
-  brkrd = FALSE;
-  reading = TRUE;
-  do {
-    if (fakeio::_read(0, &one_byte, (size_t) 1) < 0) {
-      break;
-    } else {
-      ch = (int) one_byte;
-    }
-  } while (ch != '\r' && ch != '\n' && !brkrd);
-  if (brkrd)
-    give_up(SIGTERM);
-  reading = FALSE;
+  if (is_replaying() && (result = replay_string()) != NULL) {
+    puts(result);
+    fakeio::_fflush(stdout);
+    zleep(1000);
+  } else {
+    int ch = '\0';
+    char one_byte = '\0';
+
+    fakeio::_fflush(stdout);
+    brkrd = FALSE;
+    reading = TRUE;
+    do {
+      if (fakeio::_read(0, &one_byte, (size_t) 1) < 0) {
+        break;
+      } else {
+        ch = (int) one_byte;
+      }
+    } while (ch != '\r' && ch != '\n' && !brkrd);
+    if (brkrd)
+      give_up(0);
+    reading = FALSE;
+  }
+
+  if (LOG_ENABLED) {
+    fakeio::_fputs(READ_STR "\n", log_fp);
+  }
 }
 
 /*

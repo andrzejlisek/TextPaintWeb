@@ -1,4 +1,4 @@
-/* $Id: reset.c,v 1.8 2022/02/15 23:12:01 tom Exp $ */
+/* $Id: reset.c,v 1.10 2024/12/05 00:37:39 tom Exp $ */
 
 #include "vttest.h"
 #include "esc.h"
@@ -59,6 +59,7 @@ tst_RIS(MENU_ARGS)
   reset_level();
   input_8bits = FALSE;
   output_8bits = FALSE;
+  parse_7bits = FALSE;
   return MENU_HOLD;
 }
 
@@ -67,11 +68,11 @@ tst_rst(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Reset to Initial State (RIS)",                      tst_RIS },
       { "Invoke Terminal Test (DECTST)",                     tst_DECTST },
       { "Soft Terminal Reset (DECSTR)",                      tst_DECSTR },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 

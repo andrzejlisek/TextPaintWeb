@@ -1,4 +1,4 @@
-/* $Id: charsets.c,v 1.98 2024/02/18 23:28:04 tom Exp $ */
+/* $Id: charsets.c,v 1.107 2024/12/05 00:38:44 tom Exp $ */
 
 /*
  * Test character-sets (e.g., SCS control, DECNRCM mode)
@@ -41,6 +41,8 @@ typedef enum {
   Greek_Supp,
   Hebrew_DEC,
   Hebrew_Supp,
+  JIS_Roman,
+  JIS_Katakana,
   Latin_2_Supp,
   Latin_5_Supp,
   Latin_Cyrillic,
@@ -64,11 +66,11 @@ typedef struct {
 /* *INDENT-OFF* */
 
 /* compare mappings using only 7-bits */
-#define Not11(a,b) (((a) & 0x7f) == ((b) & 0x7f))
+#define Only7(c)   ((c) & 0x7f)
+#define Not11(a,b) (Only7(a) == Only7(b))
 
 /*
  * User-preferred selection set is unknown until reset.
-
  */
 static National current_upss = Unknown;
 
@@ -97,6 +99,8 @@ static const char map_Hebrew[]       = "`abcdefghijklmnopqrstuvwxyz";
 static const char map_Italian[]      = "#@[\\]`{|}~";
 static const char map_Norwegian[]    = "@[\\]^`{|}~";
 static const char map_Portuguese[]   = "[\\]{|}";
+static const char map_Russian[]      = "`abcdefghijklmnopqrstuvwxyz{|}~";
+static const char map_SCS[]          = "@[\\]^`{|}~";
 static const char map_Spanish[]      = "#@[\\]{|}";
 static const char map_Swedish[]      = "@[\\]^`{|}~";
 static const char map_Swiss[]        = "#@[\\]^_`{|}~";
@@ -113,6 +117,11 @@ static const char map_DEC_Turkish[]  = "$&,-./48>?"
                                        "PW]^"
                                        "pw~";
 
+/* DEC VT382 94-character sets */
+static const char map_JIS_Roman[]    = "\\~";
+static const char map_JIS_Katakana[] = "!\"#$%&'()*+,-./0123456789:;<=>?"
+                                       "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
+
 /* ISO 96-Character Sets */
 static const char map_ISO_Greek[]    = "!\"$%*./45689:<>?"
                                        "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
@@ -126,15 +135,15 @@ static const char map_ISO_Latin_2[]  = "!\"#%&)*+,./1235679:;<=>?"
 static const char map_ISO_Latin_5[]  = "P]^p}~";
 
 static const CHARSETS KnownCharsets[] = {
-  { ASCII,             0, 0, 0, 9, "B",    "US ASCII", 0 },
+  { ASCII,             0, 0, 0, 9, "B",    "US ASCII", NULL },
   { British,           1, 0, 0, 9, "A",    "British", map_pound },
-  { British_Latin_1,   2, 0, 3, 9, "A",    "ISO Latin-1", 0 },
+  { British_Latin_1,   2, 0, 3, 9, "A",    "ISO Latin-1", NULL },
   { Cyrillic_DEC,      1, 0, 5, 9, "&4",   "Cyrillic (DEC)", map_all94 },
   { DEC_Spec_Graphic,  0, 0, 0, 9, "0",    "DEC Special graphics and line drawing", map_Spec_Graphic },
-  { DEC_Alt_Chars,     0, 0, 0, 0, "1",    "DEC Alternate character ROM standard characters", 0 },
-  { DEC_Alt_Graphics,  0, 0, 0, 0, "2",    "DEC Alternate character ROM special graphics", 0 },
+  { DEC_Alt_Chars,     0, 0, 0, 0, "1",    "DEC Alternate character ROM standard characters", NULL },
+  { DEC_Alt_Graphics,  0, 0, 0, 0, "2",    "DEC Alternate character ROM special graphics", NULL },
   { DEC_Supp,          0, 0, 2, 2, "<",    "DEC Supplemental", map_DEC_Supp },
-  { DEC_UPSS,          0, 0, 3, 9, "<",    "User-preferred supplemental", 0 },
+  { DEC_UPSS,          0, 0, 3, 9, "<",    "User-preferred supplemental", NULL },
   { DEC_Supp_Graphic,  1, 0, 3, 9, "%5",   "DEC Supplemental Graphic", map_Supp_Graphic },
   { DEC_Technical,     0, 0, 3, 9, ">",    "DEC Technical", map_all94 },
   { Dutch,             1, 0, 2, 9, "4",    "Dutch", map_Dutch },
@@ -152,6 +161,8 @@ static const CHARSETS KnownCharsets[] = {
   { Hebrew_DEC,        1, 0, 5, 9, "\"4",  "Hebrew (DEC)", map_DEC_Hebrew },
   { Hebrew_Supp,       2, 0, 5, 9, "H",    "ISO Hebrew Supplemental", map_ISO_Hebrew },
   { Italian,           1, 0, 2, 9, "Y",    "Italian", map_Italian },
+  { JIS_Roman,         0, 0, 3, 3, "J",    "JIS-Roman", map_JIS_Roman },
+  { JIS_Katakana,      0, 0, 3, 3, "I",    "JIS-Katakana", map_JIS_Katakana },
   { Latin_2_Supp,      2, 0, 5, 9, "B",    "ISO Latin-2 Supplemental", map_ISO_Latin_2 },
   { Latin_5_Supp,      2, 0, 5, 9, "M",    "ISO Latin-5 Supplemental", map_ISO_Latin_5 },
   { Latin_Cyrillic,    2, 0, 5, 9, "L",    "ISO Latin-Cyrillic", map_all96 },
@@ -159,15 +170,15 @@ static const CHARSETS KnownCharsets[] = {
   { Norwegian_Danish,  1, 1, 2, 9, "E",    "Norwegian/Danish", map_Norwegian },
   { Norwegian_Danish,  1, 2, 2, 9, "6",    "Norwegian/Danish", map_Norwegian },
   { Portuguese,        1, 0, 3, 9, "%6",   "Portuguese", map_Portuguese },
-  { Russian,           1, 0, 5, 9, "&5",   "Russian", 0 },
-  { SCS_NRCS,          1, 0, 5, 9, "%3",   "SCS", 0 },
+  { Russian,           1, 0, 5, 9, "&5",   "Russian", map_Russian },
+  { SCS_NRCS,          1, 0, 5, 9, "%3",   "SCS", map_SCS },
   { Spanish,           1, 0, 2, 9, "Z",    "Spanish", map_Spanish },
   { Swedish,           1, 0, 2, 9, "7",    "Swedish", map_Swedish },
   { Swedish,           1, 1, 2, 9, "H",    "Swedish", map_Swedish },
   { Swiss,             1, 0, 2, 9, "=",    "Swiss", map_Swiss },
   { Turkish,           1, 0, 5, 9, "%2",   "Turkish", map_Turkish },
   { Turkish_DEC,       1, 0, 5, 9, "%0",   "Turkish (DEC)", map_DEC_Turkish },
-  { Unknown,           0, 0,-1,-1, "?",    "Unknown", 0 }
+  { Unknown,           0, 0,-1,-1, "?",    "Unknown", NULL }
 };
 /* *INDENT-ON* */
 
@@ -193,7 +204,7 @@ lookupCode(National code)
 static const CHARSETS *
 lookupCharset(int g, int n)
 {
-  const CHARSETS *result = 0;
+  const CHARSETS *result = NULL;
   if (n >= 0 && n < TABLESIZE(KnownCharsets)) {
     if (!strcmp(KnownCharsets[n].final, "A")) {
       if (scs_national || (g == 0)) {
@@ -237,12 +248,36 @@ send32(int row, int upper, const char *not11)
   char buffer[33 * 8];
 
   if (LOG_ENABLED) {
-    fakeio::_fprintf(log_fp, "Note: send32 row %d, upper %d, not11:%s\n",
-            row, upper, not11 ? not11 : "");
+    fakeio::_fprintf(log_fp, NOTE_STR "send32 row %d, upper %d, not11:", row, upper);
+    if (not11) {
+      int lo = -1;
+      int hi = -1;
+      int nn;
+      for (nn = 0; not11[nn]; ++nn) {
+        int cc = Only7(not11[nn]);
+        if (lo < 0) {
+          lo = cc;
+        } else if (cc > hi + 1) {   /* a gap after the existing range? */
+          if (lo == hi)
+            fakeio::_fprintf(log_fp, " %d", hi);
+          else
+            fakeio::_fprintf(log_fp, " %d-%d", lo, hi);
+          lo = cc;
+        }
+        hi = cc;
+      }
+      if (lo > 0 && hi > 0) {
+        if (lo == hi)
+          fakeio::_fprintf(log_fp, " %d", hi);
+        else
+          fakeio::_fprintf(log_fp, " %d-%d", lo, hi);
+      }
+    }
+    fakeio::_fprintf(log_fp, "\n");
   }
   for (col = 0; col <= 31; col++) {
     char ch = (char) (row * 32 + upper + col);
-    if (not11 != 0 && hilite_not11) {
+    if (not11 != NULL && hilite_not11) {
       const char *p;
       int found = 0;
       for (p = not11; *p; ++p) {
@@ -269,7 +304,7 @@ send32(int row, int upper, const char *not11)
     used = append_sgr(buffer, used, sgr_reset);
   }
   buffer[used] = 0;
-  tprintf("%s", buffer);
+  cprintf("%s", buffer);
 }
 
 static char *
@@ -324,7 +359,8 @@ reset_charset(MENU_ARGS)
 {
   int n;
 
-  decnrcm(scs_national = FALSE);
+  scs_national = FALSE;
+  decnrcm(scs_national);
   for (n = 0; n < 4; n++) {
     int m = sane_cs(n);
     if (m != current_Gx[n] || (m == 0)) {
@@ -335,7 +371,6 @@ reset_charset(MENU_ARGS)
       }
     }
   }
-
   return MENU_NOHOLD;
 }
 
@@ -390,7 +425,7 @@ specify_any_Gx(MENU_ARGS, int g)
     m++;
   }
   my_menu[m].description = "";
-  my_menu[m].dispatch = 0;
+  my_menu[m].dispatch = NULL;
 
   do {
     vt_clear(2);
@@ -563,7 +598,7 @@ tst_vt220_locking(MENU_ARGS)
     int row = 3 + (4 * cset);
     int map = table[cset].mapped;
     const CHARSETS *tbl = lookupCharset(map, current_Gx[map]);
-    int map_gl = (strstr(table[cset].msg, "into GL") != 0);
+    int map_gl = (strstr(table[cset].msg, "into GL") != NULL);
 
     scs_normal();
     cup(row, 1);
@@ -583,7 +618,7 @@ tst_vt220_locking(MENU_ARGS)
         esc(table[cset].code);
       }
       cup(row + i, 5);
-      send32(i, 0, map_gl ? tbl->not11 : 0);
+      send32(i, 0, map_gl ? tbl->not11 : NULL);
 
       if (table[cset].upper) {
         do_scs(map);
@@ -609,7 +644,7 @@ tst_vt220_locking(MENU_ARGS)
         map_g1_to_gr();
       }
       cup(row + i, 40);
-      send32(i, 128, map_gl ? 0 : tbl->not11);
+      send32(i, 128, map_gl ? NULL : tbl->not11);
     }
     reset_scs(cset);
   }
@@ -646,7 +681,7 @@ tst_vt220_single(MENU_ARGS)
           const char *p;
           for (p = tbl->not11; *p; ++p) {
             if (Not11(*p, ch)) {
-              tprintf("%s", sgr_hilite);
+              cprintf("%s", sgr_hilite);
               hilited = 1;
               break;
             }
@@ -656,7 +691,7 @@ tst_vt220_single(MENU_ARGS)
         if (ch == 127 && (tbl->cs_type != 2))
           tprintf(" ");   /* DEL should have been eaten - skip past */
         if (hilited) {
-          tprintf("%s", sgr_reset);
+          cprintf("%s", sgr_reset);
         }
         tprintf(")");
       }
@@ -767,20 +802,17 @@ assign_upss(National code, int allow96)
 {
   if (code != current_upss) {
     int n;
-    int success = 0;
     for (n = 0; n < TABLESIZE(KnownCharsets); ++n) {
       if (KnownCharsets[n].code == code) {
         if (get_level() >= KnownCharsets[n].first
-            && get_level() <= KnownCharsets[n].last)
-          success = 1;
+            && get_level() <= KnownCharsets[n].last) {
+          set_tty_raw(TRUE);
+          set_tty_echo(FALSE);
+          do_dcs("%d!u%s", allow96, KnownCharsets[n].final);
+          current_upss = code;
+        }
         break;
       }
-    }
-    if (success) {
-      set_tty_raw(TRUE);
-      set_tty_echo(FALSE);
-      do_dcs("%d!u%s", allow96, KnownCharsets[n].final);
-      current_upss = code;
     }
   }
   restore_ttymodes();
@@ -836,7 +868,7 @@ tst_DECAUPSS(MENU_ARGS)
     m++;
   }
   my_menu[m].description = "";
-  my_menu[m].dispatch = 0;
+  my_menu[m].dispatch = NULL;
 
   do {
     vt_clear(2);
@@ -867,7 +899,7 @@ tst_DECRQUPSS(MENU_ARGS)
   report = get_reply();
   vt_move(row = 3, col = 10);
   chrprint2(report, row, col);
-  if ((report = skip_dcs(report)) != 0
+  if ((report = skip_dcs(report)) != NULL
       && strip_terminator(report)) {
     int cs_size;
     const char *cs_name;
@@ -904,7 +936,7 @@ tst_characters(MENU_ARGS)
   static char nrc_mesg[80];
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Reset (G0 ASCII, G1 Latin-1, no NRC mode)",         reset_charset },
       { hilite_mesg,                                         toggle_hilite },
       { nrc_mesg,                                            toggle_nrc },
@@ -918,10 +950,9 @@ tst_characters(MENU_ARGS)
       { "Test VT220 Single Shifts",                          tst_vt220_single },
       { "Test Soft Character Sets",                          not_impl },
       { "Test Keyboard Layout with G0 Selection",            tst_layout },
-      { "",                                                  0 }
+      { "",                                                  NULL }
   };
   /* *INDENT-ON* */
-
 
   hilite_not11 = 1;
   toggle_hilite(PASS_ARGS);
@@ -943,7 +974,6 @@ tst_characters(MENU_ARGS)
                 n, charset_name(n, current_Gx[n]));
       }
     } while (menu(my_menu));
-
     /* tidy in case a "vt100" emulator does not ignore SCS */
     vt_clear(1);
     return reset_charset(PASS_ARGS);
@@ -958,12 +988,12 @@ tst_upss(MENU_ARGS)
   static char upss_mesg[120];
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test character sets",                               tst_characters },
       { "Reset UPSS (User-Preferred Supplemental Sets)",     reset_upss },
       { upss_mesg,                                           tst_DECAUPSS },
       { "Test DECRQUPSS",                                    tst_DECRQUPSS },
-      { "",                                                  0 }
+      { "",                                                  NULL }
   };
   /* *INDENT-ON* */
 
@@ -987,4 +1017,3 @@ tst_upss(MENU_ARGS)
     return tst_characters(PASS_ARGS);
   }
 }
-

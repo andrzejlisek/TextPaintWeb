@@ -1,4 +1,4 @@
-/* $Id: vt220.c,v 1.40 2024/02/18 23:57:50 tom Exp $ */
+/* $Id: vt220.c,v 1.44 2024/12/05 00:40:24 tom Exp $ */
 
 /*
  * Reference:  VT220 Programmer Pocket Guide (EK-VT220-HR-002).
@@ -11,7 +11,7 @@
 #include "esc.h"
 #include "fakeio.h"
 int
-any_DSR(MENU_ARGS, const char *text, void (*explain) (char *report))
+any_DSR(MENU_ARGS, const char *text, void (*explain) (const char *report))
 {
   int row, col;
   char *report;
@@ -27,10 +27,10 @@ any_DSR(MENU_ARGS, const char *text, void (*explain) (char *report))
   report = get_reply();
   vt_move(row = 3, col = 10);
   chrprint2(report, row, col);
-  if ((report = skip_csi(report)) != 0
+  if ((report = skip_csi(report)) != NULL
       && strlen(report) > (1 + pmode)
       && (!pmode || (*report++ == '?'))) {
-    if (explain != 0)
+    if (explain != NULL)
       (*explain) (report);
     else
       show_result(SHOW_SUCCESS);
@@ -46,7 +46,7 @@ any_DSR(MENU_ARGS, const char *text, void (*explain) (char *report))
 static void
 report_ok(const char *ref, const char *tst)
 {
-  if ((tst = skip_csi_2(tst)) == 0)
+  if ((tst = skip_csi_2(tst)) == NULL)
     tst = "?";
   show_result(!strcmp(ref, tst) ? SHOW_SUCCESS : SHOW_FAILURE);
 }
@@ -56,7 +56,7 @@ report_ok(const char *ref, const char *tst)
  * Response CSI ? 27; Ps n
  */
 static void
-show_KeyboardStatus(char *report)
+show_KeyboardStatus(const char *report)
 {
   int pos = 0;
   int code;
@@ -148,7 +148,7 @@ show_KeyboardStatus(char *report)
 }
 
 static void
-show_PrinterStatus(char *report)
+show_PrinterStatus(const char *report)
 {
   int pos = 0;
   int code = scanto(report, &pos, 'n');
@@ -168,15 +168,15 @@ show_PrinterStatus(char *report)
 }
 
 static void
-show_UDK_Status(char *report)
+show_UDK_Status(const char *report)
 {
   int pos = 0;
   int code = scanto(report, &pos, 'n');
   const char *show;
   /* *INDENT-OFF* */
   switch(code) {
-  case 20: show = "UDKs unlocked"; break;
-  case 21: show = "UDKs locked";   break;
+  case 20: show = "UDKs unlocked";            break;
+  case 21: show = "UDKs locked";              break;
   case 23: show = "UDKs unsupported";         break;
   default: show = SHOW_FAILURE;
   }
@@ -205,7 +205,7 @@ tst_S8C1T(MENU_ARGS)
   set_tty_echo(FALSE);
 
   for (pass = 0; pass < 2; pass++) {
-    char *report;
+    const char *report;
     int row, col;
 
     flag = !flag;
@@ -490,7 +490,7 @@ tst_DECUDK(MENU_ARGS)
 
   for (;;) {
     int row, col;
-    char *report = instr();
+    const char *report = instr();
 
     if (*report == 'q')
       break;
@@ -526,24 +526,22 @@ tst_DSR_userkeys(MENU_ARGS)
 }
 
 static void
-show_OperatingStatus(char *report)
+show_OperatingStatus(const char *report)
 {
   int pos = 0;
   int Ps1 = scan_any(report, &pos, 'n');
   int Ps2 = scanto(report, &pos, 'n');
-  const char *show;
 
   switch (Ps1) {
   case 0:
-    show = "Terminal is in good operating condition";
+    show_result("Terminal is in good operating condition: %d", Ps2);
     break;
   case 3:
-    show = "Terminal has a malfunction";
+    show_result("Terminal has a malfunction: %d", Ps2);
     break;
   default:
-    show = SHOW_FAILURE;
+    show_result(SHOW_FAILURE);
   }
-  show_result(show, Ps2);
 }
 
 static int
@@ -592,12 +590,12 @@ tst_vt220_device_status(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test Keyboard Status",                              tst_DSR_keyboard },
       { "Test Operating Status",                             tst_DSR_operating_status },
       { "Test Printer Status",                               tst_DSR_printer },
       { "Test UDK Status",                                   tst_DSR_userkeys },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -618,12 +616,12 @@ tst_vt220_screen(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test Send/Receive mode (SRM)",                      tst_SRM },
       { "Test Visible/Invisible Cursor (DECTCEM)",           tst_DECTCEM },
       { "Test Erase Char (ECH)",                             tst_ECH },
       { "Test Protected-Areas (DECSCA)",                     tst_DECSCA },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -644,9 +642,9 @@ tst_vt220_reports(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test Device Status Report (DSR)",                   tst_vt220_device_status },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -665,7 +663,7 @@ tst_vt220(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test reporting functions",                          tst_vt220_reports },
       { "Test screen-display functions",                     tst_vt220_screen },
       { "Test 8-bit controls (S7C1T/S8C1T)",                 tst_S8C1T },
@@ -673,7 +671,7 @@ tst_vt220(MENU_ARGS)
       { "Test Soft Character Sets (DECDLD)",                 tst_softchars },
       { "Test Soft Terminal Reset (DECSTR)",                 tst_DECSTR },
       { "Test User-Defined Keys (DECUDK)",                   tst_DECUDK },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 

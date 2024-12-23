@@ -1,11 +1,11 @@
-/* $Id: ttymodes.c,v 1.26 2022/02/27 10:05:56 tom Exp $ */
+/* $Id: ttymodes.c,v 1.28 2024/10/20 21:54:50 tom Exp $ */
 
 #include "vttest.h"
 #include "ttymodes.h"
 #include "esc.h"  /* inflush() */
 #include "fakeio.h"
+#include "fakedef.h"
 #undef tabs
-
 #ifdef TAB3
 # define tabs TAB3
 #else
@@ -114,7 +114,7 @@ set_ttymodes(TTY * modes)
   //tcsetattr(0, TCSAFLUSH, modes);
 # else
 #   if USE_TERMIO
-  //tcsetattr(0, TCSETAF, modes);
+  tcsetattr(0, TCSETAF, modes);
 #   else /* USE_SGTTY */
   stty(0, modes);
 #   endif
@@ -126,7 +126,7 @@ void
 log_ttymodes(char *file, int line)
 {
   if (LOG_ENABLED)
-    fakeio::_fprintf(log_fp, "%s @%d\n", file, line);
+    fakeio::_fprintf(log_fp, NOTE_STR "%s @%d\n", file, line);
 }
 #endif
 
@@ -137,19 +137,19 @@ dump_ttymodes(char *tag, int flag)
 #ifdef UNIX
   TTY tmp_modes;
   if (LOG_ENABLED) {
-    fakeio::_fprintf(log_fp, "%s (%d):\n", tag, flag);
+    fakeio::_fprintf(log_fp, NOTE_STR "%s (%d):\n", tag, flag);
 # if USE_POSIX_TERMIOS || USE_TERMIO
     tcgetattr(0, &tmp_modes);
-    fakeio::_fprintf(log_fp, " iflag %08o\n", tmp_modes.c_iflag);
-    fakeio::_fprintf(log_fp, " oflag %08o\n", tmp_modes.c_oflag);
-    fakeio::_fprintf(log_fp, " lflag %08o\n", tmp_modes.c_lflag);
-    if (!tmp_modes.c_lflag & ICANON) {
-      fakeio::_fprintf(log_fp, " %d:min  =%d\n", VMIN, tmp_modes.c_cc[VMIN]);
-      fakeio::_fprintf(log_fp, " %d:time =%d\n", VTIME, tmp_modes.c_cc[VTIME]);
+    fakeio::_fprintf(log_fp, NOTE_STR " iflag %08o\n", tmp_modes.c_iflag);
+    fakeio::_fprintf(log_fp, NOTE_STR " oflag %08o\n", tmp_modes.c_oflag);
+    fakeio::_fprintf(log_fp, NOTE_STR " lflag %08o\n", tmp_modes.c_lflag);
+    if (!(tmp_modes.c_lflag & ICANON)) {
+      fakeio::_fprintf(log_fp, NOTE_STR " %d:min  =%d\n", VMIN, tmp_modes.c_cc[VMIN]);
+      fakeio::_fprintf(log_fp, NOTE_STR " %d:time =%d\n", VTIME, tmp_modes.c_cc[VTIME]);
     }
 # else
     gtty(0, &tmp_modes);
-    fakeio::_fprintf(log_fp, " flags %08o\n", tmp_modes.sg_flags);
+    fakeio::_fprintf(log_fp, NOTE_STR " flags %08o\n", tmp_modes.sg_flags);
 # endif
   }
 #endif
@@ -220,7 +220,7 @@ init_ttymodes(int pn)
 
 void
 restore_ttymodes(void)
-{ fakeio::Echo = true;
+{
   dump_ttymodes("restore_ttymodes", -1);
 #ifdef UNIX
   set_ttymodes(&old_modes);
@@ -261,7 +261,7 @@ set_tty_crmod(int enabled)
 
 void
 set_tty_echo(int enabled)
-{ fakeio::Echo = (enabled != 0);
+{
   dump_ttymodes("set_tty_echo", enabled);
 #ifdef UNIX
 # if USE_POSIX_TERMIOS || USE_TERMIO

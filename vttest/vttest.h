@@ -1,9 +1,12 @@
-/* $Id: vttest.h,v 1.118 2024/02/16 00:03:02 tom Exp $ */
+/* $Id: vttest.h,v 1.128 2024/11/25 01:14:50 tom Exp $ */
 
 #ifndef VTTEST_H
 #define VTTEST_H 1
 
+/* original version... */
 #define VERSION "1.7b 1985-04-19"
+
+/* the actual version is here */
 #include "patchlev.h"
 #include "fakedef.h"
 /* Choose one of these */
@@ -119,7 +122,10 @@
 #define CharOf(c) ((unsigned char)(c))
 
 extern FILE *log_fp;
+extern int allows_utf8;
+extern int assume_utf8;
 extern int brkrd;
+extern int debug_level;
 extern int decac_bg;
 extern int decac_fg;
 extern int do_colors;
@@ -131,12 +137,13 @@ extern int max_lines;
 extern int min_cols;
 extern int origin_mode;
 extern int output_8bits;
+extern int parse_7bits;
 extern int reading;
 extern int slow_motion;
 extern int tty_speed;
 extern int use_decac;
 extern int use_padding;
-//extern jmp_buf intrenv;
+//extern //jmp_buf intrenv;
 
 #ifndef TRUE
 #define TRUE (1)
@@ -185,23 +192,6 @@ extern int use_padding;
 #define GCC_UNUSED  /* nothing */
 #endif
 
-/* my SunOS 4.1.x doesn't have prototyped headers */
-#if defined(__GNUC__) && defined(sun) && !defined(__SVR4)
-extern void perror(const char *s);
-extern int _flsbuf(int c, FILE *s);
-extern int fclose(FILE *s);
-extern int fflush(FILE *s);
-extern int fprintf(FILE *s, const char *fmt, ...);
-extern int fgetc(FILE *s);
-extern int fputc(int c, FILE *s);
-extern int fputs(char *p, FILE *s);
-extern int ioctl(int fd, unsigned long mask, void *p);
-extern int printf(const char *fmt, ...);
-extern int scanf(const char *fmt, ...);
-extern int sscanf(const char *src, const char *fmt, ...);
-extern long strtol(const char *src, char **dst, int base);
-#endif
-
 #define MENU_DECL    const char *   the_title
 #define MENU_ARGS    const char *   the_title GCC_UNUSED
 #define PASS_ARGS /* const char * */the_title
@@ -215,6 +205,7 @@ typedef struct {
   int cur_level;
   int input_8bits;
   int output_8bits;
+  int parse_7bits;
 } VTLEVEL;
 
 typedef struct {
@@ -228,6 +219,20 @@ typedef struct {
 #define MENU_MERGE  2
 
 #define TITLE_LINE  3
+
+#define BUF_SIZE 1024
+
+/* normal logging-prefixes */
+#define READ_STR "Read: "   /* use this for noting user-input */
+#define NOTE_STR "Note: "   /* use this for making notes (no data involved) */
+#define SEND_STR "Send: "   /* use this for control-sequences, sent */
+#define DATA_STR "Data: "   /* use this for test-data, sent */
+#define TELL_STR "Text: "   /* use this for test-instructions */
+
+/* replay logging-prefixes */
+#define WAIT_STR "Wait: "   /* use this for suspending replay */
+#define DONE_STR "Done: "   /* use this for resuming replay */
+#define SKIP_STR "Skip: "   /* use this for debugging replay */
 
 #define WHITE_ON_BLUE   "0;37;44"
 #define WHITE_ON_GREEN  "0;37;42"
@@ -243,14 +248,18 @@ extern int current_Gx[4];
 extern int scs_national;
 
 extern RETSIGTYPE onbrk(SIG_ARGS);
-extern RETSIGTYPE onterm(SIG_ARGS);
+extern GCC_NORETURN RETSIGTYPE onterm(SIG_ARGS);
 extern char *chrformat(const char *s, int col, int first);
+extern char *get_reply(void);
+extern char *instr(void);
+extern char *replay_string(void);
 extern char *skip_csi(char *input);
 extern char *skip_dcs(char *input);
 extern char *skip_digits(char *src);
+extern char *skip_osc(char *input);
 extern char *skip_prefix(const char *prefix, char *input);
 extern char *skip_ss3(char *input);
-extern char *skip_xdigits(char *src, int *value);
+extern char inchar(void);
 extern const char *charset_name(int g, int n);
 extern const char *parse_Sdesig(const char *source, int *offset);
 extern const char *parse_upss_name(const char *source, int size);
@@ -259,7 +268,8 @@ extern const char *skip_dcs_2(const char *input);
 extern const char *skip_digits_2(const char *src);
 extern const char *skip_prefix_2(const char *prefix, const char *input);
 extern const char *skip_ss3_2(const char *input);
-extern int any_DSR(MENU_ARGS, const char *text, void (*explain) (char *report));
+extern const char *skip_xdigits(const char *src, int *value);
+extern int any_DSR(MENU_ARGS, const char *text, void (*explain) (const char *report));
 extern int any_RQM(MENU_ARGS, RQM_DATA * table, int tablesize, int private_);
 extern int any_decrqpsr(MENU_ARGS, int Ps);
 extern int any_decrqss(const char *msg, const char *func);
@@ -278,10 +288,12 @@ extern int conv_to_utf32(unsigned *target, const char *source, unsigned limit);
 extern int conv_to_utf8(unsigned char *target, unsigned source, unsigned limit);
 extern int do_scs(int g);
 extern int get_bottom_margin(int n);
+extern int get_char(void);
 extern int get_left_margin(void);
 extern int get_level(void);
 extern int get_right_margin(void);
 extern int get_top_margin(void);
+extern int is_replaying(void);
 extern int fake_main(int argc, char *argv[]);
 extern int menu(MENU *table);
 extern int menu2(MENU *table, int tp);
@@ -293,7 +305,7 @@ extern int reset_charset(MENU_ARGS);
 extern int rpt_DECSTBM(MENU_ARGS);
 extern int sane_cs(int g);
 extern int scan_DA(const char *str, int *pos);
-extern int scan_any(char *str, int *pos, int toc);
+extern int scan_any(const char *str, int *pos, int toc);
 extern int scanto(const char *str, int *pos, int toc);
 extern int set_DECRPM(int level);
 extern int set_level(int level);
@@ -338,7 +350,7 @@ extern int tst_ecma48_curs(MENU_ARGS);
 extern int tst_ecma48_misc(MENU_ARGS);
 extern int tst_insdel(MENU_ARGS);
 extern int tst_keyboard(MENU_ARGS);
-extern int tst_keyboard_layout(char *scs_params);
+extern int tst_keyboard_layout(const char *scs_params);
 extern int tst_mouse(MENU_ARGS);
 extern int tst_movements(MENU_ARGS);
 extern int tst_nonvt100(MENU_ARGS);
@@ -370,25 +382,29 @@ extern int tst_vt420_report_presentation(MENU_ARGS);
 extern int tst_vt420_reports(MENU_ARGS);
 extern int tst_vt52(MENU_ARGS);
 extern int tst_vt520(MENU_ARGS);
-extern int tst_vt520_reports(MENU_ARGS);
 extern int tst_vt520_DECRQSS(MENU_ARGS);
+extern int tst_vt520_reports(MENU_ARGS);
 extern int tst_xterm(MENU_ARGS);
 extern int vt_move(int row, int col);
-extern void bye(void);
+extern GCC_NORETURN void bye(void);
+extern void close_replay(void);
 extern void default_level(void);
 extern void dirty_charset(int state);
 extern void do_scrolling(void);
-extern void enable_logging(void);
+extern void enable_logging(const char *filename);
 extern void finish_vt420_cursor(MENU_ARGS);
 extern void initterminal(int pn);
 extern void menus_vt420_cursor(void);
+extern void pause_replay(void);
 extern void reset_colors(void);
 extern void reset_level(void);
-extern void restore_level(VTLEVEL *save);
+extern void restore_level(const VTLEVEL *save);
+extern void resume_replay(void);
 extern void save_level(VTLEVEL *save);
 extern void scs_graphics(void);
 extern void scs_normal(void);
 extern void set_colors(const char *value);
+extern void setup_replay(const char *filename);
 extern void setup_softchars(const char *filename);
 extern void setup_vt420_cursor(MENU_ARGS);
 extern void show_mousemodes(void);

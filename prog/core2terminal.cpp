@@ -660,7 +660,13 @@ void Core2Terminal::EventMouse(std::string Name, int X, int Y, int Btn)
         {
             if ((WorkStateC == WorkStateCDef::Session) && TerminalMouse_.MouseScreen)
             {
-                SendHex(TerminalMouse_.MouseEvent(Name, X, Y, Btn, false, false, false));
+                std::string StrX = TerminalMouse_.MouseEvent(Name, X, Y, Btn, false, false, false);
+                if (StrX.length() > 0)
+                {
+                    Conn.get()->ReportBegin();
+                    SendHex(StrX);
+                    Conn.get()->ReportEnd();
+                }
             }
         }
     }
@@ -840,6 +846,7 @@ std::string Core2Terminal::TelnetReportNumToStr(int N)
 
 void Core2Terminal::TelnetReport(std::string ReportRequest)
 {
+    Conn.get()->ReportBegin();
     bool SendAnswer = (TerminalType < 10);
     switch (_(ReportRequest.c_str()))
     {
@@ -858,6 +865,61 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
                 {
                     WindowIcon = ReportRequest.substr(10);
                     DisplayStatusPrepare();
+                }
+                if (TextWork::StringStartsWith(ReportRequest, "WindowFont"))
+                {
+                    if (ReportRequest.length() > 10)
+                    {
+                        std::string FontReport = ReportRequest.substr(10);
+                        int FontReportN = 0;
+                        if (FontReport[0] == '?')
+                        {
+                            std::string WinFontName = "_f_i_x_e_d07";
+                            switch (_(FontReport.c_str()))
+                            {
+                                case _("?"):
+                                    SendHex("##_]_5_0_;" + WinFontName);
+                                    break;
+                                case _("?0"):
+                                case _("?1"):
+                                case _("?2"):
+                                case _("?3"):
+                                case _("?4"):
+                                case _("?5"):
+                                case _("?6"):
+                                case _("?7"):
+                                case _("?8"):
+                                case _("?9"):
+                                    FontReportN = TextWork::StrToInt(FontReport.substr(1), 0);
+                                    SendHex("##_]_5_0_;_#" + TelnetReportNumToStr(FontReportN) + "_ " + WinFontName);
+                                    break;
+                                case _("?+0"): SendHex("##_]_5_0_;_#_0_ " + WinFontName); break;
+                                case _("?+1"): SendHex("##_]_5_0_;_#_3_ " + WinFontName); break;
+                                case _("?+2"): SendHex("##_]_5_0_;_#_4_ " + WinFontName); break;
+                                case _("?+3"): SendHex("##_]_5_0_;_#_5_ " + WinFontName); break;
+                                case _("?+4"): SendHex("##_]_5_0_;_#_6_ " + WinFontName); break;
+                                case _("?+5"):
+                                case _("?+6"):
+                                case _("?+7"):
+                                case _("?+8"):
+                                case _("?+9"):
+                                    SendHex("##_]_5_007");
+                                    break;
+                                case _("?-0"): SendHex("##_]_5_0_;_#_0_ " + WinFontName); break;
+                                case _("?-1"): SendHex("##_]_5_0_;_#_2_ " + WinFontName); break;
+                                case _("?-2"): SendHex("##_]_5_0_;_#_1_ " + WinFontName); break;
+                                case _("?-3"):
+                                case _("?-4"):
+                                case _("?-5"):
+                                case _("?-6"):
+                                case _("?-7"):
+                                case _("?-8"):
+                                case _("?-9"):
+                                    SendHex("##_]_5_007");
+                                    break;
+                            }
+                        }
+                    }
                 }
                 if (TextWork::StringStartsEndsWith(ReportRequest, "[", "*y"))
                 {
@@ -1337,6 +1399,7 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
             TerminalKeyboard_.SetTelnetKeyboardConf(5, 0);
             break;
     }
+    Conn.get()->ReportEnd();
 }
 
 void Core2Terminal::TelnetDisplayInfo(bool NeedRepaint)

@@ -25,18 +25,21 @@ void TerminalConnWorker::Open(std::string Protocol, std::string AddrPort, int Te
                 WorkerNumSend = 10;
                 WorkerNumOpen = 11;
                 WorkerNumClose = 12;
+                WorkerNumReport = 99;
                 break;
             case _("TELNET"):
                 WorkerAddr = "NET:" + AddrPort;
                 WorkerNumSend = 10;
                 WorkerNumOpen = 11;
                 WorkerNumClose = 12;
+                WorkerNumReport = 99;
                 break;
             case _("RAWNET"):
                 WorkerAddr = "NET:" + AddrPort;
                 WorkerNumSend = 10;
                 WorkerNumOpen = 11;
                 WorkerNumClose = 12;
+                WorkerNumReport = 99;
                 break;
             default:
                 break;
@@ -62,6 +65,22 @@ int TerminalConnWorker::IsConnected()
     else
     {
         return 3;
+    }
+}
+
+void TerminalConnWorker::ReportBegin()
+{
+    if (WorkerOpen && (WorkerNumReport < 99))
+    {
+        Screen::WorkerSend(WorkerNumReport, "1");
+    }
+}
+
+void TerminalConnWorker::ReportEnd()
+{
+    if (WorkerOpen && (WorkerNumReport < 99))
+    {
+        Screen::WorkerSend(WorkerNumReport, "0");
     }
 }
 

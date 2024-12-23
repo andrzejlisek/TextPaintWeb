@@ -20,6 +20,16 @@ int TerminalConn::IsConnected()
     return 0;
 }
 
+void TerminalConn::ReportBegin()
+{
+
+}
+
+void TerminalConn::ReportEnd()
+{
+
+}
+
 void TerminalConn::Send(Raw &Data)
 {
 

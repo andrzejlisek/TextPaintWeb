@@ -1,4 +1,4 @@
-/* $Id: esc.c,v 1.99 2023/12/05 00:27:44 tom Exp $ */
+/* $Id: esc.c,v 1.119 2024/12/05 00:44:52 tom Exp $ */
 
 #include "vttest.h"
 #include "esc.h"
@@ -6,9 +6,11 @@
 /* This was needed for Solaris 2.5, whose standard I/O was broken */
 #define FLUSH fakeio::_fflush(stdout)
 
-#define SEND_STR "Send: "   /* use this for control-sequences, sent */
-#define DATA_STR "Data: "   /* use this for test-data */
-#define TELL_STR "Text: "   /* use this for test-instructions */
+#define VA_OUT(fp, fmt, ap) do { \
+          va_start(ap, fmt); \
+          va_out(fp, fmt, ap); \
+          va_end(ap); \
+        } while (0)
 
 static int soft_scroll;
 
@@ -16,6 +18,7 @@ static int soft_scroll;
 
 static int pending_decstbm;
 static int pending_decslrm;
+static int putting_data;
 
 static const char csi_7[] =
 {ESC, '[', 0};
@@ -154,10 +157,12 @@ extra_padding(int msecs)
     padding(soft_scroll ? (msecs * 4) : msecs);
 }
 
+/*
+ * Print ordinary text, ensuring that the logged text has a newlne.
+ */
 int
 printxx(const char *fmt, ...)
 {
-  int endl = (strchr(fmt, '\n') != NULL ? 0 : 1);
   va_list ap;
 
   va_start(ap, fmt);
@@ -165,16 +170,23 @@ printxx(const char *fmt, ...)
   va_end(ap);
 
   if (LOG_ENABLED) {
-    va_start(ap, fmt);
+    int endl = (strchr(fmt, '\n') != NULL ? 0 : 1);
+
     fakeio::_fprintf(log_fp, TELL_STR);
+
+    va_start(ap, fmt);
     fakeio::_vfprintf(log_fp, fmt, ap);
+    va_end(ap);
+
     if (endl)
       fakeio::_fputs("\n", log_fp);
-    va_end(ap);
   }
   return 1;
 }
 
+/*
+ * Print a ordinary line of text, logging it.
+ */
 int
 println(const char *s)
 {
@@ -188,10 +200,64 @@ println(const char *s)
 void
 put_char(FILE *fp, int c)
 {
-  if (fp == stdout)
+  c &= 0xff;
+  if (fp == stdout) {
+    if (parse_7bits && (putting_data > 0) && (c >= 32)) {
+      /*
+       * Construct two different tests, according to whether the locale hints
+       * that the terminal uses UTF-8.
+       */
+      if (assume_utf8) {
+        /*
+         * In the first case, we are told that the parser expects C2 where the
+         * test sends a C1 character.  Unicode.org inverted ECMA-48 to do away
+         * with the possibility of using non-UTF-8 codes in C1.  Since that
+         * disagrees with the standard (by substituting a multibyte character
+         * for a single byte), and because the first of those bytes is a 0xC2,
+         * it is appropriate to refer to this situation as a C2 character.
+         *
+         * Progressing through the range 128..255, if the test happens to be
+         * using ISO Latin-1 (ISO-8859-1), then the UTF-8 encoding happens to
+         * look correct.  That will not work for other character sets.
+         */
+        if (parse_7bits == 2 && allows_utf8 && c >= 128 && c <= 255) {
+          unsigned char buffer[10];
+          int rc = conv_to_utf8(buffer, (unsigned) c, sizeof(buffer));
+          if (rc > 1) {   /* rc should be 0, 1 or 2 */
+            fwrite(buffer, (size_t) (rc - 1), 1, fp);
+            c = buffer[rc - 1];   /* fall-thru with the last byte */
+          }
+        }
+      } else {
+        /*
+         * The second case is relevant to ECMA-48 in contrast to the above.
+         * ECMA-48 makes it clear that both 7-bit controls and 8-bit control
+         * are parsed using a 7-bit table.  We can demonstrate whether the
+         * terminal actually does this by mapping printable 7-bit characters
+         * (32 to 126) to the 160..254 range.
+         *
+         * Because an ECMA-48 parser looks for the final character (or the
+         * string terminator for APC, etc.) using a 7-bit table, it is possible
+         * to match the final/terminating character in the 160..254 range.
+         * Unicode.org could improve its documentation to clarify how it
+         * differs from ECMA-48, and in doing so might state that the data
+         * stream need not comply with ECMA-48 in this regard.
+         *
+         * ECMA-48 and ISO 6429 provide the same information; the former is
+         * preferred because it is freely available.  Unicode.org mentions ISO
+         * 6429 in ~10 places without providing any information on control
+         * sequences.
+         */
+        if (parse_7bits == 1 && c <= 126) {
+          c |= 128;
+        }
+      }
+    }
     fakeio::_putchar(c);
-  else {
+  } else {
     c &= 0xff;
+    if (putting_data < 0 && c == ESC)
+      fakeio::_fprintf(fp, "BUG:");
     if (c <= ' ' || c >= '\177')
       fakeio::_fprintf(fp, "<%d> ", c);
     else
@@ -206,44 +272,83 @@ put_string(FILE *fp, const char *s)
     put_char(fp, (int) *s++);
 }
 
-#ifdef HAVE_VFPRINTF
-#define va_out(fp, ap, fmt) fakeio::_vfprintf(fp, fmt, ap)
-#else
-static void
-va_out(FILE *fp, va_list ap, const char *fmt)
-{
-  char temp[10];
-  int len = 0;
+#define CHECK_FORMAT() \
+        if (form_len + 2 >= (int) sizeof(real_fmt)) { \
+          done = 2; \
+          break; \
+        }
 
+#define ADD_TO_FORMAT(c) \
+        real_fmt[form_len++] = (char) (c); \
+        real_fmt[form_len] = 0
+
+#define PUT_FORMATTED(c,arg_type) \
+        CHECK_FORMAT(); \
+        ADD_TO_FORMAT(c); \
+        if (size_arg) { \
+          size_arg = va_arg(ap, int); \
+          sprintf(real_arg, real_fmt, size_arg, va_arg(ap, arg_type));  \
+        } else { \
+          sprintf(real_arg, real_fmt, va_arg(ap, arg_type));  \
+        } \
+        put_string(fp, real_arg); \
+        real_fmt[form_len = 0] = 0
+
+/*
+ * Do our own vfprintf, so that we can reformat and log the output.
+ */
+static void
+va_out(FILE *fp, const char *fmt, va_list ap)
+{
   while (*fmt != '\0') {
     if (*fmt == '%') {
-      int ch = *++fmt;
-      if (ch >= '0' && ch <= '9') {
-        ch -= '0';
-        if (len)
-          len *= 10;
-        len = ch;
-      } else {
+      char real_fmt[20];
+      char real_arg[1024];
+      int form_len = 0;
+      int size_arg = 0;
+      int done = 0;
+
+      real_fmt[0] = 0;
+      ADD_TO_FORMAT(*fmt);
+      do {
+        int ch = *++fmt;
+
+        done = 1;
         switch (ch) {
-        case '%':
-          put_char(fp, '%');
-          break;
         case 'c':
-          put_char(fp, va_arg(ap, int));
+          ch = va_arg(ap, int);
+          /* FALLTHRU */
+        case '%':
+          put_char(fp, ch);
           break;
         case 'd':
-          sprintf(temp, "%*d", len ? len : 1, va_arg(ap, int));
-          put_string(fp, temp);
+          PUT_FORMATTED(ch, int);
           break;
         case 'u':
-          sprintf(temp, "%*u", len ? len : 1, va_arg(ap, unsigned));
-          put_string(fp, temp);
+          PUT_FORMATTED(ch, unsigned);
           break;
         case 's':
-          put_string(fp, va_arg(ap, char *));
+          PUT_FORMATTED(ch, char *);
+          break;
+        case 0:
+          done = 2;
+          break;
+        default:
+          /* provide for "%20s", etc. */
+          CHECK_FORMAT();
+          ADD_TO_FORMAT(ch);
+          done = 0;
+          if (ch == '*') {
+            /* provide for "%.*s", etc. */
+            if (++size_arg > 1) {
+              done = 2;
+            }
+          }
           break;
         }
-        len = 0;
+      } while (!done);
+      if (done > 1) {
+        put_string(fp, real_fmt);   /* bug */
       }
     } else {
       put_char(fp, (int) *fmt);
@@ -251,24 +356,50 @@ va_out(FILE *fp, va_list ap, const char *fmt)
     fmt++;
   }
 }
-#endif
 
+/*
+ * Print ordinary (non-control) text, formatted.
+ */
 int
 tprintf(const char *fmt, ...)
 {
   va_list ap;
-  va_start(ap, fmt);
-  va_out(stdout, ap, fmt);
-  va_end(ap);
+
+  putting_data = -1;  /* check for unexpected controls */
+
+  VA_OUT(stdout, fmt, ap);
   FLUSH;
 
   if (LOG_ENABLED) {
     fakeio::_fputs(DATA_STR, log_fp);
-    va_start(ap, fmt);
-    va_out(log_fp, ap, fmt);
-    va_end(ap);
+    VA_OUT(log_fp, fmt, ap);
     fakeio::_fputs("\n", log_fp);
   }
+
+  putting_data = 0;
+  return 1;
+}
+
+/*
+ * Print control text, formatted.
+ */
+int
+cprintf(const char *fmt, ...)
+{
+  va_list ap;
+
+  putting_data = 1;
+
+  VA_OUT(stdout, fmt, ap);
+  FLUSH;
+
+  if (LOG_ENABLED) {
+    fakeio::_fputs(SEND_STR, log_fp);
+    VA_OUT(log_fp, fmt, ap);
+    fakeio::_fputs("\n", log_fp);
+  }
+
+  putting_data = 0;
   return 1;
 }
 
@@ -277,20 +408,21 @@ void
 do_csi(const char *fmt, ...)
 {
   va_list ap;
-  va_start(ap, fmt);
-  fakeio::_fputs(csi_output(), stdout);
-  va_out(stdout, ap, fmt);
-  va_end(ap);
+
+  putting_data = 1;
+
+  put_string(stdout, csi_output());
+  VA_OUT(stdout, fmt, ap);
+
   FLUSH;
 
   if (LOG_ENABLED) {
     fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, csi_output());
-    va_start(ap, fmt);
-    va_out(log_fp, ap, fmt);
-    va_end(ap);
+    VA_OUT(log_fp, fmt, ap);
     fakeio::_fputs("\n", log_fp);
   }
+  putting_data = 0;
 }
 
 /* DCS xxx ST */
@@ -298,22 +430,23 @@ void
 do_dcs(const char *fmt, ...)
 {
   va_list ap;
-  va_start(ap, fmt);
-  fakeio::_fputs(dcs_output(), stdout);
-  va_out(stdout, ap, fmt);
-  va_end(ap);
-  fakeio::_fputs(st_output(), stdout);
+
+  putting_data = 1;
+
+  put_string(stdout, dcs_output());
+  VA_OUT(stdout, fmt, ap);
+
+  put_string(stdout, st_output());
   FLUSH;
 
   if (LOG_ENABLED) {
-    va_start(ap, fmt);
     fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, dcs_output());
-    va_out(log_fp, ap, fmt);
-    va_end(ap);
+    VA_OUT(log_fp, fmt, ap);
     put_string(log_fp, st_output());
     fakeio::_fputs("\n", log_fp);
   }
+  putting_data = 0;
 }
 
 /* DCS xxx ST */
@@ -321,22 +454,23 @@ void
 do_osc(const char *fmt, ...)
 {
   va_list ap;
-  va_start(ap, fmt);
-  fakeio::_fputs(osc_output(), stdout);
-  va_out(stdout, ap, fmt);
-  va_end(ap);
-  fakeio::_fputs(st_output(), stdout);
+
+  putting_data = 1;
+
+  put_string(stdout, osc_output());
+  VA_OUT(stdout, fmt, ap);
+
+  put_string(stdout, st_output());
   FLUSH;
 
   if (LOG_ENABLED) {
-    va_start(ap, fmt);
     fakeio::_fputs(SEND_STR, log_fp);
     put_string(log_fp, osc_output());
-    va_out(log_fp, ap, fmt);
-    va_end(ap);
+    VA_OUT(log_fp, fmt, ap);
     put_string(log_fp, st_output());
     fakeio::_fputs("\n", log_fp);
   }
+  putting_data = 0;
 }
 
 int
@@ -371,7 +505,10 @@ print_str(const char *s)
 void
 esc(const char *s)
 {
-  fakeio::_printf("%c%s", ESC, s);
+  putting_data = 1;
+
+  put_char(stdout, ESC);
+  put_string(stdout, s);
 
   if (LOG_ENABLED) {
     fakeio::_fprintf(log_fp, SEND_STR);
@@ -379,6 +516,8 @@ esc(const char *s)
     put_string(log_fp, s);
     fakeio::_fputs("\n", log_fp);
   }
+
+  putting_data = 0;
 }
 
 /*
@@ -846,6 +985,12 @@ void
 decsera(int top, int left, int bottom, int right)   /* VT400 Selective erase rectangular area */
 {
   do_csi("%d;%d;%d;%d${", top, left, bottom, right);
+}
+
+void
+decstglt(int mode)              /* DECSTGLT Select Color Look-Up Table */
+{
+  do_csi("%d){", mode);
 }
 
 void

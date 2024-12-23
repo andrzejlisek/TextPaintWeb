@@ -235,6 +235,10 @@ function _ProgCallback(D_)
                             ScreenMouseSetHighlight(D[CallbackQueueI+1],D[CallbackQueueI+2],D[CallbackQueueI+3],D[CallbackQueueI+4],D[CallbackQueueI+5]);
                             CallbackQueueI += 6;
                             break;
+                        case 204:
+                            VTTEST_.VTReport(D[CallbackQueueI+1]);
+                            CallbackQueueI += 2;
+                            break;
                         case 210:
                             WebSocketConnSend(StringBufDecode(D[CallbackQueueI+1]));
                             CallbackQueueI += 2;

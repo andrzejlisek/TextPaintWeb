@@ -14,62 +14,81 @@ void fakeio::io_clear()
     LogHandle = 0;
     LogFlush(false);
 
-    fake_i_mtx.lock();
-    fake_o_mtx.lock();
     fake_i.clear();
     fake_o.clear();
-    fake_o_mtx.unlock();
-    fake_i_mtx.unlock();
+}
+
+void fakeio::i_magic_set(int param)
+{
+    if (InputMagicNumber != 0)
+    {
+        fakeio::i_push(fakeio::InputMagicNumber);
+        fakeio::i_push(param);
+        return;
+    }
+}
+
+void fakeio::i_magic()
+{
+    if (InputMagicNumber == 0)
+    {
+        return;
+    }
+    bool work = fake_i.size() > 0;
+    if (work) if (fake_i[0] != InputMagicNumber) work = false;
+    while (work)
+    {
+        fake_i.pop_front();
+        switch (fake_i[0])
+        {
+            case '1':
+                EchoKeys = false;
+                break;
+            case '0':
+                EchoKeys = true;
+                break;
+        }
+        fake_i.pop_front();
+
+        work = fake_i.size() > 0;
+        if (work) if (fake_i[0] != InputMagicNumber) work = false;
+    }
 }
 
 void fakeio::i_push(int Val)
 {
-    fake_i_mtx.lock();
     fake_i.push_back(Val);
-    fake_i_mtx.unlock();
 }
 
 int fakeio::i_pop()
 {
-    fake_i_mtx.lock();
     int Val = fake_i[0];
     fake_i.pop_front();
-    fake_i_mtx.unlock();
     return Val;
 }
 
 int fakeio::i_count()
 {
-    fake_i_mtx.lock();
-    int Val = fake_i.size();
-    fake_i_mtx.unlock();
-    return Val;
+    i_magic();
+    return fake_i.size();
 }
 
 void fakeio::o_push(int Val)
 {
-    fake_o_mtx.lock();
     fake_o.push_back(Val);
-    fake_o_mtx.unlock();
 }
 
 int fakeio::o_pop()
 {
-    fake_o_mtx.lock();
     int Val = fake_o[0];
     fake_o.pop_front();
-    fake_o_mtx.unlock();
     return Val;
 }
 
 int fakeio::o_count()
 {
-    fake_o_mtx.lock();
-    int Val = fake_o.size();
-    fake_o_mtx.unlock();
-    return Val;
+    return fake_o.size();
 }
-
 
 int fakeio::_putchar(int character)
 {
@@ -81,7 +100,7 @@ int fakeio::_putchar(int character)
     return 0;
 }
 
-int fakeio::_getchar( void )
+int fakeio::_getchar(void)
 {
     _fflush(stdout);
     while (i_count() < 1)
@@ -89,7 +108,7 @@ int fakeio::_getchar( void )
         _sleep(20);
     }
     int Chr = i_pop();
-    if (Echo)
+    if (EchoKeys && Echo)
     {
         if (Chr == '\r')
         {
@@ -120,7 +139,7 @@ int fakeio::_read(int fd, void * buf, int nbytes)
         while ((N < nbytes) && (i_count() > 0))
         {
             int Chr = i_pop();
-            if (Echo)
+            if (EchoKeys && Echo)
             {
                 if (Chr == '\r')
                 {
@@ -138,6 +157,49 @@ int fakeio::_read(int fd, void * buf, int nbytes)
         return N;
     }
     return 0;
+}
+
+int fakeio::_fgetc(FILE * stream)
+{
+    if (stream == stdin)
+    {
+        return _getchar();
+    }
+    else
+    {
+        return EOF;
+    }
+}
+
+char * fakeio::_fgets(char * str, int num, FILE * stream)
+{
+    if (stream == stdin)
+    {
+        int i = 0;
+        while (true)
+        {
+            int chr = _getchar();
+            if ((chr == 13) || (chr == 10))
+            {
+                str[i] = 0;
+                return str;
+            }
+            else
+            {
+                str[i] = chr;
+                i++;
+                if ((i + 1) == num)
+                {
+                    str[i] = 0;
+                    return str;
+                }
+            }
+        }
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 
@@ -226,7 +288,8 @@ int fakeio::_fprintf(FILE * stream, const char * format, ...)
 
 void fakeio::_sleep(int T)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(T));
+    emscripten_sleep(T);
+    ///###std::this_thread::sleep_for(std::chrono::milliseconds(T));
 }
 
 FILE * fakeio::_fopen(const char * filename, const char * modes)
@@ -258,7 +321,7 @@ FILE * fakeio::_fopen(const char * filename, const char * modes)
         {
             LogHandle = (FILE*)malloc(32);
         }
-        std::cout << "VTTEST log open" << std::endl;
+        //std::cout << "VTTEST log open" << std::endl;
         return LogHandle;
     }
     else
@@ -274,7 +337,7 @@ int fakeio::_fclose(FILE * stream)
         LogFlush(false);
         free(LogHandle);
         LogHandle = 0;
-        std::cout << "VTTEST log closed" << std::endl;
+        //std::cout << "VTTEST log closed" << std::endl;
     }
     return 0;
 }

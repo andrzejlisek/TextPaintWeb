@@ -12,6 +12,8 @@ public:
     virtual void Open(std::string Protocol, std::string AddrPort, int TerminalW, int TerminalH);
     virtual void AfterOpen();
     virtual int IsConnected();
+    virtual void ReportBegin();
+    virtual void ReportEnd();
     virtual void Send(Raw &Data);
     virtual void Recv(Raw &Data);
     virtual void Close();

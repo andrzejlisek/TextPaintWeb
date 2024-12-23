@@ -14,6 +14,8 @@ public:
 
     void Open(std::string Protocol, std::string AddrPort, int TerminalW, int TerminalH);
     int IsConnected();
+    void ReportBegin();
+    void ReportEnd();
     void Send(Raw &Data);
     void Close();
 protected:
@@ -23,6 +25,7 @@ protected:
     int WorkerNumSend = 0;
     int WorkerNumOpen = 1;
     int WorkerNumClose = 2;
+    int WorkerNumReport = 4;
 };
 
 #endif // TERMINALCONNWORKER_H

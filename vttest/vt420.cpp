@@ -1,4 +1,4 @@
-/* $Id: vt420.c,v 1.224 2023/12/29 16:36:47 tom Exp $ */
+/* $Id: vt420.c,v 1.236 2024/12/05 00:43:14 tom Exp $ */
 
 /*
  * Reference:  Installing and Using the VT420 Video Terminal (North American
@@ -47,7 +47,7 @@ reset_colors(void)
     sgr("0");
     use_colors = FALSE;
     if (LOG_ENABLED) {
-      fakeio::_fprintf(log_fp, "Note: turned off colors\n");
+      fakeio::_fprintf(log_fp, NOTE_STR "turned off colors\n");
     }
   }
 }
@@ -56,12 +56,13 @@ void
 set_colors(const char *value)
 {
   if (do_colors) {
-    if (value == 0)
+    if (value == NULL)
       value = "0";
     sgr(value);
     use_colors = strcmp(value, "0");
     if (LOG_ENABLED) {
-      fakeio::_fprintf(log_fp, "Note: turned %s colors\n", use_colors ? "on" : "off");
+      fakeio::_fprintf(log_fp, NOTE_STR "turned %s colors\n",
+              use_colors ? "on" : "off");
     }
   }
 }
@@ -280,7 +281,7 @@ special_prompt(int row, int col, const char *msg)
     decom(FALSE);
 
   vt_move(row, col);
-  if (msg != 0) {
+  if (msg != NULL) {
     printxx("%s", msg);
     vt_move(row + 1, col);
   }
@@ -300,7 +301,7 @@ fill_outside(int ch)
   int row, col;
 
   if (LOG_ENABLED) {
-    fakeio::_fprintf(log_fp, "Note: filling outside margins with '%c'\n", ch);
+    fakeio::_fprintf(log_fp, NOTE_STR "filling outside margins with '%c'\n", ch);
   }
 
   if (!do_colors)
@@ -533,7 +534,7 @@ rpt_DECSMKR(MENU_ARGS)
 /******************************************************************************/
 
 static void
-show_DataIntegrity(char *report)
+show_DataIntegrity(const char *report)
 {
   int pos = 0;
   int code = scanto(report, &pos, 'n');
@@ -558,47 +559,47 @@ show_DataIntegrity(char *report)
 static void
 show_keypress(int row, int col)
 {
-  char *report;
-  char last[BUFSIZ];
+  const char *report;
+  char last[BUF_SIZE];
 
   last[0] = '\0';
   vt_move(row++, 1);
   println("When you are done, press any key twice to quit.");
   vt_move(row, col);
   fakeio::_fflush(stdout);
+  pause_replay();
   while (strcmp(report = instr(), last)) {
     vt_move(row, col);
     vt_clear(0);
     chrprint2(report, row, col);
     strncpy(last, report, sizeof(last) - 2)[sizeof(last) - 2] = '\0';
   }
+  resume_replay();
 }
 
 static void
-show_MultisessionStatus(char *report)
+show_MultisessionStatus(const char *report)
 {
   int pos = 0;
   int Ps1 = scan_any(report, &pos, 'n');
   int Ps2 = scanto(report, &pos, 'n');
-  const char *show;
 
   switch (Ps1) {
   case 80:
-    show = "SSU sessions enabled (%d max)";
+    show_result("SSU sessions enabled (%d max)", Ps2);
     break;
   case 81:
-    show = "SSU sessions available but pending (%d max)";
+    show_result("SSU sessions available but pending (%d max)", Ps2);
     break;
   case 83:
-    show = "SSU sessions not ready";
+    show_result("SSU sessions not ready");
     break;
   case 87:
-    show = "Sessions on separate lines";
+    show_result("Sessions on separate lines");
     break;
   default:
-    show = SHOW_FAILURE;
+    show_result(SHOW_FAILURE);
   }
-  show_result(show, Ps2);
 }
 
 /******************************************************************************/
@@ -663,7 +664,7 @@ static int
 tst_DECBKM(MENU_ARGS)
 {
   int row, col;
-  char *report;
+  const char *report;
 
   vt_move(1, 1);
   println(the_title);
@@ -750,15 +751,15 @@ parse_DECCKSR(char *report, int Pid, int *digits, int *checksum)
   int result = 0;
   int pos = 0;
   int actual;
-  char *after;
-  char *before;
+  const char *after;
+  const char *before;
 
-  if ((report = skip_dcs(report)) != 0
+  if ((report = skip_dcs(report)) != NULL
       && strip_terminator(report)
       && strlen(report) > 1
       && scanto(report, &pos, '!') == Pid
       && report[pos++] == '~'
-      && (after = skip_xdigits((before = report + pos), &actual)) != 0
+      && (after = skip_xdigits((before = report + pos), &actual)) != NULL
       && *after == '\0') {
     result = 1;
     *digits = (int) (after - before);
@@ -1111,8 +1112,8 @@ tst_IND_RI(MENU_ARGS)
 
   fill_margins();
 
-  set_colors(0);
-  special_prompt(hold_row, hold_col, 0);
+  set_colors(NULL);
+  special_prompt(hold_row, hold_col, NULL);
 
   set_colors(WHITE_ON_GREEN);
   cup(bot, (lft + rgt) / 2);
@@ -1121,14 +1122,14 @@ tst_IND_RI(MENU_ARGS)
     ind();
   }
 
-  set_colors(0);
+  set_colors(NULL);
   special_prompt(hold_row, hold_col, "\"abcd...\" should be at top. ");
 
   fill_margins();
   fill_outside('.');
 
-  set_colors(0);
-  special_prompt(hold_row, hold_col, 0);
+  set_colors(NULL);
+  special_prompt(hold_row, hold_col, NULL);
 
   set_colors(WHITE_ON_GREEN);
   cup(top, (lft + rgt) / 2);
@@ -1137,7 +1138,7 @@ tst_IND_RI(MENU_ARGS)
     ri();
   }
 
-  set_colors(0);
+  set_colors(NULL);
   special_prompt(hold_row, hold_col, "\"0123...\" should be at bottom. ");
 
   test_with_margins(0);
@@ -1160,8 +1161,8 @@ tst_IL_DL(MENU_ARGS)
 
   fill_margins();
 
-  set_colors(0);
-  special_prompt(hold_row, hold_col, 0);
+  set_colors(NULL);
+  special_prompt(hold_row, hold_col, NULL);
 
   /*
    * This should be ignored because it is outside margins.
@@ -1193,14 +1194,14 @@ tst_IL_DL(MENU_ARGS)
     il(skip);
   }
 
-  set_colors(0);
+  set_colors(NULL);
   special_prompt(hold_row, hold_col, "\"0123...\" should be at bottom. ");
 
   fill_margins();
   fill_outside('.');
 
-  set_colors(0);
-  special_prompt(hold_row, hold_col, 0);
+  set_colors(NULL);
+  special_prompt(hold_row, hold_col, NULL);
 
   set_colors(WHITE_ON_GREEN);
   cup(top, (lft + rgt) / 2);
@@ -1213,7 +1214,7 @@ tst_IL_DL(MENU_ARGS)
     dl(skip);
   }
 
-  set_colors(0);
+  set_colors(NULL);
   special_prompt(hold_row, hold_col, "\"abcd...\" should be at top. ");
 
   test_with_margins(0);
@@ -1302,7 +1303,7 @@ tst_ICH_DCH(MENU_ARGS)
     if (row < last_row) {
       int mark = marker_of(n);
 
-      if (row >= top && row <= bot && row < last_row) {
+      if (row >= top && row <= bot) {
         mark_2nd = (char) mark;
         if (mark_1st == 0) {
           mark_1st = (char) mark;
@@ -1889,7 +1890,7 @@ tst_DECIC(MENU_ARGS)
     if (row < last_row) {
       int mark = marker_of(n);
 
-      if (row >= top && row <= bot && row < last_row) {
+      if (row >= top && row <= bot) {
         mark_2nd = (char) mark;
         if (mark_1st == 0) {
           mark_1st = (char) mark;
@@ -2061,7 +2062,7 @@ tst_vt420_DECRQSS(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features (DECRQSS)",                     tst_vt320_DECRQSS },
       { "Enable local functions (DECELF)",                   rpt_DECELF },
       { "Local function key control (DECLFKC)",              rpt_DECLFKC },
@@ -2069,7 +2070,7 @@ tst_vt420_DECRQSS(MENU_ARGS)
       { "Select modifier key reporting (DECSMKR)",           rpt_DECSMKR },
       { "Set left and right margins (DECSLRM)",              rpt_DECSLRM },
       { "Set number of lines per screen (DECSNLS)",          rpt_DECSNLS },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2242,15 +2243,12 @@ tst_DECSNLS(MENU_ARGS)
 #define SOH             1
 #define CHK(n)          ((-(n)) & 0xffff)
 
-#define to_fill(ch)     (!chk_notrim && ((ch) == ' ') ? SOH : (ch))
-#define from_fill(ch)   (!chk_notrim && ((ch) == SOH) ? ' ' : (ch))
+#define to_fill(ch)     (((ch) == ' ') ? SOH : (ch))
+#define from_fill(ch)   (((ch) == SOH) ? ' ' : (ch))
 
 static int
 tst_DSR_area_sum(MENU_ARGS, int g)
 {
-  static int chk_notrim = 0;    /* do not trim blanks */
-  static int chk_attrib = 0;    /* do not add video attributes to checksum */
-
   char buffer[1024];            /* allocate buffer for lines */
   int expected = 0;
   int title_sum = 0;
@@ -2288,7 +2286,7 @@ tst_DSR_area_sum(MENU_ARGS, int g)
     for (c = 0; c < min_cols; ++c) {
       ch = from_fill((unsigned char) lines[r][c]);
       expected += ch + mask_fg + mask_bg;
-      if (chk_notrim || (first || (ch != ' ')))
+      if (first || (ch != ' '))
         title_sum = expected;
       first = FALSE;
     }
@@ -2354,19 +2352,19 @@ tst_DSR_area_sum(MENU_ARGS, int g)
         sprintf(buffer, "%c %02X ", ch, ch);
         fakeio::_fputs(buffer, stdout);
         memcpy(&lines[r - 1][c - 1], buffer, strlen(buffer));
-        /* request checksum of the entire page */
+        /* request checksum of the given cell at (r,c) */
         do_csi("%d;%d;%d;%d;%d;%d*y", pid, page, r, c, r, c);
       }
 
       /* FIXME - use check_DECCKSR? */
       report = get_reply();
-      if ((s = strchr(report, '!')) != 0
+      if ((s = strchr(report, '!')) != NULL
           && (*++s == '~')
           && strlen(++s) > 4) {
         char test[5];
 
         if (ch > ch_end) {
-          int row_limit = (!chk_notrim ? r : max_lines);
+          int row_limit = r;
           int y, x;
 
           for (y = 0; y < row_limit; ++y) {
@@ -2374,14 +2372,13 @@ tst_DSR_area_sum(MENU_ARGS, int g)
              * If trimming, count through space after ":" in "All:".
              * Otherwise, count the whole screen.
              */
-            int col_limit = (chk_notrim || (y < (r - 1))) ? min_cols : (c + 4);
+            int col_limit = (y < (r - 1)) ? min_cols : (c + 4);
 
             for (x = 0; x < col_limit; ++x) {
               int yx = (unsigned char) lines[y][x];
 
-              if (chk_notrim
-                  || (yx >= ' ')) {
-                full += (yx < ' ') ? ' ' : yx;
+              if (yx >= ' ') {
+                full += yx;
                 full += mask_bg;
                 full += mask_fg;
               }
@@ -2391,20 +2388,18 @@ tst_DSR_area_sum(MENU_ARGS, int g)
               if (yx == SOH + 0)
                 lines[y][x] = ' ';
             }
-            if (!chk_attrib) {
-              if (y == 2) {
-                /* add attributes for highlighted report-string */
-                full += report_len * (chkINVERSE);
-              }
-              if (y == (r - 1)) {
-                /* add attributes for "All:" */
-                full += 3 * (chkBOLD | chkUNDERLINE);
-                full += 2 * (chkBOLD);
-              }
+            if (y == 2) {
+              /* add attributes for highlighted report-string */
+              full += report_len * (chkINVERSE);
+            }
+            if (y == (r - 1)) {
+              /* add attributes for "All:" */
+              full += 3 * (chkBOLD | chkUNDERLINE);
+              full += 2 * (chkBOLD);
             }
             if (LOG_ENABLED) {
               fakeio::_fprintf(log_fp,
-                      "Check: %04X %2d:%s\n",
+                      NOTE_STR "check %04X %2d:%s\n",
                       CHK(full), y + 1, lines[y]);
             }
           }
@@ -2419,8 +2414,9 @@ tst_DSR_area_sum(MENU_ARGS, int g)
           if (LOG_ENABLED) {
             unsigned actual;
             int ok = sscanf(s, "%x", &actual);
-            fakeio::_fprintf(log_fp, "Actual: %.4s%s\n", s, ok ? "" : " (ERR)");
-            fakeio::_fprintf(log_fp, "Expect: %.4s\n", test);
+            fakeio::_fprintf(log_fp, NOTE_STR "actual %.4s%s\n",
+                    s, ok ? "" : " (ERR)");
+            fakeio::_fprintf(log_fp, NOTE_STR "expect %.4s\n", test);
           }
           fakeio::_fputs(buffer, stdout);
           vt_hilite(FALSE);
@@ -2497,8 +2493,8 @@ tst_DSR_macrospace(MENU_ARGS)
   report = get_reply();
   vt_move(row = 3, col = 10);
   chrprint2(report, row, col);
-  if ((report = skip_csi(report)) != 0
-      && (report = skip_digits(report)) != 0
+  if ((report = skip_csi(report)) != NULL
+      && (report = skip_digits(report)) != NULL
       && !strcmp(report, "*{")) {
     show = SHOW_SUCCESS;
   } else {
@@ -2540,8 +2536,10 @@ tst_SRM(MENU_ARGS)
   vt_move(3, 10);
 
   oldc = -1;
+  pause_replay();
   while ((newc = inchar()) != oldc && newc > 0)
     oldc = newc;
+  resume_replay();
 
   set_tty_echo(TRUE);
   srm(TRUE);
@@ -2551,8 +2549,10 @@ tst_SRM(MENU_ARGS)
   vt_move(11, 10);
 
   oldc = -1;
+  pause_replay();
   while ((newc = inchar()) != oldc && newc > 0)
     oldc = newc;
+  resume_replay();
 
   vt_move(max_lines - 1, 1);
   restore_ttymodes();
@@ -2612,7 +2612,7 @@ tst_vt420_cursor(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features",                               tst_vt320_cursor },
       { origin_mode_mesg,                                    toggle_DECOM },
       { lrmm_mesg,                                           toggle_LRMM },
@@ -2623,7 +2623,7 @@ tst_vt420_cursor(MENU_ARGS)
       { "Test Forward Index (DECFI)",                        tst_DECFI },
       { "Test cursor movement within margins",               tst_cursor_margins },
       { "Test other movement (CR/HT/LF/FF) within margins",  tst_other_margins },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2670,7 +2670,7 @@ tst_VT420_editing(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { origin_mode_mesg,                                    toggle_DECOM },
       { lrmm_mesg,                                           toggle_LRMM },
       { tb_marg_mesg,                                        toggle_STBM },
@@ -2684,7 +2684,7 @@ tst_VT420_editing(MENU_ARGS)
       { "Test insert/delete line (IL, DL)",                  tst_IL_DL },
       { "Test insert/delete char (ICH, DCH)",                tst_ICH_DCH },
       { "Test ASCII formatting (BS, CR, TAB)",               tst_ASCII_format },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2712,7 +2712,7 @@ tst_VT420_keyboard_ctl(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test Backarrow key (DECBKM)",                       tst_DECBKM },
       { "Test Numeric keypad (DECNKM)",                      tst_DECNKM },
       { "Test Keyboard usage (DECKBUM)",                     tst_DECKBUM },
@@ -2720,7 +2720,7 @@ tst_VT420_keyboard_ctl(MENU_ARGS)
       { "Test Enable Local Functions (DECELF)",              not_impl },
       { "Test Local Function-Key Control (DECLFKC)",         not_impl },
       { "Test Select Modifier-Key Reporting (DECSMKR)",      not_impl }, /* DECEKBD */
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2740,7 +2740,7 @@ tst_VT420_rectangle(MENU_ARGS)
   static char txt_override_lines[80];
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { origin_mode_mesg,                                    toggle_DECOM },
       { lrmm_mesg,                                           toggle_LRMM },
       { tb_marg_mesg,                                        toggle_STBM },
@@ -2753,7 +2753,7 @@ tst_VT420_rectangle(MENU_ARGS)
       { "Test Fill Rectangular area (DECFRA)",               tst_DECFRA },
       { "Test Reverse-Attributes in Rectangular Area (DECRARA)", tst_DECRARA },
       { "Test Selective-Erase Rectangular area (DECSERA)",   tst_DECSERA },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2785,7 +2785,7 @@ tst_vt420_device_status(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features",                               tst_vt320_device_status },
       { "Test Printer Status",                               tst_DSR_printer },
       { "Test UDK Status",                                   tst_DSR_userkeys },
@@ -2797,7 +2797,7 @@ tst_vt420_device_status(MENU_ARGS)
       { "Test Checksum of Rectangular Area (DECRQCRA): GL",  tst_DSR_area_sum_gl },
       { "Test Checksum of Rectangular Area (DECRQCRA): GR",  tst_DSR_area_sum_gr },
       { "Test Extended Cursor-Position (DECXCPR)",           tst_DSR_cursor },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2816,11 +2816,11 @@ tst_vt420_report_presentation(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features",                               tst_vt320_report_presentation },
       { "Request Mode (DECRQM)/Report Mode (DECRPM)",        tst_DECRPM },
       { "Status-String Report (DECRQSS)",                    tst_vt420_DECRQSS },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2840,11 +2840,11 @@ tst_vt420_reports(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features",                               tst_vt320_reports },
       { "Test Presentation State Reports",                   tst_vt420_report_presentation },
       { "Test Device Status Reports (DSR)",                  tst_vt420_device_status },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2863,10 +2863,10 @@ tst_VT420_screen(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features",                               tst_vt320_screen },
       { "Test Select Number of Lines per Screen (DECSNLS)",  tst_DECSNLS },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 
@@ -2888,7 +2888,7 @@ tst_vt420(MENU_ARGS)
 {
   /* *INDENT-OFF* */
   static MENU my_menu[] = {
-      { "Exit",                                              0 },
+      { "Exit",                                              NULL },
       { "Test VT320 features",                               tst_vt320 },
       { "Test cursor-movement",                              tst_vt420_cursor },
       { "Test editing sequences",                            tst_VT420_editing },
@@ -2897,7 +2897,7 @@ tst_vt420(MENU_ARGS)
       { "Test rectangular area functions",                   tst_VT420_rectangle },
       { "Test reporting functions",                          tst_vt420_reports },
       { "Test screen-display functions",                     tst_VT420_screen },
-      { "",                                                  0 }
+      { "",                                                  NULL }
     };
   /* *INDENT-ON* */
 

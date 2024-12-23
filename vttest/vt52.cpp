@@ -1,4 +1,4 @@
-/* $Id: vt52.c,v 1.21 2024/07/08 23:20:42 tom Exp $ */
+/* $Id: vt52.c,v 1.23 2024/12/05 00:43:14 tom Exp $ */
 
 #include "vttest.h"
 #include "ttymodes.h"
@@ -74,41 +74,66 @@ tst_vt52(MENU_ARGS)
     vt52cup(i, 1);
     vt52el();   /* Erase to end of line */
   }
-
+  /*
+   * Draw some text that we do not want to display.
+   */
   for (i = 2; i <= max_lines - 1; i++) {
     vt52cup(i, 70);
     tprintf("%s", "**Foobar");
   }
+  /*
+   * Draw the left side of the box, going from bottom to top.
+   */
   vt52cup(max_lines - 1, 10);
   for (i = max_lines - 1; i >= 2; i--) {
     tprintf("%s", "*");
     tprintf("%c", 8);   /* BS */
     vt52ri();   /* Reverse LineFeed (LineStarve)        */
   }
+  /*
+   * Draw the top of the box, going from right to left.
+   * Make the movement a little more complicated by using cursor-addressing
+   * which is out of bounds vertically so that only the column is updated.
+   */
   vt52cup(1, 70);
   for (i = 70; i >= 10; i--) {
     tprintf("%s", "*");
     vt52cub1();
-    vt52cub1(); /* Cursor Left */
+    if (i % 2)
+      vt52cup(max_lines + 3, i - 1);
+    else
+      vt52cub1();   /* Cursor Left */
   }
+  /*
+   * Draw the bottom of the box, going from left to right.
+   */
   vt52cup(max_lines, 10);
   for (i = 10; i <= 70; i++) {
     tprintf("%s", "*");
     tprintf("%c", 8);   /* BS */
     vt52cuf1(); /* Cursor Right */
   }
+  /*
+   * Draw a column of "!" inside the left edge of the box.
+   */
   vt52cup(2, 11);
   for (i = 2; i <= max_lines - 1; i++) {
     tprintf("%s", "!");
     tprintf("%c", 8);   /* BS */
     vt52cud1(); /* Cursor Down  */
   }
+  /*
+   * Draw a column of "!" inside the right edge of the box.
+   */
   vt52cup(max_lines - 1, 69);
   for (i = max_lines - 1; i >= 2; i--) {
     tprintf("%s", "!");
     tprintf("%c", 8);   /* BS */
     vt52cuu1(); /* Cursor Up    */
   }
+  /*
+   * Erase the "*FooBar" on the right-side of the box, leaving just "*".
+   */
   for (i = 2; i <= max_lines - 1; i++) {
     vt52cup(i, 71);
     vt52el();   /* Erase to end of line */
@@ -219,7 +244,7 @@ tst_vt52(MENU_ARGS)
       vt_move(row, col = 10);
       printxx("Response to CUP(1,1)/DSR(6)");
       chrprint2(response, row, col);
-      if ((temp = skip_prefix(csi_input(), response)) != 0) {
+      if ((temp = skip_prefix(csi_input(), response)) != NULL) {
         if (!strcmp("1;1R", temp)) {
           printxx("S8C1T recognized --");
           show_result(SHOW_FAILURE);
@@ -229,7 +254,7 @@ tst_vt52(MENU_ARGS)
         }
       } else {
         input_8bits = FALSE;  /* we expect this anyway */
-        if ((temp = skip_prefix(csi_input(), response)) != 0
+        if ((temp = skip_prefix(csi_input(), response)) != NULL
             && !strcmp("1;1R", temp)) {
           show_result(SHOW_SUCCESS);
         } else {
