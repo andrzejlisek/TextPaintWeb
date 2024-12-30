@@ -83,7 +83,7 @@ void Core2Terminal::Init()
     ConnListName.Add("VTTEST");
     ConnListType.Add("VTTEST");
     ConnListAddr.Add("VTTEST");
-    ConnListCodec.Add(0);
+    ConnListCodec.Add("0");
 
     int ConnN = 1;
     while (CF.get()->ParamExists("Terminal" + std::to_string(ConnN) + "Name"))
@@ -91,7 +91,7 @@ void Core2Terminal::Init()
         std::string _ConnName = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Name");
         std::string _ConnType = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Type");
         std::string _ConnAddr = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Addr");
-        int _ConnCodec = CF.get()->ParamGetI("Terminal" + std::to_string(ConnN) + "Codec");
+        std::string _ConnCodec = CF.get()->ParamGetS("Terminal" + std::to_string(ConnN) + "Codec");
         if ((_ConnType.size() > 0) && (_ConnAddr.size() > 0) && (_ConnName.size() > 0))
         {
             ConnListName.Add(_ConnName);
@@ -105,7 +105,7 @@ void Core2Terminal::Init()
     ConnListName.Add("Other");
     ConnListType.Add("CUSTOM");
     ConnListAddr.Add("~");
-    ConnListCodec.Add(0);
+    ConnListCodec.Add("0");
 
     WorkStateC = WorkStateCDef::ConnListSelectBefore;
     EventKey("", 0, false, false, false);
@@ -215,6 +215,8 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             Screen_WriteLine();
             Screen_WriteText("2 - Telnet network");
             Screen_WriteLine();
+            Screen_WriteText("3 - Raw network");
+            Screen_WriteLine();
             Screen_Refresh();
             WorkStateC = WorkStateCDef::ConnListSelectCustom1Key;
             break;
@@ -228,6 +230,11 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
                     break;
                 case 2:
                     ConnSelectedType = "TELNET";
+                    WorkStateC = WorkStateCDef::ConnListSelectCustom2;
+                    EventKey("", 0, false, false, false);
+                    break;
+                case 3:
+                    ConnSelectedType = "RAW";
                     WorkStateC = WorkStateCDef::ConnListSelectCustom2;
                     EventKey("", 0, false, false, false);
                     break;
@@ -258,7 +265,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             if (OptionTextKeyWrite(KeyName, KeyChar))
             {
                 OptionTextDisplayRefresh();
-                ConnSelectedCodec = TextWork::StrToInt(OptionTextData, 65001);
+                ConnSelectedCodec = OptionTextData;
                 WorkStateC = WorkStateCDef::InfoScreenBefore;
                 EventKey("", 0, false, false, false);
             }
@@ -654,6 +661,36 @@ void Core2Terminal::EventOther(std::string EvtName, std::string EvtParam0, int E
     }
 }
 
+int Core2Terminal::CodecNumber(std::string CodecStr, bool Inp)
+{
+    int SepIdx = 0;
+    int SepCount = 0;
+    for (int i = 0; i < CodecStr.size(); i++)
+    {
+        if ((CodecStr[i] < '0') || (CodecStr[i] > '9'))
+        {
+            SepIdx = i;
+            SepCount++;
+        }
+    }
+    switch (SepCount)
+    {
+        case 0:
+            return TextWork::StrToInt(CodecStr, 65001);
+        case 1:
+            if (Inp)
+            {
+                return TextWork::StrToInt(CodecStr.substr(0, SepIdx), 65001);
+            }
+            else
+            {
+                return TextWork::StrToInt(CodecStr.substr(SepIdx + 1), 65001);
+            }
+        default:
+            return 65001;
+    }
+}
+
 void Core2Terminal::EventMouse(std::string Name, int X, int Y, int Btn)
 {
     if ((WorkStateC == WorkStateCDef::Session) || (WorkStateC == WorkStateCDef::Toolbox))
@@ -788,8 +825,8 @@ void Core2Terminal::ConnOpen()
     CoreAnsi_.get()->AnsiState_.DecParamSet(1015, 2);
     CoreAnsi_.get()->AnsiState_.DecParamSet(1016, 2);
 
-    TerminalCodecS = std::make_shared<TextCodec>(ConnSelectedCodec);
-    TerminalCodecR = std::make_shared<TextCodec>(ConnSelectedCodec);
+    TerminalCodecS = std::make_shared<TextCodec>(CodecNumber(ConnSelectedCodec, true));
+    TerminalCodecR = std::make_shared<TextCodec>(CodecNumber(ConnSelectedCodec, false));
 
     Conn.get()->Open(ConnSelectedType_ + ":" + TerminalName, ConnSelectedAddr, ScreenW, ScreenH);
     Conn.get()->AfterOpen();

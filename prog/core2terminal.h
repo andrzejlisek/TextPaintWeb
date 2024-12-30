@@ -22,15 +22,16 @@ public:
     void ConnOpen();
     void ConnClose(bool StopApp);
 private:
+    int CodecNumber(std::string CodecStr, bool Inp);
     XList<std::string> ConnListName;
     XList<std::string> ConnListType;
     XList<std::string> ConnListAddr;
-    XList<int> ConnListCodec;
+    XList<std::string> ConnListCodec;
     std::string ConnListKeys = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     std::string ConnSelectedType;
     std::string ConnSelectedAddr;
     int ConnResizeCounter = 0;
-    int ConnSelectedCodec;
+    std::string ConnSelectedCodec;
     std::unique_ptr<TextCodec> B64;
     int ServerPort = 0;
     bool ServerTelnet = false;

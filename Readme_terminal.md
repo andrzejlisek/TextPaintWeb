@@ -25,6 +25,23 @@ If rou run terminal, at the beginning you will see the predefined connections:
 
 You have to press the key pointing to desired connection\. The **0** key will run internal VTTEST and last key in the list will allow to input other connection parameters, which are not in the list\.
 
+# Codec number
+
+You can input the codec number in three different ways:
+
+
+* **One number** \- This codec will be used for both input and output\.
+  * **0** \- No codec, uses ASCII characters as are\.
+  * **437** \- IBM 437 codepage\.
+  * **65001** \- UTF\-8 codec\.
+* **Two numbers separated with any character** \- The numbers will be used for input and output respectively\.
+  * **437x65001** \- IBM 437 for input \(important with diacritic characters\) and UTF\-8 for output\.
+  * **1252,65001** \- Windows 1252 for input and UTF\-8 for output\.
+  * **65001\*850** \- UTF\-8 for input and IBM 850 for output\.
+* **Other input or incorrect number** \- UTF\-8 for both input and output\.
+
+You can input tho codec number separated by any character other than a digit, and the first number will be used as input codec, the second number will be used as output codec\. This allows to use different codec for input and different for output\.
+
 # Terminal session
 
 After selecting the connection, you will have to, choose and press key, which will be used as escape key\.
