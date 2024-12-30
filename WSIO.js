@@ -25,10 +25,17 @@ class WebSocketInputOutput
     {
         if (this.IsOpen)
         {
-            this.WS = new WebSocket(this.Addr);
-            this.WS.onopen = (event) => this.SrvOpen();
-            this.WS.onmessage = (message) => this.SrvMessage(message);
-            this.WS.onerror = (message) => this.SrvError(message);
+            try
+            {
+                this.WS = new WebSocket(this.Addr);
+                this.WS.onopen = (event) => this.SrvOpen();
+                this.WS.onmessage = (message) => this.SrvMessage(message);
+                this.WS.onerror = (message) => this.SrvError(message);
+            }
+            catch (error)
+            {
+                this.SrvError(error);
+            }
         }
     }
 
@@ -77,7 +84,7 @@ class WebSocketInputOutput
     {
         if (this.IsOpen)
         {
-            this.ResultFunc({Type:"WebSocket",Error:"Connection error"});
+            this.ResultFunc({Type:"WebSocket",Error:"Connection error",ErrorMessage:Msg});
             if (this.RetryTime > 0)
             {
                 setTimeout(() => { this.SrvInvoke(); }, this.RetryTime);

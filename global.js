@@ -208,6 +208,23 @@ function String_fromCharCode(T)
     }
 }
 
+function btoaASCII(s)
+{
+    let ss = "";
+    for (let i = 0; i < s.length; i++)
+    {
+        if ((s.charCodeAt(i) >= 32) && (s.charCodeAt(i) <= 126))
+        {
+            ss = ss + s[i];
+        }
+        else
+        {
+            ss = ss + "_";
+        }
+    }
+    return btoa(ss);
+}
+
 // Greatest common divisor
 function GCD(Num1, Num2)
 {

@@ -147,7 +147,7 @@ instr(void)
   return (result);
 }
 
-/* cf: vms_io.c */
+/* cf: vms_io.c */ int zleep_read_buffer(int t, char *result, int want);
 char *
 get_reply(void)
 {
@@ -158,10 +158,10 @@ get_reply(void)
   fakeio::_fflush(stdout);
   pause_replay();
 
-  zleep(100);
+  int get_reply_timeout = 3000;
   do {
-    new_len = read_buffer(result + old_len, (int) sizeof(result) - 2 - old_len);
-    old_len += new_len;
+    new_len = zleep_read_buffer(get_reply_timeout, result + old_len, (int) sizeof(result) - 2 - old_len);
+    old_len += new_len; get_reply_timeout = 0;
   } while (new_len != 0 && old_len < (BUF_SIZE - 2));
 
   if (LOG_ENABLED) {
@@ -289,4 +289,20 @@ zleep(int t)
     secs = 1;
   fakeio::_sleep(t);  /* UNIX can only sleep whole seconds */
 #endif
+}
+
+/*
+ * Wait for any data in buffer with timeout
+ */
+int
+zleep_read_buffer(int t, char *result, int want)
+{
+    int read_chars = 0;
+    while ((read_chars == 0) && (t > 0))
+    {
+        zleep(100);
+        t -= 100;
+        read_chars = read_buffer(result, want);
+    }
+    return read_chars;
 }

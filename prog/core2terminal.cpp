@@ -242,6 +242,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
         case WorkStateCDef::ConnListSelectCustom2Key:
             if (OptionTextKeyWrite(KeyName, KeyChar))
             {
+                ConnSelectedAddr = OptionTextData;
                 WorkStateC = WorkStateCDef::ConnListSelectCustom3;
                 EventKey("", 0, false, false, false);
             }
@@ -257,6 +258,7 @@ void Core2Terminal::EventKey(std::string KeyName, int KeyChar, bool ModShift, bo
             if (OptionTextKeyWrite(KeyName, KeyChar))
             {
                 OptionTextDisplayRefresh();
+                ConnSelectedCodec = TextWork::StrToInt(OptionTextData, 65001);
                 WorkStateC = WorkStateCDef::InfoScreenBefore;
                 EventKey("", 0, false, false, false);
             }
@@ -1075,13 +1077,13 @@ void Core2Terminal::TelnetReport(std::string ReportRequest)
         case _("[20t"):
             if (SendAnswer)
             {
-                SendHex("##_[_L" + TelnetReportStrToStr(WindowIcon) + "##_\\");
+                SendHex("##_]_L" + TelnetReportStrToStr(WindowIcon) + "##_\\");
             }
             break;
         case _("[21t"):
             if (SendAnswer)
             {
-                SendHex("##_[_l" + TelnetReportStrToStr(WindowTitle) + "##_\\");
+                SendHex("##_]_l" + TelnetReportStrToStr(WindowTitle) + "##_\\");
             }
             break;
         case _("[22;0t"):

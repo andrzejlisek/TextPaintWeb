@@ -323,9 +323,25 @@ int CoreAnsi::AnsiProcess(int ProcessCount)
             {
                 if (CharNoCommandStarting)
                 {
-                    if (AnsiState_.__AnsiDCS_)
+                    if (AnsiState_.__AnsiDCS_ || AnsiState_.__AnsiOSC_)
                     {
-                        AnsiState_.__AnsiDCS = AnsiState_.__AnsiDCS + Str::IntToStr(CharToPrint);
+                        if (AnsiState_.__AnsiDCS_)
+                        {
+                            AnsiState_.__AnsiDCS = AnsiState_.__AnsiDCS + Str::IntToStr(CharToPrint);
+                        }
+                        if (AnsiState_.__AnsiOSC_)
+                        {
+                            if (CharToPrint == 0x07)
+                            {
+                                AnsiState_.__AnsiCmd.Clear();
+                                AnsiState_.__AnsiCmd.Add('\\');
+                                AnsiProcess_Fixed(32);
+                            }
+                            else
+                            {
+                                AnsiState_.__AnsiOSC = AnsiState_.__AnsiOSC + Str::IntToStr(CharToPrint);
+                            }
+                        }
                     }
                     else
                     {

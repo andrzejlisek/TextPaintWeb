@@ -373,7 +373,9 @@ void AnsiState::Reset(int AnsiMaxX, int AnsiMaxY, int NormalB, int NormalF, int 
     __AnsiMusic = false;
     __AnsiNoWrap = false;
     __AnsiDCS = "";
+    __AnsiOSC = "";
     __AnsiDCS_ = false;
+    __AnsiOSC_ = false;
 
     for (int i = 32; i < 128; i++)
     {
@@ -1133,7 +1135,9 @@ void AnsiState::Copy(AnsiState &Src, AnsiState &Dst, bool UseScrollBuffer)
     Dst.__AnsiMusic = Src.__AnsiMusic;
     Dst.__AnsiNoWrap = Src.__AnsiNoWrap;
     Dst.__AnsiDCS = Src.__AnsiDCS;
+    Dst.__AnsiOSC = Src.__AnsiOSC;
     Dst.__AnsiDCS_ = Src.__AnsiDCS_;
+    Dst.__AnsiOSC_ = Src.__AnsiOSC_;
 
     Dst.StatusBar = Src.StatusBar;
     Dst.CursorHide = Src.CursorHide;

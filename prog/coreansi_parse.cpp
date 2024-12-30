@@ -576,36 +576,40 @@ void CoreAnsi::AnsiProcess_Fixed(int TextFileLine_i)
                 AnsiState_.__AnsiDCS = "";
                 AnsiState_.__AnsiDCS_ = false;
             }
-            AnsiState_.__AnsiCommand = false;
-            break;
-        case ']': // OSC
-            if (TextFileLine_i == 0x07)
+            if (AnsiState_.__AnsiOSC_)
             {
-                std::string AnsiCmd_ = AnsiState_.__AnsiCmd.ToString();
+                std::string AnsiCmd_ = AnsiState_.__AnsiOSC;
                 int Sep = AnsiCmd_.find(';');
                 if (Sep > 0)
                 {
                     std::string Opt = AnsiCmd_.substr(0, Sep);
-                    if (Opt == "]0")
+                    if (Opt == "0")
                     {
                         __AnsiResponse.Add("WindowIcon" + AnsiCmd_.substr(Sep + 1));
                         __AnsiResponse.Add("WindowTitle" + AnsiCmd_.substr(Sep + 1));
                     }
-                    if (Opt == "]1")
+                    if (Opt == "1")
                     {
                         __AnsiResponse.Add("WindowIcon" + AnsiCmd_.substr(Sep + 1));
                     }
-                    if (Opt == "]2")
+                    if (Opt == "2")
                     {
                         __AnsiResponse.Add("WindowTitle" + AnsiCmd_.substr(Sep + 1));
                     }
-                    if (Opt == "]50")
+                    if (Opt == "50")
                     {
                         __AnsiResponse.Add("WindowFont" + AnsiCmd_.substr(Sep + 1));
                     }
                 }
-                AnsiState_.__AnsiCommand = false;
+                AnsiState_.__AnsiOSC = "";
+                AnsiState_.__AnsiOSC_ = false;
             }
+            AnsiState_.__AnsiCommand = false;
+            break;
+        case ']': // OSC
+            AnsiState_.__AnsiOSC = "";
+            AnsiState_.__AnsiOSC_ = true;
+            AnsiState_.__AnsiCommand = false;
             break;
         case 'c': // RIS
             AnsiTerminalReset();

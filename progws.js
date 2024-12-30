@@ -7,6 +7,8 @@ function WebSocketResult(Params)
         case "WebSocket":
             if (Params.Error)
             {
+                console.log("WebSocket error: " + Params.ErrorMessage);
+                console.log(Params.ErrorMessage);
                 WebSocketObjectReady = true;
                 WebSocketObjectConnected = false;
             }
@@ -188,7 +190,7 @@ function WebSocketConnOpen(Param)
     }
     ).catch((ErrMsg) => {
         console.log("ConnOpen error: " + ErrMsg);
-        ProgEventOther("Received", btoa(ErrMsg), 1, 0, 0, 0);
+        ProgEventOther("Received", btoaASCII(ErrMsg), 1, 0, 0, 0);
     });
 
 }
@@ -201,7 +203,7 @@ function WebSocketConnClose()
     }
     ).catch((ErrMsg) => {
         console.log("ConnClose error: " + ErrMsg);
-        ProgEventOther("Received", btoa(ErrMsg), 1, 0, 0, 0);
+        ProgEventOther("Received", btoaASCII(ErrMsg), 1, 0, 0, 0);
     });
 }
 

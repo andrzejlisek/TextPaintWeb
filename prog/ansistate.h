@@ -63,7 +63,9 @@ public:
 
     XList<int> __AnsiTabs;
 
+    std::string __AnsiOSC = "";
     std::string __AnsiDCS = "";
+    bool __AnsiOSC_ = false;
     bool __AnsiDCS_ = false;
 
     bool __AnsiVT52 = false;
