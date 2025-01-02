@@ -46,6 +46,8 @@ function KeybEvent(Evt)
                 KeybMouseBtnNr = 1;
             }
             break;
+        case "_":
+            break;
         default:
             RegularKey = true;
             break;
@@ -81,7 +83,11 @@ function KeybEvent(Evt)
         StateCtrl = false;
         StateAlt = false;
     }
+}
 
+function KeybEventFocus()
+{
+    KeybSvgTxt.focus();
 }
 
 function KeybEventText(E)
@@ -103,6 +109,11 @@ function KeybEventText(E)
             KeybEvent([0, 0, 0, 0, EvtName, "", "", EvtChar]);
         }
     }
+    KeybSvgTxt.value = "";
+}
+
+function KeybEventClr(E)
+{
     KeybSvgTxt.value = "";
 }
 
@@ -212,9 +223,10 @@ KeybLayout[0].push([26, 11,  3,  2, "_Ctrl",        "Ctrl", ""]);
 
 // Right part
 KeybLayout[1].push([ 0,  0, 15, 13, "",             "", ""]);
-KeybLayout[1].push([ 9,  0,  4,  2, "",             "", ""]);
+KeybLayout[1].push([ 9,  0,  2,  2, "",             "", ""]);
 KeybLayout[1].push([ 7,  0,  2,  2, "_Mouse",       "Mouse", "", 8]);
-KeybLayout[1].push([13,  0,  2,  2, "Backspace",    "Back", "", 8]);
+KeybLayout[1].push([11,  0,  2,  2, "Backspace",    "Back", "", 8]);
+KeybLayout[1].push([13,  0,  2,  2, "_",            "", ""]);
 
 KeybLayout[1].push([ 0,  0,  2,  2, "_Shift",       "Shift", ""]);
 KeybLayout[1].push([ 2,  0,  2,  2, "_Ctrl",        "Ctrl", ""]);
@@ -596,6 +608,8 @@ KeybSvg.addEventListener("touchmove", KeybMouseMove_0);
 KeybSvg.addEventListener("touchend", KeybMouseUp_0);
 KeybSvg.addEventListener("touchcancel", KeybMouseReset);
 KeybSvgFld.addEventListener('input', KeybEventText);
+KeybSvgFld.addEventListener('focus', KeybEventClr);
+KeybSvgFld.addEventListener('blur', KeybEventClr);
 
 function KeybSetSize(W, H, H0)
 {
@@ -643,5 +657,6 @@ function KeybInit()
     KeybReady = true;
     
     ScreenDisplayResize();
+    KeybEventClr();
 }
 
