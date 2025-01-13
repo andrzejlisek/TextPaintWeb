@@ -233,16 +233,18 @@ KeybLayout[1].push([ 2,  0,  2,  2, "_Ctrl",        "Ctrl", ""]);
 KeybLayout[1].push([ 4,  0,  2,  2, "_Alt",         "Alt", ""]);
 
 KeybLayout[1].push([ 0,  3,  2,  2, "Insert",       "Insert", ""]);
-KeybLayout[1].push([ 0,  5,  2,  2, "Delete",       "Delete", ""]);
 KeybLayout[1].push([ 2,  3,  2,  2, "Home",         "Home", ""]);
-KeybLayout[1].push([ 2,  5,  2,  2, "End",          "End", ""]);
 KeybLayout[1].push([ 4,  3,  2,  2, "PageUp",       "Up", "Page"]);
+KeybLayout[1].push([ 0,  5,  2,  2, "Delete",       "Delete", ""]);
+KeybLayout[1].push([ 2,  5,  2,  2, "End",          "End", ""]);
 KeybLayout[1].push([ 4,  5,  2,  2, "PageDown",     "Down", "Page"]);
 
-KeybLayout[1].push([ 0, 11,  2,  2, "ArrowLeft",    String.fromCharCode(0x2190), ""]);
-KeybLayout[1].push([ 4, 11,  2,  2, "ArrowRight",   String.fromCharCode(0x2192), ""]);
+KeybLayout[1].push([ 0,  9,  2,  2, "Escape",       "Esc", "", 27]);
 KeybLayout[1].push([ 2,  9,  2,  2, "ArrowUp",      String.fromCharCode(0x2191), ""]);
+KeybLayout[1].push([ 4,  9,  2,  2, "Tab",          "Tab", "", 9]);
+KeybLayout[1].push([ 0, 11,  2,  2, "ArrowLeft",    String.fromCharCode(0x2190), ""]);
 KeybLayout[1].push([ 2, 11,  2,  2, "ArrowDown",    String.fromCharCode(0x2193), ""]);
+KeybLayout[1].push([ 4, 11,  2,  2, "ArrowRight",   String.fromCharCode(0x2192), ""]);
 
 KeybLayout[1].push([ 7,  3,  2,  2, "_Switch2",       "SWI", "KEYB"]);
 KeybLayout[1].push([ 9,  3,  2,  2, "NumpadDivide",   "/", "", 47]);
