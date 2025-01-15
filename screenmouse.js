@@ -252,9 +252,20 @@ function ScreenMouseScreenArea()
             Txt_.push(Txt.trimEnd());
         }
         Txt = Txt_.join("\n");
-        if (navigator.clipboard.writeText)
+        if (navigator.clipboard)
         {
-            navigator.clipboard.writeText(Txt).then((_) => {}).catch((_) => {});
+            if (navigator.clipboard.writeText)
+            {
+                navigator.clipboard.writeText(Txt).then((_) => {}).catch((_) => {});
+            }
+            else
+            {
+                console.log(Txt);
+            }
+        }
+        else
+        {
+            console.log(Txt);
         }
     }
 }
