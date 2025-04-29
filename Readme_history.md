@@ -2,6 +2,11 @@
 
 There is the history of important TextPaint commits\.
 
+## 2025\-04\-29
+
+
+* Alternative clipboard interface for use, where the native clipboard API does not working\.
+
 ## 2024\-12\-23
 
 

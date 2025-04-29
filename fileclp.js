@@ -1,15 +1,107 @@
+function FileClpExists()
+{
+    if (!navigator.clipboard) return false;
+    if (!navigator.clipboard.readText) return false;
+    if (!navigator.clipboard.writeText) return false;
+    return true;
+}
+
+
+function FileClpGuiRepaint()
+{
+    const FntSizeW = Math.floor((BrowserW() * 1.0) / 40.0);
+    const FntSizeH = Math.floor((BrowserH() * 1.0) / 30.0);
+    const FntSize = Math.min(FntSizeW, FntSizeH);
+
+    document.getElementById("clipbrd1").style["font-size"] = Math.floor(FntSize / 1) + "px";
+    document.getElementById("clipbrd2").style["font-size"] = Math.floor(FntSize / 1) + "px";
+
+    document.getElementById("clipbrdClos").style["font-size"] = FntSize + "px";
+    document.getElementById("clipbrdClea").style["font-size"] = FntSize + "px";
+    document.getElementById("clipbrdCopy").style["font-size"] = FntSize + "px";
+    document.getElementById("clipbrdSend").style["font-size"] = FntSize + "px";
+}
+
+function FileClpGuiVisible()
+{
+    if (document.getElementById("ClpBrdGui").style["display"] == "block")
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function FileClpGuiShow()
+{
+    document.getElementById("ClpBrdGui").style["display"] = "block";
+    FileClpGuiRepaint();
+}
+
+function FileClpGuiHide()
+{
+    document.getElementById("ClpBrdGui").style["display"] = "none";
+}
+
+function FileClpGuiGet()
+{
+    return document.getElementById("clipbrd2").value;
+}
+
+function FileClpGuiSet(Txt)
+{
+    document.getElementById("clipbrd1").value = Txt;
+}
+
+function FileClpGuiClea()
+{
+    document.getElementById("clipbrd2").value = "";
+}
+
+function FileClpGuiCopy()
+{
+    document.getElementById("clipbrd2").value = document.getElementById("clipbrd1").value;
+}
+
+function FileClpGuiSend()
+{
+    // Similar to KeybEventTextText from keyboard.js
+    const txt = FileClpGuiGet();
+    for (let I = 0; I < txt.length; I++)
+    {
+        let EvtName = "Character";
+        let EvtChar = txt.charCodeAt(I);
+        if (EvtChar == 13) EvtName = "Enter";
+        if ((EvtChar >= 48) && (EvtChar <= 57)) EvtName = "Digit" + String.fromCharCode(EvtChar);
+        if ((EvtChar >= 65) && (EvtChar <= 90)) EvtName = "Key" + String.fromCharCode(EvtChar);
+        if ((EvtChar >= 97) && (EvtChar <= 122)) EvtName = "Key" + String.fromCharCode(EvtChar - 32);
+        KeybEvent([0, 0, 0, 0, EvtName, "", "", EvtChar]);
+    }
+    FileClpGuiHide();
+}
+
 function FileClpCopy(Id)
 {
     let Kind = 0;
-    if (navigator.clipboard)
+    if (FileClpExists())
     {
-        if (navigator.clipboard.readText)
+        navigator.clipboard.readText().then(clipText => ProgEventOther("FileImport", clipText, Id, Kind, 0, 0)).catch(error => ProgEventOther("FileImport", "", Id, Kind, 0, 1));
+        return;
+    }
+    else
+    {
+        const txt = FileClpGuiGet();
+        if (txt.trim().length > 0)
         {
-            navigator.clipboard.readText().then(clipText => ProgEventOther("FileImport", clipText, Id, Kind, 0, 0)).catch(error => ProgEventOther("FileImport", "", Id, Kind, 0, 1));
-            return;
+            ProgEventOther("FileImport", txt, Id, Kind, 0, 0)
+        }
+        else
+        {
+            ProgEventOther("FileImport", "", Id, Kind, 0, 1);
         }
     }
-    ProgEventOther("FileImport", "", Id, Kind, 0, 1);
 }
 
 function FileClpPaste(Id, Data)
@@ -135,21 +227,16 @@ function FileClpPaste(Id, Data)
         }
     }
     ProgEventOther("FileExport", Data_, Id, Kind, 0, 0);
-    
-    if (navigator.clipboard)
+
+
+    if (FileClpExists())
     {
-        if (navigator.clipboard.writeText)
-        {
-            navigator.clipboard.writeText(Data_).then((_) => {}).catch((_) => {});
-        }
-        else
-        {
-            console.log(Data_);
-        }
+        navigator.clipboard.writeText(Data_).then((_) => {}).catch((_) => {});
     }
     else
     {
-        console.log(Data_);
+        FileClpGuiShow();
+        FileClpGuiSet(Data_);
     }
 }
 

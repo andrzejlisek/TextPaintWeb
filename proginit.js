@@ -16,6 +16,7 @@ function ProgInitAfterConf()
 {
     if (WebSocketObjectReady)
     {
+        FileClpGuiRepaint();
         ConfRepaint();
         _ProgInit("3");
     }
@@ -35,6 +36,7 @@ function WindowResize()
     ProgInitScreen();
     if (KeybReady)
     {
+        FileClpGuiRepaint();
         ConfRepaint();
         KeybInit();
     }
@@ -52,6 +54,11 @@ function KeyPress(e)
     }
 
     if (GuiSettingsShown)
+    {
+        return;
+    }
+
+    if (FileClpGuiVisible())
     {
         return;
     }

@@ -252,20 +252,14 @@ function ScreenMouseScreenArea()
             Txt_.push(Txt.trimEnd());
         }
         Txt = Txt_.join("\n");
-        if (navigator.clipboard)
+        if (FileClpExists())
         {
-            if (navigator.clipboard.writeText)
-            {
-                navigator.clipboard.writeText(Txt).then((_) => {}).catch((_) => {});
-            }
-            else
-            {
-                console.log(Txt);
-            }
+            navigator.clipboard.writeText(Txt).then((_) => {}).catch((_) => {});
         }
         else
         {
-            console.log(Txt);
+            FileClpGuiShow();
+            FileClpGuiSet(Txt);
         }
     }
 }

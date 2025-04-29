@@ -90,31 +90,92 @@ function KeybEventFocus()
     KeybSvgTxt.focus();
 }
 
-function KeybEventText(E)
-{
-    if (E.inputType == "insertLineBreak")
-    {
-            KeybEvent([0, 0, 0, 0, "Enter", "", "", 13]);
-    }
-    if (E.data)
-    {
-        let Str = "" + E.data + "";
-        for (let I = 0; I < Str.length; I++)
-        {
-            let EvtName = "Character";
-            let EvtChar = Str.charCodeAt(I);
-            if ((EvtChar >= 48) && (EvtChar <= 57)) EvtName = "Digit" + String.fromCharCode(EvtChar);
-            if ((EvtChar >= 65) && (EvtChar <= 90)) EvtName = "Key" + String.fromCharCode(EvtChar);
-            if ((EvtChar >= 97) && (EvtChar <= 122)) EvtName = "Key" + String.fromCharCode(EvtChar - 32);
-            KeybEvent([0, 0, 0, 0, EvtName, "", "", EvtChar]);
-        }
-    }
-    KeybSvgTxt.value = "";
-}
+
+let KeybEventStateVariant = 1;
+let KeybEventStateCursor = -1;
+let KeybEventStateBuf = "";
+
 
 function KeybEventClr(E)
 {
-    KeybSvgTxt.value = "";
+    KeybEventStateBuf = " ";
+    KeybSvgTxt.value = " ";
+    KeybSvgTxt.setSelectionRange(1, 1);
+    KeybEventStateCursor = 1;
+}
+
+function KeybEventTextText(txt, sel)
+{
+    let t = txt.length - (sel - KeybEventStateCursor);
+    if (KeybEventStateBuf.length > t)
+    {
+        while ((t > 0) && (txt.length > 0) && (KeybEventStateBuf[KeybEventStateBuf.length - t] == txt[0]))
+        {
+            txt = txt.slice(1);
+            t--;
+        }
+    }
+    while (t > 0)
+    {
+        KeybEventStateBuf = KeybEventStateBuf.slice(0, -1);
+        KeybEvent([0, 0, 0, 0, "Backspace", "", "", 8]);
+        t--;
+    }
+
+    for (let I = 0; I < txt.length; I++)
+    {
+        let EvtName = "Character";
+        let EvtChar = txt.charCodeAt(I);
+        if ((EvtChar >= 48) && (EvtChar <= 57)) EvtName = "Digit" + String.fromCharCode(EvtChar);
+        if ((EvtChar >= 65) && (EvtChar <= 90)) EvtName = "Key" + String.fromCharCode(EvtChar);
+        if ((EvtChar >= 97) && (EvtChar <= 122)) EvtName = "Key" + String.fromCharCode(EvtChar - 32);
+        KeybEvent([0, 0, 0, 0, EvtName, "", "", EvtChar]);
+    }
+
+    KeybEventStateBuf = KeybEventStateBuf + txt;
+    KeybEventStateCursor = sel;
+}
+
+function KeybEventTextEnter(sel)
+{
+    KeybEvent([0, 0, 0, 0, "Enter", "", "", 13]);
+    KeybEventStateBuf = KeybEventStateBuf + "\n";
+    KeybEventStateCursor = sel;
+}
+
+function KeybEventTextBackspace(sel)
+{
+    KeybEventStateBuf = KeybEventStateBuf.slice(0, -1);
+    KeybEvent([0, 0, 0, 0, "Backspace", "", "", 8]);
+    if (sel == 0)
+    {
+        setTimeout(KeybEventClr, 0);
+    }
+    else
+    {
+        KeybEventStateCursor = sel;
+    }
+}
+
+
+function KeybEventText(E)
+{
+    const sel = KeybSvgTxt.selectionEnd;
+    if (E.data)
+    {
+        KeybEventTextText("" + E.data + "", sel);
+    }
+    else
+    {
+        if (E.inputType == "deleteContentBackward")
+        {
+            KeybEventTextBackspace(sel);
+        }
+        if (E.inputType == "insertLineBreak")
+        {
+            KeybEventTextEnter(sel);
+        }
+    }
 }
 
 let KeybSvg = document.getElementById("KeybSvg");
